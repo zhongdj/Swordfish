@@ -10,5 +10,6 @@
   <modules>
   	<module>GlassfishRealm</module>
   	<module>Authorization</module>
+  	<module>Authentication</module>
   </modules>
 </project>

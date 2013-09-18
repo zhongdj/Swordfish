@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<auth-realm name="MadzRealm" classname="net.madz.appserv.security.MadzRealm">
+	<property name="jaas-context" value="MadzRealm" />
+	<!-- jdbc realm related properties -->
+	<property name="datasource" value="jdbc/crmp" />
+	<property name="user_table" value="CRMP_USER" />
+	<property name="username_col" value="USERNAME" />
+	<property name="encryptedPassword_col" value="PASSWORD" />
+	<property name="invalidPasswordAttempts_col" value="LOGINFAILEDTIMES" />
+	<property name="last_failed_time_col" value="LASTFAILEDTIME" />
+	<property name="locked_col" value="LOCKFLAG" />
+	<property name="last_pwd_change_time_col" value="LASTCHANGEPWDTIME" />
+	<property name="loginfailedtimes_col" value="LOGINFAILEDTIMES" />
+	<property name="oldPasswords_col" value="OLDPASSWORDS" />
+	<property name="last_pwd_change_time_col" value="LASTCHANGEPWDTIME" />
+	<property name="frozen_flag_col" value="FREEZENFLAG" />
+	<property name="need_reset_pwd_col" value="NEEDRESETPWD" />
+	<property name="login_date_col" value="LOGINDATE" />
+	<property name="last_login_date_col" value="LASTLOGINDATE" />
+	<property name="login_times_col" value="LOGINTIMES" />
+	<property name="access_denied_times_col" value="ACCESSDENIEDTIMES" />
+	<property name="user_company_fk" value="TENANT_ID" />
+	<property name="company_table" value="CRMP_TENANT" />
+	<property name="company_id_col" value="ID" />
+	<property name="company_name_col" value="NAME" />
+	<property name="company_lock_col" value="LOCKED" />
+	<property name="company_frozen_col" value="FREEZEN" />
+	<property name="group_table" value="CRMP_USER_GROUP" />
+	<property name="group_join_col" value="GROUP_NAME" />
+	<property name="user_join_col" value="USERNAME" />
+	<property name="user_group_join_table" value="CRMP_USER_USER_GROUP" />
+	<property name="group_name_col" value="NAME" />
+	<property name="encryptor" value="md5" />
+	<!--Madz Realm Audit Policy Properties -->
+	<property name="PasswordLifeAuditEnable" value="true" />
+	<property name="PasswordLifeLimit" value="30" />
+	<property name="OldPasswordTimes" value="3" />
+	<property name="PasswordMinLengthEnabled" value="true" />
+	<property name="PasswordMinLength" value="6" />
+	<property name="PasswordMaxLengthEnabled" value="true" />
+	<property name="PasswordMaxLength" value="16" />
+	<property name="SpecialCharactersMustEnabled" value="true" />
+	<property name="SpecialCharacters" value="~,`,!,@,#,$,%,^,&amp;,*,(,),-,_,+,=,|,{,[,},],:,;,&quot;,&apos;,&gt;,&lt;,?,/" />
+	<property name="DigitsMustEnabled" value="true" />
+	<property name="Digits" value="1,2,3,4,5,6,7,8,9,0" />
+	<property name="CommonCharactersMustEnabled" value="true" />
+	<property name="CommonCharacters"
+		value="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" />
+	<property name="UnlockEnabled" value="true" />
+	<property name="UnlockInterval" value="1" />
+	<property name="LockEnabled" value="true" />
+	<property name="PasswordAttemptLimit" value="3" />
+	<property name="AuditCompany" value="true" />
+</auth-realm>
