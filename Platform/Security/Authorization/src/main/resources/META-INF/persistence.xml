@@ -23,6 +23,8 @@
 			<property name="eclipselink.logging.level.sql" value="FINE" />
 			<property name="eclipselink.logging.parameters" value="true" />
 			<property name="eclipselink.deploy-on-startup" value="true" />
+			<property name="eclipselink.jpa.uppercase-column-names"
+				value="true" />
 		</properties>
 	</persistence-unit>
 </persistence>

@@ -31,21 +31,35 @@ import javax.persistence.Table;
 public class User extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Column(unique = true, updatable = false, length = 40)
+    @Column(unique = true, updatable = false, length = 40, nullable=false)
     private String username;
+    @Column(nullable=false)
     private String password;
+    @Column(nullable=false)
     private String email;
+    @Column(nullable=false)
     private String fullName;
+    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
+    @Column(columnDefinition="INT(32) NOT NULL DEFAULT 0")
     private int loginTimes;
+    @Column(columnDefinition="INT(4) NOT NULL DEFAULT 0")
     private int loginFailedTimes;
+    @Column(columnDefinition="INT(4) NOT NULL DEFAULT 0")
     private int accessDeniedTimes;
+    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
     private boolean freezenFlag;
+    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
     private boolean needResetPwd;
+    @Column(nullable = true)
     private Timestamp loginDate;
+    @Column(nullable = true)
     private Timestamp lastLoginDate;
+    @Column(nullable = true)
     private Timestamp lastFailedTime;
+    @Column(nullable = true)
     private Timestamp lastChangePwdTime;
+    @Column(nullable = true)
     private String oldPasswords;
     // @ManyToOne(fetch = FetchType.EAGER)
     // private Tenant tenant;

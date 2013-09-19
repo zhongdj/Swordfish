@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -21,6 +22,7 @@ import javax.persistence.Table;
 public class Role extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = -8677837722180931934L;
+    @Column(nullable = false)
     private String name;
     @ManyToMany(mappedBy = "roles")
     private final List<User> users = new LinkedList<>();

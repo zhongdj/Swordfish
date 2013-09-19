@@ -25,7 +25,7 @@ public class Group extends StandardObject implements Serializable {
     public static final String ADMINGROUP = "ADMINGroup";
     public static final String OPGROUP = "OPGroup";
     private static final long serialVersionUID = -7787991532112147877L;
-    @Column(unique = true, updatable = false, length = 40)
+    @Column(unique = true, updatable = false, length = 40, nullable = false)
     private String name;
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
     private List<User> users = new LinkedList<User>();

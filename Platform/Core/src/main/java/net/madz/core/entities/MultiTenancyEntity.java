@@ -16,6 +16,6 @@ import org.eclipse.persistence.annotations.TenantDiscriminatorColumn;
  */
 @MappedSuperclass
 @Multitenant(MultitenantType.SINGLE_TABLE)
-@TenantDiscriminatorColumn(name = "Tenant_ID", contextProperty = "tenant.id", discriminatorType = DiscriminatorType.INTEGER, primaryKey = true)
+@TenantDiscriminatorColumn(name = "TENANT_ID", contextProperty = "tenant.id", discriminatorType = DiscriminatorType.INTEGER, primaryKey = true)
 public abstract class MultiTenancyEntity extends AbstractBaseEntity {
 }
