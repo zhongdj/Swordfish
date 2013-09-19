@@ -17,18 +17,17 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
- *
+ * 
  * @author Barry Zhong
  */
 @Entity
 @Table(name = "muser")
-@NamedQueries({
-    @NamedQuery(name = "User.validate", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName AND a.password= :password"),
-    @NamedQuery(name = "User.checkExist", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName"),
-    @NamedQuery(name = "User.checkNotLocked", query = "SELECT COUNT(a) FROM User AS a WHERE a.lockFlag = false AND a.username=:accountName"),
-    @NamedQuery(name = "User.findByUsername", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
-    @NamedQuery(name = "User.findByAccountNameFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
-    @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id")})
+@NamedQueries({ @NamedQuery(name = "User.validate", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName AND a.password= :password"),
+        @NamedQuery(name = "User.checkExist", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName"),
+        @NamedQuery(name = "User.checkNotLocked", query = "SELECT COUNT(a) FROM User AS a WHERE a.lockFlag = false AND a.username=:accountName"),
+        @NamedQuery(name = "User.findByUsername", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
+        @NamedQuery(name = "User.findByAccountNameFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
+        @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
 public class User extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -48,15 +47,14 @@ public class User extends StandardObject implements Serializable {
     private Timestamp lastFailedTime;
     private Timestamp lastChangePwdTime;
     private String oldPasswords;
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    private Tenant tenant;
+    // @ManyToOne(fetch = FetchType.EAGER)
+    // private Tenant tenant;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_group", joinColumns =
-            @JoinColumn(name = "USERNAME", referencedColumnName = "USERNAME"), inverseJoinColumns =
-            @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME"))
+    @JoinTable(name = "user_group", joinColumns = @JoinColumn(name = "USERNAME", referencedColumnName = "USERNAME"), inverseJoinColumns = @JoinColumn(
+            name = "GROUP_NAME", referencedColumnName = "NAME"))
     private final List<Group> groups = new LinkedList<>();
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name="user_role")
+    @JoinTable(name = "user_role")
     private final List<Role> roles = new LinkedList<>();
 
     public User() {
@@ -67,7 +65,7 @@ public class User extends StandardObject implements Serializable {
         this.setPassword(password);
         this.setNeedResetPwd(true);
         this.setGroups(groups);
-//        this.setTenant(company);
+        // this.setTenant(company);
     }
 
     public int getAccessDeniedTimes() {
@@ -179,42 +177,41 @@ public class User extends StandardObject implements Serializable {
     }
 
     public void setGroups(List<Group> groups) {
-        if (this.groups != null && this.groups.size() > 0) {
-            for (Group userGroup : this.groups) {
+        if ( this.groups != null && this.groups.size() > 0 ) {
+            for ( Group userGroup : this.groups ) {
                 userGroup.removeUser(this);
             }
         }
         this.groups.clear();
         this.groups.addAll(groups);
-        for (Group userGroup : groups) {
+        for ( Group userGroup : groups ) {
             userGroup.addUser(this);
         }
     }
 
     public void removeAllUserGroup() {
-        if (getGroups() != null && getGroups().size() > 0) {
-            for (Group group : getGroups()) {
+        if ( getGroups() != null && getGroups().size() > 0 ) {
+            for ( Group group : getGroups() ) {
                 removeUserGroup(group);
             }
         }
     }
 
-//    public Tenant getTenant() {
-//        return tenant;
-//    }
-//
-//    public void setTenant(Tenant company) {
-//        this.tenant = company;
-//    }
-
+    // public Tenant getTenant() {
+    // return tenant;
+    // }
+    //
+    // public void setTenant(Tenant company) {
+    // this.tenant = company;
+    // }
     public void addUserGroup(Group group) {
-        if (!groups.contains(group)) {
+        if ( !groups.contains(group) ) {
             groups.add(group);
         }
     }
 
     public void removeUserGroup(Group group) {
-        if (groups.contains(group)) {
+        if ( groups.contains(group) ) {
             groups.remove(group);
         }
     }
@@ -229,8 +226,8 @@ public class User extends StandardObject implements Serializable {
     }
 
     public void addRole(Role role) {
-        if (null != role && role.getId() > 0) {
-            if (!roles.contains(role)) {
+        if ( null != role && role.getId() > 0 ) {
+            if ( !roles.contains(role) ) {
                 roles.add(role);
                 role.addUser(this);
             }
@@ -238,18 +235,18 @@ public class User extends StandardObject implements Serializable {
     }
 
     public void removeRole(Role role) {
-        if (role == null || role.getId() <= 0) {
+        if ( role == null || role.getId() <= 0 ) {
             return;
         }
-        if (roles.contains(role)) {
+        if ( roles.contains(role) ) {
             roles.remove(role);
             role.removeUser(this);
         }
     }
 
     public void removeAllRoles() {
-        if (getRoles() != null && getRoles().size() > 0) {
-            for (Role role : getRoles()) {
+        if ( getRoles() != null && getRoles().size() > 0 ) {
+            for ( Role role : getRoles() ) {
                 removeRole(role);
             }
         }
@@ -295,16 +292,16 @@ public class User extends StandardObject implements Serializable {
     @Override
     public String toString() {
         String groupStr = "";
-        if (groups != null) {
-            for (Group group : groups) {
+        if ( groups != null ) {
+            for ( Group group : groups ) {
                 groupStr += group.getName();
             }
         }
         StringBuilder s = new StringBuilder();
-        s.append("Account [ name=").append(username).append(", groups=").append(groupStr).append(", lockFlag=").append(lockFlag)
-                .append(", loginTimes=").append(loginTimes).append(", loginFailedTimes=").append(loginFailedTimes)
-                .append(", accessDeniedTimes=").append(accessDeniedTimes).append(", freezen=").append(freezenFlag).append(", loginDate =")
-                .append(loginDate).append(", lastChangePwdTime=").append(lastChangePwdTime).append("]");
+        s.append("Account [ name=").append(username).append(", groups=").append(groupStr).append(", lockFlag=").append(lockFlag).append(", loginTimes=")
+                .append(loginTimes).append(", loginFailedTimes=").append(loginFailedTimes).append(", accessDeniedTimes=").append(accessDeniedTimes)
+                .append(", freezen=").append(freezenFlag).append(", loginDate =").append(loginDate).append(", lastChangePwdTime=").append(lastChangePwdTime)
+                .append("]");
         return s.toString();
     }
 }

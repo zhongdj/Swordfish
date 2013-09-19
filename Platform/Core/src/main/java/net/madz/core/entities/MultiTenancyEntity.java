@@ -11,7 +11,7 @@ import org.eclipse.persistence.annotations.MultitenantType;
 import org.eclipse.persistence.annotations.TenantDiscriminatorColumn;
 
 /**
- *
+ * 
  * @author Barry
  */
 @MappedSuperclass

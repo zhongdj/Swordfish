@@ -10,37 +10,37 @@ package net.madz.security.login.interfaces;
  */
 public interface IAuditPolicy {
 
-	boolean isPasswordLifeAuditEnabled();
+    boolean isPasswordLifeAuditEnabled();
 
-	long getPasswordLifeLimit();
+    long getPasswordLifeLimit();
 
-	int getOldPasswordTimes();
+    int getOldPasswordTimes();
 
-	boolean isPasswordMinLengthEnabled();
+    boolean isPasswordMinLengthEnabled();
 
-	int getPasswordMinLength();
+    int getPasswordMinLength();
 
-	boolean isPasswordMaxLengthEnabled();
+    boolean isPasswordMaxLengthEnabled();
 
-	int getPasswordMaxLength();
+    int getPasswordMaxLength();
 
-	boolean isSpecialCharactersMustEnabled();
+    boolean isSpecialCharactersMustEnabled();
 
-	char[] getSpecialCharacters();
+    char[] getSpecialCharacters();
 
-	boolean isDigitsMustEnabled();
+    boolean isDigitsMustEnabled();
 
-	boolean isCommonCharactersMustEnabled();
+    boolean isCommonCharactersMustEnabled();
 
-	char[] getCommonCharacters();
+    char[] getCommonCharacters();
 
-	boolean isAutoUnlockEnabled();
+    boolean isAutoUnlockEnabled();
 
-	long getUnlockInterval();
+    long getUnlockInterval();
 
-	boolean isLockEnabled();
+    boolean isLockEnabled();
 
-	int getPasswordAttemptLimit();
+    int getPasswordAttemptLimit();
 
-	boolean isAuditCompanyEnabled();
+    boolean isAuditCompanyEnabled();
 }

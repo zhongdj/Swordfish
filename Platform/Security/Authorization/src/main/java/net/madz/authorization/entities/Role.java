@@ -13,7 +13,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 /**
- *
+ * 
  * @author CleaNEr
  */
 @Entity
@@ -54,37 +54,37 @@ public class Role extends StandardObject implements Serializable {
     }
 
     void addUserGroup(Group group) {
-        if (group == null || group.getName() == null || group.getName().trim().length() <= 0) {
+        if ( group == null || group.getName() == null || group.getName().trim().length() <= 0 ) {
             return;
         }
-        if (!groups.contains(group)) {
+        if ( !groups.contains(group) ) {
             groups.add(group);
         }
     }
 
     void removeUserGroup(Group group) {
-        if (group == null || group.getName() == null || group.getName().trim().length() <= 0) {
+        if ( group == null || group.getName() == null || group.getName().trim().length() <= 0 ) {
             return;
         }
-        if (groups.contains(group)) {
+        if ( groups.contains(group) ) {
             groups.remove(group);
         }
     }
 
     void addUser(User user) {
-        if (user == null || user.getUsername() == null || user.getUsername().trim().length() <= 0) {
+        if ( user == null || user.getUsername() == null || user.getUsername().trim().length() <= 0 ) {
             return;
         }
-        if (!users.contains(user)) {
+        if ( !users.contains(user) ) {
             users.add(user);
         }
     }
 
     void removeUser(User user) {
-        if (user == null || user.getUsername() == null || user.getUsername().trim().length() <= 0) {
+        if ( user == null || user.getUsername() == null || user.getUsername().trim().length() <= 0 ) {
             return;
         }
-        if (users.contains(user)) {
+        if ( users.contains(user) ) {
             users.remove(user);
         }
     }

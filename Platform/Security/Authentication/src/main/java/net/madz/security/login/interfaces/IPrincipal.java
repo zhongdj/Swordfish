@@ -12,35 +12,35 @@ import java.util.List;
  */
 public interface IPrincipal {
 
-	public String[] findGroup();
+    public String[] findGroup();
 
-	public boolean isFrozen();
+    public boolean isFrozen();
 
-	ICompany findCompany();
+    ICompany findCompany();
 
-	String getName();
+    String getName();
 
-	String getEncryptedPassword();
+    String getEncryptedPassword();
 
-	boolean isLocked();
+    boolean isLocked();
 
-	int getInvalidPasswordAttempts();
+    int getInvalidPasswordAttempts();
 
-	double getlockedDays();
+    double getlockedDays();
 
-	double getPasswordLife();
+    double getPasswordLife();
 
-	List<String> getOldPasswords();
+    List<String> getOldPasswords();
 
-	void lock();
+    void lock();
 
-	void unlock();
+    void unlock();
 
-	void resetPassword(String oldPassword, String newPassword, String confirmPassword);
+    void resetPassword(String oldPassword, String newPassword, String confirmPassword);
 
-	void handleLoginFailed();
+    void handleLoginFailed();
 
-	void handleLoginSuccess();
+    void handleLoginSuccess();
 
-	void save();
+    void save();
 }

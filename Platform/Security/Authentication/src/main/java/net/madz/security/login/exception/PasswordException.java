@@ -10,13 +10,13 @@ package net.madz.security.login.exception;
  */
 public class PasswordException extends Exception {
 
-	private static final long serialVersionUID = -5293332585507292084L;
+    private static final long serialVersionUID = -5293332585507292084L;
 
-	public PasswordException() {
-		super();
-	}
+    public PasswordException() {
+        super();
+    }
 
-	public PasswordException(String info) {
-		super(info);
-	}
+    public PasswordException(String info) {
+        super(info);
+    }
 }

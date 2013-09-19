@@ -13,23 +13,22 @@ import java.util.Properties;
  */
 public class RealmProperties {
 
-	private static volatile Properties prop = new Properties();
+    private static volatile Properties prop = new Properties();
 
-	public static void setConfigurations(Properties configuration) {
-		synchronized (prop) {
-			prop.clear();
-			prop.putAll(configuration);
-		}
-	}
+    public static void setConfigurations(Properties configuration) {
+        synchronized (prop) {
+            prop.clear();
+            prop.putAll(configuration);
+        }
+    }
 
-	public static Properties getProperties() throws IOException {
-		return (Properties) prop.clone();
-	}
+    public static Properties getProperties() throws IOException {
+        return (Properties) prop.clone();
+    }
 
-	private RealmProperties() {
-	}
+    private RealmProperties() {
+    }
 
-	public static void reload() {
-	}
-
+    public static void reload() {
+    }
 }

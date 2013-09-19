@@ -13,14 +13,13 @@ import javax.persistence.PersistenceUnit;
 @Remote
 public class AuthBean {
 
-	@PersistenceUnit
-	EntityManagerFactory emf;
-	
-	public void sayHello() {
-	
-		final Map<String, String> properties = new HashMap<>();
-		properties.put("tenant.id", "1");
-		final EntityManager em = emf.createEntityManager(properties);
-		em.close();
-	}
+    @PersistenceUnit
+    EntityManagerFactory emf;
+
+    public void sayHello() {
+        final Map<String, String> properties = new HashMap<>();
+        properties.put("tenant.id", "1");
+        final EntityManager em = emf.createEntityManager(properties);
+        em.close();
+    }
 }

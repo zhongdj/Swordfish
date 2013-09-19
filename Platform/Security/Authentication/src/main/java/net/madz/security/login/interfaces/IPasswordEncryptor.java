@@ -10,5 +10,5 @@ package net.madz.security.login.interfaces;
  */
 public interface IPasswordEncryptor {
 
-	String encrypt(String password);
+    String encrypt(String password);
 }

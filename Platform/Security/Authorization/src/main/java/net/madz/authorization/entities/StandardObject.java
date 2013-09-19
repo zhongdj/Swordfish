@@ -14,10 +14,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import net.madz.core.entities.MultiTenancyEntity;
 
 /**
- *
+ * 
  * @author a
  */
 @MappedSuperclass

@@ -10,9 +10,9 @@ package net.madz.security.login.factory;
  */
 public class BadRealmException extends RuntimeException {
 
-	private static final long serialVersionUID = -8166922095886126273L;
+    private static final long serialVersionUID = -8166922095886126273L;
 
-	public BadRealmException(String msg) {
-		super(msg);
-	}
+    public BadRealmException(String msg) {
+        super(msg);
+    }
 }

@@ -10,9 +10,9 @@ package net.madz.security.login.interfaces;
  */
 public interface ICompany {
 
-	String getName();
+    String getName();
 
-	boolean isLocked();
+    boolean isLocked();
 
-	boolean isFreezen();
+    boolean isFreezen();
 }

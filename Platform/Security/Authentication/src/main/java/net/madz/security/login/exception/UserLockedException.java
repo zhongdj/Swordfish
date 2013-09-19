@@ -10,13 +10,13 @@ package net.madz.security.login.exception;
  */
 public class UserLockedException extends Exception {
 
-	private static final long serialVersionUID = 6081247937817247458L;
+    private static final long serialVersionUID = 6081247937817247458L;
 
-	public UserLockedException() {
-		super();
-	}
+    public UserLockedException() {
+        super();
+    }
 
-	public UserLockedException(String msg) {
-		super(msg);
-	}
+    public UserLockedException(String msg) {
+        super(msg);
+    }
 }

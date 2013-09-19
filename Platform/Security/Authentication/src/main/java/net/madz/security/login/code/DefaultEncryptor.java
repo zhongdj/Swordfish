@@ -12,7 +12,7 @@ import net.madz.security.login.interfaces.IPasswordEncryptor;
  */
 public class DefaultEncryptor implements IPasswordEncryptor {
 
-	public String encrypt(String password) {
-		return password;
-	}
+    public String encrypt(String password) {
+        return password;
+    }
 }

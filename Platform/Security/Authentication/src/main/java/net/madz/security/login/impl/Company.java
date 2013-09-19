@@ -12,25 +12,25 @@ import net.madz.security.login.interfaces.ICompany;
  */
 public class Company implements ICompany {
 
-	private String name;
-	private boolean locked;
-	private boolean freezen;
+    private String name;
+    private boolean locked;
+    private boolean freezen;
 
-	public Company(String name, boolean locked, boolean freezen) {
-		this.name = name;
-		this.locked = locked;
-		this.freezen = freezen;
-	}
+    public Company(String name, boolean locked, boolean freezen) {
+        this.name = name;
+        this.locked = locked;
+        this.freezen = freezen;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public boolean isLocked() {
-		return locked;
-	}
+    public boolean isLocked() {
+        return locked;
+    }
 
-	public boolean isFreezen() {
-		return freezen;
-	}
+    public boolean isFreezen() {
+        return freezen;
+    }
 }

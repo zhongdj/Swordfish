@@ -10,5 +10,5 @@ package net.madz.security.login.exception;
  */
 public class UserNotExistException extends Exception {
 
-	private static final long serialVersionUID = 2279661492430201195L;
+    private static final long serialVersionUID = 2279661492430201195L;
 }
