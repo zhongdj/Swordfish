@@ -7,3 +7,22 @@
 *.prefs
 
 *.settings
+/GUI/Web/target/
+/Platform/Security/Authentication/target/
+/Platform/Security/GlassfishRealm/target/
+/Business/Modules/Billing/target/
+/Business/Modules/Customer/target/
+/Business/Modules/Production/target/
+/Business/Services/RawDataExtractTransform/target/
+/Platform/Core/target/
+/Business/Modules/Contract/target/
+/Business/Modules/Common/target/
+/Business/Modules/Payment/target/
+/Platform/Lifecyle/target/
+/Platform/Messaging/target/
+/Platform/Security/Authorization/target/
+/Platform/TOBinding/target/
+/Platform/Security/target/
+Platform/Security/Authorization/nb-configuration.xml
+
+.gitignore
