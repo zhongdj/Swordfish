@@ -9,7 +9,6 @@
 	<artifactId>Authentication</artifactId>
 	<name>Madz Authentication Module</name>
 
-
 	<build>
 		<plugins>
 			<plugin>
@@ -17,8 +16,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${jdk.source.version}</source>
+					<target>${jdk.target.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>

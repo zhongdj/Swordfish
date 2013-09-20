@@ -13,33 +13,24 @@
 
 	<name>Archive</name>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<glassfish.glassfishDirectory>/Users/Barry/Professional/Runtimes/glassfish4/glassfish</glassfish.glassfishDirectory>
-		<glassfish.user>admin</glassfish.user>
-		<glassfish.passwordFile>/Users/Barry/.asadminpass</glassfish.passwordFile>
-		<glassfish.domain.name>domain1</glassfish.domain.name>
-		<glassfish.domain.host>localhost</glassfish.domain.host>
-		<glassfish.domain.adminPort>4848</glassfish.domain.adminPort>
-	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Authorization</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Web</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>war</type>
 		</dependency>
 	</dependencies>
@@ -52,8 +43,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${jdk.source.version}</source>
+					<target>${jdk.target.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
