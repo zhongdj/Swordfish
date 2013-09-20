@@ -53,8 +53,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${jdk.source.version}</source>
+					<target>${jdk.target.version}</target>
 					<compilerArguments>
 						<endorseddirs>${endorsed.dir}</endorseddirs>
 					</compilerArguments>
@@ -68,36 +68,41 @@
 					<ejbVersion>3.2</ejbVersion>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<!-- <execution> <id>copy-dependencies</id> <phase>process-classes</phase> 
-						<goals> <goal>copy-dependencies</goal> </goals> <configuration> <includeGroupIds>net.madz</includeGroupIds> 
-						<includeArtifactIds>Core</includeArtifactIds> <outputDirectory>${project.build.outputDirectory}</outputDirectory> 
-						</configuration> </execution> -->
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${endorsed.dir}</outputDirectory>
-							<silent>true</silent>
-							<artifactItems>
-								<artifactItem>
-									<groupId>javax</groupId>
-									<artifactId>javaee-endorsed-api</artifactId>
-									<version>7.0</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.6</version>
+					<executions>
+						<!-- <execution> <id>copy-dependencies</id> <phase>process-classes</phase> 
+							<goals> <goal>copy-dependencies</goal> </goals> <configuration> <includeGroupIds>net.madz</includeGroupIds> 
+							<includeArtifactIds>Core</includeArtifactIds> <outputDirectory>${project.build.outputDirectory}</outputDirectory> 
+							</configuration> </execution> -->
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${endorsed.dir}</outputDirectory>
+								<silent>true</silent>
+								<artifactItems>
+									<artifactItem>
+										<groupId>javax</groupId>
+										<artifactId>javaee-endorsed-api</artifactId>
+										<version>7.0</version>
+										<type>jar</type>
+									</artifactItem>
+								</artifactItems>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<repositories>
 		<repository>
