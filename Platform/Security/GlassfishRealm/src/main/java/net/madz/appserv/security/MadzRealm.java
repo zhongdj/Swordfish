@@ -35,6 +35,12 @@ import com.sun.enterprise.security.auth.realm.NoSuchUserException;
 public class MadzRealm extends AppservRealm {
 
 	public static final String AUTH_TYPE = "Madz JDBC Realm";
+	private static final ThreadLocal<String> USERNAME = new ThreadLocal<>();
+	private static final ThreadLocal<ErrorCode> LOGIN_FAILURE = new ThreadLocal<>();
+
+	public static enum ErrorCode {
+		UsernameNotExist, PasswordInvalid, UserHasBeenLocked, UserHasBeenFrozen, TenantHasBeenLocked, TenantHasBeenFrozen
+	}
 
 	@Override
 	protected void init(Properties props) throws BadRealmException,
@@ -63,6 +69,9 @@ public class MadzRealm extends AppservRealm {
 
 	public String[] authenticate(String username, String password)
 			throws LoginException {
+
+		USERNAME.set(username);
+
 		if (_logger.isLoggable(Level.FINE)) {
 			_logger.fine("MadzRealm is authenticating " + username + "...");
 		}
@@ -74,12 +83,15 @@ public class MadzRealm extends AppservRealm {
 				auditPolicy);
 		try {
 			String[] groups = instance.authenticateUser(username, password);
-			
+
 			if (_logger.isLoggable(Level.FINE)) {
 				_logger.fine(username + " is authenticated Successfully");
 			}
 			return groups;
 		} catch (UserNotExistException ex) {
+
+			LOGIN_FAILURE.set(ErrorCode.UsernameNotExist);
+
 			if (_logger.isLoggable(Level.WARNING)) {
 				_logger.fine(username + " is authenticated Failed");
 			}
@@ -89,6 +101,8 @@ public class MadzRealm extends AppservRealm {
 			e.initCause(ex);
 			throw e;
 		} catch (UserLockedException ex) {
+			LOGIN_FAILURE.set(ErrorCode.UserHasBeenLocked);
+
 			if (_logger.isLoggable(Level.WARNING)) {
 				_logger.fine(username + " is authenticated Failed");
 			}
@@ -120,5 +134,18 @@ public class MadzRealm extends AppservRealm {
 		} catch (UserNotExistException ex) {
 			throw new NoSuchUserException(username + " does not exist");
 		}
+	}
+
+	public static String getUsername() {
+		return USERNAME.get();
+	}
+
+	public static ErrorCode getLoginFailure() {
+		return LOGIN_FAILURE.get();
+	}
+
+	public static void clearThreadLocals() {
+		USERNAME.remove();
+		LOGIN_FAILURE.remove();
 	}
 }

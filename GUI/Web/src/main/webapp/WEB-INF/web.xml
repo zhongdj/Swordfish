@@ -49,14 +49,14 @@
 
 
 	<welcome-file-list>
-		<welcome-file>/login.html</welcome-file>
+		<welcome-file>/faces/login.xhtml</welcome-file>
 	</welcome-file-list>
 	<login-config>
 		<auth-method>FORM</auth-method>
-		<realm-name>file</realm-name>
+		<realm-name>MadzRealm</realm-name>
 		<form-login-config>
-			<form-login-page>/login.html</form-login-page>
-			<form-error-page>/error.html</form-error-page>
+			<form-login-page>/faces/login.xhtml</form-login-page>
+			<form-error-page>/faces/loginError.xhtml</form-error-page>
 		</form-login-config>
 	</login-config>
 
