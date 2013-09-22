@@ -33,9 +33,32 @@
 		<!-- Alternative to the java.net repository -->
 		<!--repository> <id>glassfish</id> <name>Glassfish</name> <url>https://repository.jboss.org/nexus/content/repositories/glassfish</url> 
 			</repository -->
-
+		<repository>
+			<url>http://download.eclipse.org/rt/eclipselink/maven.repo/</url>
+			<id>eclipselink</id>
+			<layout>default</layout>
+			<name>Repository for library EclipseLink (JPA 2.1)</name>
+		</repository>
 	</repositories>
 	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.5.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+			<version>2.5.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
@@ -46,7 +69,13 @@
 			<groupId>net.madz</groupId>
 			<artifactId>GlassfishRealm</artifactId>
 			<version>${swordfish.release.version}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.security</groupId>
@@ -76,6 +105,16 @@
 				<version>2.3</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<packagingExcludes>
+						Authentication-*,
+						Common-*,
+						Core-*,
+						GlassfishRealm*,
+						commonj.sdo*,
+						eclipselink*,
+						pinyin4j*,
+						javax.persistence*
+					</packagingExcludes>
 				</configuration>
 			</plugin>
 		</plugins>

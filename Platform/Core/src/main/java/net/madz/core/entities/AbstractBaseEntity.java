@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
@@ -27,7 +28,7 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
 public abstract class AbstractBaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     protected long id;
 
     public long getId() {
@@ -59,9 +60,9 @@ public abstract class AbstractBaseEntity {
     @SuppressWarnings({ "rawtypes" })
     private ArrayList<Pair> findProcessorsAt(Class<? extends Annotation> timing) {
         final ArrayList<Pair> processors = new ArrayList<>();
-        for ( Class<?> c = getClass(); c.equals(Object.class); c = getClass().getSuperclass() ) {
+        for ( Class<?> c = getClass(); !c.equals(Object.class); c = c.getSuperclass() ) {
             for ( final Annotation annotationOnEntity : c.getAnnotations() ) {
-                final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity.getClass().getAnnotation(
+                final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity.annotationType().getAnnotation(
                         ExtendEntityAnnotationProcessor.class);
                 if ( null == extEntityProcessorAnnotation ) {
                     continue;

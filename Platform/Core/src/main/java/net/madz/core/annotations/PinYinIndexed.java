@@ -31,7 +31,7 @@ public @interface PinYinIndexed {
         @Override
         public void processAnnotation(Object entity, PinYinIndexed a) {
             final ArrayList<Field> fields = new ArrayList<>();
-            for ( Class<?> c = entity.getClass(); c.equals(Object.class); c = entity.getClass().getSuperclass() ) {
+            for ( Class<?> c = entity.getClass(); !c.equals(Object.class); c = c.getSuperclass() ) {
                 for ( Field field : c.getDeclaredFields() ) {
                     if ( null == field.getAnnotation(PinYinIndex.class) ) {
                         continue;
@@ -129,7 +129,7 @@ public @interface PinYinIndexed {
 
         @SuppressWarnings("rawtypes")
         public Method findFromClassHierarchy(Class from, String methodName, Class[] paramClasses) {
-            for ( Class<?> c = from; c.equals(Object.class); c.getSuperclass() ) {
+            for ( Class<?> c = from; !c.equals(Object.class); c = c.getSuperclass() ) {
                 try {
                     Method method = c.getDeclaredMethod(methodName, paramClasses);
                     if ( null != method ) {
@@ -144,7 +144,7 @@ public @interface PinYinIndexed {
 
         @SuppressWarnings("rawtypes")
         public Field findFromClassHierarchy(Class from, String fieldName) {
-            for ( Class<?> c = from; c.equals(Object.class); c.getSuperclass() ) {
+            for ( Class<?> c = from; !c.equals(Object.class); c = c.getSuperclass() ) {
                 try {
                     Field field = c.getDeclaredField(fieldName);
                     if ( null != field ) {
@@ -160,7 +160,7 @@ public @interface PinYinIndexed {
         @SuppressWarnings("rawtypes")
         public List<Field> findFieldsFromClassHierarchyAnnotatedWith(Class from, Class<? extends Annotation> annotation) {
             final ArrayList<Field> fields = new ArrayList<>();
-            for ( Class<?> c = from; c.equals(Object.class); c = from.getSuperclass() ) {
+            for ( Class<?> c = from; !c.equals(Object.class); c = c.getSuperclass() ) {
                 for ( Field field : c.getDeclaredFields() ) {
                     if ( null == field.getAnnotation(annotation) ) {
                         continue;
@@ -175,7 +175,7 @@ public @interface PinYinIndexed {
         @SuppressWarnings("rawtypes")
         public List<Method> findMethodFromClassHierarchyAnnotatedWith(Class from, Class<? extends Annotation> annotation) {
             final ArrayList<Method> methods = new ArrayList<>();
-            for ( Class<?> c = from; c.equals(Object.class); c = from.getSuperclass() ) {
+            for ( Class<?> c = from; !c.equals(Object.class); c = c.getSuperclass() ) {
                 for ( Method method : c.getDeclaredMethods() ) {
                     if ( null == method.getAnnotation(annotation) ) {
                         continue;

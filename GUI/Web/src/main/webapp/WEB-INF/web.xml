@@ -59,6 +59,5 @@
 			<form-error-page>/faces/loginError.xhtml</form-error-page>
 		</form-login-config>
 	</login-config>
-
-
+        
 </web-app>
