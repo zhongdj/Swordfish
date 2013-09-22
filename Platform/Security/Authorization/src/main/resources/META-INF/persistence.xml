@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.1"
-	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-	<persistence-unit name="CRMP-PU" transaction-type="JTA">
-		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-		<jta-data-source>jdbc/crmp</jta-data-source>
-		<class>net.madz.authorization.entities.Tenant</class>
-		<class>net.madz.authorization.entities.Group</class>
-		<class>net.madz.authorization.entities.Role</class>
-		<class>net.madz.authorization.entities.User</class>
-		<exclude-unlisted-classes>true</exclude-unlisted-classes>
-		<properties>
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://dbserver:3306/crmp?zeroDateTimeBehavior=convertToNull" />
-			<property name="javax.persistence.jdbc.password" value="1q2w3e4r5t" />
-			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-			<property name="javax.persistence.jdbc.user" value="root" />
-			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
-			<property name="eclipselink.target-database" value="MySQL" />
-			<property name="eclipselink.ddl-generation.output-mode"
-				value="both" />
-			<property name="eclipselink.logging.level.sql" value="FINE" />
-			<property name="eclipselink.logging.parameters" value="true" />
-			<property name="eclipselink.deploy-on-startup" value="true" />
-			<property name="eclipselink.jpa.uppercase-column-names"
-				value="true" />
-		</properties>
-	</persistence-unit>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence   http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="CRMP-PU" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/crmp</jta-data-source>
+    <class>net.madz.authorization.entities.Group</class>
+    <class>net.madz.authorization.entities.Role</class>
+    <class>net.madz.authorization.entities.Tenant</class>
+    <class>net.madz.authorization.entities.User</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://dbserver:3306/crmp?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.password" value="1q2w3e4r5t"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+      <property name="eclipselink.target-database" value="MySQL"/>
+      <property name="eclipselink.ddl-generation.output-mode" value="both"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <property name="eclipselink.deploy-on-startup" value="true"/>
+      <property name="eclipselink.jpa.uppercase-column-names" value="true"/>
+    </properties>
+  </persistence-unit>
 </persistence>

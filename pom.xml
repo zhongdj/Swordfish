@@ -15,19 +15,19 @@
 	<properties>
 		<swordfish.release.version>0.0.1-SNAPSHOT</swordfish.release.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<netbeans.hint.deploy.server>gfv4ee7</netbeans.hint.deploy.server>
+		<netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
 		<eclipselink.maven.repo.url>http://download.eclipse.org/rt/eclipselink/maven.repo</eclipselink.maven.repo.url>
 		<glassfish.maven.repo.url>http://download.java.net/maven/glassfish</glassfish.maven.repo.url>
 		<jdk.source.version>1.7</jdk.source.version>
 		<jdk.target.version>1.7</jdk.target.version>
-		
+
 		<!-- dependencies versions -->
 		<javax.persistence.version>2.1.0</javax.persistence.version>
 		<eclipselink.persistence.version>2.5.0-SNAPSHOT</eclipselink.persistence.version>
 		<javaee.api.version>7.0</javaee.api.version>
 		<ejb.version>3.2</ejb.version>
 		<glassfish.security.version>3.1.1</glassfish.security.version>
-		
+
 		<!-- Glasssfish Configuration -->
 		<glassfish.glassfishDirectory>${user.home}/Professional/Runtimes/glassfish4/glassfish</glassfish.glassfishDirectory>
 		<glassfish.user>admin</glassfish.user>

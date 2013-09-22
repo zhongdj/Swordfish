@@ -29,6 +29,24 @@
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
+			<artifactId>Common</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Contract</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>ejb</type>
+		</dependency>
+                <dependency>
+                    <groupId>net.madz</groupId>
+                    <artifactId>Scheduling</artifactId>
+                    <version>${swordfish.release.version}</version>
+                    <type>ejb</type>
+                </dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
 			<artifactId>Web</artifactId>
 			<version>${swordfish.release.version}</version>
 			<type>war</type>
@@ -62,6 +80,21 @@
 							<groupId>net.madz</groupId>
 							<artifactId>Authorization</artifactId>
 							<bundleFileName>authorization.jar</bundleFileName>
+						</ejbModule>
+						<ejbModule>
+							<groupId>net.madz</groupId>
+							<artifactId>Common</artifactId>
+							<bundleFileName>common.jar</bundleFileName>
+						</ejbModule>
+						<ejbModule>
+							<groupId>net.madz</groupId>
+							<artifactId>Contract</artifactId>
+							<bundleFileName>contract.jar</bundleFileName>
+						</ejbModule>
+                                                <ejbModule>
+							<groupId>net.madz</groupId>
+							<artifactId>Scheduling</artifactId>
+							<bundleFileName>scheduling.jar</bundleFileName>
 						</ejbModule>
 						<webModule>
 							<groupId>net.madz</groupId>
@@ -104,5 +137,7 @@
 		</plugins>
 		<finalName>crmp</finalName>
 	</build>
-
+	<properties>
+	 <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+	</properties>
 </project>

@@ -11,8 +11,6 @@
 		<repository>
 			<url>${eclipselink.maven.repo.url}</url>
 			<id>Eclipselink</id>
-			<layout>default</layout>
-			<name>Repository for library EclipseLink (JPA 2.1)</name>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -31,6 +29,11 @@
 			<artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
 			<version>${eclipselink.persistence.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.belerweb</groupId>
+			<artifactId>pinyin4j</artifactId>
+			<version>2.5.0</version>
 		</dependency>
 	</dependencies>
 	<packaging>jar</packaging>

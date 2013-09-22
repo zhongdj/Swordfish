@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
@@ -30,7 +31,11 @@ public class Group extends StandardObject implements Serializable {
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
     private List<User> users = new LinkedList<User>();
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "group_role")
+    @JoinTable(name = "group_role", joinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "GROUP_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") }, inverseJoinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "ROLE_ID", insertable = true, updatable = true, referencedColumnName = "ID") })
     private List<Role> roles = new LinkedList<Role>();
 
     public Group() {

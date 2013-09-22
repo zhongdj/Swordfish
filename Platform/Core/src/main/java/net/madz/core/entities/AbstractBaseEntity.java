@@ -4,9 +4,20 @@
  */
 package net.madz.core.entities;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+
+import net.madz.core.annotations.EntityAnnotationProcessor;
+import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
 
 /**
  * 
@@ -25,5 +36,70 @@ public abstract class AbstractBaseEntity {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @PrePersist
+    private void prePersistCallback() {
+        processEntityAnnotationsAt(PrePersist.class);
+    }
+
+    @PreUpdate
+    private void preUpdateCallback() {
+        processEntityAnnotationsAt(PreUpdate.class);
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    private void processEntityAnnotationsAt(Class<? extends Annotation> timing) {
+        final ArrayList<Pair> processors = findProcessorsAt(timing);
+        for ( Pair pair : processors ) {
+            pair.p.processAnnotation(this, pair.a);
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes" })
+    private ArrayList<Pair> findProcessorsAt(Class<? extends Annotation> timing) {
+        final ArrayList<Pair> processors = new ArrayList<>();
+        for ( Class<?> c = getClass(); c.equals(Object.class); c = getClass().getSuperclass() ) {
+            for ( final Annotation annotationOnEntity : c.getAnnotations() ) {
+                final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity.getClass().getAnnotation(
+                        ExtendEntityAnnotationProcessor.class);
+                if ( null == extEntityProcessorAnnotation ) {
+                    continue;
+                }
+                if ( contains(timing, extEntityProcessorAnnotation) ) {
+                    try {
+                        final EntityAnnotationProcessor processor = extEntityProcessorAnnotation.value().newInstance();
+                        processors.add(new Pair(annotationOnEntity, processor));
+                    } catch (Exception e) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE,
+                                "Failed to initialize processor instances of class : " + extEntityProcessorAnnotation.value().getName(), e);
+                    }
+                }
+            }
+        }
+        Collections.reverse(processors);
+        return processors;
+    }
+
+    private boolean contains(Class<?> timing, ExtendEntityAnnotationProcessor processorAnnotation) {
+        for ( Class<? extends Annotation> callback : processorAnnotation.callbackAt() ) {
+            if ( callback == timing ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private class Pair {
+
+        public final Annotation a;
+        @SuppressWarnings("rawtypes")
+        public final EntityAnnotationProcessor p;
+
+        @SuppressWarnings("rawtypes")
+        public Pair(Annotation a, EntityAnnotationProcessor p) {
+            this.a = a;
+            this.p = p;
+        }
     }
 }

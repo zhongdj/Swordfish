@@ -31,25 +31,25 @@ import javax.persistence.Table;
 public class User extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Column(unique = true, updatable = false, length = 40, nullable=false)
+    @Column(unique = true, updatable = false, length = 40, nullable = false)
     private String username;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String email;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String fullName;
-    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
-    @Column(columnDefinition="INT(32) NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "INT(32) NOT NULL DEFAULT 0")
     private int loginTimes;
-    @Column(columnDefinition="INT(4) NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "INT(4) NOT NULL DEFAULT 0")
     private int loginFailedTimes;
-    @Column(columnDefinition="INT(4) NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "INT(4) NOT NULL DEFAULT 0")
     private int accessDeniedTimes;
-    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean freezenFlag;
-    @Column(columnDefinition="BOOL NOT NULL DEFAULT 0")
+    @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean needResetPwd;
     @Column(nullable = true)
     private Timestamp loginDate;
@@ -64,11 +64,18 @@ public class User extends StandardObject implements Serializable {
     // @ManyToOne(fetch = FetchType.EAGER)
     // private Tenant tenant;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_group", joinColumns = @JoinColumn(name = "USERNAME", referencedColumnName = "USERNAME"), inverseJoinColumns = @JoinColumn(
-            name = "GROUP_NAME", referencedColumnName = "NAME"))
+    @JoinTable(name = "user_group", joinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "USER_NAME", referencedColumnName = "USERNAME") }, inverseJoinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })
     private final List<Group> groups = new LinkedList<>();
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role")
+    @JoinTable(name = "user_role", joinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID") }, inverseJoinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
     private final List<Role> roles = new LinkedList<>();
 
     public User() {
