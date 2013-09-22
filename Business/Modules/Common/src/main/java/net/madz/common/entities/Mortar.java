@@ -7,6 +7,10 @@ import javax.persistence.Entity;
 @DiscriminatorValue("M")
 public class Mortar extends Mixture {
 
+    public void setGrade(StrengthGrade grade) {
+        this.setGradeName(grade.getName());
+    }
+
     public static enum StrengthGrade implements IStrengthGrade {
         M2_5("M2.5", 2001),
         M5_0("M5.0", 2002),
@@ -36,4 +40,5 @@ public class Mortar extends Mixture {
     public StrengthGrade getGradeEnum() {
         return StrengthGrade.valueOf(getGradeName());
     }
+    
 }
