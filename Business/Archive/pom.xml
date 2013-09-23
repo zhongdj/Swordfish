@@ -39,15 +39,21 @@
 			<version>${swordfish.release.version}</version>
 			<type>ejb</type>
 		</dependency>
-                <dependency>
-                    <groupId>net.madz</groupId>
-                    <artifactId>Scheduling</artifactId>
-                    <version>${swordfish.release.version}</version>
-                    <type>ejb</type>
-                </dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Scheduling</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>ejb</type>
+		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Web</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>SchedulingRS</artifactId>
 			<version>${swordfish.release.version}</version>
 			<type>war</type>
 		</dependency>
@@ -91,7 +97,7 @@
 							<artifactId>Contract</artifactId>
 							<bundleFileName>contract.jar</bundleFileName>
 						</ejbModule>
-                                                <ejbModule>
+						<ejbModule>
 							<groupId>net.madz</groupId>
 							<artifactId>Scheduling</artifactId>
 							<bundleFileName>scheduling.jar</bundleFileName>
@@ -101,6 +107,12 @@
 							<artifactId>Web</artifactId>
 							<bundleFileName>swordfish.war</bundleFileName>
 							<contextRoot>swordfish</contextRoot>
+						</webModule>
+						<webModule>
+							<groupId>net.madz</groupId>
+							<artifactId>SchedulingRS</artifactId>
+							<bundleFileName>schedulingRS.war</bundleFileName>
+							<contextRoot>scheduling-api</contextRoot>
 						</webModule>
 					</modules>
 					<version>6</version>
@@ -138,6 +150,6 @@
 		<finalName>crmp</finalName>
 	</build>
 	<properties>
-	 <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+		<netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
 	</properties>
 </project>

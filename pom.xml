@@ -10,7 +10,6 @@
 	<modules>
 		<module>Business</module>
 		<module>Platform</module>
-		<module>GUI</module>
 	</modules>
 	<properties>
 		<swordfish.release.version>0.0.1-SNAPSHOT</swordfish.release.version>

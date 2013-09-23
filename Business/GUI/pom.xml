@@ -4,16 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>net.madz</groupId>
-		<artifactId>Swordfish</artifactId>
+		<artifactId>Business</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>Business</artifactId>
+	<artifactId>GUI</artifactId>
 	<packaging>pom</packaging>
 	<modules>
-		<module>Modules</module>
-		<module>Services</module>
-		<module>GUI</module>
-		<module>Archive</module>
-		<module>RESTfulWebServices</module>
+		<module>Web</module>
 	</modules>
 </project>
