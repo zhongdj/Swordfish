@@ -53,7 +53,19 @@
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
+			<artifactId>Web</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
 			<artifactId>SchedulingRS</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Web</artifactId>
 			<version>${swordfish.release.version}</version>
 			<type>war</type>
 		</dependency>
@@ -104,15 +116,15 @@
 						</ejbModule>
 						<webModule>
 							<groupId>net.madz</groupId>
-							<artifactId>Web</artifactId>
-							<bundleFileName>swordfish.war</bundleFileName>
-							<contextRoot>swordfish</contextRoot>
-						</webModule>
-						<webModule>
-							<groupId>net.madz</groupId>
 							<artifactId>SchedulingRS</artifactId>
 							<bundleFileName>schedulingRS.war</bundleFileName>
 							<contextRoot>scheduling-api</contextRoot>
+						</webModule>
+						<webModule>
+							<groupId>net.madz</groupId>
+							<artifactId>Web</artifactId>
+							<bundleFileName>swordfish.war</bundleFileName>
+							<contextRoot>swordfish</contextRoot>
 						</webModule>
 					</modules>
 					<version>6</version>

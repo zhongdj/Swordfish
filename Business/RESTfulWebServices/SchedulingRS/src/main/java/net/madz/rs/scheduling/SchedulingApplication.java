@@ -12,7 +12,7 @@ import javax.ws.rs.core.Application;
 import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 
 @Stateless
-@ApplicationPath("scheduling")
+@ApplicationPath("/")
 public class SchedulingApplication extends Application {
 
     @Override
