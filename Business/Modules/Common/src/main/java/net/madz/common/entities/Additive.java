@@ -36,6 +36,10 @@ public class Additive extends CodedEntity {
     public void setPinyinAbbrName(String pinyinAbbrName) {
         this.pinyinAbbrName = pinyinAbbrName;
     }
+    
+    public void setAdditiveEnum(AdditiveEnum additive) {
+        
+    }
 
     public static enum AdditiveEnum {
         WinterBuildingConstructionAboveNegtive10("------1"),

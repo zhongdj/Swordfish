@@ -12,6 +12,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 
 /**
  * 
@@ -23,10 +25,13 @@ public class Role extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = -8677837722180931934L;
     @Column(nullable = false)
+    @XmlID
     private String name;
     @ManyToMany(mappedBy = "roles")
+    @XmlIDREF
     private final List<User> users = new LinkedList<>();
     @ManyToMany(mappedBy = "roles")
+    @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
 
     public String getName() {

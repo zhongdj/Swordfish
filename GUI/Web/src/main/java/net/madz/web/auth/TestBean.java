@@ -3,8 +3,6 @@ package net.madz.web.auth;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 import net.madz.common.NewSessionBean;
 
 @Named

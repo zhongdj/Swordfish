@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import net.madz.authorization.entities.StandardObject;
 import net.madz.contract.spec.entities.PouringPartSpec;
 
+import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
+
 @Entity
 @Table(name = "unit_project")
 public class UnitProject extends StandardObject {
@@ -32,6 +34,7 @@ public class UnitProject extends StandardObject {
             @JoinColumn(name = "CONTRACT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
     private Contract contract;
     @OneToMany(mappedBy = "unitProject", fetch = FetchType.LAZY)
+    @XmlInverseReference(mappedBy="unitProject")
     private final List<PouringPartSpec> pouringPartSpecs = new ArrayList<>();
 
     public String getName() {

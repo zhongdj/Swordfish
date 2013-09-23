@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlIDREF;
 
 import net.madz.core.entities.MultiTenancyEntity;
 
@@ -27,6 +28,7 @@ public class StandardObject extends MultiTenancyEntity implements Serializable {
     private static final long serialVersionUID = -5489441885227863280L;
     @JoinColumn(name = "CREATED_BY", referencedColumnName = "ID", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @XmlIDREF
     protected User createdBy;
     @Column(name = "CREATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -35,6 +37,7 @@ public class StandardObject extends MultiTenancyEntity implements Serializable {
     protected Boolean deleted = false;
     @JoinColumn(name = "UPDATED_BY", referencedColumnName = "ID")
     @ManyToOne(fetch = FetchType.EAGER)
+    @XmlIDREF
     protected User updatedBy;
     @Column(name = "UPDATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)

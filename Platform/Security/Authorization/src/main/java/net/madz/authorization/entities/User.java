@@ -15,6 +15,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * 
@@ -32,6 +35,7 @@ public class User extends StandardObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Column(unique = true, updatable = false, length = 40, nullable = false)
+    @XmlID
     private String username;
     @Column(nullable = false)
     private String password;
@@ -69,6 +73,7 @@ public class User extends StandardObject implements Serializable {
             @JoinColumn(name = "USER_NAME", referencedColumnName = "USERNAME") }, inverseJoinColumns = {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })
+    @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = {
@@ -76,6 +81,7 @@ public class User extends StandardObject implements Serializable {
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID") }, inverseJoinColumns = {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
+    @XmlIDREF
     private final List<Role> roles = new LinkedList<>();
 
     public User() {
@@ -193,6 +199,7 @@ public class User extends StandardObject implements Serializable {
         this.oldPasswords = oldPasswords;
     }
 
+    @XmlTransient
     public List<Group> getGroups() {
         return groups;
     }
@@ -237,6 +244,7 @@ public class User extends StandardObject implements Serializable {
         }
     }
 
+    @XmlTransient
     public List<Role> getRoles() {
         return roles;
     }

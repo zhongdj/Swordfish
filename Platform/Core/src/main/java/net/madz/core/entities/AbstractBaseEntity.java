@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import net.madz.core.annotations.EntityAnnotationProcessor;
 import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
@@ -25,11 +27,13 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
  * @author Barry
  */
 @MappedSuperclass
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     protected long id;
+
 
     public long getId() {
         return id;

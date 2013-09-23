@@ -17,6 +17,8 @@ import javax.persistence.TemporalType;
 
 import net.madz.authorization.entities.StandardObject;
 
+import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
+
 @Entity
 @Table(name = "contract")
 public class Contract extends StandardObject {
@@ -34,6 +36,7 @@ public class Contract extends StandardObject {
     @Temporal(TemporalType.DATE)
     private Date endDate;
     @OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
+    @XmlInverseReference(mappedBy="contract")
     private final List<UnitProject> unitProjects = new ArrayList<>();
 
     public CustomerAccount getCustomer() {

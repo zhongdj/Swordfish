@@ -83,6 +83,22 @@
 			<version>${glassfish.security.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Scheduling</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-moxy</artifactId>
+			<version>2.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -105,16 +121,10 @@
 				<version>2.3</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<packagingExcludes>
-						Authentication-*,
-						Common-*,
-						Core-*,
-						GlassfishRealm*,
-						commonj.sdo*,
-						eclipselink*,
-						pinyin4j*,
-						javax.persistence*
-					</packagingExcludes>
+					<packagingIncludes>**/*.xhtml,**/*.properties,**/*.class,**/*.png,**/*.css,**/*.js,**/*.jsp</packagingIncludes>
+					<!-- 
+					<packagingExcludes>*.jar</packagingExcludes>
+					 -->
 				</configuration>
 			</plugin>
 		</plugins>
