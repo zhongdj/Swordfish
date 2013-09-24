@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+	version="2.4" package-name="net.madz.contract.spec.entities"
+	xml-mapping-metadata-complete="true">
+	<java-types>
+		<java-type name="net.madz.contract.spec.entities.PouringPartSpec" super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-type prop-order="id pouringPart unitProject mixture additives" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="pouringParSpectId/text()" />
+				<xml-element java-attribute="pouringPart" xml-path="." />
+				<xml-element java-attribute="unitProject" xml-path="." />
+				<xml-element java-attribute="mixture" xml-path="." />
+				<xml-element java-attribute="additives" xml-path="additives" />
+			</java-attributes>
+		</java-type>
+	</java-types>
+</xml-bindings>

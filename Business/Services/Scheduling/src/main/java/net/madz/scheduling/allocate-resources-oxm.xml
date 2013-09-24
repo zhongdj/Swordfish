@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+	version="2.4" package-name="net.madz.scheduling.entities"
+	xml-mapping-metadata-complete="true">
+	<java-types>
+		<!-- super-type="net.madz.authorization.entities.StandardObject" -->
+
+		<java-type name="net.madz.scheduling.entities.ResourceAllocatedTask"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-root-element />
+			<xml-type prop-order="id plannedVolume mixingPlant truck spec " />
+			<java-attributes>
+				<xml-element java-attribute="id"
+					xml-path="resourceAllocatedTaskId/text()" />
+				<xml-element java-attribute="plannedVolume" xml-path="plannedVolume/text()" />
+				<xml-element java-attribute="spec" xml-path="spec" />
+				<xml-element java-attribute="mixingPlant" xml-path="." />
+				<xml-element java-attribute="truck" xml-path="." />
+				<xml-transient java-attribute="summaryPlan" />
+				<xml-transient java-attribute="state" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.scheduling.entities.ConcreteTruck"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-root-element />
+			<xml-type prop-order="id licencePlateNumber ratedCapacity" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="truckId/text()" />
+				<xml-element java-attribute="licencePlateNumber"
+					xml-path="truckLicencePlatNumber/text()" />
+				<xml-element java-attribute="ratedCapacity" xml-path="truckRatedCapacity/text()" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.scheduling.entities.MixingPlant"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-root-element />
+			<xml-type prop-order="id name pinyinAbbrName" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="mixingPlantId/text()" />
+				<xml-element java-attribute="name" xml-path="mixingPlantName/text()" />
+				<xml-element java-attribute="pinyinAbbrName"
+					xml-path="mixingPlantPinyinAbbrName/text()" />
+			</java-attributes>
+		</java-type>
+	</java-types>
+</xml-bindings>

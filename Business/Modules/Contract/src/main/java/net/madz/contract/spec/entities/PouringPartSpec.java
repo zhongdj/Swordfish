@@ -25,25 +25,41 @@ import net.madz.contract.entities.UnitProject;
 public class PouringPartSpec extends StandardObject {
 
     private static final long serialVersionUID = 7944091197152689276L;
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "POURING_PART_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "POURING_PART_ID", nullable = false, insertable = true, updatable = true,
+                    referencedColumnName = "ID") })
     private PouringPart pouringPart;
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "UNIT_PROJECT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "UNIT_PROJECT_ID", nullable = false, insertable = true, updatable = true,
+                    referencedColumnName = "ID") })
     private UnitProject unitProject;
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "MIXTURE_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "MIXTURE_ID", nullable = false, insertable = true, updatable = true,
+                    referencedColumnName = "ID") })
     private Mixture mixture;
+
     @ManyToMany
     @JoinTable(name = "pouring_part_spec_additive", joinColumns = {
-            @JoinColumn(table = "pouring_part_spec", name = "TENANT_ID", updatable = true, insertable = true, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(table = "pouring_part_spec", name = "POURING_PART_SPEC_ID", updatable = true, insertable = true, referencedColumnName = "ID") },
-            inverseJoinColumns = {
-                    @JoinColumn(table = "additive", name = "TENANT_ID", updatable = false, insertable = false, referencedColumnName = "TENANT_ID"),
-                    @JoinColumn(table = "additive", name = "ADDITIVE_ID", updatable = true, insertable = true, referencedColumnName = "ID") })
+            @JoinColumn(table = "pouring_part_spec", name = "TENANT_ID", updatable = true, insertable = true,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(table = "pouring_part_spec", name = "POURING_PART_SPEC_ID", updatable = true,
+                    insertable = true, referencedColumnName = "ID") }, inverseJoinColumns = {
+            @JoinColumn(table = "additive", name = "TENANT_ID", updatable = false, insertable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(table = "additive", name = "ADDITIVE_ID", updatable = true, insertable = true,
+                    referencedColumnName = "ID") })
     private final List<Additive> additives = new ArrayList<>();
 
     public PouringPart getPouringPart() {
