@@ -1,5 +1,7 @@
 package net.madz.rs.scheduling;
 
+import net.madz.rs.scheduling.resources.SchedulingAdminService;
+import net.madz.rs.scheduling.resources.SchedulingOperationResources;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,7 +22,7 @@ public class SchedulingApplication extends Application {
         final Set<Class<?>> resources = new HashSet<>();
         resources.add(MOXyJsonProvider.class);
         resources.add(SchedulingAdminService.class);
-        resources.add(SchedulingOperationService.class);
+        resources.add(SchedulingOperationResources.class);
         return resources;
     }
 
