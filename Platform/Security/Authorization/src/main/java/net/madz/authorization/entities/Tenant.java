@@ -22,7 +22,7 @@ import net.madz.core.entities.AbstractBaseEntity;
  */
 @Entity
 @Table(name = "tenant")
-public class Tenant extends AbstractBaseEntity implements Serializable {
+public class Tenant extends AbstractBaseEntity {
 
     private static final long serialVersionUID = 476545537345379412L;
     public static final long DAY_MILLIS = 24L * 60 * 60 * 1000;

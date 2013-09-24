@@ -23,7 +23,7 @@ import net.madz.core.entities.MultiTenancyEntity;
  * @author a
  */
 @MappedSuperclass
-public class StandardObject extends MultiTenancyEntity implements Serializable {
+public class StandardObject extends MultiTenancyEntity{
 
     private static final long serialVersionUID = -5489441885227863280L;
     @JoinColumn(name = "CREATED_BY", referencedColumnName = "ID", nullable = false)

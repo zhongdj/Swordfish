@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlIDREF;
  */
 @Entity
 @Table(name = "mrole")
-public class Role extends StandardObject implements Serializable {
+public class Role extends StandardObject {
 
     private static final long serialVersionUID = -8677837722180931934L;
     @Column(nullable = false)

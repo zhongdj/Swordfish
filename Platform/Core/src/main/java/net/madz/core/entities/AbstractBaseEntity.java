@@ -4,6 +4,7 @@
  */
 package net.madz.core.entities;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +29,7 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
  */
 @MappedSuperclass
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class AbstractBaseEntity {
+public abstract class AbstractBaseEntity implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)

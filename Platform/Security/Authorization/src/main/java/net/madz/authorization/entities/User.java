@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
         @NamedQuery(name = "User.findByUsername", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
         @NamedQuery(name = "User.findByAccountNameFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
         @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
-public class User extends StandardObject implements Serializable {
+public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
     @Column(unique = true, updatable = false, length = 40, nullable = false)
