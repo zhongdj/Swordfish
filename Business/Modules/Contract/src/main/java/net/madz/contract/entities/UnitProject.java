@@ -13,7 +13,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import net.madz.authorization.entities.StandardObject;
+import net.madz.common.entities.Address;
 import net.madz.contract.spec.entities.PouringPartSpec;
+import net.madz.customer.entities.Contact;
 
 import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 

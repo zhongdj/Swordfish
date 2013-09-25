@@ -1,4 +1,4 @@
-package net.madz.contract.entities;
+package net.madz.common.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

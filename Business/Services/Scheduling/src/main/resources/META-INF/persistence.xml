@@ -15,9 +15,9 @@
 		<class>net.madz.common.entities.ConstructionCategory</class>
 		<class>net.madz.common.entities.Mortar</class>
 		<class>net.madz.common.entities.PouringPartTemplate</class>
-		<class>net.madz.contract.entities.Contact</class>
+		<class>net.madz.customer.entities.Contact</class>
 		<class>net.madz.contract.entities.Contract</class>
-		<class>net.madz.contract.entities.CustomerAccount</class>
+		<class>net.madz.customer.entities.CustomerAccount</class>
 		<class>net.madz.contract.entities.PouringPart</class>
 		<class>net.madz.contract.entities.UnitProject</class>
 		<class>net.madz.contract.spec.entities.PouringPartSpec</class>

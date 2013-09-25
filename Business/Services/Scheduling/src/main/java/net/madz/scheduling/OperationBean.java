@@ -22,8 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.madz.authorization.entities.User;
 import net.madz.common.entities.Additive;
+import net.madz.common.entities.Address;
 import net.madz.common.entities.Mortar;
-import net.madz.contract.entities.Address;
 import net.madz.contract.entities.PouringPart;
 import net.madz.contract.entities.UnitProject;
 import net.madz.contract.spec.entities.PouringPartSpec;
@@ -180,5 +180,9 @@ public class OperationBean {
         plant.setId(1L);
         plant.setName("1号搅拌站");
         return plant;
+    }
+
+    public List<PouringPartSpec> filterMyPartsInConstructing(String filter) {
+        return listMyPartsInConstructing();
     }
 }

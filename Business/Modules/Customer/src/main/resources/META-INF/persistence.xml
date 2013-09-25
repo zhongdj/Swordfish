@@ -5,22 +5,18 @@
 	<persistence-unit name="CRMP-PU" transaction-type="JTA">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<jta-data-source>jdbc/crmp</jta-data-source>
+		<class>net.madz.authorization.entities.Group</class>
+		<class>net.madz.authorization.entities.Role</class>
+		<class>net.madz.authorization.entities.Tenant</class>
+		<class>net.madz.authorization.entities.User</class>
 		<class>net.madz.common.entities.Additive</class>
 		<class>net.madz.common.entities.Concrete</class>
 		<class>net.madz.common.entities.ConstructionCategory</class>
 		<class>net.madz.common.entities.Mortar</class>
 		<class>net.madz.common.entities.PouringPartTemplate</class>
 		<class>net.madz.common.entities.Mixture</class>
-		<class>net.madz.authorization.entities.Group</class>
-		<class>net.madz.authorization.entities.Role</class>
-		<class>net.madz.authorization.entities.Tenant</class>
-		<class>net.madz.authorization.entities.User</class>
 		<class>net.madz.customer.entities.Contact</class>
 		<class>net.madz.customer.entities.CustomerAccount</class>
-		<class>net.madz.contract.entities.Contract</class>
-		<class>net.madz.contract.entities.PouringPart</class>
-		<class>net.madz.contract.entities.UnitProject</class>
-		<class>net.madz.contract.spec.entities.PouringPartSpec</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="javax.persistence.jdbc.url"

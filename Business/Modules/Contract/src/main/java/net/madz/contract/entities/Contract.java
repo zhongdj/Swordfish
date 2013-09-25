@@ -16,6 +16,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import net.madz.authorization.entities.StandardObject;
+import net.madz.customer.entities.CustomerAccount;
 
 import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
