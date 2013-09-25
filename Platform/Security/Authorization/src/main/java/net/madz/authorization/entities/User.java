@@ -235,12 +235,14 @@ public class User extends StandardObject {
     public void addUserGroup(Group group) {
         if ( !groups.contains(group) ) {
             groups.add(group);
+            group.addUser(this);
         }
     }
 
     public void removeUserGroup(Group group) {
         if ( groups.contains(group) ) {
             groups.remove(group);
+            group.removeUser(this);
         }
     }
 
