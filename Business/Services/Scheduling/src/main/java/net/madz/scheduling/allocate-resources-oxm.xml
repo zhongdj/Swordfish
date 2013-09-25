@@ -11,14 +11,15 @@
 			super-type="net.madz.core.entities.AbstractBaseEntity"
 			xml-accessor-type="FIELD">
 			<xml-root-element />
-			<xml-type prop-order="id plannedVolume mixingPlant truck spec " />
+			<xml-type prop-order="id plannedVolume mixingPlantResource truckResource spec " />
 			<java-attributes>
 				<xml-element java-attribute="id"
 					xml-path="resourceAllocatedTaskId/text()" />
 				<xml-element java-attribute="plannedVolume" xml-path="plannedVolume/text()" />
 				<xml-element java-attribute="spec" xml-path="spec" />
-				<xml-element java-attribute="mixingPlant" xml-path="." />
-				<xml-element java-attribute="truck" xml-path="." />
+				<xml-element java-attribute="mixingPlantResource"
+					xml-path="mixingPlantResource" />
+				<xml-element java-attribute="truckResource" xml-path="truckResource" />
 				<xml-transient java-attribute="summaryPlan" />
 				<xml-transient java-attribute="state" />
 			</java-attributes>
@@ -45,6 +46,36 @@
 				<xml-element java-attribute="name" xml-path="mixingPlantName/text()" />
 				<xml-element java-attribute="pinyinAbbrName"
 					xml-path="mixingPlantPinyinAbbrName/text()" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.scheduling.entities.MixingPlantResource"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-root-element />
+			<xml-type prop-order="id plannedVolume finishedVolume mixingPlant liveTasks" />
+			<java-attributes>
+				<xml-element java-attribute="id"
+					xml-path="mixingPlantResourceId/text()" />
+				<xml-element java-attribute="plannedVolume"
+					xml-path="mixingPlantResourcePlannedVolume/text()" />
+				<xml-element java-attribute="finishedVolume"
+					xml-path="mixingPlantResourceFinishedVolume/text()" />
+				<xml-element java-attribute="mixingPlant" xml-path="." />
+				<xml-transient java-attribute="liveTasks" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.scheduling.entities.ConcreteTruckResource"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="FIELD">
+			<xml-root-element />
+			<xml-type prop-order="id state concreteTruck" />
+			<java-attributes>
+				<xml-element java-attribute="id"
+					xml-path="concreteTruckResourceId/text()" />
+				<xml-element java-attribute="state"
+					xml-path="concreteTruckResourceState/text()" />
+				<xml-element java-attribute="concreteTruck" xml-path="." />
+
 			</java-attributes>
 		</java-type>
 	</java-types>

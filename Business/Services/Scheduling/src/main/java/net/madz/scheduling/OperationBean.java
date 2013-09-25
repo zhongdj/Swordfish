@@ -28,7 +28,9 @@ import net.madz.contract.entities.PouringPart;
 import net.madz.contract.entities.UnitProject;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.scheduling.entities.ConcreteTruck;
+import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
+import net.madz.scheduling.entities.MixingPlantResource;
 import net.madz.scheduling.entities.PlannedSummaryTask;
 import net.madz.scheduling.entities.ResourceAllocatedTask;
 
@@ -140,15 +142,15 @@ public class OperationBean {
         ResourceAllocatedTask resourceAllocatedTask = new ResourceAllocatedTask();
         resourceAllocatedTask.setSpec(createSpec());
         resourceAllocatedTask.setCreatedBy(createUser());
-        resourceAllocatedTask.setMxingPlant(createMixingPlant());
+        resourceAllocatedTask.setMixingPlantResource(createMixingPlant());
         resourceAllocatedTask.setState("Created");
         resourceAllocatedTask.setCreatedOn(createDate());
         resourceAllocatedTask.setSummaryPlan(createSummaryPlan());
-        resourceAllocatedTask.setTruck(createConcreteTruck());
+        resourceAllocatedTask.setTruckResource(createConcreteTruck());
         return resourceAllocatedTask;
     }
 
-    private ConcreteTruck createConcreteTruck() {
+    private ConcreteTruckResource createConcreteTruck() {
         ConcreteTruck truck = new ConcreteTruck();
         truck.setCreatedBy(createUser());
         truck.setCreatedOn(createDate());
@@ -156,7 +158,10 @@ public class OperationBean {
         truck.setRatedCapacity(18D);
         truck.setUpdatedBy(createUser());
         truck.setUpdatedOn(createDate());
-        return truck;
+        ConcreteTruckResource resource = new ConcreteTruckResource();
+        resource.setConcreteTruck(truck);
+        resource.setState("Available");
+        return resource;
     }
 
     private PlannedSummaryTask createSummaryPlan() {
@@ -175,11 +180,13 @@ public class OperationBean {
         return new Date();
     }
 
-    private MixingPlant createMixingPlant() {
+    private MixingPlantResource createMixingPlant() {
         MixingPlant plant = new MixingPlant();
         plant.setId(1L);
         plant.setName("1号搅拌站");
-        return plant;
+        MixingPlantResource r = new MixingPlantResource();
+        r.setMixingPlant(plant);
+        return r;
     }
 
     public List<PouringPartSpec> filterMyPartsInConstructing(String filter) {

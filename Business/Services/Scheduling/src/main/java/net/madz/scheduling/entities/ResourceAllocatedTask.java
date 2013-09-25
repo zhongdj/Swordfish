@@ -39,9 +39,9 @@ public class ResourceAllocatedTask extends StandardObject {
     @JoinColumns({
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "MIXING_PLANT_ID", nullable = false, insertable = true, updatable = true,
+            @JoinColumn(name = "MIXING_PLANT_RESOURCE_ID", nullable = false, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
-    private MixingPlant mixingPlant;
+    private MixingPlantResource mixingPlantResource;
 
     @ManyToOne
     @JoinColumns({
@@ -49,7 +49,7 @@ public class ResourceAllocatedTask extends StandardObject {
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
-    private ConcreteTruck truck;
+    private ConcreteTruckResource truckResource;
 
     @Column(name = "planned_volume", nullable = false, updatable = true)
     private double plannedVolume;
@@ -76,20 +76,12 @@ public class ResourceAllocatedTask extends StandardObject {
         this.summaryPlan.addResourceAllocatedTask(this);
     }
 
-    public MixingPlant getMxingPlant() {
-        return mixingPlant;
+    public ConcreteTruckResource getTruckResource() {
+        return truckResource;
     }
 
-    public void setMxingPlant(MixingPlant mxingPlant) {
-        this.mixingPlant = mxingPlant;
-    }
-
-    public ConcreteTruck getTruck() {
-        return truck;
-    }
-
-    public void setTruck(ConcreteTruck truck) {
-        this.truck = truck;
+    public void setTruckResource(ConcreteTruckResource truck) {
+        this.truckResource = truck;
     }
 
     public String getState() {
@@ -100,12 +92,12 @@ public class ResourceAllocatedTask extends StandardObject {
         this.state = state;
     }
 
-    public MixingPlant getMixingPlant() {
-        return mixingPlant;
+    public MixingPlantResource getMixingPlant() {
+        return mixingPlantResource;
     }
 
-    public void setMixingPlant(MixingPlant mixingPlant) {
-        this.mixingPlant = mixingPlant;
+    public void setMixingPlantResource(MixingPlantResource mixingPlant) {
+        this.mixingPlantResource = mixingPlant;
     }
 
     public double getPlannedVolume() {
