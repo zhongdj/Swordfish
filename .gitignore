@@ -3,3 +3,13 @@
 *.prefs
 *.settings
 .gitignore
+/Business/Services/Scheduling/target/
+/Platform/Security/Authorization/target/
+/Business/Modules/Contract/target/
+/Business/Modules/Common/target/
+/Platform/Core/target/
+/Business/Modules/Customer/target/
+/Platform/Security/Authentication/target/
+/Platform/Security/GlassfishRealm/target/
+/Business/GUI/Web/target/
+/Business/RESTfulWebServices/SchedulingRS/target/
