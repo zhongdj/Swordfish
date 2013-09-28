@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import net.madz.authorization.entities.StandardObject;
 
 @Entity
-@Table(name = "concrete_truck_resource")
+@Table(name="concrete_truck_resource")
 public class ConcreteTruckResource extends StandardObject {
 
     private static final long serialVersionUID = 1366415739718240376L;
@@ -33,7 +33,7 @@ public class ConcreteTruckResource extends StandardObject {
         return state;
     }
 
-    public void setState(String state) {
+    private void setState(String state) {
         this.state = state;
     }
 }

@@ -14,7 +14,7 @@ import net.madz.contract.spec.entities.PouringPartSpec;
 
 @Entity
 @Table(name = "planned_summary_task")
-public class PlannedSummaryTask extends StandardObject {
+public class ServiceSummaryPlan extends StandardObject {
 
     private static final long serialVersionUID = -2519583821494066599L;
 
@@ -23,7 +23,7 @@ public class PlannedSummaryTask extends StandardObject {
     private PouringPartSpec spec;
 
     @OneToMany
-    private List<ResourceAllocatedTask> resourceAllocatedTasks = new ArrayList<>();
+    private List<ServiceOrder> resourceAllocatedTasks = new ArrayList<>();
 
     @Column(name = "PLANNED_VOLUME")
     private double plannedVolume;
@@ -39,11 +39,11 @@ public class PlannedSummaryTask extends StandardObject {
         this.spec = spec;
     }
 
-    public List<ResourceAllocatedTask> getResourceAllocatedTasks() {
+    public List<ServiceOrder> getResourceAllocatedTasks() {
         return resourceAllocatedTasks;
     }
 
-    public void setResourceAllocatedTasks(List<ResourceAllocatedTask> resourceAllocatedTasks) {
+    public void setResourceAllocatedTasks(List<ServiceOrder> resourceAllocatedTasks) {
         this.resourceAllocatedTasks = resourceAllocatedTasks;
     }
 
@@ -63,12 +63,12 @@ public class PlannedSummaryTask extends StandardObject {
         this.finished = finished;
     }
 
-    public void addResourceAllocatedTask(ResourceAllocatedTask resourceAllocatedTask) {
+    public void addResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
         if ( this.resourceAllocatedTasks.contains(resourceAllocatedTask) ) return;
         this.resourceAllocatedTasks.add(resourceAllocatedTask);
     }
 
-    public void removeResourceAllocatedTask(ResourceAllocatedTask resourceAllocatedTask) {
+    public void removeResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
         this.resourceAllocatedTasks.remove(resourceAllocatedTask);
     }
 }

@@ -37,7 +37,7 @@ public class MixingPlantResource extends StandardObject {
     private double plannedVolume;
 
     @OneToMany(mappedBy = "mixingPlantResource")
-    private final List<ResourceAllocatedTask> liveTasks = new ArrayList<>();
+    private final List<ServiceOrder> liveTasks = new ArrayList<>();
 
     public MixingPlant getMixingPlant() {
         return mixingPlant;
@@ -47,11 +47,11 @@ public class MixingPlantResource extends StandardObject {
         this.mixingPlant = mixingPlant;
     }
 
-    public List<ResourceAllocatedTask> getLiveTasks() {
+    public List<ServiceOrder> getLiveTasks() {
         return liveTasks;
     }
 
-    public void setLiveTasks(List<ResourceAllocatedTask> liveTasks) {
+    public void setLiveTasks(List<ServiceOrder> liveTasks) {
         this.liveTasks.clear();
         this.liveTasks.addAll(liveTasks);
     }

@@ -64,7 +64,7 @@
 				<xml-transient java-attribute="liveTasks" />
 			</java-attributes>
 		</java-type>
-		<java-type name="net.madz.scheduling.entities.ConcreteTruckResource"
+		<java-type name="net.madz.scheduling.entities.ConcreteTruckResourceBase"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
 			xml-accessor-type="FIELD">
 			<xml-root-element />

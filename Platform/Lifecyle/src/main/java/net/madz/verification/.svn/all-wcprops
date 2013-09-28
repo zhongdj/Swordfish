@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/zuoraplatform/!svn/ver/358/trunk/platform-core/src/main/java/zuora/platform/meta/verification
+END
+VerificationException.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/zuoraplatform/!svn/ver/339/trunk/platform-core/src/main/java/zuora/platform/meta/verification/VerificationException.java
+END
+ServerErrorRuntimeException.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/zuoraplatform/!svn/ver/358/trunk/platform-core/src/main/java/zuora/platform/meta/verification/ServerErrorRuntimeException.java
+END
+VerificationRuntimeException.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/zuoraplatform/!svn/ver/339/trunk/platform-core/src/main/java/zuora/platform/meta/verification/VerificationRuntimeException.java
+END
+VerificationFailureSet.java
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/zuoraplatform/!svn/ver/302/trunk/platform-core/src/main/java/zuora/platform/meta/verification/VerificationFailureSet.java
+END
+Verifiable.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/zuoraplatform/!svn/ver/235/trunk/platform-core/src/main/java/zuora/platform/meta/verification/Verifiable.java
+END
+VerificationFailure.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/zuoraplatform/!svn/ver/302/trunk/platform-core/src/main/java/zuora/platform/meta/verification/VerificationFailure.java
+END

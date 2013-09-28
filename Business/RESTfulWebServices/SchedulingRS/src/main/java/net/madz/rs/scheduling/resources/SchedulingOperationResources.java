@@ -14,8 +14,8 @@ import javax.ws.rs.Produces;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
-import net.madz.scheduling.entities.PlannedSummaryTask;
-import net.madz.scheduling.entities.ResourceAllocatedTask;
+import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.entities.ServiceOrder;
 
 @Stateless
 @Path("operation")
@@ -83,7 +83,7 @@ public class SchedulingOperationResources {
     @GET
     @Path("planned-summary-task/by-state/not-finished")
     @Produces({ "application/xml", "application/json" })
-    public List<PlannedSummaryTask> listNotFinishedPlannedSummaryTasks() {
+    public List<ServiceSummaryPlan> listNotFinishedPlannedSummaryTasks() {
         return null;
     }
 
@@ -109,7 +109,7 @@ public class SchedulingOperationResources {
     @Path("planned-summary-task/{summaryId}/resource-allocated-task")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ResourceAllocatedTask allocateResource(@PathParam("{summaryId}") Long summaryId, RequiredResource resource) {
+    public ServiceOrder allocateResource(@PathParam("{summaryId}") Long summaryId, RequiredResource resource) {
         return operation.allocateResourceTo(summaryId, resource.mixingPlantId, resource.concreteTruckId);
     }
 

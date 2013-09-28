@@ -12,14 +12,14 @@ import java.util.Map;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
+import javax.persistence.EntityManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.entities.User;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
@@ -27,12 +27,17 @@ import net.madz.common.entities.Mortar;
 import net.madz.contract.entities.PouringPart;
 import net.madz.contract.entities.UnitProject;
 import net.madz.contract.spec.entities.PouringPartSpec;
+import net.madz.core.biz.BOFactory;
+import net.madz.scheduling.biz.IConcreteTruckResource;
+import net.madz.scheduling.biz.IMixingPlantResource;
+import net.madz.scheduling.biz.IServiceOrder;
+import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
-import net.madz.scheduling.entities.PlannedSummaryTask;
-import net.madz.scheduling.entities.ResourceAllocatedTask;
+import net.madz.scheduling.entities.ServiceOrder;
+import net.madz.scheduling.entities.ServiceSummaryPlan;
 
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 
@@ -42,10 +47,7 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
  */
 @Stateless
 @LocalBean
-public class OperationBean {
-
-    @PersistenceUnit
-    private EntityManagerFactory emf;
+public class OperationBean extends MultitenancyBean {
 
     public List<PouringPartSpec> listMyPartsInConstructing() {
         final ArrayList<PouringPartSpec> result = new ArrayList<>();
@@ -127,27 +129,31 @@ public class OperationBean {
         metadataSourceMap.put("net.madz.core.entities", stream);
         final Map<String, Object> prop = new HashMap<String, Object>();
         prop.put(JAXBContextProperties.OXM_METADATA_SOURCE, metadataSourceMap);
-        JAXBContext jc = JAXBContext.newInstance(new Class[] { PouringPartSpec.class, ResourceAllocatedTask.class },
-                prop);
+        JAXBContext jc = JAXBContext.newInstance(new Class[] { PouringPartSpec.class, ServiceOrder.class }, prop);
         Marshaller marshaller = jc.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty(JAXBContextProperties.MEDIA_TYPE, "application/json");
         marshaller.setProperty("eclipselink.json.include-root", false);
         // marshaller.marshal(new
         // OperationBean().listMyPartsInConstructing().get(0), System.out);
-        marshaller.marshal(new OperationBean().allocateResourceTo(1L, 1L, 1L), System.out);
+        marshaller.marshal(new OperationBean().allocateResourceTo(1L, 1L, 1L, 6.0D), System.out);
     }
 
-    public ResourceAllocatedTask allocateResourceTo(Long summaryId, Long mixingPlantId, Long concreteTruckId) {
-        ResourceAllocatedTask resourceAllocatedTask = new ResourceAllocatedTask();
-        resourceAllocatedTask.setSpec(createSpec());
-        resourceAllocatedTask.setCreatedBy(createUser());
-        resourceAllocatedTask.setMixingPlantResource(createMixingPlant());
-        resourceAllocatedTask.setState("Created");
-        resourceAllocatedTask.setCreatedOn(createDate());
-        resourceAllocatedTask.setSummaryPlan(createSummaryPlan());
-        resourceAllocatedTask.setTruckResource(createConcreteTruck());
-        return resourceAllocatedTask;
+    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId,
+            double volume) {
+        EntityManager em = em();
+        try {
+            final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryId);
+            final IServiceOrder serviceOrder = BOFactory.create(IServiceOrder.class);
+            final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
+            final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
+            serviceOrder.allocateResources(plantResource, truckResource, volume);
+            
+            serviceOrder.persist(em);
+            return serviceOrder.get();
+        } finally {
+            em.close();
+        }
     }
 
     private ConcreteTruckResource createConcreteTruck() {
@@ -160,12 +166,12 @@ public class OperationBean {
         truck.setUpdatedOn(createDate());
         ConcreteTruckResource resource = new ConcreteTruckResource();
         resource.setConcreteTruck(truck);
-        resource.setState("Available");
+        // resource.setState("Available");
         return resource;
     }
 
-    private PlannedSummaryTask createSummaryPlan() {
-        PlannedSummaryTask summaryTask = new PlannedSummaryTask();
+    private ServiceSummaryPlan createSummaryPlan() {
+        ServiceSummaryPlan summaryTask = new ServiceSummaryPlan();
         summaryTask.setId(1L);
         summaryTask.setCreatedBy(createUser());
         summaryTask.setCreatedOn(createDate());
@@ -191,5 +197,9 @@ public class OperationBean {
 
     public List<PouringPartSpec> filterMyPartsInConstructing(String filter) {
         return listMyPartsInConstructing();
+    }
+
+    public IServiceOrder createOrder() {
+        return null;
     }
 }

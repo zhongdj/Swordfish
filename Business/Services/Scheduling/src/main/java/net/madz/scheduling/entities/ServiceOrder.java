@@ -14,7 +14,7 @@ import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "planned_resource_allocated_task")
-public class ResourceAllocatedTask extends StandardObject {
+public class ServiceOrder extends StandardObject {
 
     private static final long serialVersionUID = -6118079224654228286L;
 
@@ -33,7 +33,7 @@ public class ResourceAllocatedTask extends StandardObject {
             @JoinColumn(name = "SUMMARY_PLAN_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
     @XmlInverseReference(mappedBy = "resourceAllocatedTasks")
-    private PlannedSummaryTask summaryPlan;
+    private ServiceSummaryPlan summaryPlan;
 
     @ManyToOne
     @JoinColumns({
@@ -64,11 +64,11 @@ public class ResourceAllocatedTask extends StandardObject {
         this.spec = spec;
     }
 
-    public PlannedSummaryTask getSummaryPlan() {
+    public ServiceSummaryPlan getSummaryPlan() {
         return summaryPlan;
     }
 
-    public void setSummaryPlan(PlannedSummaryTask summaryPlan) {
+    public void setSummaryPlan(ServiceSummaryPlan summaryPlan) {
         if ( null != this.summaryPlan && null == summaryPlan ) {
             this.summaryPlan.removeResourceAllocatedTask(this);
         }
@@ -80,10 +80,6 @@ public class ResourceAllocatedTask extends StandardObject {
         return truckResource;
     }
 
-    public void setTruckResource(ConcreteTruckResource truck) {
-        this.truckResource = truck;
-    }
-
     public String getState() {
         return state;
     }
@@ -92,12 +88,8 @@ public class ResourceAllocatedTask extends StandardObject {
         this.state = state;
     }
 
-    public MixingPlantResource getMixingPlant() {
+    public MixingPlantResource getMixingPlantResource() {
         return mixingPlantResource;
-    }
-
-    public void setMixingPlantResource(MixingPlantResource mixingPlant) {
-        this.mixingPlantResource = mixingPlant;
     }
 
     public double getPlannedVolume() {
@@ -106,5 +98,12 @@ public class ResourceAllocatedTask extends StandardObject {
 
     public void setPlannedVolume(double plannedVolume) {
         this.plannedVolume = plannedVolume;
+    }
+
+    public void allocateResources(MixingPlantResource mixingPlantResource, ConcreteTruckResource concreteTruckResource,
+            double volume) {
+        this.mixingPlantResource = mixingPlantResource;
+        this.truckResource = concreteTruckResource;
+        this.plannedVolume = volume;
     }
 }
