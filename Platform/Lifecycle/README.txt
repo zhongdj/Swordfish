@@ -9,6 +9,10 @@ Including:
 1.1.1 Stand-alone reactive object state transition validation
 1.1.2 Independent reactive object state transition validation
 1.1.2.1 Child reactive object state transition validation in a deep hierarchical business model, whose lifecycle is totally covered by parent object.
+NOTE: Once the root reactive object is going to transit to a new State, such as Locked or Cancelled, which will influence all of the children under
+many different layers, finish the Database Transaction fast on the root first, and then all the children's states are invalid to perform any operation, 
+except state synchronization transition from parent.  
+
 1.1.2.2 Relative reactive objects state transition validation, whose lifecycle is dependent on some other object.
 
 1.2 Hiding setting business object's state indicator operations from both business object client and application developer perspective.
