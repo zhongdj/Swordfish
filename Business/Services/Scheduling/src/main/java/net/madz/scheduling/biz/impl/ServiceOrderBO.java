@@ -12,7 +12,6 @@ import net.madz.core.biz.AbstractBO;
 import net.madz.customer.entities.Contact;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
-import net.madz.scheduling.biz.IPlantScheduleOrder;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.entities.ServiceOrder;
@@ -148,8 +147,13 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     @Override
+<<<<<<< HEAD
     public IPlantScheduleOrder.StateEnum getPlantScheduleOrderState() {
         return this.plantResource.getWorkingOrder().getPlantScheduleOrderState();
+=======
+    public String getPlantScheduleOrderState() {
+        return null;
+>>>>>>> 8609806e46ec8fe75ccba09fd3a591cda3472e41
     }
 
     @Override
@@ -201,5 +205,17 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     @Override
     public Date getTransportFinishedOn() {
         return this.truckResource.getWorkingOrder().getTransportFinishedOn();
+    }
+
+    @Override
+    public void confirmStart() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void confirmFinish() {
+        // TODO Auto-generated method stub
+        
     }
 }

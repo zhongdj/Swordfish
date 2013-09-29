@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>Core</module>
-		<module>Lifecyle</module>
+		<module>Lifecycle</module>
 		<module>Messaging</module>
 		<module>Security</module>
 		<module>TOBinding</module>
