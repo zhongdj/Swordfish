@@ -1,7 +1,6 @@
 package net.madz.core.biz;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,8 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
+
+import net.madz.core.entities.AbstractBaseEntity;
 
 public class BizObjectManager implements EntityManager {
 
@@ -71,38 +72,38 @@ public class BizObjectManager implements EntityManager {
     @SuppressWarnings("unchecked")
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
-            Class<IBizObject<Object>> bizObjectInterfaceClass = (Class<IBizObject<Object>>) entityClass;
-            Class<Object> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
-            Object entity = em.find(trueEntityClass, primaryKey);
-            return BOFactory.create(bizObjectInterfaceClass, entity);
+            Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
+            Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
+            AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey);
+            return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private Class<Object> findEntityClass(Class<? extends IBizObject<?>> bizObjectInterfaceClass) {
+    private Class<AbstractBaseEntity> findEntityClass(Class<? extends IBizObject<?>> bizObjectInterfaceClass) {
         for ( Type type : bizObjectInterfaceClass.getGenericInterfaces() ) {
             if ( type instanceof ParameterizedType ) {
                 ParameterizedType pt = (ParameterizedType) type;
                 if ( pt.getRawType().equals(IBizObject.class) ) {
                     if ( pt.getActualTypeArguments().length == 1 ) {
-                        return (Class<Object>) pt.getActualTypeArguments()[0];
+                        return (Class<AbstractBaseEntity>) pt.getActualTypeArguments()[0];
                     }
                 }
             }
         }
-        throw new RuntimeException("Cannot find Entity Class defined with ParameterType on Class "
-                + bizObjectInterfaceClass.getName());
+        throw new RuntimeException("Cannot find Entity Class defined with ParameterType on Class " + bizObjectInterfaceClass.getName());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
-            Class<IBizObject<Object>> bizObjectInterfaceClass = (Class<IBizObject<Object>>) entityClass;
-            Class<Object> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
-            Object entity = em.find(trueEntityClass, primaryKey, properties);
-            return BOFactory.create(bizObjectInterfaceClass, entity);
+            Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
+            Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
+            AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, properties);
+            return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, properties);
         }
@@ -111,10 +112,10 @@ public class BizObjectManager implements EntityManager {
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
-            Class<IBizObject<Object>> bizObjectInterfaceClass = (Class<IBizObject<Object>>) entityClass;
-            Class<Object> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
-            Object entity = em.find(trueEntityClass, primaryKey, lockMode);
-            return BOFactory.create(bizObjectInterfaceClass, entity);
+            Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
+            Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
+            AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, lockMode);
+            return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, lockMode);
         }
@@ -123,10 +124,10 @@ public class BizObjectManager implements EntityManager {
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode, Map<String, Object> properties) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
-            Class<IBizObject<Object>> bizObjectInterfaceClass = (Class<IBizObject<Object>>) entityClass;
-            Class<Object> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
-            Object entity = em.find(trueEntityClass, primaryKey, lockMode, properties);
-            return BOFactory.create(bizObjectInterfaceClass, entity);
+            Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
+            Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
+            AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, lockMode, properties);
+            return (T)BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, lockMode, properties);
         }
@@ -135,10 +136,10 @@ public class BizObjectManager implements EntityManager {
     @Override
     public <T> T getReference(Class<T> entityClass, Object primaryKey) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
-            Class<IBizObject<Object>> bizObjectInterfaceClass = (Class<IBizObject<Object>>) entityClass;
-            Class<Object> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
-            Object entity = em.getReference(trueEntityClass, primaryKey);
-            return BOFactory.create(bizObjectInterfaceClass, entity);
+            Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
+            Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
+            AbstractBaseEntity entity = em.getReference(trueEntityClass, primaryKey);
+            return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.getReference(entityClass, primaryKey);
         }
