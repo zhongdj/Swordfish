@@ -1,9 +1,12 @@
 package net.madz.scheduling.biz.impl;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.core.biz.AbstractBO;
 import net.madz.customer.entities.Contact;
@@ -15,6 +18,9 @@ import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.entities.ServiceOrder;
 
 public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IServiceOrder {
+
+    private IMixingPlantResource plantResource;
+    private IConcreteTruckResource truckResource;
 
     public ServiceOrderBO(EntityManager em, long id) {
         super(em, ServiceOrder.class, id);
@@ -37,71 +43,98 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     private boolean isMixingPlantNull() {
-        return null == this.entity || null == this.entity.getMixingPlantResource();
+        return null == this.entity.getMixingPlantResource();
     }
 
     @Override
     public String getUnitProjectName() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isUnitProjectNull() ) {
+            return null;
+        }
+        return this.entity.getSpec().getUnitProject().getName();
+    }
+
+    private boolean isUnitProjectNull() {
+        return null == this.entity.getSpec() || null == this.entity.getSpec().getUnitProject();
     }
 
     @Override
     public Address getAddress() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isUnitProjectNull() ) {
+            return null;
+        }
+        return this.entity.getSpec().getUnitProject().getAddress();
     }
 
     @Override
     public Contact getContact() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isUnitProjectNull() ) {
+            return null;
+        }
+        return this.entity.getSpec().getUnitProject().getContact();
     }
 
     @Override
     public String getPouringPartName() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isPouringPartNull() ) {
+        }
+        return this.entity.getSpec().getPouringPart().getName();
+    }
+
+    private boolean isPouringPartNull() {
+        return null == this.entity.getSpec().getPouringPart();
     }
 
     @Override
     public String getMixtureStrengthGrade() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isMixtureNull() ) {
+            return null;
+        }
+        return this.entity.getSpec().getMixture().getGradeName();
+    }
+
+    private boolean isMixtureNull() {
+        return null == this.entity.getSpec() || null == this.entity.getSpec().getMixture();
     }
 
     @Override
     public String[] getAdditiveNames() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isAdditivesNull() ) {
+            return new String[0];
+        }
+        final List<Additive> additives = this.entity.getSpec().getAdditives();
+        final List<String> additiveNames = new LinkedList<String>();
+        for ( Additive item : additives ) {
+            additiveNames.add(item.getName());
+        }
+        return (String[]) additiveNames.toArray();
+    }
+
+    private boolean isAdditivesNull() {
+        return null == this.entity.getSpec() || null == this.entity.getSpec().getAdditives();
     }
 
     @Override
     public double getVolume() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.entity.getPlannedVolume();
     }
 
     @Override
     public Date getCreatedOn() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.entity.getCreatedOn();
     }
 
     @Override
     public String getCreatedBy() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.entity.getCreatedBy().getUsername();
     }
 
     @Override
     public void doLoad() {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void doTransport() {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -116,20 +149,21 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
 
     @Override
     public IPlantScheduleOrder.StateEnum getPlantScheduleOrderState() {
-        return null;
+        return this.plantResource.getWorkingOrder().getPlantScheduleOrderState();
     }
 
     @Override
     public IVehicleScheduleOrder.StateEnum getVehicleScheduleOrderState() {
-        return null;
+        return this.truckResource.getWorkingOrder().getVehicleScheduleOrderState();
     }
 
     @Override
-    public void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource,
-            double volume) {
-        plantResource.assignOrder(this);
-        truckResource.assignOrder(this);
-        this.entity.allocateResources(plantResource.get(), truckResource.get(), volume);
+    public void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume) {
+        this.plantResource = plantResource;
+        this.truckResource = truckResource;
+        this.plantResource.assignOrder(this);
+        this.truckResource.assignOrder(this);
+        this.entity.allocateResources(this.plantResource.get(), this.truckResource.get(), volume);
     }
 
     @Override
@@ -144,25 +178,28 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
 
     @Override
     public String getPlantName() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isPlantNull() ) {
+            return null;
+        }
+        return this.entity.getMixingPlantResource().getMixingPlant().getName();
+    }
+
+    private boolean isPlantNull() {
+        return null == this.entity.getMixingPlantResource() || null == this.entity.getMixingPlantResource().getMixingPlant();
     }
 
     @Override
     public String getOperatorName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.plantResource.getOperatorName();
     }
 
     @Override
     public Date getProductionFinishedOn() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.plantResource.getWorkingOrder().getProductionFinishedOn();
     }
 
     @Override
     public Date getTransportFinishedOn() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.truckResource.getWorkingOrder().getTransportFinishedOn();
     }
 }
