@@ -1,31 +1,35 @@
 package net.madz.scheduling.biz.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
 import net.madz.core.biz.AbstractBO;
+import net.madz.core.utils.ProxyList;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.entities.ConcreteTruckResource;
+import net.madz.scheduling.entities.ServiceOrder;
 
 public class ConcreteTruckResourceBO extends AbstractBO<ConcreteTruckResource> implements IConcreteTruckResource {
 
+    private final List<IVehicleScheduleOrder> orderList;
+
     public ConcreteTruckResourceBO(ConcreteTruckResource entity) {
         super(entity);
+        orderList = new ProxyList<ServiceOrder, IVehicleScheduleOrder>(IVehicleScheduleOrder.class, entity.getServiceOrders());
     }
 
     public ConcreteTruckResourceBO(EntityManager em, Class<ConcreteTruckResource> t, long id) {
         super(em, t, id);
-    }
-
-    @Override
-    public int assignOrder(IVehicleScheduleOrder order) {
-        // TODO Auto-generated method stub
-        return 0;
+        orderList = new ProxyList<ServiceOrder, IVehicleScheduleOrder>(IVehicleScheduleOrder.class, entity.getServiceOrders());
     }
 
     @Override
     public void confirmReady() {
-        // TODO Auto-generated method stub
+        this.entity.setConfirmedDate(new Timestamp(System.currentTimeMillis()));
     }
 
     @Override
@@ -55,43 +59,52 @@ public class ConcreteTruckResourceBO extends AbstractBO<ConcreteTruckResource> i
 
     @Override
     public StateEnum getState() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public IVehicleScheduleOrder getWorkingOrder() {
-        // TODO Auto-generated method stub
+        // TODO
         return null;
     }
 
     @Override
     public IVehicleScheduleOrder[] getQueuedOrder() {
-        // TODO Auto-generated method stub
-        return null;
+        return (IVehicleScheduleOrder[]) this.orderList.toArray();
     }
 
     @Override
     public double getRatedCapacity() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.entity.getConcreteTruck().getRatedCapacity();
     }
 
     @Override
     public String getLicencePlateNumber() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( null == this.entity.getConcreteTruck() ) {
+            return null;
+        }
+        return this.entity.getConcreteTruck().getLicencePlateNumber();
     }
 
     @Override
     public String getDriverName() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( null == this.entity.getConcreteTruck() ) {
+            return null;
+        }
+        return this.entity.getConcreteTruck().getDriverName();
     }
 
     @Override
     public String getDriverPhoneNumber() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( null == this.entity.getConcreteTruck() ) {
+            return null;
+        }
+        return this.entity.getConcreteTruck().getDriverPhoneNumber();
+    }
+
+    @Override
+    public int assignOrder(IVehicleScheduleOrder order) {
+        this.orderList.add(order);
+        return this.orderList.size();
     }
 }
