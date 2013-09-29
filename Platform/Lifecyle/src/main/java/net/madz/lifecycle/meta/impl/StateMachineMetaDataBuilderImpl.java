@@ -7,10 +7,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import net.madz.lifecycle.IState;
-import net.madz.lifecycle.annotations.StateMachine;
-import net.madz.lifecycle.annotations.StateSet;
-import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.typed.TypedStateMachine;
+import net.madz.lifecycle.annotations.typed.TypedStateSet;
+import net.madz.lifecycle.annotations.typed.TypedTransition;
+import net.madz.lifecycle.annotations.typed.TypedTransitionSet;
 import net.madz.lifecycle.meta.StateMachineMetaData;
 import net.madz.lifecycle.meta.StateMachineMetaDataBuilder;
 import net.madz.lifecycle.meta.StateMetaData;
@@ -34,14 +34,14 @@ public class StateMachineMetaDataBuilderImpl extends MetaDataBuilderBase<StateMa
         if (!(element instanceof Class)) {
             throw new IllegalArgumentException("Should be interface class.");
         }
-        final StateMachine stateMachine = element.getAnnotation(StateMachine.class);
+        final TypedStateMachine stateMachine = element.getAnnotation(TypedStateMachine.class);
         if (null == stateMachine) {
             throw new IllegalArgumentException("No StateMachine Annotation found.");
         }
 
         Class reactiveObjectClass = (Class) element;
 
-        final StateSet states = stateMachine.states();
+        final TypedStateSet states = stateMachine.states();
         Class<? extends IState> stateEnumClass = states.value();
 
         stateMachineMetaData = new StateMachineMetaDataImpl(parent, reactiveObjectClass, stateEnumClass);
@@ -77,7 +77,7 @@ public class StateMachineMetaDataBuilderImpl extends MetaDataBuilderBase<StateMa
         TransitionMetaData recoverTransition = null;
         TransitionMetaData redoTransition = null;
 
-        final TransitionSet transitions = stateMachine.transitions();
+        final TypedTransitionSet transitions = stateMachine.transitions();
         final Class transitionEnumClass = transitions.value();
         final Field[] transitionFields = transitionEnumClass.getFields();
         final ArrayList<TransitionMetaData> transitionList = new ArrayList<TransitionMetaData>();
@@ -96,9 +96,9 @@ public class StateMachineMetaDataBuilderImpl extends MetaDataBuilderBase<StateMa
                     transitionMetaData.setTransitionMethod(method);
                     break;
                 } else {
-                    final Transition transitionAnnotation = method.getAnnotation(Transition.class);
+                    final TypedTransition transitionAnnotation = method.getAnnotation(TypedTransition.class);
                     if (null != transitionAnnotation) {
-                        if (!Transition.NULL.equals(transitionAnnotation.value())) {
+                        if (!TypedTransition.NULL.equals(transitionAnnotation.value())) {
                             if (method.getName().equalsIgnoreCase(transitionAnnotation.value())) {
                                 transitionMetaData.setTransitionMethod(method);
                                 break;

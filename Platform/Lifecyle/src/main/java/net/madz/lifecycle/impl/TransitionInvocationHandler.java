@@ -10,8 +10,8 @@ import net.madz.lifecycle.IReactiveObject;
 import net.madz.lifecycle.IState;
 import net.madz.lifecycle.ITransition;
 import net.madz.lifecycle.StateContext;
-import net.madz.lifecycle.annotations.StateMachine;
-import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.typed.TypedStateMachine;
+import net.madz.lifecycle.annotations.typed.TypedTransition;
 import net.madz.lifecycle.meta.StateMachineMetaData;
 import net.madz.lifecycle.meta.StateMetaData;
 import net.madz.lifecycle.meta.TransitionMetaData;
@@ -36,11 +36,11 @@ public class TransitionInvocationHandler<R extends IReactiveObject, S extends IS
             S state = reactiveObject.getState();
             StateMetaData<R, S> stateMetaData = stateMachineMetaData.getStateMetaData(state);
             final String transitionName;
-            final Transition transition = method.getAnnotation(Transition.class);
+            final TypedTransition transition = method.getAnnotation(TypedTransition.class);
             if ( null == transition ) {
                 return method.invoke(reactiveObject, args);
             }
-            if ( Transition.NULL.equals(transition.value()) ) {
+            if ( TypedTransition.NULL.equals(transition.value()) ) {
                 transitionName = StringUtil.toUppercaseFirstCharacter(method.getName());
             } else {
                 transitionName = transition.value();
@@ -100,7 +100,7 @@ public class TransitionInvocationHandler<R extends IReactiveObject, S extends IS
         final Class<? extends IReactiveObject> reactiveClass = reactiveObject.getClass();
         Class<? extends IReactiveObject> stateMachineClass = null;
         for ( Class<?> interfaze : reactiveClass.getInterfaces() ) {
-            StateMachine annotation = (StateMachine) interfaze.getAnnotation(StateMachine.class);
+            TypedStateMachine annotation = (TypedStateMachine) interfaze.getAnnotation(TypedStateMachine.class);
             if ( null == annotation ) {
                 continue;
             } else {

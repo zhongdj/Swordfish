@@ -2,32 +2,6 @@ package demo;
 
 
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import net.madz.lifecycle.IReactiveObject;
-import net.madz.lifecycle.IState;
-import net.madz.lifecycle.ITransition;
-import net.madz.lifecycle.annotations.StateMachine;
-import net.madz.lifecycle.annotations.StateSet;
-import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.annotations.TransitionSet;
-import net.madz.lifecycle.annotations.action.Corrupt;
-import net.madz.lifecycle.annotations.action.End;
-import net.madz.lifecycle.annotations.action.Fail;
-import net.madz.lifecycle.annotations.action.Recover;
-import net.madz.lifecycle.annotations.action.Redo;
-import net.madz.lifecycle.annotations.action.Timeout;
-import net.madz.lifecycle.annotations.state.Corrupted;
-import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Running;
-import net.madz.lifecycle.annotations.state.Stopped;
-import demo.IDownloadProcess.StateEnum;
-import demo.IDownloadProcess.TransitionEnum;
-
 import static demo.IDownloadProcess.TransitionEnum.Activate;
 import static demo.IDownloadProcess.TransitionEnum.Err;
 import static demo.IDownloadProcess.TransitionEnum.Finish;
@@ -40,7 +14,33 @@ import static demo.IDownloadProcess.TransitionEnum.Restart;
 import static demo.IDownloadProcess.TransitionEnum.Resume;
 import static demo.IDownloadProcess.TransitionEnum.Start;
 
-@StateMachine(states = @StateSet(StateEnum.class), transitions = @TransitionSet(TransitionEnum.class))
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import net.madz.lifecycle.IReactiveObject;
+import net.madz.lifecycle.IState;
+import net.madz.lifecycle.ITransition;
+import net.madz.lifecycle.annotations.action.Corrupt;
+import net.madz.lifecycle.annotations.action.End;
+import net.madz.lifecycle.annotations.action.Fail;
+import net.madz.lifecycle.annotations.action.Recover;
+import net.madz.lifecycle.annotations.action.Redo;
+import net.madz.lifecycle.annotations.action.Timeout;
+import net.madz.lifecycle.annotations.state.Corrupted;
+import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Running;
+import net.madz.lifecycle.annotations.state.Stopped;
+import net.madz.lifecycle.annotations.typed.TypedStateMachine;
+import net.madz.lifecycle.annotations.typed.TypedStateSet;
+import net.madz.lifecycle.annotations.typed.TypedTransition;
+import net.madz.lifecycle.annotations.typed.TypedTransitionSet;
+import demo.IDownloadProcess.StateEnum;
+import demo.IDownloadProcess.TransitionEnum;
+
+@TypedStateMachine(states = @TypedStateSet(StateEnum.class), transitions = @TypedTransitionSet(TransitionEnum.class))
 public interface IDownloadProcess extends Serializable, IReactiveObject {
 
     public static enum TransitionEnum implements ITransition {
@@ -212,52 +212,52 @@ public interface IDownloadProcess extends Serializable, IReactiveObject {
     /**
      * Rebuild lost states from incorrect persisted state and Enqueue
      */
-    @Transition
+    @TypedTransition
     void activate();
 
     /**
      * Expected Precondition: No resource enlisted Any enlisted resource should
      * be delisted
      */
-    @Transition
+    @TypedTransition
     void inactivate();
 
     /**
      * Initialize states and Enqueue
      */
-    @Transition
+    @TypedTransition
     void prepare();
 
     /**
      * Living thread allocated
      */
-    @Transition
+    @TypedTransition
     void start();
 
     /**
      * Rebuild states from correct persisted or in-memory state and Enqueue
      */
-    @Transition
+    @TypedTransition
     void resume();
 
     /**
      * Deallocate Thread resource, Persist correct states
      */
-    @Transition
+    @TypedTransition
     void pause();
 
     /**
      * Thread die naturally, persist correct states and recycle all resources
      * enlisted.
      */
-    @Transition
+    @TypedTransition
     void finish();
 
     /**
      * Process aborted unexpected, persist current states and recycle all
      * resources enlisted
      */
-    @Transition
+    @TypedTransition
     void err();
 
     /**
@@ -266,14 +266,14 @@ public interface IDownloadProcess extends Serializable, IReactiveObject {
      * @param bytes
      *            received
      */
-    @Transition
+    @TypedTransition
     void receive(long bytes);
 
     /**
      * Roll back all information change after create, Re-initialize states and
      * Enqueue
      */
-    @Transition
+    @TypedTransition
     void restart();
 
     /**
@@ -283,7 +283,7 @@ public interface IDownloadProcess extends Serializable, IReactiveObject {
      * @param both
      *            downloaded file and the download request/task
      */
-    @Transition
+    @TypedTransition
     void remove(boolean both);
 
     @SuppressWarnings("unchecked")

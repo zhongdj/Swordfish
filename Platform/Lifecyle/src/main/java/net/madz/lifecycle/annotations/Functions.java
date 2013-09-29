@@ -7,8 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Transitions {
+public @interface Functions {
 
-    Transition[] value();
-
+    Function[] value();
 }
