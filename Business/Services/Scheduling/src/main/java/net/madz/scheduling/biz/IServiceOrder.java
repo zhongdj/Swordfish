@@ -10,4 +10,3 @@ public interface IServiceOrder extends IPlantScheduleOrder, IVehicleScheduleOrde
 
     void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
 }
-
