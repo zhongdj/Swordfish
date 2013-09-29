@@ -13,6 +13,9 @@ public class AbstractBO<T extends AbstractBaseEntity> implements IBizObject<T> {
     }
 
     public AbstractBO(T entity) {
+        if ( null == entity ) {
+            throw new RuntimeException("Entity must be not null when creating biz Object");
+        }
         this.entity = entity;
     }
 
