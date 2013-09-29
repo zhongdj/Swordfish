@@ -2,7 +2,13 @@ package net.madz.scheduling.biz;
 
 import java.util.Date;
 
-public interface IPlantScheduleOrder {
+import net.madz.core.biz.BOProxy;
+import net.madz.core.biz.IBizObject;
+import net.madz.scheduling.biz.impl.ServiceOrderBO;
+import net.madz.scheduling.entities.ServiceOrder;
+
+@BOProxy(ServiceOrderBO.class)
+public interface IPlantScheduleOrder extends IBizObject<ServiceOrder> {
 
     public static enum StateEnum {
         Created,

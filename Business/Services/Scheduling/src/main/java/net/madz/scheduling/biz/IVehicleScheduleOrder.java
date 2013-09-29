@@ -3,9 +3,15 @@ package net.madz.scheduling.biz;
 import java.util.Date;
 
 import net.madz.common.entities.Address;
+import net.madz.core.biz.BOProxy;
+import net.madz.core.biz.IBizObject;
 import net.madz.customer.entities.Contact;
+import net.madz.scheduling.biz.impl.ServiceOrderBO;
+import net.madz.scheduling.entities.ServiceOrder;
 
-public interface IVehicleScheduleOrder {
+
+@BOProxy(ServiceOrderBO.class)
+public interface IVehicleScheduleOrder extends IBizObject<ServiceOrder> {
 
     public static enum StateEnum {
         Created,
