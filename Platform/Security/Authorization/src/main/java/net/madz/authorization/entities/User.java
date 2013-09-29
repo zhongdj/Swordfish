@@ -52,6 +52,9 @@ public class User extends StandardObject {
 
     @Column(nullable = false)
     private String fullName;
+    
+    @Column
+    private String phoneNumber;
 
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
@@ -360,4 +363,15 @@ public class User extends StandardObject {
                 .append(lastChangePwdTime).append("]");
         return s.toString();
     }
+
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    
 }
