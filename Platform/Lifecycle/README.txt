@@ -91,7 +91,7 @@ public interface IPlantScheduleOrder  {
 
         @End
         @InboundWhile(relation="serviceOrder", on={IServiceOrder.States.Ongoing.class})
-        @ValidWhile({ IServiceOrder.States.Ongoing.class, IServiceOrder.States.Finished.class })
+        @ValidWhile(relation="serviceOrder", on={ IServiceOrder.States.Ongoing.class, IServiceOrder.States.Finished.class })
         //Default @Functions({})
         static class Done {}
     }
