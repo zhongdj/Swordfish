@@ -45,19 +45,19 @@ public interface IServiceOrder {
     @StateIndicator("serviceOrderState")
     static class States {
         @Initial
+        @Function(transition = Schedule.class, value = Scheduled.class)
         static class Created {}
+        @Function(transition = Start.class, value = Ongoing.class)
         static class Scheduled {}
+        @Function(transition = Finish.class, value = Finished.class)
         static class Ongoing {}
         @End
         static class Finished {}
     }
 
     static class Transitions {
-
         static class Schedule {}
-
         static class Start {}
-
         static class Finish {}
     }
 
