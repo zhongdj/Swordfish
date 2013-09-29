@@ -28,3 +28,89 @@ Including:
 3. Provide life cycle events from reactive object's state change.
 
 4. Provide life cycle intercepts during reactive object's prior or post state changes happens.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                      Quick Look: Stand-alone Reactive Object
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@StateMachine(states = @StateSet(IServiceOrder.States.class),
+        transitions = @TransitionSet(IServiceOrder.Transitions.class))
+public interface IServiceOrder {
+
+    @StateIndicator("serviceOrderState")
+    static class States {
+        @Initial
+        static class Created {}
+        static class Scheduled {}
+        static class Ongoing {}
+        @End
+        static class Finished {}
+    }
+
+    static class Transitions {
+
+        static class Schedule {}
+
+        static class Start {}
+
+        static class Finish {}
+    }
+
+    @Transition(Schedule.class)
+    void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
+
+    @Transition(Start.class)
+    void confirmStart();
+
+    @Transition(Finish.class)
+    void confirmFinish();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                      Quick Look: Dependent Reactive Object
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@StateMachine(states = @StateSet(IPlantScheduleOrder.States.class),
+              transitions = @TransitionSet(IPlantScheduleOrder.Transitions.class)
+              parentOn = IServiceOrder.class)
+public interface IPlantScheduleOrder  {
+
+    @StateIndicator("plantScheduleOrderState")
+    static class States {
+
+        @Initial
+        @InboundWhile(relation="serviceOrder", on=IServiceOrder.States.Scheduled.class)
+        // Default @ValidWhile(relation="serviceOrder", on = {IServiceOrder.States.Scheduled.class})
+        @Functions({ @Function(transition = Start.class, value = Working.class) })
+        static class Created {}
+
+        @InboundWhile(relation="serviceOrder", on={IServiceOrder.States.Ongoing.class})
+        // Default @ValidWhile(IServiceOrder.States.Ongoing.class)
+        @Functions({ @Function(transition = Finish.class, value = Done.class) })
+        static class Working {}
+
+        @End
+        @InboundWhile(relation="serviceOrder", on={IServiceOrder.States.Ongoing.class})
+        @ValidWhile({ IServiceOrder.States.Ongoing.class, IServiceOrder.States.Finished.class })
+        //Default @Functions({})
+        static class Done {}
+    }
+
+    static class Transitions {
+
+        static class Start {}
+
+        static class Finish {}
+    }
+
+    @Transition(Transitions.Start.class)
+    void doStartPlantOrder();
+
+    @Transition(Transitions.Finish.class)
+    void doFinishPlantOrder();
+    
+    IServiceOrder getServiceOrder();
+
+}
+
+

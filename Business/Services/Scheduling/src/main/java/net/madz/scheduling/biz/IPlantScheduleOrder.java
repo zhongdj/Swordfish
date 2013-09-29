@@ -26,11 +26,6 @@ import net.madz.scheduling.entities.ServiceOrder;
 @BOProxy(ServiceOrderBO.class)
 public interface IPlantScheduleOrder extends IBizObject<ServiceOrder> {
 
-    @Deprecated
-    public static enum StateEnum {
-        Created, Working, Done
-    }
-
     @StateIndicator("plantScheduleOrderState")
     static class States {
 
@@ -77,4 +72,11 @@ public interface IPlantScheduleOrder extends IBizObject<ServiceOrder> {
     Date getCreatedOn();
 
     String getCreatedBy();
+
+    /* NEED TO BE FIXED*/
+    @Deprecated
+    public static enum StateEnum {
+        Created, Working, Done
+    }
+
 }
