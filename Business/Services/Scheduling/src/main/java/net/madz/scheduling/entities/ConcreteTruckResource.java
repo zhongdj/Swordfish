@@ -9,14 +9,17 @@ import javax.persistence.Table;
 import net.madz.authorization.entities.StandardObject;
 
 @Entity
-@Table(name="concrete_truck_resource")
+@Table(name = "concrete_truck_resource")
 public class ConcreteTruckResource extends StandardObject {
 
     private static final long serialVersionUID = 1366415739718240376L;
 
     @OneToOne
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = false) })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = false,
+                    referencedColumnName = "ID") })
     private ConcreteTruck concreteTruck;
 
     private String state;

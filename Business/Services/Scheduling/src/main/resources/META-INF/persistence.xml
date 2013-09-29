@@ -24,6 +24,12 @@
 		<class>net.madz.common.entities.Mixture</class>
 		<!-- Scheduling Service Entities -->
 		<class>net.madz.scheduling.entities.ScheduleGroup</class>
+		<class>net.madz.scheduling.entities.ConcreteTruck</class>
+		<class>net.madz.scheduling.entities.ConcreteTruckResource</class>
+		<class>net.madz.scheduling.entities.MixingPlant</class>
+		<class>net.madz.scheduling.entities.MixingPlantResource</class>
+		<class>net.madz.scheduling.entities.ServiceOrder</class>
+		<class>net.madz.scheduling.entities.ServiceSummaryPlan</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>

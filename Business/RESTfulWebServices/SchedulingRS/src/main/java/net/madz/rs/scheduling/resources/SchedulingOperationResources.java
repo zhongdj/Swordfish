@@ -110,7 +110,7 @@ public class SchedulingOperationResources {
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
     public ServiceOrder allocateResource(@PathParam("{summaryId}") Long summaryId, RequiredResource resource) {
-        return operation.allocateResourceTo(summaryId, resource.mixingPlantId, resource.concreteTruckId);
+        return operation.allocateResourceTo(summaryId, resource.mixingPlantId, resource.concreteTruckId, resource.volume);
     }
 
     public static class RequiredResource {
@@ -118,5 +118,7 @@ public class SchedulingOperationResources {
         public Long mixingPlantId;
 
         public Long concreteTruckId;
+        
+        public Double volume;
     }
 }

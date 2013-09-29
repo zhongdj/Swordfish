@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -13,17 +15,21 @@ import net.madz.authorization.entities.StandardObject;
 import net.madz.contract.spec.entities.PouringPartSpec;
 
 @Entity
-@Table(name = "planned_summary_task")
+@Table(name = "service_summary_plan")
 public class ServiceSummaryPlan extends StandardObject {
 
     private static final long serialVersionUID = -2519583821494066599L;
 
     @ManyToOne
-    @Column(name = "PRODUCE_SPEC_ID", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "PRODUCE_SPEC_ID", nullable = false, insertable = true, updatable = false,
+                    referencedColumnName = "ID") })
     private PouringPartSpec spec;
 
-    @OneToMany
-    private List<ServiceOrder> resourceAllocatedTasks = new ArrayList<>();
+    @OneToMany(mappedBy="summaryPlan")
+    private List<ServiceOrder> serviceOrderList = new ArrayList<>();
 
     @Column(name = "PLANNED_VOLUME")
     private double plannedVolume;
@@ -39,12 +45,12 @@ public class ServiceSummaryPlan extends StandardObject {
         this.spec = spec;
     }
 
-    public List<ServiceOrder> getResourceAllocatedTasks() {
-        return resourceAllocatedTasks;
+    public List<ServiceOrder> getServiceOrderList() {
+        return serviceOrderList;
     }
 
-    public void setResourceAllocatedTasks(List<ServiceOrder> resourceAllocatedTasks) {
-        this.resourceAllocatedTasks = resourceAllocatedTasks;
+    public void setServiceOrderList(List<ServiceOrder> resourceAllocatedTasks) {
+        this.serviceOrderList = resourceAllocatedTasks;
     }
 
     public double getPlannedVolume() {
@@ -64,11 +70,11 @@ public class ServiceSummaryPlan extends StandardObject {
     }
 
     public void addResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
-        if ( this.resourceAllocatedTasks.contains(resourceAllocatedTask) ) return;
-        this.resourceAllocatedTasks.add(resourceAllocatedTask);
+        if ( this.serviceOrderList.contains(resourceAllocatedTask) ) return;
+        this.serviceOrderList.add(resourceAllocatedTask);
     }
 
     public void removeResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
-        this.resourceAllocatedTasks.remove(resourceAllocatedTask);
+        this.serviceOrderList.remove(resourceAllocatedTask);
     }
 }

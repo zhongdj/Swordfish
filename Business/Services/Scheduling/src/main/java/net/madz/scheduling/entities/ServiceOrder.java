@@ -13,14 +13,14 @@ import net.madz.contract.spec.entities.PouringPartSpec;
 import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
-@Table(name = "planned_resource_allocated_task")
+@Table(name = "service_order")
 public class ServiceOrder extends StandardObject {
 
     private static final long serialVersionUID = -6118079224654228286L;
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "POURING_PART_SPEC_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
@@ -28,7 +28,7 @@ public class ServiceOrder extends StandardObject {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "SUMMARY_PLAN_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
@@ -37,7 +37,7 @@ public class ServiceOrder extends StandardObject {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "MIXING_PLANT_RESOURCE_ID", nullable = false, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
@@ -45,13 +45,13 @@ public class ServiceOrder extends StandardObject {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = true,
+            @JoinColumn(name = "CONCRETE_TRUCK_RESOURCE_ID", nullable = false, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
     private ConcreteTruckResource truckResource;
 
-    @Column(name = "planned_volume", nullable = false, updatable = true)
+    @Column(name = "PLANNED_VOLUME", nullable = false, updatable = true)
     private double plannedVolume;
 
     private String state;

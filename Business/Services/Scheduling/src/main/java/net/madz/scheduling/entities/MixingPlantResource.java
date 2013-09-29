@@ -16,7 +16,7 @@ import net.madz.authorization.entities.StandardObject;
 import org.eclipse.persistence.annotations.Indexes;
 
 @Entity
-@Table(name = "mixing_plant_resoruce")
+@Table(name = "mixing_plant_resource")
 @Indexes()
 public class MixingPlantResource extends StandardObject {
 
