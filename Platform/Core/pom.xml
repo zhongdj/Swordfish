@@ -37,7 +37,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
-			<artifactId>Lifecyle</artifactId>
+			<artifactId>Lifecycle</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

@@ -2,9 +2,7 @@ package net.madz.core.biz;
 
 import javax.persistence.EntityManager;
 
-import net.madz.lifecycle.IReactiveObject;
-
-public interface IBizObject<T> {// extends IReactiveObject {
+public interface IBizObject<T> {
 
     Long getId();
 
