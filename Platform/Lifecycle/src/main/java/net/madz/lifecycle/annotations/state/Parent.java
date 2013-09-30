@@ -1,4 +1,4 @@
-package net.madz.lifecycle.annotations;
+package net.madz.lifecycle.annotations.state;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,11 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StateMachine {
+public @interface Parent {
 
-    StateSet states() default @StateSet();
-
-    TransitionSet transitions() default @TransitionSet();
-
-    Class<?> parentOn() default Null.class;
+    String value() default "";
 }

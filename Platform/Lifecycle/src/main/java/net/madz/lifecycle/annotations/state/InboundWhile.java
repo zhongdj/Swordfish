@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InboundWhile {
 
-    Class<?>[] value() default {};
+    Class<?> relation();
+
+    Class<?>[] on();
 }

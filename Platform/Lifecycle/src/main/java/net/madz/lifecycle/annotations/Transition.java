@@ -9,8 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Transition {
 
-    public static class NULL {
-    }
-
-    Class<?> value() default NULL.class;
+    Class<?> value() default Null.class;
 }
