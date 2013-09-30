@@ -117,4 +117,100 @@ public interface IPlantScheduleOrder  {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                 Quick Look: Long Process Reactive Live Object
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+@StateMachine(states = @StateSet(IDownloadProcess.States.class), transitions = TransitionSet(IDownloadProcess.Transitions.class))
+public interface IDownloadProcess {
+
+    static class States {
+       @Intial
+       @Functions ({
+                    @Function(transition = Prepare.class, value = Queued.class), 
+                    @Function(transition = Remove.class, value = Removed.class )
+       })
+       static class New {}
+       
+       @Running
+       @Functions ({
+                    @Function(transition = Pause.class, value = Paused.class),
+                    @Function(transition = Start.class, value = Started.class),
+                    @Function(transition = Deactive.class, value = InactiveQueued.class), 
+                    @Function(transition = Remove.class, value = Removed.class )
+       })
+       static class Queued {}
+       
+       @Running
+       @Functions ({
+                    @Function(transition = Pause.class, value = Paused.class),
+                    @Function(transition = Receive.class, value = Started.class),
+                    @Function(transition = Deactive.class, value = InactiveStarted.class),
+                    @Function(transition = Err.class, value = Failed.class),
+                    @Function(transition = Finish.class, value = Finished.class),
+                    @Function(transition = Remove.class, value = Removed.class)
+       })
+       static class Started {}
+       
+       @Corrupted ( recoverPriority = 1 )
+       @Functions ({
+                    @Function(transition = Activate.class, value = Queued.class),
+                    @Function(transition = Remove.class, value = Removed.class)
+       })
+       static class InactiveQueued {}
+       
+       @Corrupted ( recoverPriority = 0 )
+       @Functions ({
+                    @Function(transition = Activate.class, value = Queued.class),
+                    @Function(transition = Remove.class, value = Removed.class)
+       })
+       static class InactiveStarted {}
+       
+       @Stopped
+       @Functions ({
+                    @Function(transition = Resume.class, value = New.class),
+                    @Function(transition = Restart.class, value = New.class),
+                    @Function(transition = Remove.class, value = Removed.class)
+       })
+       static class Paused {}
+       
+       @Stopped
+       @Functions ({
+                    @Function(transition = Restart.class, value = New.class),
+                    @Function(transition = Resume.class, value = New.class),
+                    @Function(transition = Remove.class, value = Removed.class),
+       })
+       static class Failed {}
+       
+       @Stopped
+       @Functions ({
+                    @Function(transition = Restart.class, value = New.class),
+                    @Function(transition = Remove.class, value = Removed.class),
+       })
+       static class Finished {}
+       
+       @End
+       static class Removed {}
+    }
+   
+    static class Transitions{
+        @Recover
+        @Timeout(3000L)
+        static class Activate {}
+        @Corrupt
+        @Timeout(3000L)
+        static class Deactivate {}
+        @Fail
+        @Timeout(3000L)
+        static class Err {}
+        static class Prepare {}
+        static class Start {}
+        static class Resume {}
+        static class Pause {}
+        static class Finish {}
+        static class Receive {}
+        @Redo
+        @Timeout(3000L)
+        static class Restart {}
+        static Remove {}
+    }
