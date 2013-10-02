@@ -1,12 +1,12 @@
 package net.madz.scheduling.biz.impl;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import net.madz.core.biz.AbstractBO;
+import net.madz.core.biz.BizObjectManager;
 import net.madz.core.utils.ProxyList;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;

@@ -1,7 +1,6 @@
 package net.madz.scheduling.entities;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 
 import net.madz.authorization.entities.StandardObject;
 
