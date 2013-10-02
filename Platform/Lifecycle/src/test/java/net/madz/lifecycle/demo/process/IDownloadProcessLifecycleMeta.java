@@ -15,22 +15,22 @@ import net.madz.lifecycle.annotations.state.Corrupted;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Running;
 import net.madz.lifecycle.annotations.state.Stopped;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Activate;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Deactive;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Err;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Finish;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Pause;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Prepare;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Receive;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Remove;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Restart;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Resume;
-import net.madz.lifecycle.demo.process.IDownloadProcess.Transitions.Start;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Activate;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Deactive;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Err;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Finish;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Pause;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Prepare;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Receive;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Remove;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Restart;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Resume;
+import net.madz.lifecycle.demo.process.IDownloadProcessLifecycleMeta.Transitions.Start;
 
-@StateMachine(states = @StateSet(IDownloadProcess.States.class),
-        transitions = @TransitionSet(IDownloadProcess.Transitions.class))
-public interface IDownloadProcess {
+@StateMachine
+public interface IDownloadProcessLifecycleMeta {
 
+    @StateSet
     static class States {
 
         @Initial
@@ -85,6 +85,7 @@ public interface IDownloadProcess {
         static class Removed {}
     }
 
+    @TransitionSet
     static class Transitions {
 
         @Recover

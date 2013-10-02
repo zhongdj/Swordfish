@@ -9,9 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StateMachine {
 
-    StateSet states() default @StateSet();
-
-    TransitionSet transitions() default @TransitionSet();
-
     Class<?> parentOn() default Null.class;
 }

@@ -5,16 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Customizable State Type and Name
- * Design considerations:
- * 
- * @author Barry
- * 
- */
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StateIndicator {
+public @interface LifecycleMeta {
 
-    String value() default "state";
+    Class<?> value();
 }
