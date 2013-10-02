@@ -5,13 +5,20 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import net.madz.core.entities.AbstractBaseEntity;
-import net.madz.lifecycle.impl.TransitionInvocationHandler;
 
 public class BOFactory {
 
+    private static Logger logger = Logger.getLogger(BOFactory.class.getName());
+    
     public static <E extends AbstractBaseEntity, T extends IBizObject<E>> T create(Class<T> proxyClass) {
         BOProxy annotation = proxyClass.getAnnotation(BOProxy.class);
         if ( proxyClass.isAssignableFrom(annotation.value()) ) {
@@ -53,6 +60,22 @@ public class BOFactory {
 
     @SuppressWarnings("unchecked")
     private static <E extends AbstractBaseEntity, T extends IBizObject<E>> T wrap(final Class<T> proxyClass, final T object) {
+        
+        try {
+            InitialContext context = new InitialContext();
+            String nameInNamespace = context.getNameInNamespace();
+            logger.info("name In Namesapce = " + nameInNamespace);
+            
+            Hashtable<?,?> environment = context.getEnvironment();
+            for ( Entry e : environment.entrySet()) {
+                logger.info("Key = "  + e.getKey().toString() + ", Value = " + e.getValue().toString());
+            }
+            
+        } catch (NamingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         return (T) Proxy.newProxyInstance(BOFactory.class.getClassLoader(), new Class[] { proxyClass }, new InvocationHandler() {
 
             @SuppressWarnings("rawtypes")
