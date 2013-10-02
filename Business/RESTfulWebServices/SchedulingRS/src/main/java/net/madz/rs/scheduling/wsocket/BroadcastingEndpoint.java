@@ -9,7 +9,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-@ServerEndpoint(value = "scheduling/ws-endpoint", encoders = {})
+@ServerEndpoint(value = "/scheduling/ws-endpoint", encoders = {})
 public class BroadcastingEndpoint {
 
     @OnOpen
