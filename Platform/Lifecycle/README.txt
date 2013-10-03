@@ -17,7 +17,7 @@ public interface IServiceOrder {
     String getServiceOrderState();
 }
 
-----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 @StateMachine
 public interface ServiceableLifecycleMeta {
@@ -77,7 +77,7 @@ public interface IServiceOrder {
     String getServiceOrderState();
 }
 
--------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 @StateMachine
 public interface ServiceableLifecycleMeta {
@@ -155,7 +155,7 @@ public interface IConcreteTruckResource {
     void detach();
 }
 
-------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 @StateMachine
 public interface ConcreteTruckResourceLifecycleMeta extends SchedulableLifecycleMeta {
 
@@ -176,7 +176,7 @@ public interface ConcreteTruckResourceLifecycleMeta extends SchedulableLifecycle
         public static class Detach {}
     }
 }
-------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 @StateMachine
 public interface SchedulableLifecycleMeta {
 
