@@ -1,3 +1,304 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                  Quick Look: Stand-alone Reactive Object
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@LifecycleMeta(ServiceableLifecycleMeta.class)
+public interface IServiceOrder {
+
+    @Transition(Schedule.class)
+    void allocateResources();
+
+    @Transition(Start.class)
+    void confirmStart();
+
+    @Transition(Finish.class)
+    void confirmFinish();
+
+    @StateIndicator
+    String getServiceOrderState();
+}
+
+----------------------------------------------------------------------------------------------------------------
+
+@StateMachine
+public interface ServiceableLifecycleMeta {
+
+    @StateSet
+    static class States {
+
+        @Initial
+        @Function(transition = Schedule.class, value = Queued.class)
+        static class Created {}
+
+        @Functions({ @Function(transition = Start.class, value = Ongoing.class),
+                @Function(transition = Cancel.class, value = Cancelled.class) })
+        static class Queued {}
+
+        @Functions({ @Function(transition = Finish.class, value = Finished.class),
+                @Function(transition = Cancel.class, value = Cancelled.class) })
+        static class Ongoing {}
+
+        @End
+        static class Finished {}
+
+        @End
+        static class Cancelled {}
+    }
+
+    @TransitionSet
+    static class Transitions {
+
+        static class Schedule {}
+
+        static class Start {}
+
+        static class Finish {}
+
+        static class Cancel {}
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                 Quick Look: Dependent Reactive Object
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@LifecycleMeta(ServiceableLifecycleMeta.class)
+public interface IServiceOrder {
+
+    @Transition(Schedule.class)
+    void allocateResources(@Relation(PlantResource.class) IPlantResource plantResource,
+            @Relation(ConcreteTruckResource.class) IConcreteTruckResource truckResource);
+
+    @Transition(ServiceableLifecycleMeta.Transitions.Start.class)
+    void confirmStart();
+
+    @Transition(ServiceableLifecycleMeta.Transitions.Finish.class)
+    void confirmFinish();
+
+    @StateIndicator
+    String getServiceOrderState();
+}
+
+-------------------------------------------------------------------------------------------------------------
+
+@StateMachine
+public interface ServiceableLifecycleMeta {
+
+    @StateSet
+    public static class States {
+
+        @Initial
+        @Function(transition = Schedule.class, value = Queued.class)
+        @InboundWhiles({
+                @InboundWhile(relation = PlantResource.class, on = { PlantResourceLifecycleMeta.States.Idle.class,
+                        PlantResourceLifecycleMeta.States.Busy.class }),
+                @InboundWhile(relation = PlantResource.class, on = {
+                        ConcreteTruckResourceLifecycleMeta.States.Idle.class,
+                        ConcreteTruckResourceLifecycleMeta.States.Busy.class }) })
+        public static class Created {}
+
+        @Functions({ @Function(transition = Start.class, value = Ongoing.class),
+                @Function(transition = Cancel.class, value = Cancelled.class) })
+        public static class Queued {}
+
+        @Functions({ @Function(transition = Finish.class, value = Finished.class),
+                @Function(transition = Cancel.class, value = Cancelled.class) })
+        public static class Ongoing {}
+
+        @End
+        public static class Finished {}
+
+        @End
+        public static class Cancelled {}
+    }
+
+    @TransitionSet
+    public static class Transitions {
+
+        public static class Schedule {}
+
+        public static class Start {}
+
+        public static class Finish {}
+
+        public static class Cancel {}
+    }
+
+    @RelationSet
+    public static class Relations {
+
+        // default to @Relation("plantResource")
+        public static class PlantResource {}
+
+        // default to @Relation("concreteTruckResource")
+        public static class ConcreteTruckResource {}
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                 Quick Look: Lifecycle Inheritance
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@LifecycleMeta(ConcreteTruckResourceLifecycleMeta.class)
+@StateIndicator
+//Default with getState
+public interface IConcreteTruckResource {
+
+    @Transition
+    // default to @Transition(Assign.class) use assign -> Assign
+    void assign();
+
+    @Transition(ConcreteTruckResourceLifecycleMeta.Transitions.Release.class)
+    void doRelease();
+
+    @Transition
+    // default to @Transition(Detach.class) use detach -> Detach
+    void detach();
+}
+
+------------------------------------------------------------------------------------------------------------
+@StateMachine
+public interface ConcreteTruckResourceLifecycleMeta extends SchedulableLifecycleMeta {
+
+    @StateSet
+    public static class States extends SchedulableLifecycleMeta.States {
+
+        @Initial
+        @Function(transition = Detach.class, value = Detached.class)
+        public static class Idle extends SchedulableLifecycleMeta.States.Idle {}
+
+        @End
+        public static class Detached {}
+    }
+
+    @TransitionSet
+    public class Transitions extends SchedulableLifecycleMeta.Transitions {
+
+        public static class Detach {}
+    }
+}
+------------------------------------------------------------------------------------------------------------
+@StateMachine
+public interface SchedulableLifecycleMeta {
+
+    @StateSet
+    public static class States {
+
+        @Functions({ @Function(transition = Assign.class, value = Busy.class) })
+        public static class Idle {}
+
+        @Function(transition = Release.class, value = Idle.class)
+        public static class Busy {}
+    }
+
+    @TransitionSet
+    public static class Transitions {
+
+        public static class Assign {}
+
+        public static class Release {}
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                 Quick Look: Long Process Reactive Live Object
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@StateMachine
+public interface IDownloadProcess {
+
+    @StateSet
+    static class States {
+
+        @Initial
+        @Functions({ @Function(transition = Prepare.class, value = Queued.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class New {}
+
+        @Running
+        @Functions({ @Function(transition = Pause.class, value = Paused.class),
+                @Function(transition = Start.class, value = Started.class),
+                @Function(transition = Deactive.class, value = InactiveQueued.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class Queued {}
+
+        @Running
+        @Functions({ @Function(transition = Pause.class, value = Paused.class),
+                @Function(transition = Receive.class, value = Started.class),
+                @Function(transition = Deactive.class, value = InactiveStarted.class),
+                @Function(transition = Err.class, value = Failed.class),
+                @Function(transition = Finish.class, value = Finished.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class Started {}
+
+        @Corrupted(recoverPriority = 1)
+        @Functions({ @Function(transition = Activate.class, value = Queued.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class InactiveQueued {}
+
+        @Corrupted(recoverPriority = 0)
+        @Functions({ @Function(transition = Activate.class, value = Queued.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class InactiveStarted {}
+
+        @Stopped
+        @Functions({ @Function(transition = Resume.class, value = New.class),
+                @Function(transition = Restart.class, value = New.class),
+                @Function(transition = Remove.class, value = Removed.class) })
+        static class Paused {}
+
+        @Stopped
+        @Functions({ @Function(transition = Restart.class, value = New.class),
+                @Function(transition = Resume.class, value = New.class),
+                @Function(transition = Remove.class, value = Removed.class), })
+        static class Failed {}
+
+        @Stopped
+        @Functions({ @Function(transition = Restart.class, value = New.class),
+                @Function(transition = Remove.class, value = Removed.class), })
+        static class Finished {}
+
+        @End
+        static class Removed {}
+    }
+
+    @TransitionSet
+    static class Transitions {
+
+        @Recover
+        @Timeout(3000L)
+        static class Activate {}
+
+        @Corrupt
+        @Timeout(3000L)
+        static class Deactive {}
+
+        @Fail
+        @Timeout(3000L)
+        static class Err {}
+
+        static class Prepare {}
+
+        static class Start {}
+
+        static class Resume {}
+
+        static class Pause {}
+
+        static class Finish {}
+
+        static class Receive {}
+
+        @Redo
+        @Timeout(3000L)
+        static class Restart {}
+
+        static class Remove {}
+    }
+}
+
 Lifecycle exists since variations happening always. A subset of data varies together, and others do not. To simplify describing system states(data) 
 manipulation by instructions, a block of data and a few blocks of instructions were introduced to make the expression more concisely and clearly, 
 such as structs and functions constructs in C programming language, or class in java (OO) programming language. 
@@ -63,182 +364,3 @@ except state synchronization transition from parent.
 
 4. Provide life cycle intercepts during reactive object's prior or post state changes happens.
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                  Quick Look: Stand-alone Reactive Object
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@StateMachine(states = @StateSet(IServiceOrder.States.class),
-        transitions = @TransitionSet(IServiceOrder.Transitions.class))
-public interface IServiceOrder {
-
-    @StateIndicator("serviceOrderState")
-    static class States {
-        @Initial
-        @Function(transition = Schedule.class, value = Scheduled.class)
-        static class Created {}
-        @Function(transition = Start.class, value = Ongoing.class)
-        static class Scheduled {}
-        @Function(transition = Finish.class, value = Finished.class)
-        static class Ongoing {}
-        @End
-        static class Finished {}
-    }
-
-    static class Transitions {
-        static class Schedule {}
-        static class Start {}
-        static class Finish {}
-    }
-
-    @Transition(Schedule.class)
-    void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource);
-
-    @Transition(Start.class)
-    void confirmStart();
-
-    @Transition(Finish.class)
-    void confirmFinish();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                 Quick Look: Dependent Reactive Object
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@StateMachine(states = @StateSet(IPlantScheduleOrder.States.class),
-              transitions = @TransitionSet(IPlantScheduleOrder.Transitions.class)
-              parentOn = IServiceOrder.class)
-public interface IPlantScheduleOrder  {
-
-    @StateIndicator("plantScheduleOrderState")
-    static class States {
-
-        @Initial
-        @InboundWhile(relation="serviceOrder", on=IServiceOrder.States.Scheduled.class)
-        // Default @ValidWhile(relation="serviceOrder", on = {IServiceOrder.States.Scheduled.class})
-        @Functions({ @Function(transition = Start.class, value = Working.class) })
-        static class Created {}
-
-        @InboundWhile(relation="serviceOrder", on={IServiceOrder.States.Ongoing.class})
-        // Default @ValidWhile(IServiceOrder.States.Ongoing.class)
-        @Functions({ @Function(transition = Finish.class, value = Done.class) })
-        static class Working {}
-
-        @End
-        @InboundWhile(relation="serviceOrder", on={IServiceOrder.States.Ongoing.class})
-        @ValidWhile(relation="serviceOrder", on={ IServiceOrder.States.Ongoing.class, IServiceOrder.States.Finished.class })
-        //Default @Functions({})
-        static class Done {}
-    }
-
-    static class Transitions {
-
-        static class Start {}
-
-        static class Finish {}
-    }
-
-    @Transition(Transitions.Start.class)
-    void doStartPlantOrder();
-
-    @Transition(Transitions.Finish.class)
-    void doFinishPlantOrder();
-    
-    IServiceOrder getServiceOrder();
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                 Quick Look: Long Process Reactive Live Object
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@StateMachine(states = @StateSet(IDownloadProcess.States.class),
-        transitions = @TransitionSet(IDownloadProcess.Transitions.class))
-public interface IDownloadProcess {
-
-    static class States {
-
-        @Initial
-        @Functions({ @Function(transition = Prepare.class, value = Queued.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class New {}
-
-        @Running
-        @Functions({ @Function(transition = Pause.class, value = Paused.class),
-                @Function(transition = Start.class, value = Started.class),
-                @Function(transition = Deactive.class, value = InactiveQueued.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class Queued {}
-
-        @Running
-        @Functions({ @Function(transition = Pause.class, value = Paused.class),
-                @Function(transition = Receive.class, value = Started.class),
-                @Function(transition = Deactive.class, value = InactiveStarted.class),
-                @Function(transition = Err.class, value = Failed.class),
-                @Function(transition = Finish.class, value = Finished.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class Started {}
-
-        @Corrupted(recoverPriority = 1)
-        @Functions({ @Function(transition = Activate.class, value = Queued.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class InactiveQueued {}
-
-        @Corrupted(recoverPriority = 0)
-        @Functions({ @Function(transition = Activate.class, value = Queued.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class InactiveStarted {}
-
-        @Stopped
-        @Functions({ @Function(transition = Resume.class, value = New.class),
-                @Function(transition = Restart.class, value = New.class),
-                @Function(transition = Remove.class, value = Removed.class) })
-        static class Paused {}
-
-        @Stopped
-        @Functions({ @Function(transition = Restart.class, value = New.class),
-                @Function(transition = Resume.class, value = New.class),
-                @Function(transition = Remove.class, value = Removed.class), })
-        static class Failed {}
-
-        @Stopped
-        @Functions({ @Function(transition = Restart.class, value = New.class),
-                @Function(transition = Remove.class, value = Removed.class), })
-        static class Finished {}
-
-        @End
-        static class Removed {}
-    }
-
-    static class Transitions {
-
-        @Recover
-        @Timeout(3000L)
-        static class Activate {}
-
-        @Corrupt
-        @Timeout(3000L)
-        static class Deactive {}
-
-        @Fail
-        @Timeout(3000L)
-        static class Err {}
-
-        static class Prepare {}
-
-        static class Start {}
-
-        static class Resume {}
-
-        static class Pause {}
-
-        static class Finish {}
-
-        static class Receive {}
-
-        @Redo
-        @Timeout(3000L)
-        static class Restart {}
-
-        static class Remove {}
-    }
-}
