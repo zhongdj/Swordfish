@@ -1,9 +1,9 @@
-package net.madz.lifecycle.demo.relational;
+package net.madz.lifecycle.demo.inheritance;
 
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.demo.relational.meta.PlantResourceLifecycleMeta;
+import net.madz.lifecycle.demo.inheritance.meta.PlantResourceLifecycleMeta;
 
 @LifecycleMeta(PlantResourceLifecycleMeta.class)
 @StateIndicator

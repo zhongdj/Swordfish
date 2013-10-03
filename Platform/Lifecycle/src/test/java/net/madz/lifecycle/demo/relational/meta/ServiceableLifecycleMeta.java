@@ -23,7 +23,7 @@ public interface ServiceableLifecycleMeta {
     public static class States {
 
         @Initial
-        @Function(transition = Schedule.class, value = Scheduled.class)
+        @Function(transition = Schedule.class, value = Queued.class)
         @InboundWhiles({
                 @InboundWhile(relation = PlantResource.class, on = { PlantResourceLifecycleMeta.States.Idle.class,
                         PlantResourceLifecycleMeta.States.Busy.class }),
@@ -34,7 +34,7 @@ public interface ServiceableLifecycleMeta {
 
         @Functions({ @Function(transition = Start.class, value = Ongoing.class),
                 @Function(transition = Cancel.class, value = Cancelled.class) })
-        public static class Scheduled {}
+        public static class Queued {}
 
         @Functions({ @Function(transition = Finish.class, value = Finished.class),
                 @Function(transition = Cancel.class, value = Cancelled.class) })
