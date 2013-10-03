@@ -3,6 +3,8 @@ package net.madz.lifecycle.demo.inheritance.meta;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
+import net.madz.lifecycle.annotations.StateSet;
+import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.StateOverride;
 import net.madz.lifecycle.demo.inheritance.meta.PlantScheduleOrderLifecycleMeta.Transitions.Finish;
@@ -10,12 +12,13 @@ import net.madz.lifecycle.demo.inheritance.meta.VehicleScheduleOrderLifecycleMet
 import net.madz.lifecycle.demo.inheritance.meta.VehicleScheduleOrderLifecycleMeta.Transitions.DoTransport;
 
 @StateMachine
-public interface VehicleScheduleOrderLifecycleMeta extends ServiceableLifecycleMeta {
+public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
 
-    public static class States extends ServiceableLifecycleMeta.States {
+    @StateSet
+    public static class States extends OrderLifecycleMeta.States {
 
         @StateOverride
-        public static class Ongoing extends ServiceableLifecycleMeta.States.Ongoing {
+        public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {
 
             @Initial
             @Function(transition = DoTransport.class, value = OnPassage.class)
@@ -29,7 +32,8 @@ public interface VehicleScheduleOrderLifecycleMeta extends ServiceableLifecycleM
         }
     }
 
-    public static class Transitions extends ServiceableLifecycleMeta.Transitions {
+    @TransitionSet
+    public static class Transitions extends OrderLifecycleMeta.Transitions {
 
         public static class DoTransport {}
 

@@ -10,6 +10,7 @@ import net.madz.lifecycle.annotations.state.InboundWhile;
 import net.madz.lifecycle.annotations.state.InboundWhiles;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.RelationSet;
+import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Relations.ConcreteTruckResource;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Relations.PlantResource;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Transitions.Cancel;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Transitions.Finish;
@@ -24,16 +25,18 @@ public interface ServiceableLifecycleMeta {
 
         @Initial
         @Function(transition = Schedule.class, value = Queued.class)
-        @InboundWhiles({
-                @InboundWhile(relation = PlantResource.class, on = { PlantResourceLifecycleMeta.States.Idle.class,
-                        PlantResourceLifecycleMeta.States.Busy.class }),
-                @InboundWhile(relation = PlantResource.class, on = {
-                        ConcreteTruckResourceLifecycleMeta.States.Idle.class,
-                        ConcreteTruckResourceLifecycleMeta.States.Busy.class }) })
         public static class Created {}
 
         @Functions({ @Function(transition = Start.class, value = Ongoing.class),
                 @Function(transition = Cancel.class, value = Cancelled.class) })
+        @InboundWhiles({
+                @InboundWhile(relation = PlantResource.class, on = { PlantResourceLifecycleMeta.States.Idle.class,
+                        PlantResourceLifecycleMeta.States.Busy.class }),
+                @InboundWhile(relation = ConcreteTruckResource.class, on = {
+                        ConcreteTruckResourceLifecycleMeta.States.Idle.class,
+                        ConcreteTruckResourceLifecycleMeta.States.Busy.class }) })
+        // Default @ValidWhiles = @InboundWhiles or Default @ValidWhile =
+        // @InboundWhile
         public static class Queued {}
 
         @Functions({ @Function(transition = Finish.class, value = Finished.class),

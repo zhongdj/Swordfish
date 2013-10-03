@@ -18,6 +18,6 @@ public interface IPlantScheduleOrder {
     @Parent
     IServiceOrder getServiceOrder();
 
-    @StateIndicator("plantScheduleOrderState")
+    @StateIndicator
     String getPlantScheduleOrderState();
 }

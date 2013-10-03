@@ -5,6 +5,7 @@ import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.demo.inheritance.meta.SchedulableLifecycleMeta.Transitions.Assign;
 import net.madz.lifecycle.demo.inheritance.meta.SchedulableLifecycleMeta.Transitions.Release;
 
@@ -12,8 +13,10 @@ import net.madz.lifecycle.demo.inheritance.meta.SchedulableLifecycleMeta.Transit
 public interface SchedulableLifecycleMeta {
 
     @StateSet
-    public static class States {
+    //abstract only indicate there is no final(@End) states definition
+    public static abstract class States {
 
+        @Initial
         @Functions({ @Function(transition = Assign.class, value = Busy.class) })
         public static class Idle {}
 

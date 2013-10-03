@@ -7,13 +7,13 @@ import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.demo.inheritance.meta.ServiceableLifecycleMeta.Transitions.Cancel;
-import net.madz.lifecycle.demo.inheritance.meta.ServiceableLifecycleMeta.Transitions.Finish;
-import net.madz.lifecycle.demo.inheritance.meta.ServiceableLifecycleMeta.Transitions.Schedule;
-import net.madz.lifecycle.demo.inheritance.meta.ServiceableLifecycleMeta.Transitions.Start;
+import net.madz.lifecycle.demo.inheritance.meta.OrderLifecycleMeta.Transitions.Cancel;
+import net.madz.lifecycle.demo.inheritance.meta.OrderLifecycleMeta.Transitions.Finish;
+import net.madz.lifecycle.demo.inheritance.meta.OrderLifecycleMeta.Transitions.Schedule;
+import net.madz.lifecycle.demo.inheritance.meta.OrderLifecycleMeta.Transitions.Start;
 
 @StateMachine
-public interface ServiceableLifecycleMeta {
+public interface OrderLifecycleMeta {
 
     @StateSet
     public static class States {
