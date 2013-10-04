@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta;
+package net.madz.lifecycle.meta.typed;
 
 import java.lang.reflect.Method;
 

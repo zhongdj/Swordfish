@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta.impl;
+package net.madz.lifecycle.meta.typed.impl;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -9,10 +9,10 @@ import net.madz.common.ParameterString;
 import net.madz.lifecycle.annotations.typed.ITypedReactiveObject;
 import net.madz.lifecycle.annotations.typed.ITypedState;
 import net.madz.lifecycle.annotations.typed.ITypedTransition;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.StateMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData;
-import net.madz.lifecycle.meta.StateMetaData.StateTypeEnum;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaData.StateTypeEnum;
 import net.madz.meta.KeySet;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;

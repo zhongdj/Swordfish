@@ -1,14 +1,14 @@
-package net.madz.lifecycle.meta.impl;
+package net.madz.lifecycle.meta.typed.impl;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.typed.ITypedReactiveObject;
 import net.madz.lifecycle.annotations.typed.ITypedState;
 import net.madz.lifecycle.annotations.typed.ITypedTransition;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.StateMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData.TransitionTypeEnum;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData.TransitionTypeEnum;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;

@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta;
+package net.madz.lifecycle.meta.typed;
 
 import net.madz.common.Dumpable;
 import net.madz.lifecycle.annotations.typed.ITypedReactiveObject;

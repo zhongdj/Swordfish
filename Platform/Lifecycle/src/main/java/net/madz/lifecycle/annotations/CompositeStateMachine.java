@@ -7,9 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StateMachine {
-
-    String name() default "";
-
-    Class<?> parentOn() default Null.class;
+public @interface CompositeStateMachine {
 }

@@ -23,36 +23,36 @@ import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.S
 public interface ServiceableLifecycleMeta {
 
     @StateSet
-    static class States {
+    public static class States {
 
         @Initial
         @Function(transition = Schedule.class, value = Queued.class)
-        static class Created {}
+        public static class Created {}
 
         @Functions({ @Function(transition = Start.class, value = Ongoing.class),
                 @Function(transition = Cancel.class, value = Cancelled.class) })
-        static class Queued {}
+        public static class Queued {}
 
         @Functions({ @Function(transition = Finish.class, value = Finished.class),
                 @Function(transition = Cancel.class, value = Cancelled.class) })
-        static class Ongoing {}
+        public static class Ongoing {}
 
         @End
-        static class Finished {}
+        public static class Finished {}
 
         @End
-        static class Cancelled {}
+        public static class Cancelled {}
     }
 
     @TransitionSet
-    static class Transitions {
+    public static class Transitions {
 
-        static class Schedule {}
+        public static class Schedule {}
 
-        static class Start {}
+        public static class Start {}
 
-        static class Finish {}
+        public static class Finish {}
 
-        static class Cancel {}
+        public static class Cancel {}
     }
 }

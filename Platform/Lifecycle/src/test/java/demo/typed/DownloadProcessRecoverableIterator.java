@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.madz.lifecycle.IRecoverableIterator;
-import net.madz.lifecycle.meta.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
 import demo.typed.IDownloadProcess.StateEnum;
 import demo.typed.IDownloadProcess.TransitionEnum;
 

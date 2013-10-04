@@ -30,4 +30,5 @@ public interface MetaDataBuilder<SELF extends MetaData, PARENT extends MetaData>
      * @return
      */
     public boolean hasKey(Object key);
+
 }

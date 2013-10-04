@@ -12,10 +12,10 @@ import net.madz.lifecycle.annotations.typed.ITypedTransition;
 import net.madz.lifecycle.annotations.typed.TypedStateContext;
 import net.madz.lifecycle.annotations.typed.TypedStateMachine;
 import net.madz.lifecycle.annotations.typed.TypedTransition;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.StateMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData;
-import net.madz.lifecycle.meta.impl.StateMachineMetaDataBuilderImpl;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.impl.StateMachineMetaDataBuilderImpl;
 import net.madz.util.StringUtil;
 
 import org.apache.log4j.Logger;

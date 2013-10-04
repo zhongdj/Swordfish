@@ -1,12 +1,12 @@
-package net.madz.lifecycle.meta.impl;
+package net.madz.lifecycle.meta.typed.impl;
 
 import java.lang.reflect.Method;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.typed.ITypedTransition;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationFailureSet;
 

@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta;
+package net.madz.lifecycle.meta.typed;
 
 import net.madz.common.Dumpable;
 import net.madz.lifecycle.annotations.typed.ITypedReactiveObject;
@@ -24,7 +24,8 @@ public interface StateMetaData<R extends ITypedReactiveObject, S extends ITypedS
 
     TransitionMetaData getCorruptTransitionMetaData();
 
+    boolean containsRecoverTransition();
+
     TransitionMetaData getRecoverTransitionMetaData();
 
-    boolean containsRecoverTransition();
 }

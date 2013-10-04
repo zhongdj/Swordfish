@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta.impl;
+package net.madz.lifecycle.meta.typed.impl;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -11,11 +11,11 @@ import net.madz.lifecycle.annotations.typed.TypedStateMachine;
 import net.madz.lifecycle.annotations.typed.TypedStateSet;
 import net.madz.lifecycle.annotations.typed.TypedTransition;
 import net.madz.lifecycle.annotations.typed.TypedTransitionSet;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.StateMachineMetaDataBuilder;
-import net.madz.lifecycle.meta.StateMetaData;
-import net.madz.lifecycle.meta.StateMetaDataBuilder;
-import net.madz.lifecycle.meta.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMachineMetaDataBuilder;
+import net.madz.lifecycle.meta.typed.StateMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaDataBuilder;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
 import net.madz.meta.MetaData;
 import net.madz.meta.impl.MetaDataBuilderBase;
 import net.madz.verification.VerificationFailureSet;

@@ -8,10 +8,10 @@ import java.util.logging.Logger;
 import net.madz.event.ILifeCycleEventListener;
 import net.madz.event.LifeCycleEvent;
 import net.madz.lifecycle.impl.TransitionInvocationHandler;
-import net.madz.lifecycle.meta.StateMachineMetaData;
-import net.madz.lifecycle.meta.StateMetaData;
-import net.madz.lifecycle.meta.TransitionMetaData;
-import net.madz.lifecycle.meta.impl.StateMachineMetaDataBuilderImpl;
+import net.madz.lifecycle.meta.typed.StateMachineMetaData;
+import net.madz.lifecycle.meta.typed.StateMetaData;
+import net.madz.lifecycle.meta.typed.TransitionMetaData;
+import net.madz.lifecycle.meta.typed.impl.StateMachineMetaDataBuilderImpl;
 import net.madz.verification.VerificationFailureSet;
 
 import com.google.common.eventbus.Subscribe;
