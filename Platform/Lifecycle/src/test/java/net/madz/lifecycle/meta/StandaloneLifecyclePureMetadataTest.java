@@ -1,7 +1,5 @@
 package net.madz.lifecycle.meta;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -23,6 +21,7 @@ import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 
 import org.junit.Test;
+import static junit.framework.Assert.*;
 
 public class StandaloneLifecyclePureMetadataTest {
 
