@@ -1,0 +1,31 @@
+SET FOREIGN_KEY_CHECKS=0;
+
+insert into muser(ID, ACCESSDENIEDTIMES, EMAIL, FREEZENFLAG, FULLNAME, LOCKFLAG, LOGINFAILEDTIMES, LOGINTIMES, NEEDRESETPWD, PASSWORD, USERNAME, CREATED_BY, TENANT_ID, UPDATED_BY) values(1, 0, 'hailing@126.com', 0, 'tracylu', 0, 0, 1, 0, '123456', 'ANONYMOUS', 1, 1, 1);
+
+insert into tenant(ID, ADDRESS, ARREARAGE, ARTIFICIAL_PERSON_NAME, DELETED, EVALUATED, FREEZEN, HISTORY_SERVICE_DAYS, LOCKED, MATURITY_DATE, NAME, PAYMENT, SERVICE_DAYS_LEFT, SERVICE_DAYS_PAID, CREATED_BY, UPDATED_BY, TENANT_ID) values(1, 'Beijing Beichen East Road',0, 'Barryzhong',0,0,0,100,0, '2015-10-4','北京风云科技有限公司', 1000, 730, 100, 1,1,1);
+
+insert into service_summary_plan(TENANT_ID, ID, CREATED_BY, PRODUCE_SPEC_ID, UPDATED_BY ) values(1,1, 1, 1, 1);
+
+insert into mixing_plant_resource(TENANT_ID, ID, FINISHED_VOLUME,PLANNED_VOLUME ,CREATED_BY, UPDATED_BY, MIXING_PLANT_ID) values(1, 1, 300, 3000,1,1, 1);
+
+insert into mixing_plant(TENANT_ID, ID, NAME, PINYIN_ABBR_NAME, CREATED_BY, UPDATED_BY, OPERATOR_ID) values(1, 1, '第三号搅拌站', 'dshjbz', 1, 1, 2);
+
+insert into muser(ID, ACCESSDENIEDTIMES, EMAIL, FREEZENFLAG, FULLNAME, LOCKFLAG, LOGINFAILEDTIMES, LOGINTIMES, NEEDRESETPWD, PASSWORD, USERNAME, CREATED_BY, TENANT_ID, UPDATED_BY) values(2, 0, 'superdingdang@126.com', 0, 'superdingdang', 0, 0, 1, 0, '1234567', 'superdingdang', 1, 1, 1);
+
+insert into concrete_truck_resource(TENANT_ID, ID, CREATED_BY, UPDATED_BY, CONCRETE_TRUCK_ID) values(1, 1, 1, 1, 1);
+
+insert into concrete_truck(TENANT_ID, ID, LICENCE_PLATE_NUMBER, RATED_CAPACITY, CREATED_BY, UPDATED_BY) values(1, 1, '黑A001', 30, 1, 1);
+
+insert into POURING_PART_SPEC(TENANT_ID, ID, CREATED_BY, MIXTURE_ID, POURING_PART_ID, UNIT_PROJECT_ID, UPDATED_BY) values(1, 1, 1, 1, 1, 1, 1);
+
+insert into POURING_PART(TENANT_ID, ID, NAME, PINYIN_ABBR_NAME, CREATED_BY, UPDATED_BY) values(1, 1, '五层以下楼板', 'wcyxlb', 1, 1);
+
+insert into mixture(ID, type, GRADE_NAME) values(1, 'M', 'M2.5');
+
+insert into unit_project(TENANT_ID, ID, NAME, CITY_NAME, NUMBER, PROVINCE_NAME, STREET, ZIP_CODE, ALTITUDE, LATITUDE, LONGITUDE, CONTACT_ID, CONTRACT_ID, CREATED_BY, UPDATED_BY) values(1, 1, '绿波华园16号楼', '阿城', 253, '黑龙', '胜利大街', '153000', 0, 0, 0, 1, 1, 1, 1 );
+
+insert into contract(TENANT_ID, ID, CREATED_BY, CUSTOMER_ID, UPDATED_BY) values(1, 1, 1, 1, 1);
+
+insert into contact(TENANT_ID, ID, EMAIL, MALE, NAME, CREATED_BY, UPDATED_BY ) values(1, 1, 'wingspan@126.com', 0, '王三', 1, 1 );
+
+SET FOREIGN_KEY_CHECKS=1;
