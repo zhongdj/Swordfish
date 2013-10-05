@@ -128,4 +128,12 @@ public abstract class AbstractStateMachineRegistry {
     public Map<Object, StateMachineInst> getStateMachineInstances() {
         return Collections.unmodifiableMap(this.instanceMap);
     }
+
+    public StateMachineMetadata getStateMachineMeta(Object key) {
+        return this.typeMap.get(key);
+    }
+
+    public StateMachineInst getStateMachineInst(Object key) {
+        return this.instanceMap.get(key);
+    }
 }

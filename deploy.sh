@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mvn clean install
+mvn -DskipTests=true clean install
 
 cd Business/Archive
 
