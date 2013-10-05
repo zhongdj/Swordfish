@@ -19,7 +19,7 @@ public class MultitenancyBean {
     private EntityManagerFactory emf;
 
     @Resource
-    private EJBContext context;
+    protected EJBContext context;
 
     public MultitenancyBean() {
         super();
@@ -29,8 +29,9 @@ public class MultitenancyBean {
         Map<String, Long> tenantIdKey = new HashMap<>();
         EntityManager globalEm = emf.createEntityManager();
         try {
+            final String name = context.getCallerPrincipal().getName();
             Query query = globalEm.createNamedQuery("User.findByUsername").setParameter("username",
-                    context.getCallerPrincipal().getName());
+                    name);
             User user = (User) query.getSingleResult();
             long tenantId = user.getTenant().getId();
             tenantIdKey.put("tenant.id", tenantId);

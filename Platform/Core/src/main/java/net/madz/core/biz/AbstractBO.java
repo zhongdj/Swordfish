@@ -1,5 +1,6 @@
 package net.madz.core.biz;
 
+import javax.ejb.EJBContext;
 import javax.persistence.EntityManager;
 
 import net.madz.core.entities.AbstractBaseEntity;
@@ -7,6 +8,7 @@ import net.madz.core.entities.AbstractBaseEntity;
 public class AbstractBO<T extends AbstractBaseEntity> implements IBizObject<T> {
 
     protected final T entity;
+    protected EJBContext context;
 
     public AbstractBO(EntityManager em, Class<T> t, long id) {
         this(em.find(t, id));
@@ -42,5 +44,9 @@ public class AbstractBO<T extends AbstractBaseEntity> implements IBizObject<T> {
     @Override
     public void remove(EntityManager em) {
         em.remove(entity);
+    }
+    
+    public void setEJBContext(EJBContext context) {
+        this.context = context;
     }
 }
