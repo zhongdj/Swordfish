@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import net.madz.authorization.AuthContext;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.core.biz.AbstractBO;
@@ -14,6 +15,7 @@ import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IPlantScheduleOrder;
 import net.madz.scheduling.biz.IServiceOrder;
+import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.entities.ServiceOrder;
 
@@ -26,12 +28,19 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
         super(em, ServiceOrder.class, id);
     }
 
+
     public ServiceOrderBO(ServiceOrder order) {
         super(order);
     }
 
     public ServiceOrderBO() {
         super(new ServiceOrder());
+        setStandardObjectProperties();
+    }
+
+    private void setStandardObjectProperties() {
+        this.entity.setCreatedBy(AuthContext.getUser());
+        this.entity.setUpdatedBy(AuthContext.getUser());
     }
 
     @Override
@@ -206,12 +215,16 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     @Override
     public void confirmStart() {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void confirmFinish() {
         // TODO Auto-generated method stub
-        
+    }
+
+    @Override
+    public void setSummaryPlan(IServiceSummaryPlan summaryPlan) {
+        this.entity.setSummaryPlan(summaryPlan.get());
+        this.entity.setSpec(summaryPlan.get().getSpec());
     }
 }

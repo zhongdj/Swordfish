@@ -48,4 +48,6 @@ public interface IServiceOrder extends IPlantScheduleOrder, IVehicleScheduleOrde
 
     @Transition(Finish.class)
     void confirmFinish();
+
+    void setSummaryPlan(IServiceSummaryPlan summaryPlan);
 }
