@@ -109,7 +109,7 @@ public class SchedulingOperationResources {
     @Path("planned-summary-task/{summaryId}/resource-allocated-task")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceOrder allocateResource(@PathParam("{summaryId}") Long summaryId, RequiredResource resource) {
+    public ServiceOrder allocateResource(@PathParam("summaryId") Long summaryId, RequiredResource resource) {
         return operation.allocateResourceTo(summaryId, resource.mixingPlantId, resource.concreteTruckId, resource.volume);
     }
 
