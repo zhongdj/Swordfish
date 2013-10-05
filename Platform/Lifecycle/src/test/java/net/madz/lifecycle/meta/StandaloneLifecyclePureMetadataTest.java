@@ -298,23 +298,27 @@ public class StandaloneLifecyclePureMetadataTest {
         assertNotNull(i.getState(Finished.class.getName()));
         assertNotNull(i.getState(Cancelled.class.getName()));
         // Dotted Path Validation
-        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet."
-                + Created.class.getSimpleName()));
-        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet."
-                + Queued.class.getSimpleName()));
-        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet."
-                + Ongoing.class.getSimpleName()));
-        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet."
-                + Finished.class.getSimpleName()));
-        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet."
-                + Cancelled.class.getSimpleName()));
-        
+        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Created.class.getSimpleName()));
+        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Queued.class.getSimpleName()));
+        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Ongoing.class.getSimpleName()));
+        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Finished.class.getSimpleName()));
+        assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Cancelled.class.getSimpleName()));
         final StateMachineMetadata m = machineMetadata;
         assertEquals(m.getState(Created.class), i.getState(Created.class).getTemplate());
         assertEquals(m.getState(Queued.class), i.getState(Queued.class).getTemplate());
         assertEquals(m.getState(Ongoing.class), i.getState(Ongoing.class).getTemplate());
         assertEquals(m.getState(Finished.class), i.getState(Finished.class).getTemplate());
         assertEquals(m.getState(Cancelled.class), i.getState(Cancelled.class).getTemplate());
+    }
+
+    @Test
+    public void testStateMachineInst() throws Throwable {
+        final StateMachineInst i = stateMachineInst;
+        final Method getter = i.stateGetter();
+        final Method setter = i.stateSetter();
+        final Method methodG = IServiceOrder.class.getMethod("getServiceOrderState");
+        assertEquals(methodG, getter);
+        assertNull(setter);
     }
 
     private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass,
