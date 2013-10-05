@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import javax.ejb.EJBContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -25,7 +26,8 @@ public class BOFactory {
             @SuppressWarnings("unchecked")
             Class<T> clz = (Class<T>) annotation.value();
             try {
-                return wrap(proxyClass, clz.newInstance());
+                T bizObject = clz.newInstance();
+                return wrap(proxyClass, bizObject);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -63,6 +65,7 @@ public class BOFactory {
         
         try {
             InitialContext context = new InitialContext();
+            
             String nameInNamespace = context.getNameInNamespace();
             logger.info("name In Namesapce = " + nameInNamespace);
             
@@ -76,7 +79,7 @@ public class BOFactory {
             e.printStackTrace();
         }
         
-        return (T) Proxy.newProxyInstance(BOFactory.class.getClassLoader(), new Class[] { proxyClass }, new InvocationHandler() {
+        return (T) Proxy.newProxyInstance(object.getClass().getClassLoader(), new Class[] { proxyClass }, new InvocationHandler() {
 
             @SuppressWarnings("rawtypes")
             @Override
