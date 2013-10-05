@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,6 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.entities.User;
+import net.madz.authorization.interceptor.AuthorizationInterceptor;
+import net.madz.authorization.interceptor.Authorized;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.common.entities.Mortar;
@@ -45,8 +48,10 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
  * 
  * @author Barry
  */
+@Authorized
 @Stateless
 @LocalBean
+@Interceptors(AuthorizationInterceptor.class)
 public class OperationBean extends MultitenancyBean {
 
     public List<PouringPartSpec> listMyPartsInConstructing() {
@@ -67,7 +72,7 @@ public class OperationBean extends MultitenancyBean {
         additives.add(additive);
         spec.setAdditives(additives);
         User user = createUser();
-        spec.setCreatedBy(user);
+//         spec.setCreatedBy(user);
         spec.setId(1L);
         spec.setCreatedOn(createDate());
         spec.setDeleted(false);
@@ -79,18 +84,18 @@ public class OperationBean extends MultitenancyBean {
         spec.setMixture(mixture);
         final PouringPart pouringPart = new PouringPart();
         pouringPart.setName("底柱");
-        pouringPart.setCreatedBy(user);
+        // pouringPart.setCreatedBy(user);
         pouringPart.setCreatedOn(createDate());
         pouringPart.setDeleted(false);
         pouringPart.setId(1L);
-        pouringPart.setUpdatedBy(user);
+        // pouringPart.setUpdatedBy(user);
         pouringPart.setUpdatedOn(createDate());
         spec.setPouringPart(pouringPart);
         UnitProject unitProject = new UnitProject();
         unitProject.setAddress(new Address());
         unitProject.setName("新龙城56栋");
         spec.setUnitProject(unitProject);
-        spec.setUpdatedBy(user);
+        // spec.setUpdatedBy(user);
         spec.setUpdatedOn(createDate());
         return spec;
     }
@@ -107,25 +112,20 @@ public class OperationBean extends MultitenancyBean {
                 "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
                         + "allocate-resources-oxm.xml");
         metadataSourceMap.put("net.madz.scheduling.entities", stream);
-        stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-spec-oxm.xml");
+        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+                + "allocate-resources-spec-oxm.xml");
         metadataSourceMap.put("net.madz.contract.spec.entities", stream);
-        stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-common-oxm.xml");
+        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+                + "allocate-resources-common-oxm.xml");
         metadataSourceMap.put("net.madz.common.entities", stream);
-        stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-contract-oxm.xml");
+        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+                + "allocate-resources-contract-oxm.xml");
         metadataSourceMap.put("net.madz.contract.entities", stream);
-        stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-auth-oxm.xml");
+        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+                + "allocate-resources-auth-oxm.xml");
         metadataSourceMap.put("net.madz.authorization.entities", stream);
-        stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-core-oxm.xml");
+        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+                + "allocate-resources-core-oxm.xml");
         metadataSourceMap.put("net.madz.core.entities", stream);
         final Map<String, Object> prop = new HashMap<String, Object>();
         prop.put(JAXBContextProperties.OXM_METADATA_SOURCE, metadataSourceMap);
@@ -139,16 +139,15 @@ public class OperationBean extends MultitenancyBean {
         marshaller.marshal(new OperationBean().allocateResourceTo(1L, 1L, 1L, 6.0D), System.out);
     }
 
-    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId,
-            double volume) {
+    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId, double volume) {
         EntityManager em = em();
         try {
             final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryId);
             final IServiceOrder serviceOrder = BOFactory.create(IServiceOrder.class);
             final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
+            serviceOrder.setSummaryPlan(summaryTask);
             serviceOrder.allocateResources(plantResource, truckResource, volume);
-            
             serviceOrder.persist(em);
             return serviceOrder.get();
         } finally {
@@ -158,11 +157,11 @@ public class OperationBean extends MultitenancyBean {
 
     private ConcreteTruckResource createConcreteTruck() {
         ConcreteTruck truck = new ConcreteTruck();
-        truck.setCreatedBy(createUser());
+        // truck.setCreatedBy(createUser());
         truck.setCreatedOn(createDate());
         truck.setLicencePlateNumber("黑A88888");
         truck.setRatedCapacity(18D);
-        truck.setUpdatedBy(createUser());
+        // truck.setUpdatedBy(createUser());
         truck.setUpdatedOn(createDate());
         ConcreteTruckResource resource = new ConcreteTruckResource();
         resource.setConcreteTruck(truck);
@@ -173,11 +172,11 @@ public class OperationBean extends MultitenancyBean {
     private ServiceSummaryPlan createSummaryPlan() {
         ServiceSummaryPlan summaryTask = new ServiceSummaryPlan();
         summaryTask.setId(1L);
-        summaryTask.setCreatedBy(createUser());
+        // summaryTask.setCreatedBy(createUser());
         summaryTask.setCreatedOn(createDate());
         summaryTask.setPlannedVolume(500D);
         summaryTask.setSpec(createSpec());
-        summaryTask.setUpdatedBy(createUser());
+        // summaryTask.setUpdatedBy(createUser());
         summaryTask.setUpdatedOn(createDate());
         return summaryTask;
     }
