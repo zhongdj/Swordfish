@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.core.annotations.PinYinIndex;
 import net.madz.core.annotations.PinYinIndexed;
 
@@ -16,7 +16,7 @@ import org.eclipse.persistence.annotations.Indexes;
 @PinYinIndexed
 @Indexes({ @Index(name = "INDEX_CUSTOMER_ACCOUNT_SHORT_SEARCH_NAME", columnNames = { "TENANT_ID", "SHORT_PINYIN_ABBR_NAME" }),
         @Index(name = "INDEX_CUSTOMER_ACCOUNT_FULL_SEARCH_NAME", columnNames = { "TENANT_ID", "FULL_PINYIN_ABBR_NAME" }) })
-public class CustomerAccount extends StandardObject {
+public class CustomerAccount extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1L;
     @Column(name = "FULL_NAME", nullable = false, length = 30)

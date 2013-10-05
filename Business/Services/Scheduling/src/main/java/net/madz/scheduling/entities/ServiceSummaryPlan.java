@@ -11,12 +11,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.contract.spec.entities.PouringPartSpec;
 
 @Entity
 @Table(name = "service_summary_plan")
-public class ServiceSummaryPlan extends StandardObject {
+public class ServiceSummaryPlan extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -2519583821494066599L;
 

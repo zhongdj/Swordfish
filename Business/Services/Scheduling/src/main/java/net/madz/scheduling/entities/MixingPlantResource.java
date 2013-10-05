@@ -11,14 +11,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 
 import org.eclipse.persistence.annotations.Indexes;
+import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "mixing_plant_resource")
 @Indexes()
-public class MixingPlantResource extends StandardObject {
+public class MixingPlantResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -3622084568259603724L;
 
@@ -37,6 +38,7 @@ public class MixingPlantResource extends StandardObject {
     private double plannedVolume;
 
     @OneToMany(mappedBy = "mixingPlantResource")
+    @XmlInverseReference(mappedBy = "mixingPlantResource")
     private final List<ServiceOrder> liveTasks = new ArrayList<>();
 
     public MixingPlant getMixingPlant() {

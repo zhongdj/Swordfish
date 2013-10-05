@@ -15,14 +15,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.customer.entities.CustomerAccount;
 
 import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "contract")
-public class Contract extends StandardObject {
+public class Contract extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 6888298311566859312L;
     @ManyToOne

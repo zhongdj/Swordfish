@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.common.entities.Address;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.customer.entities.Contact;
@@ -21,7 +21,7 @@ import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "unit_project")
-public class UnitProject extends StandardObject {
+public class UnitProject extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1067321008139265973L;
     @Column(nullable = false, length = 40)

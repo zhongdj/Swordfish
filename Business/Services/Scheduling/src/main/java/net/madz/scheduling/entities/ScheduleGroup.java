@@ -10,13 +10,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.authorization.entities.User;
 import net.madz.contract.entities.UnitProject;
 
 @Entity
 @Table(name="scheduling_group")
-public class ScheduleGroup extends StandardObject {
+public class ScheduleGroup extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -4802888767536025513L;
 

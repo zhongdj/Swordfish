@@ -8,16 +8,21 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.eclipse.persistence.annotations.Index;
 
 /**
  * 
@@ -25,95 +30,70 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "muser")
-@NamedQueries({
-        @NamedQuery(name = "User.validate",
-                query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName AND a.password= :password"),
+@NamedQueries({ @NamedQuery(name = "User.validate", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName AND a.password= :password"),
         @NamedQuery(name = "User.checkExist", query = "SELECT COUNT(a) FROM User AS a WHERE a.username = :accountName"),
-        @NamedQuery(name = "User.checkNotLocked",
-                query = "SELECT COUNT(a) FROM User AS a WHERE a.lockFlag = false AND a.username=:accountName"),
-        @NamedQuery(name = "User.findByUsername",
-                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
-        @NamedQuery(name = "User.findByAccountNameFuzzy",
-                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
+        @NamedQuery(name = "User.checkNotLocked", query = "SELECT COUNT(a) FROM User AS a WHERE a.lockFlag = false AND a.username=:accountName"),
+        @NamedQuery(name = "User.findByUsername", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
+        @NamedQuery(name = "User.findByAccountNameFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
         @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
+@Index(name = "INDEX_USER_TENANT_FIRST", columnNames = { "TENANT_ID" })
+@IdClass(ComposedPK.class)
 public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
-
     @Column(unique = true, updatable = false, length = 40, nullable = false)
     @XmlID
     private String username;
-
     @Column(nullable = false)
     private String password;
-
     @Column(nullable = false)
     private String email;
-
     @Column(nullable = false)
     private String fullName;
-    
     @Column
     private String phoneNumber;
-
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
-
     @Column(columnDefinition = "INT(32) NOT NULL DEFAULT 0")
     private int loginTimes;
-
     @Column(columnDefinition = "INT(4) NOT NULL DEFAULT 0")
     private int loginFailedTimes;
-
     @Column(columnDefinition = "INT(4) NOT NULL DEFAULT 0")
     private int accessDeniedTimes;
-
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean freezenFlag;
-
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean needResetPwd;
-
     @Column(nullable = true)
     private Timestamp loginDate;
-
     @Column(nullable = true)
     private Timestamp lastLoginDate;
-
     @Column(nullable = true)
     private Timestamp lastFailedTime;
-
     @Column(nullable = true)
     private Timestamp lastChangePwdTime;
-
     @Column(nullable = true)
     private String oldPasswords;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "TENANT_ID", insertable = false, nullable = false, updatable = false)
-    private Tenant tenant;
-
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_group", joinColumns = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true,
-                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "USER_NAME", referencedColumnName = "USERNAME") }, inverseJoinColumns = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
-                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })
     @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
-
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true,
-                    referencedColumnName = "TENANT_ID"), @JoinColumn(name = "USER_ID", referencedColumnName = "ID") },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
-                            referencedColumnName = "TENANT_ID"),
-                    @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID") }, inverseJoinColumns = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
     @XmlIDREF
     private final List<Role> roles = new LinkedList<>();
+    @Id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn(name = "TENANT_ID")
+    private Tenant tenant;
 
     public User() {
     }
@@ -356,22 +336,30 @@ public class User extends StandardObject {
             }
         }
         StringBuilder s = new StringBuilder();
-        s.append("Account [ name=").append(username).append(", groups=").append(groupStr).append(", lockFlag=")
-                .append(lockFlag).append(", loginTimes=").append(loginTimes).append(", loginFailedTimes=")
-                .append(loginFailedTimes).append(", accessDeniedTimes=").append(accessDeniedTimes).append(", freezen=")
-                .append(freezenFlag).append(", loginDate =").append(loginDate).append(", lastChangePwdTime=")
-                .append(lastChangePwdTime).append("]");
+        s.append("Account [ name=").append(username).append(", groups=").append(groupStr).append(", lockFlag=").append(lockFlag).append(", loginTimes=")
+                .append(loginTimes).append(", loginFailedTimes=").append(loginFailedTimes).append(", accessDeniedTimes=").append(accessDeniedTimes)
+                .append(", freezen=").append(freezenFlag).append(", loginDate =").append(loginDate).append(", lastChangePwdTime=").append(lastChangePwdTime)
+                .append("]");
         return s.toString();
     }
 
-    
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-    
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
+    }
 }

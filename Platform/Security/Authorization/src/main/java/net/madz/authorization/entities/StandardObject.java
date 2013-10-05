@@ -4,30 +4,31 @@
  */
 package net.madz.authorization.entities;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlIDREF;
 
-import net.madz.core.entities.MultiTenancyEntity;
+import net.madz.core.entities.AbstractBaseEntity;
 
 /**
  * 
- * @author a
+ * @author Barry
  */
 @MappedSuperclass
-public class StandardObject extends MultiTenancyEntity{
+public abstract class StandardObject extends AbstractBaseEntity {
 
     private static final long serialVersionUID = -5489441885227863280L;
-    @JoinColumn(name = "CREATED_BY", referencedColumnName = "ID", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     @XmlIDREF
     protected User createdBy;
     @Column(name = "CREATED_ON")
@@ -35,16 +36,14 @@ public class StandardObject extends MultiTenancyEntity{
     protected Date createdOn;
     @Column(name = "DELETED")
     protected Boolean deleted = false;
-    @JoinColumn(name = "UPDATED_BY", referencedColumnName = "ID")
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     @XmlIDREF
     protected User updatedBy;
     @Column(name = "UPDATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updatedOn;
-
-    public StandardObject() {
-    }
 
     public User getCreatedBy() {
         return createdBy;

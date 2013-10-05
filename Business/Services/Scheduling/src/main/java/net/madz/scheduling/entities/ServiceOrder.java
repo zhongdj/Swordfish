@@ -7,14 +7,14 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.contract.spec.entities.PouringPartSpec;
 
 import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "service_order")
-public class ServiceOrder extends StandardObject {
+public class ServiceOrder extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -6118079224654228286L;
 

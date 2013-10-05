@@ -4,11 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 
 @Entity
 @Table(name = "concrete_truck")
-public class ConcreteTruck extends StandardObject {
+public class ConcreteTruck extends MultiTenancyEntity {
 
 	private static final long serialVersionUID = -1132231092160514575L;
 

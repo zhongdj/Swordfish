@@ -12,18 +12,21 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
+
+import net.madz.authorization.entities.MultiTenancyEntity;
 
 @Entity
 @Table(name = "concrete_truck_resource")
-public class ConcreteTruckResource extends StandardObject {
+public class ConcreteTruckResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1366415739718240376L;
     @OneToOne
     @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     private ConcreteTruck concreteTruck;
-    @OneToMany
+    @OneToMany(mappedBy = "truckResource")
+    @XmlInverseReference(mappedBy = "truckResource")
     private List<ServiceOrder> serviceOrders = new LinkedList<ServiceOrder>();
     private String state;
     @Column(name = "Confirmed_Date")

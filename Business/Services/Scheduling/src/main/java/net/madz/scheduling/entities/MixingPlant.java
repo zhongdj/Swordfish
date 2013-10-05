@@ -7,7 +7,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import net.madz.authorization.entities.StandardObject;
+import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.authorization.entities.User;
 import net.madz.core.annotations.PinYinIndex;
 import net.madz.core.annotations.PinYinIndexed;
@@ -15,7 +15,7 @@ import net.madz.core.annotations.PinYinIndexed;
 @Entity
 @Table(name = "mixing_plant")
 @PinYinIndexed
-public class MixingPlant extends StandardObject {
+public class MixingPlant extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1113872983257589610L;
     @Column(nullable = false, length = 20)
