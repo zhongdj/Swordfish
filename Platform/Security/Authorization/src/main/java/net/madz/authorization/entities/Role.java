@@ -4,13 +4,17 @@
  */
 package net.madz.authorization.entities;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -21,6 +25,7 @@ import javax.xml.bind.annotation.XmlIDREF;
  */
 @Entity
 @Table(name = "mrole")
+@IdClass(ComposedPK.class)
 public class Role extends StandardObject {
 
     private static final long serialVersionUID = -8677837722180931934L;
@@ -33,6 +38,10 @@ public class Role extends StandardObject {
     @ManyToMany(mappedBy = "roles")
     @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
+    @Id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn(name = "TENANT_ID")
+    private Tenant tenant;
 
     public String getName() {
         return name;
@@ -94,5 +103,13 @@ public class Role extends StandardObject {
         if ( users.contains(user) ) {
             users.remove(user);
         }
+    }
+
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 }

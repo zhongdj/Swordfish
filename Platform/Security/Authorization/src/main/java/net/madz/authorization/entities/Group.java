@@ -1,6 +1,5 @@
 package net.madz.authorization.entities;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,10 +7,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -23,12 +26,12 @@ import javax.xml.bind.annotation.XmlIDREF;
 @Entity
 @Table(name = "mgroup")
 @NamedQuery(name = "UserGroup.findGroupByName", query = "SELECT OBJECT(a) FROM Group AS a WHERE a.name=:groupName")
+@IdClass(ComposedPK.class)
 public class Group extends StandardObject {
 
     public static final String ADMINGROUP = "ADMINGroup";
     public static final String OPGROUP = "OPGroup";
     private static final long serialVersionUID = -7787991532112147877L;
-    
     @Column(unique = true, updatable = false, length = 40, nullable = false)
     @XmlID
     private String name;
@@ -42,6 +45,10 @@ public class Group extends StandardObject {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "ROLE_ID", insertable = true, updatable = true, referencedColumnName = "ID") })
     private List<Role> roles = new LinkedList<Role>();
+    @Id
+    @ManyToOne(fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn(name = "TENANT_ID")
+    private Tenant tenant;
 
     public Group() {
     }
@@ -144,5 +151,13 @@ public class Group extends StandardObject {
             }
         }
         return getClass().getName() + ":[ name = " + name + ", accounts = " + userNames + "]";
+    }
+
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 }

@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -54,14 +55,16 @@ public class Tenant extends AbstractBaseEntity {
     private boolean arrearage;
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean evaluated;
-    @JoinColumn(name = "UPDATED_BY", referencedColumnName = "ID")
+    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     @ManyToOne(fetch = FetchType.LAZY)
     @XmlIDREF
     protected User updatedBy;
     @Column(name = "UPDATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updatedOn;
-    @JoinColumn(name = "CREATED_BY", referencedColumnName = "ID", nullable = true)
+    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @XmlIDREF
     protected User createdBy;
