@@ -111,6 +111,7 @@ public class Tenant extends AbstractBaseEntity {
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "ADMIN_USER_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
+    @XmlIDREF
     private User adminUser;
 
     public Tenant() {
