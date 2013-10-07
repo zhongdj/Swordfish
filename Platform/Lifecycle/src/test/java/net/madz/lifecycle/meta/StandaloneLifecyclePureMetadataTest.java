@@ -44,6 +44,9 @@ public class StandaloneLifecyclePureMetadataTest {
         stateMachineInst = registry.getStateMachineInst(IServiceOrder.class);
     }
 
+    // /////////////////////////////////////////////////////////////////
+    // Summary Part
+    // ////////////////////////////////////////////////////////////////
     @Test
     public void testRegistry() {
         final Map<Object, StateMachineMetadata> types = registry.getStateMachineTypes();
@@ -62,6 +65,9 @@ public class StandaloneLifecyclePureMetadataTest {
         }
     }
 
+    // //////////////////////////////////////////////////////////////////
+    // TransitionMetadata Part
+    // //////////////////////////////////////////////////////////////////
     @Test
     public void testTransitionMetadatas() throws SecurityException {
         StateMachineMetadata m = machineMetadata;
@@ -133,6 +139,9 @@ public class StandaloneLifecyclePureMetadataTest {
         }
     }
 
+    // //////////////////////////////////////////////////////////////////
+    // TransitionInstance Part
+    // //////////////////////////////////////////////////////////////////
     @Test
     public void testTransitionInstances() throws NoSuchMethodException {
         // Check 3 transition instances
@@ -176,6 +185,9 @@ public class StandaloneLifecyclePureMetadataTest {
                 || m.getFinalStates()[1] == m.getState(Cancelled.class));
     }
 
+    // //////////////////////////////////////////////////////////////////
+    // StateMetadata Part
+    // //////////////////////////////////////////////////////////////////
     @Test
     public void testStateMetadatas() {
         final StateMachineMetadata m = machineMetadata;
@@ -280,6 +292,9 @@ public class StandaloneLifecyclePureMetadataTest {
         assertFalse(created.hasValidWhiles());
     }
 
+    // //////////////////////////////////////////////////////////////////
+    // StateInstance Part
+    // //////////////////////////////////////////////////////////////////
     @Test
     public void testStateInstancesSummary() throws Exception {
         final StateMachineInst i = stateMachineInst;
