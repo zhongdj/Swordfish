@@ -7,7 +7,7 @@
 	<java-types>
 		<java-type name="net.madz.contract.entities.PouringPart"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-type prop-order="id name pinYinAbbrName comment" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="pouringPartId/text()" />
@@ -18,7 +18,7 @@
 		</java-type>
 		<java-type name="net.madz.contract.entities.UnitProject"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-type prop-order="id name" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="unitProjectId/text()" />

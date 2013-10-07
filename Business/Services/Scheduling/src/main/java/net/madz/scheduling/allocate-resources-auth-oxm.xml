@@ -6,7 +6,7 @@
 	xml-mapping-metadata-complete="true">
 	<java-types>
 		<java-type name="net.madz.authorization.entities.StandardObject"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
 			<java-attributes>
 				<xml-transient java-attribute="createdBy" />

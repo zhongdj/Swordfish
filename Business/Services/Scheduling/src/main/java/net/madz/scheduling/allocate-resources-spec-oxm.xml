@@ -6,7 +6,7 @@
 	xml-mapping-metadata-complete="true">
 	<java-types>
 		<java-type name="net.madz.contract.spec.entities.PouringPartSpec" super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-type prop-order="id pouringPart unitProject mixture additives" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="pouringParSpectId/text()" />

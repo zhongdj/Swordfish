@@ -7,14 +7,13 @@
 	<java-types>
 		<!-- super-type="net.madz.authorization.entities.StandardObject" -->
 
-		<java-type name="net.madz.scheduling.entities.ResourceAllocatedTask"
+		<java-type name="net.madz.scheduling.entities.ServiceOrder"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
 			<xml-type prop-order="id plannedVolume mixingPlantResource truckResource spec " />
 			<java-attributes>
-				<xml-element java-attribute="id"
-					xml-path="resourceAllocatedTaskId/text()" />
+				<xml-element java-attribute="id" xml-path="serviceOrderId/text()" />
 				<xml-element java-attribute="plannedVolume" xml-path="plannedVolume/text()" />
 				<xml-element java-attribute="spec" xml-path="spec" />
 				<xml-element java-attribute="mixingPlantResource"
@@ -26,31 +25,36 @@
 		</java-type>
 		<java-type name="net.madz.scheduling.entities.ConcreteTruck"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
-			<xml-type prop-order="id licencePlateNumber ratedCapacity" />
+			<xml-type
+				prop-order="id licencePlateNumber ratedCapacity driverName driverPhoneNumber" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="truckId/text()" />
 				<xml-element java-attribute="licencePlateNumber"
 					xml-path="truckLicencePlatNumber/text()" />
 				<xml-element java-attribute="ratedCapacity" xml-path="truckRatedCapacity/text()" />
+				<xml-element java-attribute="driverName" xml-path="driverName/text()" />
+				<xml-element java-attribute="driverPhoneNumber"
+					xml-path="driverPhoneNumber/text()" />
 			</java-attributes>
 		</java-type>
 		<java-type name="net.madz.scheduling.entities.MixingPlant"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
-			<xml-type prop-order="id name pinyinAbbrName" />
+			<xml-type prop-order="id name pinyinAbbrName operator" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="mixingPlantId/text()" />
 				<xml-element java-attribute="name" xml-path="mixingPlantName/text()" />
 				<xml-element java-attribute="pinyinAbbrName"
 					xml-path="mixingPlantPinyinAbbrName/text()" />
+				<xml-transient java-attribute="operator" />
 			</java-attributes>
 		</java-type>
 		<java-type name="net.madz.scheduling.entities.MixingPlantResource"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
 			<xml-type prop-order="id plannedVolume finishedVolume mixingPlant liveTasks" />
 			<java-attributes>
@@ -64,18 +68,20 @@
 				<xml-transient java-attribute="liveTasks" />
 			</java-attributes>
 		</java-type>
-		<java-type name="net.madz.scheduling.entities.ConcreteTruckResourceBase"
+		<java-type name="net.madz.scheduling.entities.ConcreteTruckResource"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-root-element />
-			<xml-type prop-order="id state concreteTruck" />
+			<xml-type prop-order="id state confirmedDate concreteTruck serviceOrders" />
 			<java-attributes>
 				<xml-element java-attribute="id"
 					xml-path="concreteTruckResourceId/text()" />
 				<xml-element java-attribute="state"
 					xml-path="concreteTruckResourceState/text()" />
+				<xml-element java-attribute="confirmedDate"
+					xml-path="concreteTruckConfirmedDate/text()" />
 				<xml-element java-attribute="concreteTruck" xml-path="." />
-
+				<xml-transient java-attribute="serviceOrders" />
 			</java-attributes>
 		</java-type>
 	</java-types>

@@ -31,6 +31,10 @@ public class PouringPart extends MultiTenancyEntity {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String getPinYinAbbrName() {
+        return pinYinAbbrName;
+    }
 
     public String getComment() {
         return comment;

@@ -7,7 +7,7 @@
 	<java-types>
 		<java-type name="net.madz.common.entities.Mixture"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-discriminator-node="@mixtureType" xml-accessor-type="FIELD">
+			xml-discriminator-node="@mixtureType" xml-accessor-type="PROPERTY">
 			<xml-type prop-order="id gradeName" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="mixtureId/text()" />
@@ -16,15 +16,15 @@
 		</java-type>
 		<java-type name="net.madz.common.entities.Mortar"
 			super-type="net.madz.common.entities.Mixture"
-			xml-discriminator-value="Mortar" xml-accessor-type="FIELD">
+			xml-discriminator-value="Mortar" xml-accessor-type="PROPERTY">
 
 		</java-type>
 		<java-type name="net.madz.common.entities.Concrete"
 			super-type="net.madz.common.entities.Mixture"
-			xml-discriminator-value="Concrete" xml-accessor-type="FIELD"></java-type>
+			xml-discriminator-value="Concrete" xml-accessor-type="PROPERTY"></java-type>
 		<java-type name="net.madz.common.entities.Additive"
 			super-type="net.madz.core.entities.AbstractBaseEntity"
-			xml-accessor-type="FIELD">
+			xml-accessor-type="PROPERTY">
 			<xml-type prop-order="id name pinyinAbbrName" />
 			<java-attributes>
 				<xml-element java-attribute="id" xml-path="additiveId/text()" />
