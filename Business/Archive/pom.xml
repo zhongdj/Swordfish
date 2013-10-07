@@ -219,7 +219,7 @@
 
 				<configuration>
 					<driver>org.gjt.mm.mysql.Driver</driver>
-					<url>jdbc:mysql://dbserver:3306/crmp</url>
+					<url>jdbc:mysql://dbserver:3306/crmp?useUnicode=true&amp;characterEncoding=UTF-8</url>
 					<password>1q2w3e4r5t</password>
 					<username>root</username>
 					<!-- The value of settingsKey should be a server id in ~/.m2/settings.xml -->
