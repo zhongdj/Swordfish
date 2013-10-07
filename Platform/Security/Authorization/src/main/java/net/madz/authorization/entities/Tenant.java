@@ -73,7 +73,7 @@ public class Tenant extends AbstractBaseEntity {
     private boolean evaluated;
 
     @JoinColumns(value = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+            @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
@@ -86,7 +86,7 @@ public class Tenant extends AbstractBaseEntity {
     protected Date updatedOn;
 
     @JoinColumns(value = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+            @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
@@ -107,7 +107,7 @@ public class Tenant extends AbstractBaseEntity {
 
     @OneToOne
     @JoinColumns(value = {
-            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+            @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "ADMIN_USER_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
