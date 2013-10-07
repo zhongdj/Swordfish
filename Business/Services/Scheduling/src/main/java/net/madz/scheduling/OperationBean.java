@@ -22,8 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.entities.User;
-import net.madz.authorization.interceptor.AuthorizationInterceptor;
 import net.madz.authorization.interceptor.Authorized;
+import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationInterceptor;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.common.entities.Mortar;
@@ -51,7 +51,7 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
 @Authorized
 @Stateless
 @LocalBean
-@Interceptors(AuthorizationInterceptor.class)
+@Interceptors(SessionBeanAuthorizationInterceptor.class)
 public class OperationBean extends MultitenancyBean {
 
     public List<PouringPartSpec> listMyPartsInConstructing() {
@@ -148,7 +148,9 @@ public class OperationBean extends MultitenancyBean {
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
             serviceOrder.setSummaryPlan(summaryTask);
             serviceOrder.allocateResources(plantResource, truckResource, volume);
+            
             serviceOrder.persist(em);
+            
             return serviceOrder.get();
         } finally {
             em.close();

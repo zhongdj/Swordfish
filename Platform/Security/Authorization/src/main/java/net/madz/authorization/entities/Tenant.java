@@ -1,6 +1,5 @@
 package net.madz.authorization.entities;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -10,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -26,56 +26,92 @@ import net.madz.core.entities.AbstractBaseEntity;
 public class Tenant extends AbstractBaseEntity {
 
     private static final long serialVersionUID = 476545537345379412L;
+
     public static final long DAY_MILLIS = 24L * 60 * 60 * 1000;
+
     public static final int EVALUATE_DAYS = 180;
+
     public static final long MONTH_MILLIS = 30L * 24 * 60 * 60 * 1000;
+
     @Column(unique = true, nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String address;
+
     @Column(name = "ARTIFICIAL_PERSON_NAME", nullable = false)
     private String artificialPersonName;
+
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean locked;
+
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean freezen;
+
     @Column(name = "PAYMENT_DATE", nullable = true)
     private Timestamp paymentDate;
+
     @Column(columnDefinition = "DOUBLE NOT NULL DEFAULT 0.0")
     private double payment;
+
     @Column(name = "HISTORY_SERVICE_DAYS", columnDefinition = "INT NOT NULL DEFAULT 0")
     private int historyServiceDays;
+
     @Column(name = "SERVICE_DAYS_PAID", columnDefinition = "INT NOT NULL DEFAULT 0")
     private int serviceDaysPaid;
+
     @Column(name = "SERVICE_DAYS_LEFT", columnDefinition = "INT NOT NULL DEFAULT 0")
     private int serviceDaysLeft;
+
     @Column(name = "MATURITY_DATE", nullable = false)
     private Timestamp maturityDate;
+
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean arrearage;
+
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean evaluated;
-    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
+
+    @JoinColumns(value = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false,
+                    referencedColumnName = "ID") })
     @ManyToOne(fetch = FetchType.LAZY)
     @XmlIDREF
     protected User updatedBy;
+
     @Column(name = "UPDATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updatedOn;
-    @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
+
+    @JoinColumns(value = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false,
+                    referencedColumnName = "ID") })
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @XmlIDREF
     protected User createdBy;
+
     @Column(name = "CREATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date createdOn;
+
     @Column(name = "DELETED", columnDefinition = "BOOL NOT NULL DEFAULT 0")
     protected Boolean deleted;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PARENT_TENANT_ID", referencedColumnName = "ID", nullable = true)
     private Tenant parentTenant;
+
+    @OneToOne
+    @JoinColumns(value = {
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "ADMIN_USER_ID", nullable = false, insertable = true, updatable = false,
+                    referencedColumnName = "ID") })
+    private User adminUser;
 
     public Tenant() {
     }
@@ -208,10 +244,11 @@ public class Tenant extends AbstractBaseEntity {
 
     @Override
     public String toString() {
-        return "Tenant [id=" + getId() + ", name=" + name + ", address=" + address + ", artificialPersonName=" + artificialPersonName + ", locked=" + locked
-                + ", freezen=" + freezen + ", paymentDate=" + paymentDate + ", payment=" + payment + ", historyServiceDays=" + historyServiceDays
-                + ", serviceDaysPaid=" + serviceDaysPaid + ", serviceDaysLeft=" + serviceDaysLeft + ", maturityDate=" + maturityDate + ", arrearage="
-                + arrearage + ", evaluated=" + evaluated + ", parentTenant=" + parentTenant + "]";
+        return "Tenant [id=" + getId() + ", name=" + name + ", address=" + address + ", artificialPersonName="
+                + artificialPersonName + ", locked=" + locked + ", freezen=" + freezen + ", paymentDate=" + paymentDate
+                + ", payment=" + payment + ", historyServiceDays=" + historyServiceDays + ", serviceDaysPaid="
+                + serviceDaysPaid + ", serviceDaysLeft=" + serviceDaysLeft + ", maturityDate=" + maturityDate
+                + ", arrearage=" + arrearage + ", evaluated=" + evaluated + ", parentTenant=" + parentTenant + "]";
     }
 
     // Business Methods
@@ -274,5 +311,53 @@ public class Tenant extends AbstractBaseEntity {
 
     public void unlock() {
         setLocked(false);
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public User getAdminUser() {
+        return adminUser;
+    }
+
+    public void setAdminUser(User adminUser) {
+        this.adminUser = adminUser;
+    }
+
+    public User getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(User updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(Date updatedOn) {
+        this.updatedOn = updatedOn;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }
