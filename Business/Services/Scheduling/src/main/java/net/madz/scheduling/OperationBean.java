@@ -48,7 +48,6 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
  * 
  * @author Barry
  */
-@Authorized
 @Stateless
 @LocalBean
 @Interceptors(SessionBeanAuthorizationInterceptor.class)

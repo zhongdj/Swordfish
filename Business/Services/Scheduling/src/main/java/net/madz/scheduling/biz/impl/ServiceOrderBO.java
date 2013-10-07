@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import net.madz.authorization.AuthContext;
+import net.madz.authorization.interceptor.UserSession;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.core.biz.AbstractBO;
@@ -39,8 +39,8 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     private void setStandardObjectProperties() {
-        this.entity.setCreatedBy(AuthContext.getUser());
-        this.entity.setUpdatedBy(AuthContext.getUser());
+        this.entity.setCreatedBy(UserSession.getUserSession().getUser());
+        this.entity.setUpdatedBy(UserSession.getUserSession().getUser());
     }
 
     @Override
