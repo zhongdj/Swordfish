@@ -22,7 +22,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.entities.User;
-import net.madz.authorization.interceptor.Authorized;
 import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationInterceptor;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
