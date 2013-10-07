@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import javax.ejb.EJBContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
