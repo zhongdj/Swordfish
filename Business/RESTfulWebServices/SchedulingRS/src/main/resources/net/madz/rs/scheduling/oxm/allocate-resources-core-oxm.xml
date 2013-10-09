@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+	version="2.4" package-name="net.madz.core.entities"
+	xml-mapping-metadata-complete="true">
+	<java-types>
+		<java-type name="net.madz.core.entities.AbstractBaseEntity"
+			xml-transient="true">
+		</java-type>
+	</java-types>
+</xml-bindings>

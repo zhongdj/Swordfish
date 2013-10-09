@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+	version="2.4" package-name="net.madz.common.entities"
+	xml-mapping-metadata-complete="true">
+	<java-types>
+		<java-type name="net.madz.common.entities.Mixture"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-discriminator-node="@mixtureType" xml-accessor-type="PROPERTY">
+			<xml-type prop-order="id gradeName" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="mixtureId/text()" />
+				<xml-element java-attribute="gradeName" xml-path="mixtureGradeName/text()" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.common.entities.Mortar"
+			super-type="net.madz.common.entities.Mixture"
+			xml-discriminator-value="Mortar" xml-accessor-type="PROPERTY">
+
+		</java-type>
+		<java-type name="net.madz.common.entities.Concrete"
+			super-type="net.madz.common.entities.Mixture"
+			xml-discriminator-value="Concrete" xml-accessor-type="PROPERTY"></java-type>
+		<java-type name="net.madz.common.entities.Additive"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="PROPERTY">
+			<xml-type prop-order="id name pinyinAbbrName" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="additiveId/text()" />
+				<xml-element java-attribute="name" xml-path="additiveName/text()" />
+				<xml-element java-attribute="pinyinAbbrName"
+					xml-path="additivePinyinAbbrName/text()" />
+			</java-attributes>
+		</java-type>
+
+	</java-types>
+</xml-bindings>

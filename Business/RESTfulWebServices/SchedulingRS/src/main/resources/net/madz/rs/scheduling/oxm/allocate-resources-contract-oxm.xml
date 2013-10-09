@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+	version="2.4" package-name="net.madz.contract.entities"
+	xml-mapping-metadata-complete="true">
+	<java-types>
+		<java-type name="net.madz.contract.entities.PouringPart"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="PROPERTY">
+			<xml-type prop-order="id name pinYinAbbrName comment" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="pouringPartId/text()" />
+				<xml-element java-attribute="name" xml-path="pouringPartName/text()" />
+				<xml-element java-attribute="pinYinAbbrName" xml-path="pouringPartAbbrName/text()" />
+				<xml-element java-attribute="comment" xml-path="pouringPartComment/text()" />
+			</java-attributes>
+		</java-type>
+		<java-type name="net.madz.contract.entities.UnitProject"
+			super-type="net.madz.core.entities.AbstractBaseEntity"
+			xml-accessor-type="PROPERTY">
+			<xml-type prop-order="id name" />
+			<java-attributes>
+				<xml-element java-attribute="id" xml-path="unitProjectId/text()" />
+				<xml-element java-attribute="name" xml-path="unitProjectName/text()" />
+				<xml-transient java-attribute="address" />
+				<xml-transient java-attribute="contact" />
+				<xml-transient java-attribute="contract" />
+				<xml-transient java-attribute="pouringPartSpecs" />
+			</java-attributes>
+		</java-type>
+
+	</java-types>
+</xml-bindings>

@@ -94,7 +94,7 @@
 				<version>2.3</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<packagingIncludes>**/*.class</packagingIncludes>
+					<packagingIncludes>**/*.class, WEB-INF/classes/**/*.xml</packagingIncludes>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -208,24 +208,19 @@ public class ServiceOrderJsonProvider implements MessageBodyReader<ServiceOrder>
 
     private Map<String, Object> getMetadataProperties() {
         final Map<String, Source> metadataSourceMap = new HashMap<String, Source>();
-        StreamSource stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-oxm.xml");
+        String dir = "net/madz/rs/scheduling/oxm/";
+        System.out.println(dir);
+        StreamSource stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-oxm.xml"));
         metadataSourceMap.put("net.madz.scheduling.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-spec-oxm.xml");
+        stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-spec-oxm.xml"));
         metadataSourceMap.put("net.madz.contract.spec.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-common-oxm.xml");
+        stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-common-oxm.xml"));
         metadataSourceMap.put("net.madz.common.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-contract-oxm.xml");
+        stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-contract-oxm.xml"));
         metadataSourceMap.put("net.madz.contract.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-auth-oxm.xml");
+        stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-auth-oxm.xml"));
         metadataSourceMap.put("net.madz.authorization.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-core-oxm.xml");
+        stream = new StreamSource(getClass().getClassLoader().getResourceAsStream(dir + "allocate-resources-core-oxm.xml"));
         metadataSourceMap.put("net.madz.core.entities", stream);
         final Map<String, Object> prop = new HashMap<String, Object>();
         prop.put(JAXBContextProperties.OXM_METADATA_SOURCE, metadataSourceMap);
