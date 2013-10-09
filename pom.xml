@@ -26,7 +26,8 @@
 		<javaee.api.version>7.0</javaee.api.version>
 		<ejb.version>3.2</ejb.version>
 		<glassfish.security.version>3.1.1</glassfish.security.version>
-
+		<junit.version>4.11</junit.version>
+		
 		<!-- Glasssfish Configuration -->
 		<glassfish.glassfishDirectory>${user.home}/Professional/Runtimes/glassfish4/glassfish</glassfish.glassfishDirectory>
 		<glassfish.user>admin</glassfish.user>
