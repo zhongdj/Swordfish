@@ -70,7 +70,7 @@ public class OperationBean extends MultitenancyBean {
         additives.add(additive);
         spec.setAdditives(additives);
         User user = createUser();
-//         spec.setCreatedBy(user);
+        // spec.setCreatedBy(user);
         spec.setId(1L);
         spec.setCreatedOn(createDate());
         spec.setDeleted(false);
@@ -106,24 +106,40 @@ public class OperationBean extends MultitenancyBean {
 
     public static void main(String[] args) throws JAXBException {
         final Map<String, Source> metadataSourceMap = new HashMap<String, Source>();
-        StreamSource stream = new StreamSource(
-                "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                        + "allocate-resources-oxm.xml");
+        StreamSource stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-oxm.xml");
         metadataSourceMap.put("net.madz.scheduling.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-spec-oxm.xml");
+        stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-spec-oxm.xml");
         metadataSourceMap.put("net.madz.contract.spec.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-common-oxm.xml");
+        stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-common-oxm.xml");
         metadataSourceMap.put("net.madz.common.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-contract-oxm.xml");
+        stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-contract-oxm.xml");
         metadataSourceMap.put("net.madz.contract.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-auth-oxm.xml");
+        stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-auth-oxm.xml");
         metadataSourceMap.put("net.madz.authorization.entities", stream);
-        stream = new StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
-                + "allocate-resources-core-oxm.xml");
+        stream = new StreamSource("/net/madz/scheduling/" + "allocate-resources-core-oxm.xml");
+        // StreamSource stream = new StreamSource(
+        // "/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-oxm.xml");
+        // metadataSourceMap.put("net.madz.scheduling.entities", stream);
+        // stream = new
+        // StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-spec-oxm.xml");
+        // metadataSourceMap.put("net.madz.contract.spec.entities", stream);
+        // stream = new
+        // StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-common-oxm.xml");
+        // metadataSourceMap.put("net.madz.common.entities", stream);
+        // stream = new
+        // StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-contract-oxm.xml");
+        // metadataSourceMap.put("net.madz.contract.entities", stream);
+        // stream = new
+        // StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-auth-oxm.xml");
+        // metadataSourceMap.put("net.madz.authorization.entities", stream);
+        // stream = new
+        // StreamSource("/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/Services/Scheduling/src/main/java/net/madz/scheduling/"
+        // + "allocate-resources-core-oxm.xml");
         metadataSourceMap.put("net.madz.core.entities", stream);
         final Map<String, Object> prop = new HashMap<String, Object>();
         prop.put(JAXBContextProperties.OXM_METADATA_SOURCE, metadataSourceMap);
@@ -137,7 +153,8 @@ public class OperationBean extends MultitenancyBean {
         marshaller.marshal(new OperationBean().allocateResourceTo(1L, 1L, 1L, 6.0D), System.out);
     }
 
-    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId, double volume) {
+    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId,
+            double volume) {
         EntityManager em = em();
         try {
             final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryId);
@@ -146,9 +163,7 @@ public class OperationBean extends MultitenancyBean {
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
             serviceOrder.setSummaryPlan(summaryTask);
             serviceOrder.allocateResources(plantResource, truckResource, volume);
-            
             serviceOrder.persist(em);
-            
             return serviceOrder.get();
         } finally {
             em.close();
