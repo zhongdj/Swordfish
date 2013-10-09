@@ -11,20 +11,25 @@ import java.lang.annotation.Target;
 
 /**
  * Target: In order to convert a business object, which may contain some complex
- * type fields, to a transfer object. Such as: Warehouse --> WarehouseCTO
+ * type fields, to a transfer object. <br/>
+ * Such as: Warehouse --> WarehouseCTO<br/>
+ * <br/>
+ * [Class Warehouse]<br/>
+ * private Long id;<br/>
+ * private String name;<br/>
+ * private WarehouseType type; <--- complex type field ...<br/>
+ * <br/>
+ * [Class WarehouseType]<br/>
+ * private Long id; <--- simple type field<br/>
+ * private String name; <--- simple type field ...<br/>
+ * <br/>
+ * [Class WarehouseCTO]:<br/>
+ * protected String name;<br/>
  * 
- * [Class Warehouse] private Long id; private String name; private WarehouseType
- * type; <--- complex type field ...
- * 
- * [Class WarehouseType] private Long id; <--- simple type field private String
- * name; <--- simple type field ...
- * 
- * [Class WarehouseCTO]: protected String name;
- * 
- * @Binding(name = "type.id") <--- Warehouse.type@WarehouseType.id@Long private
- *               Long typeId;
- * @Binding(name = "type.name") <--- Warehouse.type@WarehouseType.name@String
- *               private String typeName; ...
+ * *@Binding(name = "type.id") <--- Warehouse.type@WarehouseType.id@Long <br/>
+ * *private Long typeId;<br/>
+ * *@Binding(name = "type.name") <--- Warehouse.type@WarehouseType.name@String<br/>
+ * *private String typeName; ...<br/>
  * 
  * @author Barry
  */
