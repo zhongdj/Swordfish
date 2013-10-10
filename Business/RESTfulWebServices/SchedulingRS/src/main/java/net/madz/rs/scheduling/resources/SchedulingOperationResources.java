@@ -16,6 +16,7 @@ import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.entities.ServiceOrder;
+import net.madz.scheduling.to.ServiceOrderTO;
 
 @Stateless
 @Path("operation")
@@ -47,8 +48,7 @@ public class SchedulingOperationResources {
     /**
      * @param filter
      *            过滤字符串，是一组通过空格分隔的拼音开头字母和数字。<br/>
-     *            例如: "XLC16 1CLB" 目标过滤对象为 "新龙城 1层楼板"
-     *            所对应的浇筑部位规格
+     *            例如: "XLC16 1CLB" 目标过滤对象为 "新龙城 1层楼板" 所对应的浇筑部位规格
      * 
      * 
      * @return 经过过滤字符串过滤后的<big>调度小组</big> 所管辖的正在<big> 建设中 </big>的<big> 浇筑部位技术规格
@@ -75,8 +75,7 @@ public class SchedulingOperationResources {
      * @return <big>调度小组</big>
      *         针对所管辖<big>单位工程</big>所对应的<big>未完成</big>生产的<big>排产任务</big>的集合<br/>
      * 
-     *         注:
-     *         <big>未完成</big>是<big>排产任务</big>的状态之一,另一个状态是<big>已完成</big>。
+     *         注: <big>未完成</big>是<big>排产任务</big>的状态之一,另一个状态是<big>已完成</big>。
      *         任务是否完成的条件取决于是否完成了排产计划预期。<br/>
      *         必要充分条件或为<big>调度员</big> 主观决定 或为 <big>预计生产量已经满足</big> 取决于策略配置
      */
@@ -109,16 +108,14 @@ public class SchedulingOperationResources {
     @Path("summaryPlan/{summaryPlanId}/serviceOrder")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceOrder allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource) {
+    public ServiceOrderTO allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource) {
         return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId, resource.concreteTruckResourceId, resource.volume);
     }
 
     public static class RequiredResource {
 
         public Long mixingPlantResourceId;
-
         public Long concreteTruckResourceId;
-        
         public Double volume;
     }
 }
