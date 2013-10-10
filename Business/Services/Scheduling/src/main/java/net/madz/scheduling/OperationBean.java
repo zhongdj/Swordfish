@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -23,6 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.entities.User;
 import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationInterceptor;
+import net.madz.binding.TransferObjectFactory;
 import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.common.entities.Mortar;
@@ -40,6 +43,7 @@ import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
 import net.madz.scheduling.entities.ServiceOrder;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.to.ServiceOrderTO;
 
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 
@@ -52,6 +56,8 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
 @Interceptors(SessionBeanAuthorizationInterceptor.class)
 public class OperationBean extends MultitenancyBean {
 
+    private static Logger logger = Logger.getLogger(OperationBean.class.getName());
+    
     public List<PouringPartSpec> listMyPartsInConstructing() {
         final ArrayList<PouringPartSpec> result = new ArrayList<>();
         PouringPartSpec spec = createSpec();
@@ -153,18 +159,24 @@ public class OperationBean extends MultitenancyBean {
         marshaller.marshal(new OperationBean().allocateResourceTo(1L, 1L, 1L, 6.0D), System.out);
     }
 
-    public ServiceOrder allocateResourceTo(Long summaryId, Long mixingPlantResourceId, Long concreteTruckResourceId,
+    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId, Long concreteTruckResourceId,
             double volume) {
         EntityManager em = em();
         try {
-            final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryId);
-            final IServiceOrder serviceOrder = BOFactory.create(IServiceOrder.class);
+            final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryPlanId);
+            final IServiceOrder serviceOrderBO = BOFactory.create(IServiceOrder.class);
             final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
-            serviceOrder.setSummaryPlan(summaryTask);
-            serviceOrder.allocateResources(plantResource, truckResource, volume);
-            serviceOrder.persist(em);
-            return serviceOrder.get();
+            serviceOrderBO.setSummaryPlan(summaryTask);
+            serviceOrderBO.allocateResources(plantResource, truckResource, volume);
+            serviceOrderBO.persist(em);
+            ServiceOrder serviceOrder = serviceOrderBO.get();
+            try {
+                return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrder);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "TOBindingError", e);
+            }
+            return null;
         } finally {
             em.close();
         }
