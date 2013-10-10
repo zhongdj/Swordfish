@@ -9,7 +9,6 @@ import javax.ejb.Stateless;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import net.madz.rs.scheduling.providers.ServiceOrderJsonProvider;
 import net.madz.rs.scheduling.resources.SchedulingAdminService;
 import net.madz.rs.scheduling.resources.SchedulingOperationResources;
 
@@ -22,7 +21,6 @@ public class SchedulingApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> resources = new HashSet<>();
-        resources.add(ServiceOrderJsonProvider.class);
         resources.add(SchedulingAdminService.class);
         resources.add(SchedulingOperationResources.class);
         return resources;
