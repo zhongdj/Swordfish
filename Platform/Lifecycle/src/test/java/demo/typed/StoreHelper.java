@@ -12,6 +12,7 @@ public class StoreHelper {
 
     public static final String DATA_STORE_PATH = "dataStore";
 
+    @SuppressWarnings("unchecked")
     public static List<IDownloadProcess> list() {
         ObjectInputStream ois = null;
         try {

@@ -15,7 +15,6 @@ import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
-import net.madz.scheduling.entities.ServiceOrder;
 import net.madz.scheduling.to.ServiceOrderTO;
 
 @Stateless

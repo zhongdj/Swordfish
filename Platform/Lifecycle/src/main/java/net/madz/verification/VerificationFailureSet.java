@@ -16,9 +16,12 @@ import net.madz.util.json.io.JsonWriter;
  * Collection of VerificationFailures for a meta object.
  */
 public class VerificationFailureSet implements Iterable<VerificationFailure>, Dumpable, Cloneable {
+
     @SuppressWarnings("unchecked")
-    public final static VerificationFailureSet NULL_SET = new VerificationFailureSet((Set<VerificationFailure>) Collections.EMPTY_SET);
-    private final static long serialVersionUID = 1L;
+    public final static VerificationFailureSet NULL_SET = new VerificationFailureSet(
+            (Set<VerificationFailure>) Collections.EMPTY_SET);
+
+    // private final static long serialVersionUID = 1L;
     private final Set<VerificationFailure> failureSet;
 
     private VerificationFailureSet(Set<VerificationFailure> failureSet) {
@@ -73,7 +76,8 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @param details
      *            Message error parameters
      */
-    public VerificationFailureSet add(Throwable e, Object source, String errorKey, String defaultErrorMessage, Object... details) {
+    public VerificationFailureSet add(Throwable e, Object source, String errorKey, String defaultErrorMessage,
+            Object... details) {
         add(new VerificationFailure(e, source, errorKey, defaultErrorMessage, details));
         return this;
     }
@@ -124,7 +128,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @throws VerificationException
      */
     public void assertNoFailures() throws VerificationException {
-        if (size() > 0) {
+        if ( size() > 0 ) {
             throw new VerificationException(this);
         }
     }
@@ -136,7 +140,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @throws VerificationRuntimeException
      */
     public void throwRuntimeException() {
-        if (size() > 0) {
+        if ( size() > 0 ) {
             throw new VerificationRuntimeException(this);
         }
     }
@@ -166,10 +170,9 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
     @Override
     public String toString() {
         ParameterString sb = new ParameterString(getClass().getSimpleName());
-        for (VerificationFailure failure : this.failureSet) {
+        for ( VerificationFailure failure : this.failureSet ) {
             sb.append(failure.getErrorKey());
         }
-
         return sb.toString();
     }
 
@@ -178,7 +181,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * if it is.
      */
     public final static VerificationFailureSet get(VerificationFailureSet set) {
-        if (null == set || NULL_SET == set) {
+        if ( null == set || NULL_SET == set ) {
             set = new VerificationFailureSet();
         }
         return set;
@@ -186,7 +189,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
 
     @Override
     public void dump(Dumper dumper) {
-        for (VerificationFailure failure : this.failureSet) {
+        for ( VerificationFailure failure : this.failureSet ) {
             failure.dump(dumper);
         }
     }
@@ -194,12 +197,11 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
     public void writeJson(JsonWriter writer) throws IOException {
         writer.startAnonymousArray("Errors");
         try {
-            for (VerificationFailure failure : this.failureSet) {
+            for ( VerificationFailure failure : this.failureSet ) {
                 failure.writeJson(writer);
             }
         } finally {
             writer.endArray();
         }
     }
-
 }

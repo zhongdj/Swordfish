@@ -4,7 +4,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
 import net.madz.common.Dumper;
 import net.madz.event.LifeCycleEvent;
 import net.madz.event.LifeCycleEventUtils;
@@ -130,6 +129,7 @@ public class StateMachineTest {
         return machineMetaData;
     }
 
+    @SuppressWarnings("unchecked")
     private void testTransition(Dumper dumper, final DownloadProcess process,
                                        final StateMachineMetaData<IDownloadProcess, StateEnum, TransitionEnum> machineMetaData) {
         dumper.println("");

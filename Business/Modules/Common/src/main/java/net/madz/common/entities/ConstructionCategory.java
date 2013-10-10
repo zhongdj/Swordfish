@@ -12,10 +12,14 @@ import org.eclipse.persistence.annotations.Index;
 @Entity
 @Table(name = "construction_category")
 @PinYinIndexed
-//@TableGenerator(name = "CONSTRUCTION_CATEGORY_SEQUENCE", initialValue = 1, allocationSize = 1)
+// @TableGenerator(name = "CONSTRUCTION_CATEGORY_SEQUENCE", initialValue = 1,
+// allocationSize = 1)
 public class ConstructionCategory extends AbstractBaseEntity {
 
+    private static final long serialVersionUID = -7058590808090558306L;
+
     private String name;
+
     @Index(name = "INDEX_CONSTRUCTION_CATEGORY_PINYIN_ABBR_NAME")
     @PinYinIndex(from = "name")
     private String pinyinAbbrName;

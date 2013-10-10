@@ -93,7 +93,8 @@ public class BizObjectManager implements EntityManager {
                 }
             }
         }
-        throw new RuntimeException("Cannot find Entity Class defined with ParameterType on Class " + bizObjectInterfaceClass.getName());
+        throw new RuntimeException("Cannot find Entity Class defined with ParameterType on Class "
+                + bizObjectInterfaceClass.getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -109,6 +110,7 @@ public class BizObjectManager implements EntityManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
@@ -121,18 +123,20 @@ public class BizObjectManager implements EntityManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode, Map<String, Object> properties) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, lockMode, properties);
-            return (T)BOFactory.create(bizObjectInterfaceClass, entity);
+            return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, lockMode, properties);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getReference(Class<T> entityClass, Object primaryKey) {
         if ( IBizObject.class.isAssignableFrom(entityClass) ) {
@@ -266,11 +270,13 @@ public class BizObjectManager implements EntityManager {
         return em.createQuery(criteriaQuery);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Query createQuery(CriteriaUpdate updateQuery) {
         return em.createQuery(updateQuery);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Query createQuery(CriteriaDelete deleteQuery) {
         return em.createQuery(deleteQuery);
@@ -296,6 +302,7 @@ public class BizObjectManager implements EntityManager {
         return em.createNativeQuery(sqlString);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Query createNativeQuery(String sqlString, Class resultClass) {
         return em.createNativeQuery(sqlString, resultClass);
@@ -316,6 +323,7 @@ public class BizObjectManager implements EntityManager {
         return em.createStoredProcedureQuery(procedureName);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses) {
         return em.createStoredProcedureQuery(procedureName, resultClasses);

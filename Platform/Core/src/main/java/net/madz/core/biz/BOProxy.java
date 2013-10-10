@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BOProxy {
 
-    Class<? extends IBizObject> value();
+    Class<? extends IBizObject<?>> value();
 }

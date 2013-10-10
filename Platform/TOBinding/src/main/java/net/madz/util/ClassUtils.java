@@ -13,7 +13,7 @@ public class ClassUtils {
     private ClassUtils() {
     }
 
-    public static Method findMethodThroughClassHierarchy(Class cl, String name) {
+    public static Method findMethodThroughClassHierarchy(Class<?> cl, String name) {
         try {
             return cl.getDeclaredMethod(name);
         } catch (SecurityException e) {
@@ -27,7 +27,7 @@ public class ClassUtils {
         }
     }
 
-    public static Method findMethodThroughClassHierarchy(Class cl, String name, Class... args) {
+    public static Method findMethodThroughClassHierarchy(Class<?> cl, String name, Class<?>... args) {
         try {
             return cl.getDeclaredMethod(name, args);
         } catch (SecurityException e) {
@@ -41,7 +41,7 @@ public class ClassUtils {
         }
     }
 
-    public static Field findFieldThroughClassHierarchy(Class cl, String name) throws NoSuchFieldException {
+    public static Field findFieldThroughClassHierarchy(Class<?> cl, String name) throws NoSuchFieldException {
         try {
             return cl.getDeclaredField(name);
         } catch (SecurityException e) {

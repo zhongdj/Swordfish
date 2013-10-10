@@ -143,15 +143,13 @@ public class TransferObjectFactoryTest {
     @Test
     public void testCreateTransferObject_WithBindingInTOButNotInBOFields() {
         Warehouse_Second bizObject = new Warehouse_Second();
-        WarehouseCTO_Second expectedTO = new WarehouseCTO_Second();
-        WarehouseCTO_Second actualTO = null;
         bizObject.id = 1L;
         bizObject.name = "John";
         bizObject.location = "Beijing";
         bizObject.description = "testCreateTransferObject_WithBindingInTOButNotInBOFields";
         bizObject.type = "store food";
         try {
-            actualTO = TransferObjectFactory.createTransferObject(WarehouseCTO_Second.class, bizObject);
+            TransferObjectFactory.createTransferObject(WarehouseCTO_Second.class, bizObject);
         } catch (Exception e) {
             assertEquals(NoSuchFieldException.class, e.getCause().getClass());
         }
@@ -178,7 +176,7 @@ public class TransferObjectFactoryTest {
     @Test
     public void testAssembleTransferObjectList_WithSecondNullInputParam() {
         try {
-            List bizObject = new ArrayList();
+            List<String> bizObject = new ArrayList<>();
             bizObject.add(new String("aa"));
             bizObject.add(new String("bb"));
             TransferObjectFactory.assembleTransferObjectList(bizObject, null);
@@ -363,7 +361,8 @@ public class TransferObjectFactoryTest {
 
     public static class WarehouseBase implements Serializable {
 
-        // private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
+
         protected Long id;
 
         protected String name;
@@ -375,12 +374,15 @@ public class TransferObjectFactoryTest {
 
     public static class Warehouse extends WarehouseBase {
 
+        private static final long serialVersionUID = -6217703224974283127L;
+
         protected WarehouseType type;
     }
 
     public static class WarehouseTO implements Serializable {
 
-        // private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
+
         protected String name;
 
         protected String location;
@@ -435,6 +437,8 @@ public class TransferObjectFactoryTest {
     }
 
     public static class WarehouseCTO extends WarehouseTO {
+
+        private static final long serialVersionUID = 1441480742451850603L;
 
         @Binding(name = "type.id")
         protected Long typeId;
@@ -648,6 +652,8 @@ public class TransferObjectFactoryTest {
 
     public static class ParentTO implements Serializable {
 
+        private static final long serialVersionUID = 4741292316277876286L;
+
         protected String name;
 
         @Binding(bindingType = BindingTypeEnum.Entity, embeddedType = ChildTO.class)
@@ -655,6 +661,8 @@ public class TransferObjectFactoryTest {
     }
 
     public static class ChildTO implements Serializable {
+
+        private static final long serialVersionUID = -789027920280989669L;
 
         protected String name;
     }

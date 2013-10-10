@@ -17,26 +17,29 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
         @Override
         public void run() {
             try {
-                while (!Thread.interrupted()) {
+                while ( !Thread.interrupted() ) {
                     synchronized (this) {
                         wait(500L);
                     }
                 }
             } catch (InterruptedException ex) {
-
             }
-
         }
     }
 
+    @SuppressWarnings("unused")
     private static final class Segment implements Serializable {
 
         private static final long serialVersionUID = 6637203548006150257L;
+
         /* package */long startOffset;
+
         /* package */long endOffset;
+
         /* package */long wroteBytes;
 
-        /* package */Segment(long startOffset, long endOffset) {
+        /* package */
+        Segment(long startOffset, long endOffset) {
             super();
             this.startOffset = startOffset;
             this.endOffset = endOffset;
@@ -55,10 +58,10 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
         }
 
         public void writtenBytes(long bytes) {
-            if (startOffset + wroteBytes == endOffset) {
+            if ( startOffset + wroteBytes == endOffset ) {
                 throw new IllegalStateException("This segment receiving bytes after been finished");
             }
-            if (startOffset + wroteBytes > endOffset) {
+            if ( startOffset + wroteBytes > endOffset ) {
                 throw new IllegalStateException("Overwrite happened.");
             }
             wroteBytes += bytes;
@@ -68,8 +71,11 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
     public static class DownloadRequest implements Serializable {
 
         private static final long serialVersionUID = 821976542154139230L;
+
         /* package */final String url;
+
         /* package */final String referenceUrl;
+
         /* package */final String localFileName;
 
         public DownloadRequest(String url, String referenceUrl, String localFileName) {
@@ -90,18 +96,24 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
         public String getLocalFileName() {
             return localFileName;
         }
-
     }
 
     private static final long serialVersionUID = -2206411843392592595L;
 
     private final DownloadRequest request;
+
     private StateEnum state;
+
     private int id;
+
     private long contentLength;
+
+    @SuppressWarnings("unused")
     private final List<Segment> segments = new ArrayList<Segment>();
 
+    @SuppressWarnings("unused")
     private int numberOfThreads = 1;
+
     private transient ExecutorService threadPool = null;
 
     public DownloadProcess(DownloadRequest request) {
@@ -115,6 +127,7 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
         this.state = StateEnum.New;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public StateEnum getState() {
         return this.state;
@@ -163,7 +176,6 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
 
     @Override
     public void receive(long bytes) {
-
     }
 
     @Override
@@ -175,18 +187,16 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
     @Override
     public void remove(boolean both) {
         stop();
-        if (both) {
+        if ( both ) {
             deleteFile();
         }
     }
 
     @Override
     public void prepare() {
-
-        if (null != threadPool) {
+        if ( null != threadPool ) {
             threadPool.shutdownNow();
         }
-
         threadPool = Executors.newFixedThreadPool(2, new ThreadFactory() {
 
             private int counter = 1;
@@ -208,27 +218,24 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
                  * 
                  * } return null; } });
                  */
-
                 return new Thread(runnable, sb.toString());
             }
         });
-
         // Create segments
     }
 
     private void deleteFile() {
         final File downloadedFile = new File(request.localFileName);
-        if (downloadedFile.exists()) {
-            if (!downloadedFile.delete()) {
+        if ( downloadedFile.exists() ) {
+            if ( !downloadedFile.delete() ) {
                 throw new IllegalStateException("Cannot delete file: " + request.localFileName);
             }
         }
     }
 
     private void stop() {
-
-        if (null != threadPool) {
-            if (!threadPool.isShutdown() && !threadPool.isTerminated()) {
+        if ( null != threadPool ) {
+            if ( !threadPool.isShutdown() && !threadPool.isTerminated() ) {
                 threadPool.shutdownNow();
             }
             threadPool = null;
@@ -259,5 +266,4 @@ public class DownloadProcess implements IDownloadProcess, ITypedReactiveObject {
     public long getContentLength() {
         return contentLength;
     }
-
 }

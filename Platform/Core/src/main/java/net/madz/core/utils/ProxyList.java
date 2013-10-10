@@ -45,6 +45,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return new ProxyIterator<E, T>(tClass, this.entityList.iterator());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object[] toArray() {
         final Object[] wrappedArray = this.entityList.toArray();
@@ -55,6 +56,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return result;
     }
 
+    @SuppressWarnings({ "unchecked", "hiding" })
     @Override
     public <T> T[] toArray(T[] a) {
         final Object[] wrappedArray = this.entityList.toArray();
@@ -79,6 +81,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean containsAll(Collection<?> c) {
         for ( Object object : c ) {
@@ -94,6 +97,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(Collection<? extends T> c) {
         for ( Object object : c ) {
@@ -109,6 +113,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
         int position = index;
@@ -124,6 +129,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean removeAll(Collection<?> c) {
         for ( Object object : c ) {
@@ -137,6 +143,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean retainAll(Collection<?> c) {
         final List<E> entities = this.entityList;
@@ -187,6 +194,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         return BOFactory.create(this.tClass, remove);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int indexOf(Object o) {
         if ( !( o instanceof IBizObject ) ) {
@@ -197,6 +205,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int lastIndexOf(Object o) {
         if ( !( o instanceof IBizObject ) ) {
@@ -217,6 +226,7 @@ public class ProxyList<E extends AbstractBaseEntity, T extends IBizObject<E>> im
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
         List<T> result = new ArrayList<T>();

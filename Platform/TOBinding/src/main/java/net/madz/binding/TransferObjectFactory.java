@@ -36,6 +36,7 @@ import net.madz.util.ClassUtils;
  */
 public class TransferObjectFactory {
 
+    @SuppressWarnings("rawtypes")
     private static ThreadLocal _cache = new ThreadLocal();
 
     // TODO [Tracy] [Done] [Add Method Comments] [Alt + Shift + J]
@@ -185,6 +186,7 @@ public class TransferObjectFactory {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T __createTransferObject(Class<T> toClazz, Object bizObject) throws InstantiationException,
             IllegalAccessException, Exception, InvocationTargetException {
         // New a blank tranfer object instance
@@ -270,7 +272,7 @@ public class TransferObjectFactory {
                         }
                         String getterName = "get" + propertyName.toUpperCase().charAt(0) + propertyName.substring(1);
                         Method getter = ClassUtils.findMethodThroughClassHierarchy(bizObject.getClass(), getterName);
-                        value = getter.invoke(bizObject, null);
+                        value = getter.invoke(bizObject, (Object[])null);
                     }
                     if ( BindingTypeEnum.Entity == binding.bindingType() ) {
                         Class<?> embeddedToClass = binding.embeddedType();

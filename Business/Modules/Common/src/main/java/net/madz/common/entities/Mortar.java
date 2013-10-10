@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 @DiscriminatorValue("M")
 public class Mortar extends Mixture {
 
+    private static final long serialVersionUID = -8446619721481346638L;
+
     public void setGrade(StrengthGrade grade) {
         this.setGradeName(grade.getName());
     }
@@ -20,6 +22,7 @@ public class Mortar extends Mixture {
         M20("M20", 2006);
 
         private int value;
+
         private String name;
 
         private StrengthGrade(String name, int value) {
@@ -40,5 +43,4 @@ public class Mortar extends Mixture {
     public StrengthGrade getGradeEnum() {
         return StrengthGrade.valueOf(getGradeName());
     }
-    
 }

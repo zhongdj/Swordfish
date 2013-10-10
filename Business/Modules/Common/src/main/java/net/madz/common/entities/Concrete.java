@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 @DiscriminatorValue("C")
 public class Concrete extends Mixture {
 
+    private static final long serialVersionUID = 5253902172558137092L;
+
     public static enum StrengthGrade implements IStrengthGrade {
         C10(1001),
         C15(1002),
@@ -54,12 +56,12 @@ public class Concrete extends Mixture {
 
     public void setGrade(StrengthGrade grade) {
         switch (grade) {
-        case C100:
-            setGradeName("100");
-            break;
-        default:
-            setGradeName(grade.name());
-            break;
+            case C100:
+                setGradeName("100");
+                break;
+            default:
+                setGradeName(grade.name());
+                break;
         }
     }
 }

@@ -16,6 +16,8 @@ import demo.typed.IDownloadProcess.TransitionEnum;
 public class DownloadProcessRecoverableIterator implements IRecoverableIterator<IDownloadProcess> {
 
     private final Iterator<IDownloadProcess> iterator;
+
+    @SuppressWarnings("unused")
     private final StateMachineMetaData<IDownloadProcess, StateEnum, TransitionEnum> stateMachineMetaData;
 
     public DownloadProcessRecoverableIterator(StateMachineMetaData<IDownloadProcess, StateEnum, TransitionEnum> metaData) {
@@ -24,13 +26,14 @@ public class DownloadProcessRecoverableIterator implements IRecoverableIterator<
         iterator = downloads.iterator();
     }
 
+    @SuppressWarnings("unchecked")
     public List<IDownloadProcess> getSampleProcesses() {
         final ArrayList<IDownloadProcess> result = new ArrayList<IDownloadProcess>();
         ObjectInputStream ois = null;
         try {
             final File persistent = new File("dataStore");
             System.out.println(persistent.getAbsolutePath());
-            if (!persistent.exists()) {
+            if ( !persistent.exists() ) {
                 persistent.createNewFile();
             }
             ois = new ObjectInputStream(new FileInputStream(persistent));
@@ -40,7 +43,7 @@ public class DownloadProcessRecoverableIterator implements IRecoverableIterator<
             // throw new IllegalStateException(e);
             return new ArrayList<IDownloadProcess>();
         } finally {
-            if (null != ois) {
+            if ( null != ois ) {
                 try {
                     ois.close();
                 } catch (IOException e) {
@@ -65,5 +68,4 @@ public class DownloadProcessRecoverableIterator implements IRecoverableIterator<
     public void remove() {
         throw new UnsupportedOperationException();
     }
-
 }

@@ -12,10 +12,14 @@ import net.madz.core.entities.AbstractBaseEntity;
 @Table(name = "pouring_part_template")
 public class PouringPartTemplate extends AbstractBaseEntity {
 
+    private static final long serialVersionUID = -3053022546016915999L;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CONSTRUCTION_CATEGORY_ID")
     private ConstructionCategory category;
+
     private String name;
+
     private int prirority;
 
     public ConstructionCategory getCategory() {

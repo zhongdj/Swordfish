@@ -44,6 +44,7 @@ public class ConcreteTruckResource extends MultiTenancyEntity {
         return state;
     }
 
+    @SuppressWarnings("unused")
     private void setState(String state) {
         this.state = state;
     }

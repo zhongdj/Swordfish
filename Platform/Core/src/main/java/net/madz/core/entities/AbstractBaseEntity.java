@@ -29,12 +29,13 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
  */
 @MappedSuperclass
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class AbstractBaseEntity implements Serializable{
+public abstract class AbstractBaseEntity implements Serializable {
+
+    private static final long serialVersionUID = -6885878862729201814L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     protected long id;
-
 
     public long getId() {
         return id;
@@ -67,8 +68,8 @@ public abstract class AbstractBaseEntity implements Serializable{
         final ArrayList<Pair> processors = new ArrayList<>();
         for ( Class<?> c = getClass(); !c.equals(Object.class); c = c.getSuperclass() ) {
             for ( final Annotation annotationOnEntity : c.getAnnotations() ) {
-                final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity.annotationType().getAnnotation(
-                        ExtendEntityAnnotationProcessor.class);
+                final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity
+                        .annotationType().getAnnotation(ExtendEntityAnnotationProcessor.class);
                 if ( null == extEntityProcessorAnnotation ) {
                     continue;
                 }
@@ -77,8 +78,10 @@ public abstract class AbstractBaseEntity implements Serializable{
                         final EntityAnnotationProcessor processor = extEntityProcessorAnnotation.value().newInstance();
                         processors.add(new Pair(annotationOnEntity, processor));
                     } catch (Exception e) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE,
-                                "Failed to initialize processor instances of class : " + extEntityProcessorAnnotation.value().getName(), e);
+                        Logger.getLogger(getClass().getName()).log(
+                                Level.SEVERE,
+                                "Failed to initialize processor instances of class : "
+                                        + extEntityProcessorAnnotation.value().getName(), e);
                     }
                 }
             }
@@ -99,6 +102,7 @@ public abstract class AbstractBaseEntity implements Serializable{
     private class Pair {
 
         public final Annotation a;
+
         @SuppressWarnings("rawtypes")
         public final EntityAnnotationProcessor p;
 

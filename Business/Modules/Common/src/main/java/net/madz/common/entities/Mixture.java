@@ -10,12 +10,13 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="mixture")
+@Table(name = "mixture")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.CHAR, length = 1)
 public abstract class Mixture extends CodedEntity {
+
+    private static final long serialVersionUID = -5317402076349568390L;
 
     @Column(name = "GRADE_NAME", nullable = false)
     protected String gradeName;

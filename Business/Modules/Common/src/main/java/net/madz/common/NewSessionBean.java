@@ -41,7 +41,7 @@ public class NewSessionBean {
     }
 
     public void doIt() {
-        final Map prop = new HashMap();
+        final Map<String, String> prop = new HashMap<>();
         prop.put("tenant.id", "1");
         final EntityManager em = emf.createEntityManager(prop);
         for ( Concrete.StrengthGrade grade : Concrete.StrengthGrade.values() ) {

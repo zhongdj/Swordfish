@@ -33,10 +33,6 @@ import java.lang.annotation.Target;
  * 
  * @author Barry
  */
-// TODO [Tracy] [Done] [Code Review Task] [Using Ctrl + Shift + G to search
-// references in workspace, and design test cases.]
-// TODO [Tracy] [Done] [Add Method Comments] [Alt + Shift + J]
-// TODO [Tracy] [Done] [Study][@Target & @Retention]
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Binding {
@@ -54,5 +50,5 @@ public @interface Binding {
 
     BindingTypeEnum bindingType() default BindingTypeEnum.Field;
 
-    Class embeddedType() default Object.class;
+    Class<?> embeddedType() default Object.class;
 }

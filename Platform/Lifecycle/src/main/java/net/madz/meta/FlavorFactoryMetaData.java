@@ -11,6 +11,7 @@ public abstract class FlavorFactoryMetaData<OWNER extends MetaData, E extends En
     private final KeySet keySet;
     private final Map<Class<?>, E> flavorKeyMap;
 
+    @SuppressWarnings("unchecked")
     protected FlavorFactoryMetaData(E... keyEnumeration) {
         flavorKeyMap = KeyedEnumerationMap.valueOf(keyEnumeration);
         keySet = new KeySet(flavorKeyMap.keySet().toArray(new Object[flavorKeyMap.size()]));
