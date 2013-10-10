@@ -22,7 +22,7 @@ public class SchedulingApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> resources = new HashSet<>();
-        resources.add(ServiceOrderJsonProvider.class);
+        resources.add(MOXyJsonProvider.class);
         resources.add(SchedulingAdminService.class);
         resources.add(SchedulingOperationResources.class);
         return resources;

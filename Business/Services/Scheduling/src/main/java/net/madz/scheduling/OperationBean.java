@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -54,6 +56,8 @@ import org.eclipse.persistence.jaxb.JAXBContextProperties;
 @Interceptors(SessionBeanAuthorizationInterceptor.class)
 public class OperationBean extends MultitenancyBean {
 
+    private static Logger logger = Logger.getLogger(OperationBean.class.getName());
+    
     public List<PouringPartSpec> listMyPartsInConstructing() {
         final ArrayList<PouringPartSpec> result = new ArrayList<>();
         PouringPartSpec spec = createSpec();
@@ -170,7 +174,7 @@ public class OperationBean extends MultitenancyBean {
             try {
                 return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrder);
             } catch (Exception e) {
-                //TODO
+                logger.log(Level.SEVERE, "TOBindingError", e);
             }
             return null;
         } finally {

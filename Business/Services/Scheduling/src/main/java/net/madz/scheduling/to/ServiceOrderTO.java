@@ -3,53 +3,75 @@ package net.madz.scheduling.to;
 import java.io.Serializable;
 import java.util.List;
 
+import net.madz.binding.annotation.Binding;
 
 public class ServiceOrderTO implements Serializable{
     
     private static final long serialVersionUID = 8875587973768271476L;
-    
+    @Binding(name = "id")
     private Long serviceOrderId;
     
+    @Binding(name = "plannedVolume")
     private Double plannedVolume;
     
+    @Binding(name = "mixingPlantResource.id")
     private Long mixingPlantResourceId;
-    
+
+    @Binding(name = "mixingPlantResource.plannedVolume")
     private Double mixingPlantResourcePlannedVolume;
     
+    @Binding(name = "mixingPlantResource.finishedVolume")
     private Double mixingPlantResourceFinishedVolume;
     
+    @Binding(name = "mixingPlantResource.mixingPlant.id")
     private Long mixingPlantId;
     
+    @Binding(name = "mixingPlantResource.mixingPlant.name")
     private String mixingPlantName;
     
+    @Binding(name = "mixingPlantResource.mixingPlant.pinyinAbbrName")
     private String mixingPlantPinyinAbbrName;
     
+    @Binding(name = "truckResource.id")
     private Long concreteTruckResourceId;
     
+    @Binding(name = "truckResource.concreteTruck.id")
     private Long truckId;
     
+    @Binding(name = "truckResource.concreteTruck.licencePlateNumber")
     private String truckLicencePlatNumber;
     
+    @Binding(name = "truckResource.concreteTruck.ratedCapacity")
     private Double truckRatedCapacity;
     
-    private String mixtureType;
+    //@Binding(name = "spec.mixture.type")
+    //private String mixtureType;
     
+    @Binding(name = "spec.id")
     private Long pouringParSpectId;
     
+    @Binding(name = "spec.pouringPart.id")
     private Long pouringPartId;
     
+    @Binding(name = "spec.pouringPart.name")
     private String pouringPartName;
     
+    @Binding(name = "spec.pouringPart.pinYinAbbrName")
     private String pouringPartAbbrName;
     
+    @Binding(name = "spec.unitProject.id")
     private Long unitProjectId;
     
+    @Binding(name = "spec.unitProject.name")
     private String unitProjectName;
     
+    @Binding(name = "spec.mixture.id")
     private Long mixtureId;
     
+    @Binding(name = "spec.mixture.gradeName")
     private String mixtureGradeName;
     
+    @Binding(name = "spec.additives")
     private List<AdditiveTO> additives;
 
     
@@ -173,14 +195,14 @@ public class ServiceOrderTO implements Serializable{
     }
 
     
-    public String getMixtureType() {
-        return mixtureType;
-    }
-
-    
-    public void setMixtureType(String mixtureType) {
-        this.mixtureType = mixtureType;
-    }
+//    public String getMixtureType() {
+//        return mixtureType;
+//    }
+//
+//    
+//    public void setMixtureType(String mixtureType) {
+//        this.mixtureType = mixtureType;
+//    }
 
     
     public Long getPouringParSpectId() {

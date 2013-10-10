@@ -1,10 +1,16 @@
 package net.madz.scheduling.to;
 
+import net.madz.binding.annotation.Binding;
+
 public class AdditiveTO {
 
+    @Binding(name = "id")
     private Long addtiveId;
+    @Binding(name = "name")
     private String additiveName;
+    @Binding(name = "pinyinAbbrName")
     private String additivePinyinAbbrName;
+    @Binding(name = "code")
     private String additiveCode;
 
     public Long getAddtiveId() {
