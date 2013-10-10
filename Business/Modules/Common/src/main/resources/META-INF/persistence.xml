@@ -15,9 +15,8 @@
       <property name="javax.persistence.jdbc.password" value="1q2w3e4r5t"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
-      <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+      <property name="eclipselink.ddl-generation" value="NONE"/>
       <property name="eclipselink.target-database" value="MySQL"/>
-      <property name="eclipselink.ddl-generation.output-mode" value="both"/>
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
       <property name="eclipselink.deploy-on-startup" value="true"/>
