@@ -106,18 +106,18 @@ public class SchedulingOperationResources {
      * 
      */
     @POST
-    @Path("planned-summary-task/{summaryId}/resource-allocated-task")
+    @Path("summaryPlan/{summaryPlanId}/serviceOrder")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceOrder allocateResource(@PathParam("summaryId") Long summaryId, RequiredResource resource) {
-        return operation.allocateResourceTo(summaryId, resource.mixingPlantId, resource.concreteTruckId, resource.volume);
+    public ServiceOrder allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource) {
+        return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId, resource.concreteTruckResourceId, resource.volume);
     }
 
     public static class RequiredResource {
 
-        public Long mixingPlantId;
+        public Long mixingPlantResourceId;
 
-        public Long concreteTruckId;
+        public Long concreteTruckResourceId;
         
         public Double volume;
     }
