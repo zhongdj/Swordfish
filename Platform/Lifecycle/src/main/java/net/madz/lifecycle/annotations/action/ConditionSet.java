@@ -1,4 +1,4 @@
-package net.madz.lifecycle.annotations;
+package net.madz.lifecycle.annotations.action;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,9 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Function {
-
-    Class<?>[] value();
-
-    Class<?> transition();
+public @interface ConditionSet {
 }
