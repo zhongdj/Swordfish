@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.madz.lifecycle.annotations.action.Corrupt;
-import net.madz.lifecycle.annotations.action.End;
 import net.madz.lifecycle.annotations.action.Fail;
 import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.annotations.action.Timeout;
 import net.madz.lifecycle.annotations.state.Corrupted;
+import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Running;
 import net.madz.lifecycle.annotations.state.Stopped;
@@ -26,7 +26,6 @@ import net.madz.lifecycle.annotations.typed.TypedTransition;
 import net.madz.lifecycle.annotations.typed.TypedTransitionSet;
 import demo.typed.IDownloadProcess.StateEnum;
 import demo.typed.IDownloadProcess.TransitionEnum;
-
 import static demo.typed.IDownloadProcess.TransitionEnum.Activate;
 import static demo.typed.IDownloadProcess.TransitionEnum.Err;
 import static demo.typed.IDownloadProcess.TransitionEnum.Finish;

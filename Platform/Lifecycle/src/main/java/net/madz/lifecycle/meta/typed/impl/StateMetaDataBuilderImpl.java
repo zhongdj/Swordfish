@@ -3,8 +3,8 @@ package net.madz.lifecycle.meta.typed.impl;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 
-import net.madz.lifecycle.annotations.action.End;
 import net.madz.lifecycle.annotations.state.Corrupted;
+import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Running;
 import net.madz.lifecycle.annotations.state.Stopped;

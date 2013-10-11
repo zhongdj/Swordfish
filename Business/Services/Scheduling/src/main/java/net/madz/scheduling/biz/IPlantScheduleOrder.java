@@ -8,7 +8,7 @@ import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.annotations.action.End;
+import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.scheduling.biz.IPlantScheduleOrder.Transitions.Finish;
 import net.madz.scheduling.biz.IPlantScheduleOrder.Transitions.Start;

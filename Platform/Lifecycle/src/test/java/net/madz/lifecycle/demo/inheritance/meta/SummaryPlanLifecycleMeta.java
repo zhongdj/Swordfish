@@ -7,7 +7,7 @@ import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
-import net.madz.lifecycle.annotations.action.End;
+import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.demo.inheritance.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
 import net.madz.lifecycle.demo.inheritance.meta.SummaryPlanLifecycleMeta.States.Ongoing;
