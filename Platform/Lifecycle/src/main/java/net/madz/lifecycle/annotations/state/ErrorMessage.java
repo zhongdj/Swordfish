@@ -7,11 +7,12 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InboundWhile {
+public @interface ErrorMessage {
 
-    Class<?> relation();
+    Class<?>[] states();
 
-    Class<?>[] on();
+    String code();
 
-    ErrorMessage[] otherwise() default {};
+    String bundle();
+    
 }
