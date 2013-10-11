@@ -16,6 +16,7 @@ import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ServiceOrder;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
 
 public class ServiceSummaryPlanBO extends AbstractBO<ServiceSummaryPlan> implements IServiceSummaryPlan {
 
@@ -100,11 +101,37 @@ public class ServiceSummaryPlanBO extends AbstractBO<ServiceSummaryPlan> impleme
     }
 
     @Override
-    public IServiceOrder createServiceOrder(IMixingPlantResource plantResource, IConcreteTruckResource truckResource,
-            double volume) {
+    public IServiceOrder createServiceOrder(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume) {
         final IServiceOrder serviceOrderBO = BOFactory.create(IServiceOrder.class);
         serviceOrderBO.configureResources(this, plantResource, truckResource, volume);
         return serviceOrderBO;
     }
 
+    @Override
+    public void adjustTotalVolume(double newTotalVolume) {
+     // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void confirmFinish() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public VolumeMeasurable getVolumeMeasurable() {
+     // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean isVolumeLeft() {
+        final double leftValue = this.entity.getTotalVolume() - this.entity.getPlannedVolume();
+        return leftValue > 0;
+    }
 }
