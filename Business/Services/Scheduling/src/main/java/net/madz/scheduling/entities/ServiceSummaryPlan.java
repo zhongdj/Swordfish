@@ -28,14 +28,25 @@ public class ServiceSummaryPlan extends MultiTenancyEntity {
                     referencedColumnName = "ID") })
     private PouringPartSpec spec;
 
-    @OneToMany(mappedBy="summaryPlan")
+    @OneToMany(mappedBy = "summaryPlan")
     private List<ServiceOrder> serviceOrderList = new ArrayList<>();
+
+    @Column(name = "TOTAL_VOLUME")
+    private double totalVolume;
 
     @Column(name = "PLANNED_VOLUME")
     private double plannedVolume;
 
-    @Column(name = "FINISHED")
-    private boolean finished;
+    @Column(name = "FINISHED_VOLUME")
+    private double finishedVolume;
+
+    @Column(name = "ONGOING_VOLUME")
+    private double ongoingVolume;
+
+    @Column(name = "CANCELLED_VOLUME")
+    private double cancelledVolume;
+
+    private String state;
 
     public PouringPartSpec getSpec() {
         return spec;
@@ -61,14 +72,6 @@ public class ServiceSummaryPlan extends MultiTenancyEntity {
         this.plannedVolume = plannedVolume;
     }
 
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
-    }
-
     public void addResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
         if ( this.serviceOrderList.contains(resourceAllocatedTask) ) return;
         this.serviceOrderList.add(resourceAllocatedTask);
@@ -76,5 +79,25 @@ public class ServiceSummaryPlan extends MultiTenancyEntity {
 
     public void removeResourceAllocatedTask(ServiceOrder resourceAllocatedTask) {
         this.serviceOrderList.remove(resourceAllocatedTask);
+    }
+
+    public double getTotalVolume() {
+        return totalVolume;
+    }
+
+    public double getFinishedVolume() {
+        return finishedVolume;
+    }
+
+    public double getOngoingVolume() {
+        return ongoingVolume;
+    }
+
+    public double getCancelledVolume() {
+        return cancelledVolume;
+    }
+
+    public String getState() {
+        return state;
     }
 }
