@@ -18,6 +18,7 @@ import net.madz.authorization.MultitenancyBean;
 import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationInterceptor;
 import net.madz.binding.TransferObjectFactory;
 import net.madz.contract.spec.entities.PouringPartSpec;
+import net.madz.core.exceptions.AppServiceException;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
@@ -40,14 +41,23 @@ public class OperationBean extends MultitenancyBean {
         return result;
     }
 
-    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId,
-            Long concreteTruckResourceId, double volume) {
+    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId, Long concreteTruckResourceId, double volume)
+            throws AppServiceException {
         EntityManager em = em();
         try {
-            final IServiceSummaryPlan summaryTask = em.find(IServiceSummaryPlan.class, summaryPlanId);
+            final IServiceSummaryPlan summaryPlan = em.find(IServiceSummaryPlan.class, summaryPlanId);
+            if ( null == summaryPlan ) {
+                throw new BONotFoundException("scheduling", "100-0001");
+            }
             final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
+            if ( null == plantResource ) {
+                throw new BONotFoundException("scheduling", "100-0006");
+            }
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
-            final IServiceOrder serviceOrderBO = summaryTask.createServiceOrder(plantResource, truckResource, volume);
+            if ( null == truckResource ) {
+                throw new BONotFoundException("scheduling", "100-0004");
+            }
+            final IServiceOrder serviceOrderBO = summaryPlan.createServiceOrder(plantResource, truckResource, volume);
             serviceOrderBO.persist(em);
             try {
                 return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrderBO.get());
