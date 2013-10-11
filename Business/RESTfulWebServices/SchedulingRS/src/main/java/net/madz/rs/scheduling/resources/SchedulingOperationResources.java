@@ -12,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import net.madz.contract.spec.entities.PouringPartSpec;
+import net.madz.core.exceptions.AppServiceException;
 import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
@@ -101,20 +102,25 @@ public class SchedulingOperationResources {
      * @param resource
      *            为排产任务分配的资源标识对象，包含砼车和搅拌站的标识(Id)
      * @return 已经加入所分配<big>搅拌站</big>生产队列的<big>生产任务</big>
+     * @throws AppServiceException
      * 
      */
     @POST
     @Path("summaryPlan/{summaryPlanId}/serviceOrder")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceOrderTO allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource) {
-        return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId, resource.concreteTruckResourceId, resource.volume);
+    public ServiceOrderTO allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource)
+            throws AppServiceException {
+        return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId,
+                resource.concreteTruckResourceId, resource.volume);
     }
 
     public static class RequiredResource {
 
         public Long mixingPlantResourceId;
+
         public Long concreteTruckResourceId;
+
         public Double volume;
     }
 }

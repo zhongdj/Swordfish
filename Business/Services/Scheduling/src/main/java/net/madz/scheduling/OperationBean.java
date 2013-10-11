@@ -47,15 +47,15 @@ public class OperationBean extends MultitenancyBean {
         try {
             final IServiceSummaryPlan summaryPlan = em.find(IServiceSummaryPlan.class, summaryPlanId);
             if ( null == summaryPlan ) {
-                throw new BONotFoundException("scheduling", "100-0001");
+                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0001");
             }
             final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
             if ( null == plantResource ) {
-                throw new BONotFoundException("scheduling", "100-0006");
+                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0006");
             }
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
             if ( null == truckResource ) {
-                throw new BONotFoundException("scheduling", "100-0004");
+                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0004");
             }
             final IServiceOrder serviceOrderBO = summaryPlan.createServiceOrder(plantResource, truckResource, volume);
             serviceOrderBO.persist(em);

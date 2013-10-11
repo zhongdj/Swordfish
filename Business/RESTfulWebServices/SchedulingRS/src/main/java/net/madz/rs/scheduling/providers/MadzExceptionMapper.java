@@ -2,24 +2,25 @@ package net.madz.rs.scheduling.providers;
 
 import java.io.Serializable;
 
-import javax.ejb.EJBException;
-import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import net.madz.scheduling.BONotFoundException;
 import net.madz.utils.MadzException;
 
 @Provider
-public class MadzExceptionMapper implements ExceptionMapper<EJBException> {
+public class MadzExceptionMapper implements ExceptionMapper<MadzException> {
 
     @Override
-    public Response toResponse(EJBException e) {
+    public Response toResponse(MadzException e) {
         final Response result;
-        if ( e.getCause() instanceof EntityNotFoundException ) {
-            result = null;
-        } else if ( e.getCause() instanceof MadzException ) {
-            MadzException me = (MadzException) e.getCause();
+        if ( e instanceof BONotFoundException ) {
+            BONotFoundException be = (BONotFoundException) e;
+            result = Response.status(Response.Status.NOT_FOUND)
+                    .entity(new Error(be.getCategory(), be.getErrorCode(), be.getLocalizedMessage())).build();
+        } else if ( e instanceof MadzException ) {
+            MadzException me = (MadzException) e;
             result = Response.status(Response.Status.BAD_REQUEST)
                     .entity(new Error(me.getCategory(), me.getErrorCode(), me.getLocalizedMessage())).build();
         } else {
@@ -33,11 +34,15 @@ public class MadzExceptionMapper implements ExceptionMapper<EJBException> {
 
         private static final long serialVersionUID = -2474784670718130250L;
 
-        private final String category;
+        private String category;
 
-        private final String errorCode;
+        private String errorCode;
 
-        private final String errorMessage;
+        private String errorMessage;
+
+        public Error() {
+            super();
+        }
 
         public Error(String category, String errorCode, String errorMessage) {
             super();
@@ -56,6 +61,18 @@ public class MadzExceptionMapper implements ExceptionMapper<EJBException> {
 
         public String getErrorMessage() {
             return errorMessage;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public void setErrorCode(String errorCode) {
+            this.errorCode = errorCode;
+        }
+
+        public void setErrorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
         }
     }
 }

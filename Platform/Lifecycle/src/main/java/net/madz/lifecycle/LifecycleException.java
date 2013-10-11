@@ -4,22 +4,20 @@ import net.madz.utils.MadzException;
 
 public class LifecycleException extends MadzException {
 
+    private static final long serialVersionUID = 7069144333982097517L;
+
     private static final String LIFECYCLE = "Lifecycle";
 
-    public LifecycleException(String bundle, String errorCode, String[] messageVars, Throwable cause) {
-        super(bundle, errorCode, messageVars, cause);
+    public LifecycleException(Class<?> cls, String bundle, String errorCode, String[] messageVars, Throwable cause) {
+        super(cls, bundle, errorCode, messageVars, cause);
     }
 
-    public LifecycleException(String bundle, String errorCode, String[] messageVars) {
-        super(bundle, errorCode, messageVars);
+    public LifecycleException(Class<?> cls, String bundle, String errorCode, Throwable cause) {
+        super(cls, bundle, errorCode, cause);
     }
 
-    public LifecycleException(String bundle, String errorCode, Throwable cause) {
-        super(bundle, errorCode, cause);
-    }
-
-    public LifecycleException(String bundle, String errorCode) {
-        super(bundle, errorCode);
+    public LifecycleException(Class<?> cls, String bundle, String errorCode) {
+        super(cls, bundle, errorCode);
     }
 
     @Override

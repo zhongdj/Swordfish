@@ -75,6 +75,9 @@ public class BizObjectManager implements EntityManager {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey);
+            if ( null == entity ) {
+                return null;
+            }
             return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey);
@@ -104,6 +107,9 @@ public class BizObjectManager implements EntityManager {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, properties);
+            if ( null == entity ) {
+                return null;
+            }
             return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, properties);
@@ -117,6 +123,9 @@ public class BizObjectManager implements EntityManager {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, lockMode);
+            if ( null == entity ) {
+                return null;
+            }
             return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, lockMode);
@@ -130,6 +139,9 @@ public class BizObjectManager implements EntityManager {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.find(trueEntityClass, primaryKey, lockMode, properties);
+            if ( null == entity ) {
+                return null;
+            }
             return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.find(entityClass, primaryKey, lockMode, properties);
@@ -143,6 +155,9 @@ public class BizObjectManager implements EntityManager {
             Class<IBizObject<AbstractBaseEntity>> bizObjectInterfaceClass = (Class<IBizObject<AbstractBaseEntity>>) entityClass;
             Class<AbstractBaseEntity> trueEntityClass = findEntityClass(bizObjectInterfaceClass);
             AbstractBaseEntity entity = em.getReference(trueEntityClass, primaryKey);
+            if ( null == entity ) {
+                return null;
+            }
             return (T) BOFactory.create(bizObjectInterfaceClass, entity);
         } else {
             return em.getReference(entityClass, primaryKey);
