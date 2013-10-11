@@ -14,5 +14,6 @@
 		<module>Messaging</module>
 		<module>Security</module>
 		<module>TOBinding</module>
+		<module>CommonUtils</module>
 	</modules>
 </project>

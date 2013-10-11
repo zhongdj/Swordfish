@@ -1,4 +1,4 @@
-package net.madz.lifecycle;
+package net.madz.utils;
 
 public abstract class MadzException extends Exception {
 

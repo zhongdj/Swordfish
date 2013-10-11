@@ -35,5 +35,10 @@
 			<artifactId>jmockit</artifactId>
 			<version>1.4</version>
 		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>CommonUtils</artifactId>
+			<version>${swordfish.release.version}</version>
+		</dependency>
 	</dependencies>
 </project>

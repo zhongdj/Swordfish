@@ -1,5 +1,7 @@
 package net.madz.lifecycle;
 
+import net.madz.utils.MadzException;
+
 public class LifecycleException extends MadzException {
 
     private static final String LIFECYCLE = "Lifecycle";
