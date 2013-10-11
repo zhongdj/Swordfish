@@ -43,6 +43,12 @@
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
 			<version>${javaee.api.version}</version>
@@ -76,6 +82,12 @@
 			<groupId>net.madz</groupId>
 			<artifactId>TOBinding</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.restfuse</groupId>
+			<artifactId>com.eclipsesource.restfuse</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 	</dependencies>
 
