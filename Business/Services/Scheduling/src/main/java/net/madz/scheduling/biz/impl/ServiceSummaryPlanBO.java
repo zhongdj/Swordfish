@@ -10,6 +10,8 @@ import net.madz.common.entities.Address;
 import net.madz.common.entities.Mixture;
 import net.madz.core.biz.AbstractBO;
 import net.madz.core.biz.BOFactory;
+import net.madz.scheduling.biz.IConcreteTruckResource;
+import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ServiceOrder;
@@ -93,12 +95,16 @@ public class ServiceSummaryPlanBO extends AbstractBO<ServiceSummaryPlan> impleme
     }
 
     @Override
-    public double getPlannedVolumn() {
+    public double getPlannedVolume() {
         return this.entity.getPlannedVolume();
     }
 
     @Override
-    public boolean getFinished() {
-        return this.entity.isFinished();
+    public IServiceOrder createServiceOrder(IMixingPlantResource plantResource, IConcreteTruckResource truckResource,
+            double volume) {
+        final IServiceOrder serviceOrderBO = BOFactory.create(IServiceOrder.class);
+        serviceOrderBO.configureResources(this, plantResource, truckResource, volume);
+        return serviceOrderBO;
     }
+
 }

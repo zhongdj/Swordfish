@@ -26,7 +26,7 @@ public interface IServiceSummaryPlan extends IBizObject<ServiceSummaryPlan> {
 
     List<IServiceOrder> getServiceOrderList();
 
-    double getPlannedVolumn();
+    double getPlannedVolume();
 
-    boolean getFinished();
+    IServiceOrder createServiceOrder(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
 }

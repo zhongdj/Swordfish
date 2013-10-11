@@ -41,7 +41,7 @@ public interface IServiceOrder extends IPlantScheduleOrder, IVehicleScheduleOrde
     }
 
     @Transition(Schedule.class)
-    void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
+    void configureResources(IServiceSummaryPlan summaryPlan, IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
 
     @Transition(Start.class)
     void confirmStart();
@@ -49,5 +49,4 @@ public interface IServiceOrder extends IPlantScheduleOrder, IVehicleScheduleOrde
     @Transition(Finish.class)
     void confirmFinish();
 
-    void setSummaryPlan(IServiceSummaryPlan summaryPlan);
 }

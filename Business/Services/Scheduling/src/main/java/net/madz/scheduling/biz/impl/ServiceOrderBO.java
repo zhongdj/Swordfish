@@ -167,7 +167,11 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     @Override
-    public void allocateResources(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume) {
+    public void configureResources(IServiceSummaryPlan summaryPlan, IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume) {
+        
+        this.entity.setSummaryPlan(summaryPlan.get());
+        this.entity.setSpec(summaryPlan.get().getSpec());
+        
         this.plantResource = plantResource;
         this.truckResource = truckResource;
         this.plantResource.assignOrder(this);
@@ -222,9 +226,4 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void setSummaryPlan(IServiceSummaryPlan summaryPlan) {
-        this.entity.setSummaryPlan(summaryPlan.get());
-        this.entity.setSpec(summaryPlan.get().getSpec());
-    }
 }
