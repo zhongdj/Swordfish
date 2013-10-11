@@ -15,6 +15,9 @@ import net.madz.scheduling.biz.impl.ServiceSummaryPlanBO;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.meta.SummaryPlanLifecycleMeta;
 import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
+import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume;
+import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.ConfirmFinish;
+import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.CreateServiceOrder;
 
 @BOProxy(ServiceSummaryPlanBO.class)
 @LifecycleMeta(value = SummaryPlanLifecycleMeta.class)
@@ -36,16 +39,16 @@ public interface IServiceSummaryPlan extends IBizObject<ServiceSummaryPlan>, Vol
     double getPlannedVolume();
 
     /** Transitional methods **/
-    @Transition(SummaryPlanLifecycleMeta.Transitions.createServiceOrder.class)
+    @Transition(CreateServiceOrder.class)
     IServiceOrder createServiceOrder(IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
 
-    @Transition(SummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume.class)
+    @Transition(AdjustTotalVolume.class)
     void adjustTotalVolume(double newTotalVolume);
 
-    @Transition(SummaryPlanLifecycleMeta.Transitions.confirmFinish.class)
+    @Transition(ConfirmFinish.class)
     void confirmFinish();
 
-    @Condition(SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable.class)
+    @Condition(VolumeMeasurable.class)
     VolumeMeasurable getVolumeMeasurable();
 
     @StateIndicator
