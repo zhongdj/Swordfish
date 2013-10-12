@@ -1,6 +1,5 @@
 package net.madz.scheduling.biz.impl;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -24,41 +23,6 @@ public class ConcreteTruckResourceBO extends AbstractBO<ConcreteTruckResource> i
     public ConcreteTruckResourceBO(EntityManager em, Class<ConcreteTruckResource> t, long id) {
         super(em, t, id);
         orderList = new ProxyList<ServiceOrder, IVehicleScheduleOrder>(IVehicleScheduleOrder.class, entity.getServiceOrders());
-    }
-
-    @Override
-    public void confirmReady() {
-        this.entity.setConfirmedDate(new Timestamp(System.currentTimeMillis()));
-    }
-
-    @Override
-    public void confirmDetachPlant() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void confirmLeaveStation() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void confirmArriveToConstructionPlant() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void confirmReturn() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void confirmArriveStation() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public StateEnum getState() {
-        return null;
     }
 
     @Override
@@ -105,5 +69,21 @@ public class ConcreteTruckResourceBO extends AbstractBO<ConcreteTruckResource> i
     public int assignOrder(IVehicleScheduleOrder order) {
         this.orderList.add(order);
         return this.orderList.size();
+    }
+
+    @Override
+    public void finishOrder(Long orderId) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void detach() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

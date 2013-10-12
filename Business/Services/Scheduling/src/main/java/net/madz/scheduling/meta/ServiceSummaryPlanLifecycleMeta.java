@@ -9,16 +9,16 @@ import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.States.Ongoing;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.States.VolumeLeftEmpty;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.ConfirmFinish;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.CreateServiceOrder;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Utils.VolumeMeasurableTransition;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.States.Ongoing;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.States.VolumeLeftEmpty;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.ConfirmFinish;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.CreateServiceOrder;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Utils.VolumeMeasurableTransition;
 
 @StateMachine
-public interface SummaryPlanLifecycleMeta {
+public interface ServiceSummaryPlanLifecycleMeta {
 
     @StateSet
     public static class States {

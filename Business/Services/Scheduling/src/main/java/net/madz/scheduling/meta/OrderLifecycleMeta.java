@@ -1,7 +1,5 @@
 package net.madz.scheduling.meta;
 
-import javax.ejb.Schedule;
-
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -20,13 +18,9 @@ public interface OrderLifecycleMeta {
     public static class States {
 
         @Initial
-        @Functions(value = { @Function(transition = Schedule.class, value = { Queued.class }) })
-        public static class Created {
-        }
-
         @Functions(
                 value = { @Function(transition = Start.class, value = { Ongoing.class }), @Function(transition = Cancel.class, value = { Cancelled.class }) })
-        public static class Queued {
+        public static class Created {
         }
 
         @Functions(value = { @Function(transition = Finish.class, value = { Finished.class }),
@@ -45,9 +39,6 @@ public interface OrderLifecycleMeta {
 
     @TransitionSet
     public static class Transitions {
-
-        public static class Schedule {
-        }
 
         public static class Start {
         }

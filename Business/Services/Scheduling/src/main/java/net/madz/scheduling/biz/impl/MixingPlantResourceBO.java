@@ -8,7 +8,6 @@ import net.madz.core.biz.AbstractBO;
 import net.madz.core.utils.ProxyList;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IPlantScheduleOrder;
-import net.madz.scheduling.biz.IPlantScheduleOrder.StateEnum;
 import net.madz.scheduling.entities.MixingPlantResource;
 
 public class MixingPlantResourceBO extends AbstractBO<MixingPlantResource> implements IMixingPlantResource {
@@ -33,8 +32,8 @@ public class MixingPlantResourceBO extends AbstractBO<MixingPlantResource> imple
     @Override
     public IPlantScheduleOrder getWorkingOrder() {
         for ( IPlantScheduleOrder order : orderList ) {
-            StateEnum plantScheduleOrderState = order.getPlantScheduleOrderState();
-            if ( plantScheduleOrderState == StateEnum.Working ) {
+            String plantScheduleOrderState = order.getPlantScheduleOrderState();
+            if ( plantScheduleOrderState == "Ongoing" ) {
                 return order;
             }
         }
@@ -66,4 +65,23 @@ public class MixingPlantResourceBO extends AbstractBO<MixingPlantResource> imple
         }
         return this.entity.getMixingPlant().getOperator().getPhoneNumber();
     }
+
+    @Override
+    public void release() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void maintain() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

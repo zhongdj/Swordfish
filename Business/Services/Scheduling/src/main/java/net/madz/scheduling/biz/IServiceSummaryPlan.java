@@ -13,14 +13,14 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.scheduling.biz.impl.ServiceSummaryPlanBO;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.ConfirmFinish;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Transitions.CreateServiceOrder;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.AdjustTotalVolume;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.ConfirmFinish;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Transitions.CreateServiceOrder;
 
 @BOProxy(ServiceSummaryPlanBO.class)
-@LifecycleMeta(value = SummaryPlanLifecycleMeta.class)
+@LifecycleMeta(value = ServiceSummaryPlanLifecycleMeta.class)
 public interface IServiceSummaryPlan extends IBizObject<ServiceSummaryPlan>, VolumeMeasurable {
 
     /** Non-transitional methods **/

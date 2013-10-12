@@ -3,7 +3,8 @@ package net.madz.scheduling.meta;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
-import net.madz.scheduling.meta.PlantResourceLifecycleMeta.Transition.Maintain;
+import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.scheduling.meta.PlantResourceLifecycleMeta.Transitions.Maintain;
 
 @StateMachine
 public interface PlantResourceLifecycleMeta extends SchedulableResourceLifecycleMeta {
@@ -20,7 +21,8 @@ public interface PlantResourceLifecycleMeta extends SchedulableResourceLifecycle
         public static class Maintaining {}
     }
 
-    public static class Transition extends SchedulableResourceLifecycleMeta.Transitions {
+    @TransitionSet
+    public static class Transitions extends SchedulableResourceLifecycleMeta.Transitions {
 
         public static class Maintain {}
     }

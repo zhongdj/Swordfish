@@ -3,6 +3,7 @@ package net.madz.scheduling.meta;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
+import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.scheduling.meta.ConcreteTruckResourceLifecycleMeta.Transitions.Detach;
 
@@ -19,6 +20,7 @@ public interface ConcreteTruckResourceLifecycleMeta extends SchedulableResourceL
         public static class Detached {}
     }
 
+    @TransitionSet
     public static class Transitions extends SchedulableResourceLifecycleMeta.Transitions {
 
         public static class Detach {}

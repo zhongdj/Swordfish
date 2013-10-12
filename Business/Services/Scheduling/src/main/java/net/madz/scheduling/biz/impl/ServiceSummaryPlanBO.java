@@ -16,7 +16,7 @@ import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ServiceOrder;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
-import net.madz.scheduling.meta.SummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
+import net.madz.scheduling.meta.ServiceSummaryPlanLifecycleMeta.Conditions.VolumeMeasurable;
 
 public class ServiceSummaryPlanBO extends AbstractBO<ServiceSummaryPlan> implements IServiceSummaryPlan {
 

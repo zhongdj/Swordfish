@@ -16,18 +16,17 @@ import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IPlantScheduleOrder;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
-import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.entities.ServiceOrder;
 
 public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IServiceOrder {
 
     private IMixingPlantResource plantResource;
+
     private IConcreteTruckResource truckResource;
 
     public ServiceOrderBO(EntityManager em, long id) {
         super(em, ServiceOrder.class, id);
     }
-
 
     public ServiceOrderBO(ServiceOrder order) {
         super(order);
@@ -139,54 +138,14 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     @Override
-    public void doLoad() {
-    }
-
-    @Override
-    public void doTransport() {
-    }
-
-    @Override
-    public void doComplete() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void doAbort() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public IPlantScheduleOrder.StateEnum getPlantScheduleOrderState() {
-        return this.plantResource.getWorkingOrder().getPlantScheduleOrderState();
-    }
-
-    @Override
-    public IVehicleScheduleOrder.StateEnum getVehicleScheduleOrderState() {
-        return this.truckResource.getWorkingOrder().getVehicleScheduleOrderState();
-    }
-
-    @Override
     public void configureResources(IServiceSummaryPlan summaryPlan, IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume) {
-        
         this.entity.setSummaryPlan(summaryPlan.get());
         this.entity.setSpec(summaryPlan.get().getSpec());
-        
         this.plantResource = plantResource;
         this.truckResource = truckResource;
         this.plantResource.assignOrder(this);
         this.truckResource.assignOrder(this);
         this.entity.allocateResources(this.plantResource.get(), this.truckResource.get(), volume);
-    }
-
-    @Override
-    public void doStartPlantOrder() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void doFinishPlantOrder() {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -217,6 +176,47 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
     }
 
     @Override
+    public void doStartPlantOrder() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doFinishPlantOrder() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doLoad() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doTransport() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doConstruct() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doComplete() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void doAbortOnVehicleScheduleOrder() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public void confirmStart() {
         // TODO Auto-generated method stub
     }
@@ -226,25 +226,20 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
         // TODO Auto-generated method stub
     }
 
+    @Override
+    public void cancel() {
+        // TODO Auto-generated method stub
+    }
 
     @Override
-    public String getState() {
+    public String getPlantScheduleOrderState() {
         // TODO Auto-generated method stub
         return null;
     }
 
-
     @Override
-    public void Schedule() {
+    public String getVehicleScheduleOrderState() {
         // TODO Auto-generated method stub
-        
+        return null;
     }
-
-
-    @Override
-    public void Cancel() {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

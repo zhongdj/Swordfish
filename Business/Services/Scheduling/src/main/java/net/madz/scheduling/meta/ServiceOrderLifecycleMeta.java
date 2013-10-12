@@ -11,41 +11,35 @@ import net.madz.scheduling.meta.ServiceOrderLifecycleMeta.Relations.ConcreteTruc
 import net.madz.scheduling.meta.ServiceOrderLifecycleMeta.Relations.PlantResource;
 import net.madz.scheduling.meta.ServiceOrderLifecycleMeta.Relations.SummaryPlan;
 
-@StateMachine
-public class ServiceOrderLifecycleMeta implements OrderLifecycleMeta {
+@StateMachine(parentOn = ServiceSummaryPlanLifecycleMeta.class)
+public interface ServiceOrderLifecycleMeta extends OrderLifecycleMeta {
 
     @StateSet
     public static class States extends OrderLifecycleMeta.States {
 
-        @InboundWhiles(value = { @InboundWhile(on = { SummaryPlanLifecycleMeta.States.Ongoing.class }, relation = SummaryPlan.class, otherwise = {
-                @ErrorMessage(states = { SummaryPlanLifecycleMeta.States.VolumeLeftEmpty.class }, bundle = "scheduling", code = "100-0002"),
-                @ErrorMessage(states = { SummaryPlanLifecycleMeta.States.Done.class }, bundle = "scheduling", code = "100-0003") }) })
-        public static class Created extends OrderLifecycleMeta.States.Created {
-        }
         @InboundWhiles({
-            @InboundWhile(relation = PlantResource.class, on = { PlantResourceLifecycleMeta.States.Idle.class,
-                    PlantResourceLifecycleMeta.States.Busy.class }),
-            @InboundWhile(relation = ConcreteTruckResource.class, on = {
-                    ConcreteTruckResourceLifecycleMeta.States.Idle.class,
-                    ConcreteTruckResourceLifecycleMeta.States.Busy.class }) })
-        public static class Queued extends OrderLifecycleMeta.States.Queued {
-        }
+                @InboundWhile(relation = SummaryPlan.class, on = { ServiceSummaryPlanLifecycleMeta.States.Ongoing.class }, otherwise = {
+                        @ErrorMessage(states = { ServiceSummaryPlanLifecycleMeta.States.VolumeLeftEmpty.class }, bundle = "scheduling", code = "100-0002"),
+                        @ErrorMessage(states = { ServiceSummaryPlanLifecycleMeta.States.Done.class }, bundle = "scheduling", code = "100-0003") }),
+                @InboundWhile(relation = PlantResource.class,
+                        on = { PlantResourceLifecycleMeta.States.Idle.class, PlantResourceLifecycleMeta.States.Busy.class }, otherwise = { @ErrorMessage(
+                                bundle = "sheduling", code = "100-0007", states = { PlantResourceLifecycleMeta.States.Maintaining.class }) }),
+                @InboundWhile(relation = ConcreteTruckResource.class, on = { ConcreteTruckResourceLifecycleMeta.States.Idle.class,
+                        ConcreteTruckResourceLifecycleMeta.States.Busy.class }, otherwise = { @ErrorMessage(bundle = "sheduling", code = "100-0005",
+                        states = { ConcreteTruckResourceLifecycleMeta.States.Detached.class }) }) })
+        public static class Created extends OrderLifecycleMeta.States.Created {}
     }
 
     @TransitionSet
-    public static class Transitions extends OrderLifecycleMeta.Transitions {
-    }
+    public static class Transitions extends OrderLifecycleMeta.Transitions {}
 
     @RelationSet
     public static class Relations {
 
-        public static class SummaryPlan {
-        }
+        public static class SummaryPlan {}
 
-        public static class ConcreteTruckResource {
-        }
+        public static class ConcreteTruckResource {}
 
-        public static class PlantResource {
-        }
+        public static class PlantResource {}
     }
 }
