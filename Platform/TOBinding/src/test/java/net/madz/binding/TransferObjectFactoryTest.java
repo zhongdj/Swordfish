@@ -1,6 +1,6 @@
 package net.madz.binding;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
 import net.madz.binding.TransferObjectFactory;
 import net.madz.binding.annotation.AccessTypeEnum;
 import net.madz.binding.annotation.Binding;
@@ -269,7 +268,7 @@ public class TransferObjectFactoryTest {
         p.name = "Parent";
         try {
             ParentTO actualResult = TransferObjectFactory.createTransferObject(ParentTO.class, p);
-            assert ( actualResult.child.name.equals("Child") );
+            assertTrue(actualResult.child.name.equals("Child"));
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -298,7 +297,7 @@ public class TransferObjectFactoryTest {
                     ParentWithListChildrenTO.class, p);
             assert ( actualResult.children.size() == 3 );
             for ( int i = 0; i < 3; i++ ) {
-                assert ( actualResult.children.get(i).name.equals("Child" + ( i + 1 )) );
+                assertTrue(actualResult.children.get(i).name.equals("Child" + ( i + 1 )));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -322,9 +321,9 @@ public class TransferObjectFactoryTest {
         try {
             ParentWithSetChildrenTO actualResult = TransferObjectFactory.createTransferObject(
                     ParentWithSetChildrenTO.class, p);
-            assert ( actualResult.children.size() == 3 );
+            assertEquals(3, actualResult.children.size());
             for ( ChildTO child : actualResult.children ) {
-                assert ( child.name.equals("Child") );
+                assertEquals("Child", child.name);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -348,9 +347,9 @@ public class TransferObjectFactoryTest {
         try {
             ParentWithSetChildrenPropertyAccessTO actualResult = TransferObjectFactory.createTransferObject(
                     ParentWithSetChildrenPropertyAccessTO.class, p);
-            Assert.assertEquals(3, actualResult.children.size());
+            assertEquals(3, actualResult.children.size());
             for ( ChildTO child : actualResult.children ) {
-                Assert.assertTrue( child.name.equals("Child") );
+                assertTrue(child.name.equals("Child"));
             }
         } catch (Exception e) {
             e.printStackTrace();
