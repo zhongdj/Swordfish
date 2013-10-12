@@ -13,11 +13,11 @@ import net.madz.test.stochastic.utilities.annotations.Dimension;
 import net.madz.test.stochastic.utilities.annotations.DynamicCase;
 import net.madz.test.stochastic.utilities.annotations.Filter;
 
-final class GlobalDimensionBasedDynamicCase implements IDynamicCase {
+public final class GlobalDimensionBasedDynamicCase implements IDynamicCase {
 
     private final DynamicCase testCase;
 
-    GlobalDimensionBasedDynamicCase(DynamicCase testCase) {
+    public GlobalDimensionBasedDynamicCase(DynamicCase testCase) {
         this.testCase = testCase;
     }
 

@@ -3,8 +3,6 @@ package net.madz.scheduling;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -23,26 +21,15 @@ public class OperationBeanTestBase {
 
     protected static OperationBean bean;
 
+    private static String EJB_MODULE_NAME = "scheduling";
+
+    private static String APP_NAME = "scheduling-app";
+
     @BeforeClass
     public static void setup() throws NamingException, GlassFishException, IOException {
-        glassfish = GlassFishRuntime.bootstrap().newGlassFish();
-        URI uri = createScatteredArchive();
-        addShutdownHook(glassfish);
-        glassfish.start();
-        CommandRunner cr = glassfish.getCommandRunner();
-        CommandResult result = cr
-                .run("create-jdbc-connection-pool",
-                        "--datasourceclassname=com.mysql.jdbc.jdbc2.optional.MysqlDataSource",
-                        "--restype=javax.sql.DataSource",
-                        "--property=Url=jdbc\\:mysql\\://dbserver\\:3306/crmp?zeroDateTimeBehavior\\=convertToNull:User=root:Password=1q2w3e4r5t",
-                        "crmp_pool");
-        System.out.println(result.getOutput());
-        result = cr.run("create-jdbc-resource", "--connectionpoolid=crmp_pool", "jdbc/crmp");
-        System.out.println(result.getOutput());
-        deployer = glassfish.getDeployer();
-        appName = deployer.deploy(uri);
+        startGlassfish(APP_NAME, EJB_MODULE_NAME);
         InitialContext context = new InitialContext();
-        bean = (OperationBean) context.lookup("java:global/scheduling-app/Scheduling-0.0.1-SNAPSHOT/OperationBean");
+        bean = (OperationBean) context.lookup("java:global/" + APP_NAME + "/" + EJB_MODULE_NAME + "/OperationBean");
     }
 
     protected static void cleanup() {
@@ -79,7 +66,27 @@ public class OperationBeanTestBase {
         });
     }
 
-    protected static URI createScatteredArchive() throws IOException {
+    private static void startGlassfish(String appName, String moduleName) throws GlassFishException, IOException,
+            NamingException {
+        glassfish = GlassFishRuntime.bootstrap().newGlassFish();
+        final URI uri = createScatteredArchive(appName, moduleName + ".jar");
+        addShutdownHook(glassfish);
+        glassfish.start();
+        final CommandRunner cr = glassfish.getCommandRunner();
+        CommandResult result = cr
+                .run("create-jdbc-connection-pool",
+                        "--datasourceclassname=com.mysql.jdbc.jdbc2.optional.MysqlDataSource",
+                        "--restype=javax.sql.DataSource",
+                        "--property=Url=jdbc\\:mysql\\://dbserver\\:3306/crmp?zeroDateTimeBehavior\\=convertToNull:User=root:Password=1q2w3e4r5t",
+                        "crmp_pool");
+        System.out.println(result.getOutput());
+        result = cr.run("create-jdbc-resource", "--connectionpoolid=crmp_pool", "jdbc/crmp");
+        System.out.println(result.getOutput());
+        deployer = glassfish.getDeployer();
+        appName = deployer.deploy(uri);
+    }
+
+    protected static URI createScatteredArchive(String appName, String moduleName) throws IOException {
         File currentDirectory = new File(System.getProperty("user.dir"));
         if ( currentDirectory.getName().equals("target") ) {
             basedir = currentDirectory.getParentFile();
@@ -87,22 +94,14 @@ public class OperationBeanTestBase {
             basedir = currentDirectory;
         }
         // Create a scattered web application.
-        ScatteredEnterpriseArchive archive = new ScatteredEnterpriseArchive("scheduling-app");
+        ScatteredEnterpriseArchive archive = new ScatteredEnterpriseArchive(appName);
         try {
             // target/classes directory contains my complied servlets
-            List<File> archiveFiles = listArchiveFiles();
-            for ( File archiveFile : archiveFiles )
-                archive.addArchive(archiveFile);
+            archive.addArchive(new File(new File(( basedir ), "target"), "classes"), moduleName);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         return archive.toURI();
-    }
-
-    protected static List<File> listArchiveFiles() {
-        ArrayList<File> archive = new ArrayList<File>();
-        archive.add(new File(new File(( basedir ), "target"), "Scheduling-0.0.1-SNAPSHOT.jar"));
-        return archive;
     }
 
     public OperationBeanTestBase() {

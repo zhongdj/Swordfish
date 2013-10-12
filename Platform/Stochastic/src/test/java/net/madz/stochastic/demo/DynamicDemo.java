@@ -1,4 +1,4 @@
-package net.madz.test.stochastic.core.impl;
+package net.madz.stochastic.demo;
 
 import java.lang.reflect.Method;
 
@@ -9,6 +9,8 @@ import net.madz.test.stochastic.core.DynamicCaseContext;
 import net.madz.test.stochastic.core.IDynamicCase;
 import net.madz.test.stochastic.core.IExpectation;
 import net.madz.test.stochastic.core.TestContext;
+import net.madz.test.stochastic.core.impl.DefaultTestContext;
+import net.madz.test.stochastic.core.impl.GlobalDimensionBasedDynamicCase;
 import net.madz.test.stochastic.core.impl.processors.DynamicCaseProcessor;
 import net.madz.test.stochastic.utilities.annotations.Dimension;
 import net.madz.test.stochastic.utilities.annotations.DynamicCase;
