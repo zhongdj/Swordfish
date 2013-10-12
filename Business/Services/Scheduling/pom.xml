@@ -11,7 +11,7 @@
 	<artifactId>Scheduling</artifactId>
 
 	<name>Scheduling</name>
-        <packaging>ejb</packaging>
+	<packaging>ejb</packaging>
 
 	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -45,6 +45,22 @@
 			<groupId>net.madz</groupId>
 			<artifactId>TOBinding</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.main.extras</groupId>
+			<artifactId>glassfish-embedded-all</artifactId>
+			<version>${glassfish.extras.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.main.extras</groupId>
+			<artifactId>glassfish-embedded-static-shell</artifactId>
+			<version>${glassfish.extras.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.connector.java.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -101,5 +117,16 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	<pluginRepositories>
+		<pluginRepository>
+			<id>maven.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>https://maven.java.net/content/groups/promoted/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/glassfish/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>

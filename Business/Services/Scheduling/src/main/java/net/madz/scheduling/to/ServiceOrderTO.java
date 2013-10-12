@@ -275,4 +275,21 @@ public class ServiceOrderTO implements Serializable {
     public void setAdditives(List<AdditiveTO> additives) {
         this.additives = additives;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceOrderTO [serviceOrderId=" + serviceOrderId + ", plannedVolume=" + plannedVolume
+                + ", mixingPlantResourceId=" + mixingPlantResourceId + ", mixingPlantResourcePlannedVolume="
+                + mixingPlantResourcePlannedVolume + ", mixingPlantResourceFinishedVolume="
+                + mixingPlantResourceFinishedVolume + ", mixingPlantId=" + mixingPlantId + ", mixingPlantName="
+                + mixingPlantName + ", mixingPlantPinyinAbbrName=" + mixingPlantPinyinAbbrName
+                + ", concreteTruckResourceId=" + concreteTruckResourceId + ", truckId=" + truckId
+                + ", truckLicencePlatNumber=" + truckLicencePlatNumber + ", truckRatedCapacity=" + truckRatedCapacity
+                + ", pouringParSpectId=" + pouringParSpectId + ", pouringPartId=" + pouringPartId
+                + ", pouringPartName=" + pouringPartName + ", pouringPartAbbrName=" + pouringPartAbbrName
+                + ", unitProjectId=" + unitProjectId + ", unitProjectName=" + unitProjectName + ", mixtureId="
+                + mixtureId + ", mixtureGradeName=" + mixtureGradeName + ", additives=" + additives + "]";
+    }
+    
+    
 }

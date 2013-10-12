@@ -39,7 +39,7 @@
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.user" value="root" />
 			<!-- drop-and-create-tables -->
-			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
+			<property name="eclipselink.ddl-generation" value="NONE" />
 			<property name="eclipselink.target-database" value="MySQL" />
 			<property name="eclipselink.ddl-generation.output-mode"
 				value="database" />
