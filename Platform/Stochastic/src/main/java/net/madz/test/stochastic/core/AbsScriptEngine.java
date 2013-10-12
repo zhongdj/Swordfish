@@ -10,18 +10,18 @@ public abstract class AbsScriptEngine<META> implements ScriptEngine<META> {
 
     private static Logger logger = Logger.getLogger(AbsScriptEngine.class.getName());
 
-    @Override
-    public abstract void doProcess(TestContext context, META t);
+    public void doProcess(TestContext context, META t) throws Throwable {
+        context.getBase().evaluate();
+    }
 
-    @Override
-    public void doProcess(TestContext context, META[] ts) {
+    public void doProcess(TestContext context, META[] ts) throws Throwable {
         for ( META t : ts ) {
             doProcess(context, t);
         }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void executeScript(TestContext context, final Annotation script) {
+    public void executeScript(TestContext context, final Annotation script) throws Throwable {
         increaseIndent();
         debug(script.toString());
         try {
@@ -36,15 +36,13 @@ public abstract class AbsScriptEngine<META> implements ScriptEngine<META> {
                 final AbsScriptEngine processInstance = processorClass.newInstance();
                 processInstance.doProcess(context, script);
             }
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
         } finally {
             decreaseIndent();
         }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void processAnnotation(TestContext context, final Annotation[] annotations) {
+    public void processAnnotation(TestContext context, final Annotation[] annotations) throws Throwable {
         try {
             increaseIndent();
             if ( null != annotations && 0 < annotations.length ) {
@@ -60,8 +58,6 @@ public abstract class AbsScriptEngine<META> implements ScriptEngine<META> {
                 final AbsScriptEngine processInstance = processorClass.newInstance();
                 processInstance.doProcess(context, annotations);
             }
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
         } finally {
             decreaseIndent();
         }
@@ -104,5 +100,4 @@ public abstract class AbsScriptEngine<META> implements ScriptEngine<META> {
         decreaseIndent();
         return withValue;
     }
-
 }

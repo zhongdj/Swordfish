@@ -22,7 +22,7 @@ public @interface NewTenant {
     public static class NewTenantProcessor extends AbsScriptEngine<NewTenant> {
 
         @Override
-        public void doProcess(final TestContext context, NewTenant t) {
+        public void doProcess(final TestContext context, NewTenant t) throws Throwable {
             increaseIndent();
             debug("Creating New Tenant and Inject UserSession");
             Constructor<UserSession> constructor = null;
@@ -40,8 +40,6 @@ public @interface NewTenant {
                         return null;
                     }
                 });
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
             } finally {
                 if ( null != constructor ) {
                     constructor.setAccessible(false);

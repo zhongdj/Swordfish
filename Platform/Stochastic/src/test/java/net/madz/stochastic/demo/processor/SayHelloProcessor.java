@@ -7,7 +7,7 @@ import net.madz.test.stochastic.core.TestContext;
 public class SayHelloProcessor extends AbsScriptEngine<SayHello> {
 
     @Override
-    public void doProcess(TestContext context, SayHello t) {
+    public void doProcess(TestContext context, SayHello t) throws Throwable {
         System.out.println("Hello, " + t.value());
     }
 }

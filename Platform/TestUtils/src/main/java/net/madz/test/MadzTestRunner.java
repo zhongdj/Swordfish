@@ -45,9 +45,10 @@ public class MadzTestRunner extends BlockJUnit4ClassRunner {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Statement withMethodProcessables(Statement result, FrameworkMethod method, Object object) {
-        for ( Annotation a : method.getAnnotations() ) {
-            if ( null != a.annotationType().getAnnotation(Processor.class) ) {
-                result = new ScriptStatement(result, a, method.getMethod(), object);
+        Annotation[] annotations = method.getAnnotations();
+        for ( int i = annotations.length - 1; i >= 0; i-- ) {
+            if ( null != annotations[i].annotationType().getAnnotation(Processor.class) ) {
+                result = new ScriptStatement(result, annotations[i], method.getMethod(), object);
             }
         }
         return result;
@@ -55,9 +56,10 @@ public class MadzTestRunner extends BlockJUnit4ClassRunner {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Statement withClassProcessables(Statement result) {
-        for ( Annotation a : getTestClass().getAnnotations() ) {
-            if ( null != a.annotationType().getAnnotation(Processor.class) ) {
-                result = new ScriptStatement(result, a, getTestClass().getJavaClass(), null);
+        Annotation[] annotations = getTestClass().getAnnotations();
+        for ( int i = annotations.length - 1; i >= 0; i-- ) {
+            if ( null != annotations[i].annotationType().getAnnotation(Processor.class) ) {
+                result = new ScriptStatement(result, annotations[i], getTestClass().getJavaClass(), null);
             }
         }
         return result;

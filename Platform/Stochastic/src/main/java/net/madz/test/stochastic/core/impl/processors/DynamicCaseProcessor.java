@@ -36,9 +36,13 @@ import net.madz.test.stochastic.utilities.annotations.Constraint.ConstraintTypeE
 public abstract class DynamicCaseProcessor extends AbsScriptEngine<IDynamicCase> {
 
     private final List<IDimension> dimensions = new ArrayList<IDimension>();
+
     private volatile boolean headerCreated;
+
     private volatile int counter;
+
     private volatile int rowNumber;
+
     private volatile int totalNumber;
 
     // TODO [Barry][Code Review] [Encapsulate TestContext from dependent on
@@ -49,12 +53,13 @@ public abstract class DynamicCaseProcessor extends AbsScriptEngine<IDynamicCase>
     protected void afterDynamicCase(TestContext context, DynamicCaseContext dynamicContext) {
     }
 
-    protected abstract DeduceResultEnum generateExpectation(TestContext context, DynamicCaseContext deduceContext, IDynamicCase t);
+    protected abstract DeduceResultEnum generateExpectation(TestContext context, DynamicCaseContext deduceContext,
+            IDynamicCase t);
 
     protected abstract void performTestAction(TestContext context, DynamicCaseContext deduceContext);
 
     @Override
-    public void doProcess(final TestContext context, final IDynamicCase dynamicCase) {
+    public void doProcess(final TestContext context, final IDynamicCase dynamicCase) throws Throwable {
         DynamicTestExecutor testExecutor = null;
         ExcelFormatTestReporter reporterCopy = null;
         try {
@@ -94,8 +99,10 @@ public abstract class DynamicCaseProcessor extends AbsScriptEngine<IDynamicCase>
             final ConstraintCombination constraintCombination = parseConstraints(dynamicCase, dimensionIndex);
             explorer.doExplore(dimensions, iFilters.toArray(new IFilter[0]), constraintCombination, dimensionIndex);
             if ( getTotalNumber() > dynamicCase.maxCombinations() ) {
-                throw new IllegalArgumentException("Combination number exceeded limitation.Please add constraints or remove useless dimensions. "
-                        + "Combination Number : " + getTotalNumber() + ", Limitation: " + dynamicCase.maxCombinations());
+                throw new IllegalArgumentException(
+                        "Combination number exceeded limitation.Please add constraints or remove useless dimensions. "
+                                + "Combination Number : " + getTotalNumber() + ", Limitation: "
+                                + dynamicCase.maxCombinations());
             } else {
                 debug("Found combinations: " + getTotalNumber());
             }
@@ -182,8 +189,8 @@ public abstract class DynamicCaseProcessor extends AbsScriptEngine<IDynamicCase>
                 exclusions.add(e);
             }
         }
-        final ConstraintCombination constraintCombination = new ConstraintCombination(inclusions.toArray(new IConstraint[0]),
-                exclusions.toArray(new IConstraint[0]));
+        final ConstraintCombination constraintCombination = new ConstraintCombination(
+                inclusions.toArray(new IConstraint[0]), exclusions.toArray(new IConstraint[0]));
         return constraintCombination;
     }
 
@@ -254,7 +261,7 @@ public abstract class DynamicCaseProcessor extends AbsScriptEngine<IDynamicCase>
         setTotalNumber(0);
     }
 
-    void produceTargetState(TestContext context, DynamicCaseContext deduceContext) {
+    void produceTargetState(TestContext context, DynamicCaseContext deduceContext) throws Throwable {
         System.out.println("Producing Target States...");
         final List<DimensionValuePair> targetStateList = deduceContext.getTargetStateList();
         for ( DimensionValuePair targetState : targetStateList ) {

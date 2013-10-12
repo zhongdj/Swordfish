@@ -53,7 +53,7 @@ final class DynamicTestExecutor implements ICombinationHandler {
         executor.submit(runnable);
     }
 
-    public void runTest(final DynamicCaseContext dynamicTestContext) {
+    public void runTest(final DynamicCaseContext dynamicTestContext) throws Throwable {
         this.dynamicCaseProcessor.beforeDynamicCase(context, dynamicTestContext);
         try {
             synchronized (dynamicCaseProcessor) {

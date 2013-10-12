@@ -55,7 +55,7 @@ public class DynamicTestRunnable implements Runnable {
         }
     }
 
-    private void doRunTest() {
+    private void doRunTest() throws Throwable {
         // t.doExecute(new OpenSessionCallback() {
         //
         // @Override
@@ -73,7 +73,7 @@ public class DynamicTestRunnable implements Runnable {
         // });
     }
 
-    private void doResourceSetup() {
+    private void doResourceSetup() throws Throwable {
         if ( null == resourceSetup.get() || !resourceSetup.get() ) {
             // t.doExecute(new OpenSessionCallback() {
             //

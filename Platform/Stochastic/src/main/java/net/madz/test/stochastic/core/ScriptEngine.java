@@ -4,11 +4,7 @@ import java.lang.annotation.Annotation;
 
 public interface ScriptEngine<META> {
 
-    public abstract void doProcess(TestContext context, META t);
+    public void executeScript(final TestContext context, final Annotation annotation) throws Throwable;
 
-    public abstract void doProcess(TestContext context, META[] ts);
-
-    public void executeScript(TestContext context, final Annotation annotation);
-
-    public void processAnnotation(TestContext context, final Annotation[] annotations);
+    public void processAnnotation(final TestContext context, final Annotation[] annotations) throws Throwable;
 }

@@ -17,7 +17,7 @@ public interface IDimension {
      */
     String getAlias();
 
-    void choose(TestContext context, String choice);
+    void choose(TestContext context, String choice) throws Throwable;
 
     String[] values();
 

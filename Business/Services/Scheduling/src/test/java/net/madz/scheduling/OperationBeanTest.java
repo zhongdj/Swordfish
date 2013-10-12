@@ -10,13 +10,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.*;
+
 @RunWith(MadzTestRunner.class)
 @NewTenant
 public class OperationBeanTest extends OperationBeanTestBase {
 
     @BeforeClass
     public static void prepareData() {
-        
     }
 
     @AfterClass
@@ -30,5 +31,47 @@ public class OperationBeanTest extends OperationBeanTestBase {
         Long concreteTruckId = 1L;
         ServiceOrderTO orderTO = bean.allocateResourceTo(summaryPlanId, plantResourceId, concreteTruckId, 30D);
         System.out.println(orderTO);
+    }
+
+    @Test(expected = BONotFoundException.class)
+    public void testAllocateResourceTo_ne_summaryPlanId_invalid() throws AppServiceException {
+        long summaryPlanId = 2L;
+        Long plantResourceId = 1L;
+        Long concreteTruckId = 1L;
+        try {
+            bean.allocateResourceTo(summaryPlanId, plantResourceId, concreteTruckId, 30D);
+            fail("BONotFoundException expected");
+        } catch (BONotFoundException be) {
+            assertEquals("100-0001", be.getErrorCode());
+            throw be;
+        } 
+    }
+
+    @Test(expected = BONotFoundException.class)
+    public void testAllocateResourceTo_ne_planResourceId_invalid() throws AppServiceException {
+        long summaryPlanId = 1L;
+        Long plantResourceId = 2L;
+        Long concreteTruckId = 1L;
+        try {
+            bean.allocateResourceTo(summaryPlanId, plantResourceId, concreteTruckId, 30D);
+            fail("BONotFoundException expected");
+        } catch (BONotFoundException be) {
+            assertEquals("100-0006", be.getErrorCode());
+            throw be;
+        }
+    }
+
+    @Test(expected = BONotFoundException.class)
+    public void testAllocateResourceTo_ne_concreteResourceId_invalid() throws AppServiceException {
+        long summaryPlanId = 1L;
+        Long plantResourceId = 1L;
+        Long concreteTruckId = 2L;
+        try {
+            bean.allocateResourceTo(summaryPlanId, plantResourceId, concreteTruckId, 30D);
+            fail("BONotFoundException expected");
+        } catch (BONotFoundException be) {
+            assertEquals("100-0004", be.getErrorCode());
+            throw be;
+        }
     }
 }

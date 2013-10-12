@@ -43,7 +43,7 @@ public class DefaultPairDimension extends DefaultDimension implements IPairDimen
     }
 
     @Override
-    public void choose(TestContext context, String choice) {
+    public void choose(TestContext context, String choice) throws Throwable {
         final Object one = getOne();
         final Object other = getOther();
         if ( null == one || null == other ) {

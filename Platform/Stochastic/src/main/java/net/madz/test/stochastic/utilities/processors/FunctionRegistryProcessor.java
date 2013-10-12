@@ -9,13 +9,9 @@ import net.madz.test.stochastic.utilities.annotations.FunctionRegistry;
 public class FunctionRegistryProcessor extends AbsScriptEngine<FunctionRegistry> {
 
     @Override
-    public void doProcess(TestContext context, FunctionRegistry t) {
-        try {
-            final Class<? extends IFunctionRegistry> value = t.value();
-            IFunctionRegistry functionRegistry = value.newInstance();
-            GlobalTestContext.getInstance().registerLocalFunctions(functionRegistry);
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
+    public void doProcess(TestContext context, FunctionRegistry t) throws Throwable {
+        final Class<? extends IFunctionRegistry> value = t.value();
+        IFunctionRegistry functionRegistry = value.newInstance();
+        GlobalTestContext.getInstance().registerLocalFunctions(functionRegistry);
     }
 }

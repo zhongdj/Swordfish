@@ -8,5 +8,4 @@ public class DefaultGlobalDimension extends DefaultDimension implements IGlobalD
     public String getDottedName() {
         return getAlias();
     }
-
 }

@@ -4,11 +4,10 @@ import net.madz.stochastic.demo.annotations.Action;
 import net.madz.test.stochastic.core.AbsScriptEngine;
 import net.madz.test.stochastic.core.TestContext;
 
-
 public class ActionProcessor extends AbsScriptEngine<Action> {
 
     @Override
-    public void doProcess(TestContext context, Action t) {
+    public void doProcess(TestContext context, Action t) throws Throwable {
         System.out.println("Do action: " + t.value());
     }
 }

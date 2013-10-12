@@ -22,7 +22,7 @@ public class DefaultObjectDimension extends DefaultDimension implements IObjectD
     }
 
     @Override
-    public void choose(TestContext context, String choice) {
+    public void choose(TestContext context, String choice) throws Throwable {
         final Object one = getOne();
         if ( null == one ) {
             throw new NullPointerException("Please set Object type value to 'one' first.");

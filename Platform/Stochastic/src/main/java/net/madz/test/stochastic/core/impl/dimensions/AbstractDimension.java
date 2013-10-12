@@ -52,7 +52,7 @@ public abstract class AbstractDimension extends AbsScriptEngine implements IDime
     }
 
     // TODO[Code Review][Refactor the annotation]
-    protected void processAnnotations(TestContext context, String choice) {
+    protected void processAnnotations(TestContext context, String choice) throws Throwable {
         try {
             Field field = getEnumType().getField(choice);
             final Annotation[] annotations = field.getAnnotations();
@@ -66,7 +66,7 @@ public abstract class AbstractDimension extends AbsScriptEngine implements IDime
 
     public abstract Class<? extends Enum> getEnumType();
 
-    public void choose(TestContext context, String choice) {
+    public void choose(TestContext context, String choice) throws Throwable {
         processAnnotations(context, choice);
     }
 
@@ -76,7 +76,7 @@ public abstract class AbstractDimension extends AbsScriptEngine implements IDime
     }
 
     @Override
-    public void doProcess(TestContext context, Object t) {
+    public void doProcess(TestContext context, Object t) throws Throwable {
     }
 
     public String[] values() {

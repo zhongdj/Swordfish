@@ -17,7 +17,7 @@ import net.madz.test.stochastic.utilities.annotations.DynamicCase;
 
 public class DynamicDemo {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         final Method[] declaredMethods = DynamicDemo.class.getDeclaredMethods();
         for ( final Method m : declaredMethods ) {
             if ( m.getAnnotation(DynamicCase.class) == null ) {
