@@ -226,4 +226,25 @@ public class ServiceOrderBO extends AbstractBO<ServiceOrder> implements IService
         // TODO Auto-generated method stub
     }
 
+
+    @Override
+    public String getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public void Schedule() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void Cancel() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

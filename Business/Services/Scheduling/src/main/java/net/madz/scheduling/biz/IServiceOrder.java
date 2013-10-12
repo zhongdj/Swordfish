@@ -2,51 +2,36 @@ package net.madz.scheduling.biz;
 
 import net.madz.core.biz.BOProxy;
 import net.madz.core.biz.IBizObject;
+import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.annotations.state.End;
-import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.scheduling.biz.IServiceOrder.Transitions.Finish;
-import net.madz.scheduling.biz.IServiceOrder.Transitions.Schedule;
-import net.madz.scheduling.biz.IServiceOrder.Transitions.Start;
 import net.madz.scheduling.biz.impl.ServiceOrderBO;
 import net.madz.scheduling.entities.ServiceOrder;
+import net.madz.scheduling.meta.OrderLifecycleMeta.Transitions.Finish;
+import net.madz.scheduling.meta.OrderLifecycleMeta.Transitions.Start;
+import net.madz.scheduling.meta.OrderLifecycleMeta.Transitions.Schedule;
+import net.madz.scheduling.meta.OrderLifecycleMeta.Transitions.Cancel;
+import net.madz.scheduling.meta.ServiceOrderLifecycleMeta;
 
 @BOProxy(ServiceOrderBO.class)
-//@StateMachine(states = @StateSet(IServiceOrder.States.class),
-//        transitions = @TransitionSet(IServiceOrder.Transitions.class))
+@LifecycleMeta(value = ServiceOrderLifecycleMeta.class)
 public interface IServiceOrder extends IPlantScheduleOrder, IVehicleScheduleOrder, IBizObject<ServiceOrder> {
 
     @StateIndicator("serviceOrderState")
-    static class States {
+    String getState();
 
-        @Initial
-        static class Created {}
-
-        static class Scheduled {}
-
-        static class Ongoing {}
-
-        @End
-        static class Finished {}
-    }
-
-    static class Transitions {
-
-        static class Schedule {}
-
-        static class Start {}
-
-        static class Finish {}
-    }
-
-    @Transition(Schedule.class)
     void configureResources(IServiceSummaryPlan summaryPlan, IMixingPlantResource plantResource, IConcreteTruckResource truckResource, double volume);
 
+    /** Transition methods **/
     @Transition(Start.class)
     void confirmStart();
 
     @Transition(Finish.class)
     void confirmFinish();
 
+    @Transition(Schedule.class)
+    void Schedule();
+
+    @Transition(Cancel.class)
+    void Cancel();
 }
