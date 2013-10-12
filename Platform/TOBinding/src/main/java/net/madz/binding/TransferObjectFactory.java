@@ -178,7 +178,12 @@ public class TransferObjectFactory {
                 return object.toString();
             }
             idField.setAccessible(true);
-            return String.valueOf(idField.get(object));
+            Object value = idField.get(object);
+            if ( null != value ) {
+                return String.valueOf(value);
+            } else {
+                return object.toString();
+            }
         } catch (Exception ex) {
             return "";
         } finally {
@@ -272,7 +277,7 @@ public class TransferObjectFactory {
                         }
                         String getterName = "get" + propertyName.toUpperCase().charAt(0) + propertyName.substring(1);
                         Method getter = ClassUtils.findMethodThroughClassHierarchy(bizObject.getClass(), getterName);
-                        value = getter.invoke(bizObject, (Object[])null);
+                        value = getter.invoke(bizObject, (Object[]) null);
                     }
                     if ( BindingTypeEnum.Entity == binding.bindingType() ) {
                         Class<?> embeddedToClass = binding.embeddedType();
@@ -336,7 +341,8 @@ public class TransferObjectFactory {
             String name = names.remove(0);
             Field nextField = ClassUtils.findFieldThroughClassHierarchy(navigatingObject.getClass(), name);
             if ( null == nextField ) {
-                throw new NoSuchFieldException("Field: " + name + " does not exist throught class hierarchy: " + navigatingObject.getClass());
+                throw new NoSuchFieldException("Field: " + name + " does not exist throught class hierarchy: "
+                        + navigatingObject.getClass());
             }
             T result = null;
             if ( !nextField.isAccessible() ) {

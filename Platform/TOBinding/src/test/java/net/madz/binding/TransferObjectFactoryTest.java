@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.Assert;
 import net.madz.binding.TransferObjectFactory;
 import net.madz.binding.annotation.AccessTypeEnum;
 import net.madz.binding.annotation.Binding;
@@ -347,9 +348,9 @@ public class TransferObjectFactoryTest {
         try {
             ParentWithSetChildrenPropertyAccessTO actualResult = TransferObjectFactory.createTransferObject(
                     ParentWithSetChildrenPropertyAccessTO.class, p);
-            assert ( actualResult.children.size() == 3 );
+            Assert.assertEquals(3, actualResult.children.size());
             for ( ChildTO child : actualResult.children ) {
-                assert ( child.name.equals("Child") );
+                Assert.assertTrue( child.name.equals("Child") );
             }
         } catch (Exception e) {
             e.printStackTrace();
