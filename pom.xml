@@ -30,6 +30,7 @@
 		<glassfish.security.version>3.1.1</glassfish.security.version>
 		<junit.version>4.11</junit.version>
 		<restfuse.version>1.2.0</restfuse.version>
+		<poi.version>3.0-FINAL</poi.version>
 		<!-- Glasssfish Configuration -->
 		<glassfish.glassfishDirectory>${user.home}/Professional/Runtimes/glassfish4/glassfish</glassfish.glassfishDirectory>
 		<glassfish.user>admin</glassfish.user>
@@ -51,4 +52,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.11</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

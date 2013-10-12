@@ -19,6 +19,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>${javaee.api.version}</version>
@@ -51,16 +56,30 @@
 			<groupId>org.glassfish.main.extras</groupId>
 			<artifactId>glassfish-embedded-all</artifactId>
 			<version>${glassfish.extras.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.main.extras</groupId>
 			<artifactId>glassfish-embedded-static-shell</artifactId>
 			<version>${glassfish.extras.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.connector.java.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Stochastic</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>TestUtils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

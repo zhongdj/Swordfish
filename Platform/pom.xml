@@ -15,5 +15,7 @@
 		<module>Security</module>
 		<module>TOBinding</module>
 		<module>CommonUtils</module>
+		<module>Stochastic</module>
+		<module>TestUtils</module>
 	</modules>
 </project>
