@@ -16,12 +16,12 @@ public class Additive extends CodedEntity {
 
     private static final long serialVersionUID = 2488317593704593687L;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 30)
     private String name;
 
     @Index(name = "INDEX_ADDITIVE_PINYIN_ABBR_NAME")
     @PinYinIndex(from = "name")
-    @Column(name = "PINYIN_ABBR_NAME", nullable = false, length = 10)
+    @Column(name = "PINYIN_ABBR_NAME", nullable = false, length = 30)
     private String pinyinAbbrName;
 
     public String getName() {
