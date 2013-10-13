@@ -6,7 +6,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.util.Region;
 
-@SuppressWarnings("deprecation")
 public class MergeableCell extends Cell {
 
     private final int bottomRightColumn;

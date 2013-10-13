@@ -9,8 +9,15 @@ import net.madz.lifecycle.AbstractStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbstractStateMachineRegistry.StateMachineMetadataBuilder;
 import net.madz.lifecycle.demo.standalone.IServiceOrder;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta;
-import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.*;
-import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.*;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Cancelled;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Created;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Finished;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Ongoing;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Queued;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Cancel;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Finish;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Schedule;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Start;
 import net.madz.lifecycle.meta.impl.builder.AnnotationBasedStateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateInst;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
@@ -23,7 +30,7 @@ import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class StandaloneLifecyclePureMetadataTest {
 

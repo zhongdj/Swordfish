@@ -1,7 +1,6 @@
 package net.madz.binding;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
