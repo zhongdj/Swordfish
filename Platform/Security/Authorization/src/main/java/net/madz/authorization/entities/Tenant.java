@@ -40,7 +40,7 @@ public class Tenant extends AbstractBaseEntity {
     @Column(nullable = false)
     private String address;
 
-    @Column(name = "ARTIFICIAL_PERSON_NAME", nullable = false)
+    @Column(name = "ARTIFICIAL_PERSON_NAME", nullable = true)
     private String artificialPersonName;
 
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
@@ -76,7 +76,7 @@ public class Tenant extends AbstractBaseEntity {
     @JoinColumns(value = {
             @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "UPDATED_BY", nullable = true, insertable = false, updatable = true,
                     referencedColumnName = "ID") })
     @ManyToOne(fetch = FetchType.LAZY)
     @XmlIDREF
@@ -89,9 +89,9 @@ public class Tenant extends AbstractBaseEntity {
     @JoinColumns(value = {
             @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "CREATED_BY", nullable = true, insertable = false, updatable = true,
                     referencedColumnName = "ID") })
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @XmlIDREF
     protected User createdBy;
 
@@ -100,17 +100,17 @@ public class Tenant extends AbstractBaseEntity {
     protected Date createdOn;
 
     @Column(name = "DELETED", columnDefinition = "BOOL NOT NULL DEFAULT 0")
-    protected Boolean deleted;
+    protected boolean deleted;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PARENT_TENANT_ID", referencedColumnName = "ID", nullable = true)
     private Tenant parentTenant;
 
-    @OneToOne
+    @OneToOne(cascade={CascadeType.PERSIST})
     @JoinColumns(value = {
             @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "ADMIN_USER_ID", nullable = false, insertable = true, updatable = false,
+            @JoinColumn(name = "ADMIN_USER_ID", nullable = true, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
     @XmlIDREF
     private User adminUser;

@@ -49,6 +49,7 @@ public class AuthorizationBean {
         {
             freeTrailTenant.setFreeTrial(true);
             freeTrailTenant.setServiceDaysLeft(30);
+            freeTrailTenant.setAddress(freeTrailRequest.getAddress().toString());
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.setTime(justNow);
             calendar.add(Calendar.DAY_OF_MONTH, 30);
@@ -61,6 +62,6 @@ public class AuthorizationBean {
             freeTrailTenant.setUpdatedBy(createdBy);
         }
         em.persist(freeTrailTenant);
-        //em.persist(createdBy);
+        em.persist(createdBy);
     }
 }

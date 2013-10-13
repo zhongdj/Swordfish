@@ -42,7 +42,7 @@ import org.eclipse.persistence.annotations.Index;
                 query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
         @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
 @Index(name = "INDEX_USER_TENANT_FIRST", columnNames = { "TENANT_ID" })
-@IdClass(ComposedPK.class)
+//@IdClass(ComposedPK.class)
 public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
@@ -120,8 +120,8 @@ public class User extends StandardObject {
 
     @Id
     @ManyToOne(fetch = FetchType.EAGER)
-    @PrimaryKeyJoinColumn(name = "TENANT_ID")
-    private Tenant tenant;
+    @JoinColumn(name = "TENANT_ID", insertable = true, updatable = false, nullable = false, referencedColumnName = "ID")
+    private Tenant aTenant;
 
     public User() {
     }
@@ -264,7 +264,7 @@ public class User extends StandardObject {
     }
 
     public Tenant getTenant() {
-        return tenant;
+        return aTenant;
     }
 
     public void addUserGroup(Group group) {
@@ -389,6 +389,6 @@ public class User extends StandardObject {
     }
 
     public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+        this.aTenant = tenant;
     }
 }

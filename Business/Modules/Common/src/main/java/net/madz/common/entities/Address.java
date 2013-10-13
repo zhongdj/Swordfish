@@ -8,16 +8,22 @@ public class Address {
 
     @Column(name = "PROVINCE_NAME", nullable = false, updatable = true, length = 10)
     private String provinceName;
+
     @Column(name = "CITY_NAME", nullable = false, updatable = true, length = 10)
     private String cityName;
+
     @Column(name = "ZIP_CODE", nullable = false, updatable = true, length = 10)
     private String zipCode;
+
     @Column(name = "DISTRICT", nullable = true, updatable = true, length = 20)
     private String district;
+
     @Column(name = "STREET", nullable = false, updatable = true, length = 40)
     private String street;
+
     @Column(name = "NUMBER", nullable = false, updatable = true, length = 10)
     private String number;
+
     private GPSPosition gpsPosition;
 
     public String getProvinceName() {
@@ -74,5 +80,10 @@ public class Address {
 
     public void setGpsPosition(GPSPosition gpsPosition) {
         this.gpsPosition = gpsPosition;
+    }
+
+    @Override
+    public String toString() {
+        return provinceName + cityName + district + street + number;
     }
 }

@@ -232,7 +232,7 @@
 							<fileset>
 								<basedir>${basedir}/src/main/scripts</basedir>
 								<includes>
-									<include>create-test-data.sql</include>
+									<include>create-mixture-additives.sql</include>
 								</includes>
 							</fileset>
 						</configuration>

@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 @Entity
 @Table(name = "mgroup")
 @NamedQuery(name = "UserGroup.findGroupByName", query = "SELECT OBJECT(a) FROM Group AS a WHERE a.name=:groupName")
-@IdClass(ComposedPK.class)
+//@IdClass(ComposedPK.class)
 public class Group extends StandardObject {
 
     public static final String ADMINGROUP = "ADMINGroup";

@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class ComposedPK implements Serializable {
 
     private static final long serialVersionUID = -2751724340081615108L;
-    protected long tenant;
+    protected long aTenant;
     protected long id;
 
     public ComposedPK(long tenant, long id) {
         super();
-        this.tenant = tenant;
+        this.aTenant = tenant;
         this.id = id;
     }
 
@@ -23,18 +23,18 @@ public class ComposedPK implements Serializable {
     }
 
     public long getTenant() {
-        return tenant;
+        return aTenant;
     }
 
     public void setTenant(long tenant) {
-        this.tenant = tenant;
+        this.aTenant = tenant;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) ( tenant ^ ( tenant >>> 32 ) );
+        result = prime * result + (int) ( aTenant ^ ( aTenant >>> 32 ) );
         result = prime * result + (int) ( id ^ ( id >>> 32 ) );
         return result;
     }
@@ -45,7 +45,7 @@ public class ComposedPK implements Serializable {
         if ( obj == null ) return false;
         if ( getClass() != obj.getClass() ) return false;
         ComposedPK other = (ComposedPK) obj;
-        if ( tenant != other.tenant ) return false;
+        if ( aTenant != other.aTenant ) return false;
         if ( id != other.id ) return false;
         return true;
     }
