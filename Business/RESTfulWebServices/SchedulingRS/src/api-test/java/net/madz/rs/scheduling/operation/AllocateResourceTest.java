@@ -27,7 +27,7 @@ public class AllocateResourceTest {
     @Context
     private Response response;
 
-    @HttpTest(method = Method.POST, path = "/scheduling-api/operation/summaryPlan/1/serviceOrder",
+    @HttpTest(method = Method.POST, path = "/api/scheduling/operation/summaryPlan/1/serviceOrder",
             file = "positive.allocate.resource.json", headers = {
                     @Header(name = "Content-Type", value = "application/json"),
                     @Header(name = "Accept", value = "application/json") })
@@ -39,7 +39,7 @@ public class AllocateResourceTest {
         System.out.println(value);
     }
 
-    @HttpTest(method = Method.POST, path = "/scheduling-api/operation/summaryPlan/2/serviceOrder",
+    @HttpTest(method = Method.POST, path = "/api/scheduling/operation/summaryPlan/2/serviceOrder",
             file = "positive.allocate.resource.json", headers = {
                     @Header(name = "Content-Type", value = "application/json"),
                     @Header(name = "Accept", value = "application/json") })
@@ -51,7 +51,7 @@ public class AllocateResourceTest {
         System.out.println(value);
     }
 
-    @HttpTest(method = Method.POST, path = "/scheduling-api/operation/summaryPlan/1/serviceOrder",
+    @HttpTest(method = Method.POST, path = "/api/scheduling/operation/summaryPlan/1/serviceOrder",
             file = "allocate.resource.invalid.plantResourceId.json", headers = {
                     @Header(name = "Content-Type", value = "application/json"),
                     @Header(name = "Accept", value = "application/json") })
@@ -63,7 +63,7 @@ public class AllocateResourceTest {
         System.out.println(value);
     }
 
-    @HttpTest(method = Method.POST, path = "/scheduling-api/operation/summaryPlan/1/serviceOrder",
+    @HttpTest(method = Method.POST, path = "/api/scheduling/operation/summaryPlan/1/serviceOrder",
             file = "allocate.resource.invalid.concreteTruckResourceId.json", headers = {
                     @Header(name = "Content-Type", value = "application/json"),
                     @Header(name = "Accept", value = "application/json") })
