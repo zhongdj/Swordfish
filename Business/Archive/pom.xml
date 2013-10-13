@@ -118,7 +118,7 @@
 							<groupId>net.madz</groupId>
 							<artifactId>SchedulingRS</artifactId>
 							<bundleFileName>schedulingRS.war</bundleFileName>
-							<contextRoot>scheduling-api</contextRoot>
+							<contextRoot>/api</contextRoot>
 						</webModule>
 						<webModule>
 							<groupId>net.madz</groupId>
