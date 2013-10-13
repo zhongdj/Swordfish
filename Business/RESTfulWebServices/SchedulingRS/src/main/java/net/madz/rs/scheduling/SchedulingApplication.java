@@ -16,7 +16,7 @@ import net.madz.rs.scheduling.resources.SchedulingOperationResources;
 import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 
 @Stateless
-@ApplicationPath("/")
+@ApplicationPath("/scheduling")
 public class SchedulingApplication extends Application {
 
     @Override
