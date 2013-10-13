@@ -28,6 +28,10 @@ public class AppServiceException extends MadzException {
 
     @Override
     public String getCategory() {
-        return moduleName == null ? APP_SERVICE : moduleName;
+        return APP_SERVICE;
+    }
+
+    public String getModuleName() {
+        return this.moduleName;
     }
 }

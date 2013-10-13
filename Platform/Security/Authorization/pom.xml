@@ -44,6 +44,17 @@
 			<version>${swordfish.release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Common</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Authentication</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

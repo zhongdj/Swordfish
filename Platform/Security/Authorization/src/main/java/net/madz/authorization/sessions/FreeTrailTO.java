@@ -1,4 +1,4 @@
-package net.madz.rs.registration.resources;
+package net.madz.authorization.sessions;
 
 import java.io.Serializable;
 

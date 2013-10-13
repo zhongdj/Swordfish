@@ -3,6 +3,7 @@ package net.madz.authorization.entities;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -90,7 +91,7 @@ public class Tenant extends AbstractBaseEntity {
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @XmlIDREF
     protected User createdBy;
 
@@ -120,7 +121,7 @@ public class Tenant extends AbstractBaseEntity {
     public Tenant(String name) {
         this.name = name;
         setArrearage(false);
-        setEvaluated(true);
+        setFreeTrial(true);
         setFreezen(false);
         setHistoryServiceDays(0);
         setLocked(false);
@@ -195,7 +196,7 @@ public class Tenant extends AbstractBaseEntity {
         this.serviceDaysPaid = serviceDaysPaid;
     }
 
-    public void setEvaluated(boolean evaluated) {
+    public void setFreeTrial(boolean evaluated) {
         this.evaluated = evaluated;
     }
 

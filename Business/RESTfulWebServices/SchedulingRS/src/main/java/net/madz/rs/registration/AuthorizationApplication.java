@@ -3,14 +3,16 @@ package net.madz.rs.registration;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ejb.Stateless;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-
-import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 
 import net.madz.rs.registration.resources.RegistrationResources;
 import net.madz.rs.scheduling.providers.MadzExceptionMapper;
 
+import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
+
+@Stateless
 @ApplicationPath("/auth")
 public class AuthorizationApplication extends Application {
 

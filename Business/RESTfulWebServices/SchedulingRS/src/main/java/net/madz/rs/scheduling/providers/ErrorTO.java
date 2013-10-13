@@ -8,6 +8,8 @@ public class ErrorTO implements Serializable {
 
     private String category;
 
+    private String moduleName;
+
     private String errorCode;
 
     private String errorMessage;
@@ -17,7 +19,14 @@ public class ErrorTO implements Serializable {
     }
 
     public ErrorTO(String category, String errorCode, String errorMessage) {
+        this(category, "UNKNOWN", errorCode, errorMessage);
+    }
+
+    public ErrorTO(String category, String moduleName, String errorCode, String errorMessage) {
         super();
+        if ( null != moduleName ) {
+            this.moduleName = moduleName;
+        }
         this.category = category;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
@@ -47,8 +56,17 @@ public class ErrorTO implements Serializable {
         this.errorMessage = errorMessage;
     }
 
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
     @Override
     public String toString() {
-        return "ErrorTO [category=" + category + ", errorCode=" + errorCode + ", errorMessage=" + errorMessage + "]";
+        return "ErrorTO [category=" + category + ", moduleName=" + moduleName + ", errorCode=" + errorCode
+                + ", errorMessage=" + errorMessage + "]";
     }
 }
