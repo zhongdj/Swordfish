@@ -6,7 +6,7 @@ import net.madz.common.entities.Address;
 
 import org.eclipse.persistence.oxm.annotations.XmlPath;
 
-public class FreeTrailTO implements Serializable {
+public class FreeTrailRequest implements Serializable {
 
     private static final long serialVersionUID = 5165402349203097026L;
 

@@ -25,7 +25,7 @@ public class AuthorizationBean {
     @PersistenceContext
     EntityManager em;
 
-    public void registerFreeTrial(FreeTrailTO freeTrailRequest) throws BusinessModuleException {
+    public void registerFreeTrial(FreeTrailRequest freeTrailRequest) throws BusinessModuleException {
         final Date justNow = new Date();
         final User createdBy = new User();
         createdBy.setCreatedOn(justNow);

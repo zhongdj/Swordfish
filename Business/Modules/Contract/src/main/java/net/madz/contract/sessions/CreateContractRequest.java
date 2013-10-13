@@ -1,4 +1,4 @@
-package net.madz.rs.contract.resources;
+package net.madz.contract.sessions;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import net.madz.common.entities.Address;
 
 import org.eclipse.persistence.oxm.annotations.XmlPath;
 
-public class CreateContractRequestTO implements Serializable {
+public class CreateContractRequest implements Serializable {
 
     private static final long serialVersionUID = -4996775530902230740L;
 

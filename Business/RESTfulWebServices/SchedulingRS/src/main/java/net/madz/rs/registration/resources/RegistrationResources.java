@@ -10,7 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import net.madz.authorization.sessions.AuthorizationBean;
-import net.madz.authorization.sessions.FreeTrailTO;
+import net.madz.authorization.sessions.FreeTrailRequest;
 import net.madz.core.exceptions.AppServiceException;
 import net.madz.utils.BusinessModuleException;
 
@@ -26,7 +26,7 @@ public class RegistrationResources {
     @Path("freeTrial")
     @POST
     @Consumes({ "application/json", "application/xml" })
-    public void createFreeTrail(FreeTrailTO freeTrailRequest) throws AppServiceException {
+    public void createFreeTrail(FreeTrailRequest freeTrailRequest) throws AppServiceException {
         logger.info(freeTrailRequest.toString());
         try {
             authBean.registerFreeTrial(freeTrailRequest);
