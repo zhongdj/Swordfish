@@ -42,7 +42,6 @@ import org.eclipse.persistence.annotations.Index;
                 query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
         @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
 @Index(name = "INDEX_USER_TENANT_FIRST", columnNames = { "TENANT_ID" })
-//@IdClass(ComposedPK.class)
 public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
@@ -96,11 +95,11 @@ public class User extends StandardObject {
     @Column(nullable = true)
     private String oldPasswords;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(name = "user_group", joinColumns = {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = true, updatable = true,
                     referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "USER_NAME", referencedColumnName = "USERNAME") }, inverseJoinColumns = {
+            @JoinColumn(name = "USERNAME", referencedColumnName = "USERNAME") }, inverseJoinColumns = {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })

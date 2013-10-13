@@ -127,6 +127,11 @@
 							<contextRoot>swordfish</contextRoot>
 						</webModule>
 					</modules>
+					<security>
+						<security-role>
+							<role-name>admin</role-name>
+						</security-role>
+					</security>
 					<version>6</version>
 					<defaultLibBundleDir>lib</defaultLibBundleDir>
 				</configuration>

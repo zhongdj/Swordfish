@@ -28,24 +28,30 @@ public class AuthorizationBean {
     public void registerFreeTrial(FreeTrailTO freeTrailRequest) throws BusinessModuleException {
         final Date justNow = new Date();
         final User createdBy = new User();
-        {
-            createdBy.setCreatedOn(justNow);
-            createdBy.setEmail(freeTrailRequest.getEmail());
-            createdBy.setFullName(freeTrailRequest.getFullName());
-            final List<Group> groups = new ArrayList<>();
-            createdBy.setGroups(groups);
-            createdBy.setLastChangePwdTime(new Timestamp(justNow.getTime()));
-            String encrypted = EncryptorFactory.getInstance().getPasswordEncryptor()
-                    .encrypt(freeTrailRequest.getPassword());
-            createdBy.setPassword(encrypted);
-            createdBy.setPhoneNumber(freeTrailRequest.getPhoneNumber());
-            createdBy.setUsername(freeTrailRequest.getUserName());
-            createdBy.setUpdatedOn(justNow);
-            createdBy.setUpdatedBy(createdBy);
-            createdBy.setCreatedBy(createdBy);
-        }
+        createdBy.setCreatedOn(justNow);
+        createdBy.setEmail(freeTrailRequest.getEmail());
+        createdBy.setFullName(freeTrailRequest.getFullName());
+        final List<Group> groups = new ArrayList<>();
+        Group group = new Group();
+        group.setName("admin");
+        groups.add(group);
+        group.setCreatedBy(createdBy);
+        group.setCreatedOn(justNow);
+        group.setUpdatedBy(createdBy);
+        group.setUpdatedOn(justNow);
+        createdBy.setGroups(groups);
+        createdBy.setLastChangePwdTime(new Timestamp(justNow.getTime()));
+        String encrypted = EncryptorFactory.getInstance().getPasswordEncryptor()
+                .encrypt(freeTrailRequest.getPassword());
+        createdBy.setPassword(encrypted);
+        createdBy.setPhoneNumber(freeTrailRequest.getPhoneNumber());
+        createdBy.setUsername(freeTrailRequest.getUserName());
+        createdBy.setUpdatedOn(justNow);
+        createdBy.setUpdatedBy(createdBy);
+        createdBy.setCreatedBy(createdBy);
         Tenant freeTrailTenant = new Tenant();
         createdBy.setTenant(freeTrailTenant);
+        group.setTenant(freeTrailTenant);
         {
             freeTrailTenant.setFreeTrial(true);
             freeTrailTenant.setServiceDaysLeft(30);

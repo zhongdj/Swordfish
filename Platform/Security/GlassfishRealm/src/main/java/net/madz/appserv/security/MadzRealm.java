@@ -87,6 +87,7 @@ public class MadzRealm extends AppservRealm {
 			if (_logger.isLoggable(Level.FINE)) {
 				_logger.fine(username + " is authenticated Successfully");
 			}
+			
 			return groups;
 		} catch (UserNotExistException ex) {
 
