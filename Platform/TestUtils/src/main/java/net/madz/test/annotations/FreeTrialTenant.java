@@ -16,11 +16,22 @@ import net.madz.test.stochastic.core.AbsScriptEngine;
 import net.madz.test.stochastic.core.TestContext;
 import net.madz.test.stochastic.utilities.annotations.Processor;
 
-import org.junit.runners.model.Statement;
-
 import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.internal.InternalRequest;
 
+/**
+ * FreeTrialTenant is a test script, which will be interpreted as:  <br/>
+ * "To create a new free trial tenant in the running test context." <br/> <br/>
+ * There are 3 phases: <br/>
+ * 1. Before test method execution, create a free trial tenant and register
+ * userName and password into thread local variables of
+ * FreeTrialTenant.ScriptProcessor.class. <br/>
+ * 2. Proceeding with testing statement. <br/>
+ * 3. Cleaning up thread local variables. <br/>
+ * 
+ * @author Barry
+ * 
+ */
 @Processor(ScriptProcessor.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -29,13 +40,6 @@ public @interface FreeTrialTenant {
     public static final String USER = "test.polaris.metadata";
 
     public static final String PASS = "1q2w3e4r5t";
-
-    public class EmptyStatement extends Statement {
-
-        @Override
-        public void evaluate() throws Throwable {
-        }
-    }
 
     String username() default USER;
 
@@ -56,7 +60,7 @@ public @interface FreeTrialTenant {
         @Override
         public void doProcess(final TestContext context, FreeTrialTenant t) throws Throwable {
             increaseIndent();
-            debug("Creating New Tenant and Inject UserSession");
+            debug("Creating New Free Trial Tenant ...");
             long time = new Date().getTime();
             if ( USER.equals(t.username()) ) {
                 username.set(USER + "." + time + "@gmail.com");
@@ -67,11 +71,12 @@ public @interface FreeTrialTenant {
             }
             try {
                 doRequestFreeTrailTenant(t);
+                debug("Free Trial Tenant has been created.");
                 context.getBase().evaluate();
             } finally {
                 username.remove();
                 password.remove();
-                debug("UserSession had been removed.");
+                debug("Leaving FreeTrialTenant processor");
                 decreaseIndent();
             }
         }
@@ -93,10 +98,16 @@ public @interface FreeTrialTenant {
             try {
                 content = content.replaceAll("#\\{userName\\}", getUsername());
                 content = content.replaceAll("#\\{password\\}", getPassword());
-                System.out.println(content);
+                debug("POST RESTful Request with content:");
+                increaseIndent();
+                debug(content);
+                decreaseIndent();
                 request.setContent(new ByteArrayInputStream(content.getBytes()));
                 Response response = request.post();
-                System.out.println(response.getBody());
+                debug("Server responsed with: ");
+                increaseIndent();
+                debug(response.getBody());
+                decreaseIndent();
             } catch (Exception e) {
                 e.printStackTrace();
             }

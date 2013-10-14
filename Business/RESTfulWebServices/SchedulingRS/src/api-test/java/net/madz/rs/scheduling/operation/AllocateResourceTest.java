@@ -7,6 +7,8 @@ import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.test.MadzDestination;
 import net.madz.test.MadzHttpUnitRunner;
 import net.madz.test.annotations.FreeTrialTenant;
+import net.madz.test.annotations.VariableInjector;
+import net.madz.test.annotations.processors.FreeTrialCredentialInjector;
 import net.madz.utils.MOXyUtils;
 
 import org.junit.Assert;
@@ -45,6 +47,7 @@ public class AllocateResourceTest {
             file = "positive.allocate.resource.json", headers = {
                     @Header(name = "Content-Type", value = "application/json"),
                     @Header(name = "Accept", value = "application/json") })
+    @VariableInjector(FreeTrialCredentialInjector.class)
     public void test_invalid_summaryPlanId() throws JAXBException {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
