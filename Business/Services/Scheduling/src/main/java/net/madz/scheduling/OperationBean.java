@@ -13,8 +13,11 @@ import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import net.madz.authorization.MultitenancyBean;
+import net.madz.authorization.entities.User;
+import net.madz.authorization.interceptor.UserSession;
 import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationInterceptor;
 import net.madz.binding.TransferObjectFactory;
 import net.madz.contract.spec.entities.PouringPartSpec;
@@ -23,6 +26,9 @@ import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
+import net.madz.scheduling.entities.MixingPlant;
+import net.madz.scheduling.entities.MixingPlantResource;
+import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
 
 /**
@@ -72,5 +78,38 @@ public class OperationBean extends MultitenancyBean {
 
     public List<PouringPartSpec> filterMyPartsInConstructing(String filter) {
         return listMyPartsInConstructing();
+    }
+
+    public MixingPlantResourceTO createPlantResource(String mixingPlantName, String operatorName) throws AppServiceException {
+        EntityManager em = em();
+        try {
+            if (null == mixingPlantName || 0 >= mixingPlantName.trim().length()) {
+                throw new NullPointerException("mixing plant name is null.");
+            }
+            if (null == operatorName || 0 >= operatorName.trim().length()) {
+                throw new NullPointerException("operator name is null.");
+            }
+            MixingPlantResource plantResource = new MixingPlantResource();
+            User user = UserSession.getUserSession().getUser();
+            plantResource.setCreatedBy(user);
+            plantResource.setUpdatedBy(user);
+            MixingPlant mixingPlant = new MixingPlant();
+            mixingPlant.setCreatedBy(user);
+            mixingPlant.setName(mixingPlantName);
+            mixingPlant.setUpdatedBy(user);
+            Query query = em.createNamedQuery("User.findByUsername").setParameter("username", operatorName);
+            final User operator = (User) query.getSingleResult();
+            mixingPlant.setOperator(operator);
+            plantResource.setMixingPlant(mixingPlant);
+            em.persist(plantResource);
+            try {
+                return TransferObjectFactory.createTransferObject(MixingPlantResourceTO.class, plantResource);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "TOBindingError", e);
+            }
+            return null;
+        } finally {
+            em.close();
+        }
     }
 }
