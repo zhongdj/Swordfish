@@ -125,7 +125,13 @@ public class SchedulingOperationResources {
     @Path("plantResource")
     @Consumes({"application/xml", "application/json"})
     @Produces({"application/xml", "application/json"})
-    public MixingPlantResourceTO createPlantResource(String mixingPlantName, String operatorName) throws AppServiceException {
-        return operation.createPlantResource(mixingPlantName, operatorName);
+    public MixingPlantResourceTO createPlantResource(PlantResourceParameters params) throws AppServiceException {
+        return operation.createPlantResource(params.mixingPlantName, params.operatorName);
+    }
+    
+    public static class PlantResourceParameters {
+        public String mixingPlantName;
+        
+        public String operatorName;
     }
 }
