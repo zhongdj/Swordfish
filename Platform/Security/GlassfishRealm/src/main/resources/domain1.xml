@@ -3,7 +3,7 @@
 	<property name="jaas-context" value="MadzRealm" />
 	<!-- jdbc realm related properties -->
 	<property name="datasource" value="jdbc/crmp" />
-	<property name="user_table" value="CRMP_USER" />
+	<property name="user_table" value="MUSER" />
 	<property name="username_col" value="USERNAME" />
 	<property name="encryptedPassword_col" value="PASSWORD" />
 	<property name="invalidPasswordAttempts_col" value="LOGINFAILEDTIMES" />
@@ -20,15 +20,15 @@
 	<property name="login_times_col" value="LOGINTIMES" />
 	<property name="access_denied_times_col" value="ACCESSDENIEDTIMES" />
 	<property name="user_company_fk" value="TENANT_ID" />
-	<property name="company_table" value="CRMP_TENANT" />
+	<property name="company_table" value="TENANT" />
 	<property name="company_id_col" value="ID" />
 	<property name="company_name_col" value="NAME" />
 	<property name="company_lock_col" value="LOCKED" />
 	<property name="company_frozen_col" value="FREEZEN" />
-	<property name="group_table" value="CRMP_USER_GROUP" />
+	<property name="group_table" value="MGROUP" />
 	<property name="group_join_col" value="GROUP_NAME" />
 	<property name="user_join_col" value="USERNAME" />
-	<property name="user_group_join_table" value="CRMP_USER_USER_GROUP" />
+	<property name="user_group_join_table" value="USER_GROUP" />
 	<property name="group_name_col" value="NAME" />
 	<property name="encryptor" value="md5" />
 	<!--Madz Realm Audit Policy Properties -->
