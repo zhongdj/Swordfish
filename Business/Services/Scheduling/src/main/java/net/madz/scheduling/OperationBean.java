@@ -32,9 +32,11 @@ import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
+import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.to.ConcreteTruckResourceTO;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
+import net.madz.scheduling.to.ServiceSummaryPlanTO;
 
 /**
  * 
@@ -160,6 +162,34 @@ public class OperationBean extends MultitenancyBean {
                 final ConcreteTruckResourceTO result = TransferObjectFactory.createTransferObject(
                         ConcreteTruckResourceTO.class, ctr);
                 return result;
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "TOBindingError", e);
+            }
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public ServiceSummaryPlanTO createServiceSummaryPlan(ServiceSummaryPlanTO sto) throws AppServiceException {
+        EntityManager em = em();
+        try {
+            ServiceSummaryPlan ssp = new ServiceSummaryPlan();
+            User user = UserSession.getUserSession().getUser();
+            ssp.setCreatedBy(user);
+            ssp.setUpdatedBy(user);
+            ssp.setUpdatedOn(new Date());
+            ssp.setTotalVolume(sto.getTotalVolume());
+            PouringPartSpec spec = null;
+            try {
+                spec = em.find(PouringPartSpec.class, sto.getId());
+            } catch (NoResultException ex) {
+                throw new NullPointerException("PouringPartSpec id is invalid, you must specify a valid spec id.");
+            }
+            ssp.setSpec(spec);
+            em.persist(ssp);
+            try {
+                return TransferObjectFactory.createTransferObject(ServiceSummaryPlanTO.class, ssp);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }

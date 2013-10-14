@@ -100,4 +100,8 @@ public class ServiceSummaryPlan extends MultiTenancyEntity {
     public String getState() {
         return state;
     }
+
+    public void setTotalVolume(double totalVolume) {
+        this.totalVolume = totalVolume;
+    }
 }

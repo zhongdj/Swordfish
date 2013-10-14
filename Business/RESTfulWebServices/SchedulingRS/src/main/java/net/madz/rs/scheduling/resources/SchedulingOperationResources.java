@@ -19,6 +19,7 @@ import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.to.ConcreteTruckResourceTO;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
+import net.madz.scheduling.to.ServiceSummaryPlanTO;
 
 @Stateless
 @Path("operation")
@@ -147,5 +148,12 @@ public class SchedulingOperationResources {
     @Produces({ "application/xml", "application/json" })
     public ConcreteTruckResourceTO createConcreteTruckResource(ConcreteTruckResourceTO cto) throws AppServiceException {
         return operation.createConcreteTruckResource(cto);
+    }
+    @POST
+    @Path("serviceSummaryPlan")
+    @Consumes({ "application/xml", "application/json" })
+    @Produces({ "application/xml", "application/json" })
+    public ServiceSummaryPlanTO createServiceSummaryPlan(ServiceSummaryPlanTO sto) throws AppServiceException{
+        return operation.createServiceSummaryPlan(sto);
     }
 }
