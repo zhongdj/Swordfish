@@ -9,14 +9,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -46,7 +44,7 @@ public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(unique = true, updatable = false, length = 40, nullable = false)
+    @Column(unique = true, updatable = false, length = 60, nullable = false)
     @XmlID
     private String username;
 
@@ -61,7 +59,7 @@ public class User extends StandardObject {
 
     @Column
     private String phoneNumber;
-
+    
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
 
