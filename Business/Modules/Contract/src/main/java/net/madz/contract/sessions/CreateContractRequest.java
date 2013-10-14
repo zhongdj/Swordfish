@@ -13,34 +13,13 @@ public class CreateContractRequest implements Serializable {
     private static final long serialVersionUID = -4996775530902230740L;
 
     @XmlPath("customer-info/id/text()")
-    private String customerId;
+    private long customerId = -1;
 
     @XmlPath("customer-info/fullName/text()")
     private String customerFullName;
 
     @XmlPath("customer-info/shortName/text()")
     private String customerShortName;
-
-    @XmlPath("contact-info/name/text()")
-    private String contactName;
-
-    @XmlPath("contact-info/email/text()")
-    private String contactEmail;
-
-    @XmlPath("contact-info/male/text()")
-    private boolean contactMale;
-
-    @XmlPath("contact-info/cellPhone/text()")
-    private String contactCellPhone;
-
-    @XmlPath("contact-info/workCellPhone/text()")
-    private String workCellPhone;
-
-    @XmlPath("contact-info/officePhone/text()")
-    private String officePhone;
-
-    @XmlPath("contact-info/homePhone/text()")
-    private String homePhone;
 
     @XmlPath("contract-info/name/text()")
     private String contractName;
@@ -54,11 +33,11 @@ public class CreateContractRequest implements Serializable {
     @XmlPath("unitProjects-info/")
     private UnitProjectInfo[] unitProjects;
 
-    public String getCustomerId() {
+    public long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(String customerId) {
+    public void setCustomerId(long customerId) {
         this.customerId = customerId;
     }
 
@@ -76,62 +55,6 @@ public class CreateContractRequest implements Serializable {
 
     public void setCustomerShortName(String customerShortName) {
         this.customerShortName = customerShortName;
-    }
-
-    public String getContactName() {
-        return contactName;
-    }
-
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    public boolean isContactMale() {
-        return contactMale;
-    }
-
-    public void setContactMale(boolean contactMale) {
-        this.contactMale = contactMale;
-    }
-
-    public String getContactCellPhone() {
-        return contactCellPhone;
-    }
-
-    public void setContactCellPhone(String contactCellPhone) {
-        this.contactCellPhone = contactCellPhone;
-    }
-
-    public String getWorkCellPhone() {
-        return workCellPhone;
-    }
-
-    public void setWorkCellPhone(String workCellPhone) {
-        this.workCellPhone = workCellPhone;
-    }
-
-    public String getOfficePhone() {
-        return officePhone;
-    }
-
-    public void setOfficePhone(String officePhone) {
-        this.officePhone = officePhone;
-    }
-
-    public String getHomePhone() {
-        return homePhone;
-    }
-
-    public void setHomePhone(String homePhone) {
-        this.homePhone = homePhone;
     }
 
     public String getContractName() {
@@ -172,6 +95,30 @@ public class CreateContractRequest implements Serializable {
 
         private String name;
 
+        @XmlPath("contact-info/name/text()")
+        private String contactName;
+
+        @XmlPath("contact-info/email/text()")
+        private String contactEmail;
+
+        @XmlPath("contact-info/birthYear/text()")
+        private int contactBirthYear;
+
+        @XmlPath("contact-info/male/text()")
+        private boolean contactMale;
+
+        @XmlPath("contact-info/cellPhone/text()")
+        private String contactCellPhone;
+
+        @XmlPath("contact-info/workCellPhone/text()")
+        private String workCellPhone;
+
+        @XmlPath("contact-info/officePhone/text()")
+        private String officePhone;
+
+        @XmlPath("contact-info/homePhone/text()")
+        private String homePhone;
+
         @XmlPath("address-info/")
         private Address address;
 
@@ -191,6 +138,66 @@ public class CreateContractRequest implements Serializable {
             this.address = address;
         }
 
+        public String getContactName() {
+            return contactName;
+        }
+
+        public void setContactName(String contactName) {
+            this.contactName = contactName;
+        }
+
+        public String getContactEmail() {
+            return contactEmail;
+        }
+
+        public void setContactEmail(String contactEmail) {
+            this.contactEmail = contactEmail;
+        }
+
+        public boolean isContactMale() {
+            return contactMale;
+        }
+
+        public void setContactMale(boolean contactMale) {
+            this.contactMale = contactMale;
+        }
+
+        public String getContactCellPhone() {
+            return contactCellPhone;
+        }
+
+        public void setContactCellPhone(String contactCellPhone) {
+            this.contactCellPhone = contactCellPhone;
+        }
+
+        public String getWorkCellPhone() {
+            return workCellPhone;
+        }
+
+        public void setWorkCellPhone(String workCellPhone) {
+            this.workCellPhone = workCellPhone;
+        }
+
+        public String getOfficePhone() {
+            return officePhone;
+        }
+
+        public void setOfficePhone(String officePhone) {
+            this.officePhone = officePhone;
+        }
+
+        public String getHomePhone() {
+            return homePhone;
+        }
+
+        public void setHomePhone(String homePhone) {
+            this.homePhone = homePhone;
+        }
+
+        public int getContactBirthYear() {
+            return this.contactBirthYear;
+        }
+
         @Override
         public String toString() {
             return "UnitProjectInfo [name=" + name + ", address=" + address + "]";
@@ -199,11 +206,9 @@ public class CreateContractRequest implements Serializable {
 
     @Override
     public String toString() {
-        return "CreateContractRequestTO [customerId=" + customerId + ", customerFullName=" + customerFullName
-                + ", customerShortName=" + customerShortName + ", contactName=" + contactName + ", contactEmail="
-                + contactEmail + ", contactMale=" + contactMale + ", contactCellPhone=" + contactCellPhone
-                + ", workCellPhone=" + workCellPhone + ", officePhone=" + officePhone + ", homePhone=" + homePhone
-                + ", contractName=" + contractName + ", contractStartDate=" + contractStartDate + ", contractEndDate="
-                + contractEndDate + ", unitProjects=" + Arrays.toString(unitProjects) + "]";
+        return "CreateContractRequest [customerId=" + customerId + ", customerFullName=" + customerFullName
+                + ", customerShortName=" + customerShortName + ", contractName=" + contractName
+                + ", contractStartDate=" + contractStartDate + ", contractEndDate=" + contractEndDate
+                + ", unitProjects=" + Arrays.toString(unitProjects) + "]";
     }
 }

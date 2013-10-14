@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import net.madz.contract.sessions.ContractBean;
 import net.madz.contract.sessions.CreateContractRequest;
 import net.madz.contract.sessions.CreateContractResponse;
+import net.madz.core.exceptions.AppServiceException;
+import net.madz.utils.BusinessModuleException;
 
 @Path("contracts")
 public class ContractResources {
@@ -19,8 +21,13 @@ public class ContractResources {
     @POST
     @Produces("application/json")
     @Consumes("application/json")
-    public CreateContractResponse createContract(CreateContractRequest request) {
+    public CreateContractResponse createContract(CreateContractRequest request) throws AppServiceException {
         System.out.println(request.toString());
-        return bean.createContract(request);
+        try {
+            return bean.createContract(request);
+        } catch (BusinessModuleException e) {
+            throw new AppServiceException(CreateContractRequest.class, e.getBusinessModuleName(), e.getBundle(),
+                    e.getErrorCode());
+        }
     }
 }

@@ -6,11 +6,11 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class GPSPosition {
 
-    @Column(name = "ALTITUDE", nullable = false)
+    @Column(name = "ALTITUDE", nullable = true)
     private double altitude;
-    @Column(name = "LATITUDE", nullable = false)
+    @Column(name = "LATITUDE", nullable = true)
     private double latitude;
-    @Column(name = "LONGITUDE", nullable = false)
+    @Column(name = "LONGITUDE", nullable = true)
     private double longitude;
 
     public double getAltitude() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,7 +37,7 @@ public class Contract extends MultiTenancyEntity {
     @Column(name = "END_DATE")
     @Temporal(TemporalType.DATE)
     private Date endDate;
-    @OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "contract", fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
     @XmlInverseReference(mappedBy="contract")
     private final List<UnitProject> unitProjects = new ArrayList<>();
 

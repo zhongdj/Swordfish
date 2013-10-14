@@ -1,0 +1,61 @@
+{ 
+   "customer-info":{
+       "id":"",
+       "fullName":"老北京炸酱面海碗居",
+       "shortName":"海碗居"
+   },
+   
+  "contract-info": {
+       "name":"海碗居2013蛇年朝阳区店面合约",
+       "startDate":"2013-09-01",
+       "endDate":"2014-08-31"
+  },
+
+  "unitProjects-info" : [
+         {
+           "name":"朝阳北路SOHO A座",
+           "contact-info":{
+               "name":"马如云",
+               "email":"maruyun@xox.com",
+               "birthYear": "1986",
+               "male":"false",
+               "cellPhone":"15151515151",
+               "workCellPhone":"14214214211",
+               "officePhone":"01011111111",
+               "homePhone":"01021921921"
+           },
+           "address-info":{
+               "provinceName": "北京",
+               "cityName": "北京",
+               "zipCode": "100000",
+               "district": "朝阳区",
+               "street": "北辰东路",
+               "number": "8号"
+            }
+         },
+     
+        {
+           "name":"海淀甘家口店",
+           "contact-info":{
+               "name":"马如雨",
+               "email":"maruyun@xox.com",
+               "birthYear": "1986",
+               "male":"false",
+               "cellPhone":"15151515151",
+               "workCellPhone":"14214214211",
+               "officePhone":"01011111111",
+               "homePhone":"01021921921"
+           },
+           "address-info":
+            {
+                "provinceName": "北京",
+                "cityName": "北京",
+                "zipCode": "100000",
+                "district": "海淀区",
+                "street": "北辰东路",
+                "number": "8号"
+            }
+
+         }
+  ]
+}

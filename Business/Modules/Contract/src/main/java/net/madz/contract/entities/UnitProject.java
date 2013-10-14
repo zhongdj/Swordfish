@@ -3,6 +3,7 @@ package net.madz.contract.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,19 +25,30 @@ import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 public class UnitProject extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1067321008139265973L;
+
     @Column(nullable = false, length = 40)
     private String name;
+
     private Address address;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "CONTACT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CONTACT_ID", nullable = false, insertable = true, updatable = true,
+                    referencedColumnName = "ID") })
     private Contact contact;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
-            @JoinColumn(name = "CONTRACT_ID", nullable = false, insertable = true, updatable = true, referencedColumnName = "ID") })
+    @JoinColumns({
+            @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
+                    referencedColumnName = "TENANT_ID"),
+            @JoinColumn(name = "CONTRACT_ID", nullable = false, insertable = true, updatable = true,
+                    referencedColumnName = "ID") })
     private Contract contract;
+
     @OneToMany(mappedBy = "unitProject", fetch = FetchType.LAZY)
-    @XmlInverseReference(mappedBy="unitProject")
+    @XmlInverseReference(mappedBy = "unitProject")
     private final List<PouringPartSpec> pouringPartSpecs = new ArrayList<>();
 
     public String getName() {
