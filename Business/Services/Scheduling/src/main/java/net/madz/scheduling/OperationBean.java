@@ -5,6 +5,7 @@
 package net.madz.scheduling;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +14,7 @@ import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import net.madz.authorization.MultitenancyBean;
@@ -26,8 +28,11 @@ import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
+import net.madz.scheduling.entities.ConcreteTruck;
+import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
+import net.madz.scheduling.to.ConcreteTruckResourceTO;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
 
@@ -47,8 +52,8 @@ public class OperationBean extends MultitenancyBean {
         return result;
     }
 
-    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId, Long concreteTruckResourceId, double volume)
-            throws AppServiceException {
+    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId,
+            Long concreteTruckResourceId, double volume) throws AppServiceException {
         EntityManager em = em();
         try {
             final IServiceSummaryPlan summaryPlan = em.find(IServiceSummaryPlan.class, summaryPlanId);
@@ -80,13 +85,14 @@ public class OperationBean extends MultitenancyBean {
         return listMyPartsInConstructing();
     }
 
-    public MixingPlantResourceTO createPlantResource(String mixingPlantName, String operatorName) throws AppServiceException {
+    public MixingPlantResourceTO createPlantResource(String mixingPlantName, String operatorName)
+            throws AppServiceException {
         EntityManager em = em();
         try {
-            if (null == mixingPlantName || 0 >= mixingPlantName.trim().length()) {
+            if ( null == mixingPlantName || 0 >= mixingPlantName.trim().length() ) {
                 throw new NullPointerException("mixing plant name is null.");
             }
-            if (null == operatorName || 0 >= operatorName.trim().length()) {
+            if ( null == operatorName || 0 >= operatorName.trim().length() ) {
                 throw new NullPointerException("operator name is null.");
             }
             MixingPlantResource plantResource = new MixingPlantResource();
@@ -104,6 +110,56 @@ public class OperationBean extends MultitenancyBean {
             em.persist(plantResource);
             try {
                 return TransferObjectFactory.createTransferObject(MixingPlantResourceTO.class, plantResource);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "TOBindingError", e);
+            }
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public ConcreteTruckResourceTO createConcreteTruckResource(ConcreteTruckResourceTO cto) throws AppServiceException {
+        EntityManager em = em();
+        try {
+            if ( null == cto.getLicencePlateNumber() ) {
+                throw new NullPointerException(
+                        "ConcreteTruck resource information is incomplete, you must specify a licencePlateNumber for a ConcreteTruck resource.");
+            }
+            if ( 0 >= cto.getRatedCapacity() ) {
+                throw new IllegalStateException(
+                        "ConcreteTruck resource information is incomplete, you must specify ratedCapacity for a ConcreteTruck resource.");
+            }
+            Query query = em.createNamedQuery("concreteTruck.findByLicencePlateNumber").setParameter(
+                    "licencePlateNumber", cto.getLicencePlateNumber());
+            try {
+                Object singleResult = query.getSingleResult();
+                if ( null != singleResult ) {
+                    throw new IllegalStateException(
+                            "licencePlateNumber already exists.  Please specify an unused licencePlateNumber.");
+                }
+            } catch (NoResultException expected) {
+                // Ignored
+            }
+            ConcreteTruckResource ctr = new ConcreteTruckResource();
+            ConcreteTruck ct = new ConcreteTruck();
+            User user = UserSession.getUserSession().getUser();
+            ct.setCreatedBy(user);
+            ct.setUpdatedBy(user);
+            ct.setDriverName(cto.getDriverName());
+            ct.setDriverPhoneNumber(cto.getDriverPhoneNumber());
+            ct.setLicencePlateNumber(cto.getLicencePlateNumber());
+            ct.setRatedCapacity(cto.getRatedCapacity());
+            ct.setCreatedOn(new Date());
+            ctr.setConcreteTruck(ct);
+            ctr.setCreatedBy(user);
+            ctr.setUpdatedBy(user);
+            ctr.setCreatedOn(new Date());
+            em.persist(ctr);
+            try {
+                final ConcreteTruckResourceTO result = TransferObjectFactory.createTransferObject(
+                        ConcreteTruckResourceTO.class, ctr);
+                return result;
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }

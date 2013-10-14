@@ -16,6 +16,7 @@ import net.madz.core.exceptions.AppServiceException;
 import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.to.ConcreteTruckResourceTO;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
 
@@ -110,28 +111,41 @@ public class SchedulingOperationResources {
     @Path("summaryPlan/{summaryPlanId}/serviceOrder")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceOrderTO allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource) throws AppServiceException {
-        return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId, resource.concreteTruckResourceId, resource.volume);
+    public ServiceOrderTO allocateResource(@PathParam("summaryPlanId") Long summaryPlanId, RequiredResource resource)
+            throws AppServiceException {
+        return operation.allocateResourceTo(summaryPlanId, resource.mixingPlantResourceId,
+                resource.concreteTruckResourceId, resource.volume);
     }
 
     public static class RequiredResource {
 
         public Long mixingPlantResourceId;
+
         public Long concreteTruckResourceId;
+
         public Double volume;
     }
 
     @POST
     @Path("plantResource")
-    @Consumes({"application/xml", "application/json"})
-    @Produces({"application/xml", "application/json"})
+    @Consumes({ "application/xml", "application/json" })
+    @Produces({ "application/xml", "application/json" })
     public MixingPlantResourceTO createPlantResource(PlantResourceParameters params) throws AppServiceException {
         return operation.createPlantResource(params.mixingPlantName, params.operatorName);
     }
-    
+
     public static class PlantResourceParameters {
+
         public String mixingPlantName;
-        
+
         public String operatorName;
+    }
+
+    @POST
+    @Path("concreteTruckResource")
+    @Consumes({ "application/xml", "application/json" })
+    @Produces({ "application/xml", "application/json" })
+    public ConcreteTruckResourceTO createConcreteTruckResource(ConcreteTruckResourceTO cto) throws AppServiceException {
+        return operation.createConcreteTruckResource(cto);
     }
 }

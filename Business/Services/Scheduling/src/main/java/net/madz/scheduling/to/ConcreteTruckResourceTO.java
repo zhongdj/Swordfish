@@ -1,30 +1,29 @@
-package net.madz.scheduling.entities;
+package net.madz.scheduling.to;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import net.madz.binding.annotation.Binding;
 
-import net.madz.authorization.entities.MultiTenancyEntity;
+import org.eclipse.persistence.oxm.annotations.XmlPath;
 
-@Entity
-@Table(name = "concrete_truck")
-@NamedQuery(name = "concreteTruck.findByLicencePlateNumber",
-        query = "SELECT OBJECT(c) from ConcreteTruck AS c WHERE c.licencePlateNumber = :licencePlateNumber")
-public class ConcreteTruck extends MultiTenancyEntity {
+public class ConcreteTruckResourceTO  {
 
-    private static final long serialVersionUID = -1132231092160514575L;
+    @Binding(name = "id")
+    @XmlPath("id/text()")
+    private Long id;
 
-    @Column(name = "LICENCE_PLATE_NUMBER", nullable = false)
+    @Binding(name = "concreteTruck.licencePlateNumber")
+    @XmlPath("licencePlateNumber/text()")
     private String licencePlateNumber;
 
-    @Column(name = "RATED_CAPACITY", nullable = false)
+    @XmlPath("ratedCapacity/text()")
+    @Binding(name = "concreteTruck.ratedCapacity")
     private double ratedCapacity;
 
-    @Column(name = "DRIVER_NAME", nullable = true)
+    @Binding(name = "concreteTruck.driverName")
+    @XmlPath("driverName/text()")
     private String driverName;
 
-    @Column(name = "DRIVER_PHONE_NUMBER", nullable = true)
+    @Binding(name = "concreteTruck.driverPhoneNumber")
+    @XmlPath("driverPhoneNumber/text()")
     private String driverPhoneNumber;
 
     public String getLicencePlateNumber() {
@@ -58,4 +57,13 @@ public class ConcreteTruck extends MultiTenancyEntity {
     public void setDriverPhoneNumber(String driverPhoneNumber) {
         this.driverPhoneNumber = driverPhoneNumber;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
+

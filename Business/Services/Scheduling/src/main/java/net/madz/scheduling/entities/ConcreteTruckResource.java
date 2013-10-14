@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -21,7 +22,7 @@ import net.madz.authorization.entities.MultiTenancyEntity;
 public class ConcreteTruckResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1366415739718240376L;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     private ConcreteTruck concreteTruck;
