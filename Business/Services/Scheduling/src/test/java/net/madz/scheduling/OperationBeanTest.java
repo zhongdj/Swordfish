@@ -3,7 +3,7 @@ package net.madz.scheduling;
 import net.madz.core.exceptions.AppServiceException;
 import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.test.MadzTestRunner;
-import net.madz.test.annotations.NewTenant;
+import net.madz.test.annotations.FreeTrialTenant;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 @RunWith(MadzTestRunner.class)
-@NewTenant
+@FreeTrialTenant
 public class OperationBeanTest extends OperationBeanTestBase {
 
     @BeforeClass

@@ -1,0 +1,24 @@
+{
+
+   "user-info":{
+       "userName":"#{userName}",
+       "email":"#{userName}",
+       "fullName":"Test Generated Account",
+       "password":"#{password}",
+       "passConfirm":"#{password}",
+       "mobileNumber":"15810281450"
+   },
+   "tenant-info":{
+       "companyName":"#{userName}",
+       "address-info":{
+           "provinceName": "北京",
+           "cityName": "北京",
+           "zipCode": "100000",
+           "district": "朝阳区",
+           "street": "北辰东路",
+           "number": "8号"
+       },
+
+       "phoneNumber": "78909870"
+   }
+}
