@@ -3,6 +3,7 @@ package net.madz.scheduling.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -23,7 +24,7 @@ public class MixingPlantResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -3622084568259603724L;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumns({
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
