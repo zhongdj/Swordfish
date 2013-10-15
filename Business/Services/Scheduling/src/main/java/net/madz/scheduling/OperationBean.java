@@ -37,9 +37,9 @@ import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
 import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
 import net.madz.scheduling.to.CreateMixingPlantResourceRequest;
 import net.madz.scheduling.to.CreateMixingPlantResourceResponse;
+import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 import net.madz.scheduling.to.CreateServiceSummaryPlanResponse;
 import net.madz.scheduling.to.ServiceOrderTO;
-import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 
 /**
  * 
