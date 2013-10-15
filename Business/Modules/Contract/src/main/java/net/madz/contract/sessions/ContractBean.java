@@ -105,56 +105,75 @@ public class ContractBean extends MultitenancyBean {
         }
     }
 
-    public void createPouringPartSpecs(Long unitProjectId, List<CreatePouringPartSpecRequest> request)
-            throws BusinessModuleException {
+    public CreatePouringPartSpecResponse createPouringPartSpecs(Long unitProjectId,
+            List<CreatePouringPartSpecRequest> request) throws BusinessModuleException {
         EntityManager em = em();
         try {
-            final User user = UserSession.getUserSession().getUser();
-            // Create pouringPartSpec according to createPouringPartRequestData
-            for ( CreatePouringPartSpecRequest item : request ) {
-                final PouringPartSpec spec = new PouringPartSpec();
-                spec.setCreatedBy(user);
-                spec.setUpdatedBy(user);
-                spec.setCreatedOn(new Date());
-                // Find unitProject
-                if ( null == unitProjectId ) {
-                    throw new BusinessModuleException(ContractBean.class, "contract", "");
-                }
-                final UnitProject unitProject = em.find(UnitProject.class, unitProjectId);
-                if ( null == unitProject ) {
-                    throw new BusinessModuleException(ContractBean.class, "contract", "");
-                }
-                spec.setUnitProject(unitProject);
-                // Create pouringPart
-                PouringPart pouringPart = new PouringPart();
-                pouringPart.setCreatedBy(user);
-                pouringPart.setUpdatedBy(user);
-                pouringPart.setCreatedOn(new Date());
-                final String pouringPartName = item.getPouringPartName();
-                if ( null == pouringPartName || 0 >= pouringPartName.length() ) {
-                    throw new BusinessModuleException(ContractBean.class, "contract", "");
-                }
-                pouringPart.setName(pouringPartName);
-                pouringPart.setComment(item.getPouringPartComment());
-                spec.setPouringPart(pouringPart);
-                // Find mixture
-                Mixture mixture = getMixture(em, item.getMixtureId(), item.getMixtureGradeName());
-                spec.setMixture(mixture);
-                // Find additives
-                List<Additive> additives = new LinkedList<Additive>();
-                AdditiveInfo[] additivesInfo = item.getAdditives();
-                for ( AdditiveInfo info : additivesInfo ) {
-                    long id = info.getId();
-                    String name = info.getName();
-                    Additive additive = getAdditive(em, id, name);
-                    additives.add(additive);
-                }
-                spec.setAdditives(additives);
-                em.persist(spec);
+            if ( null == unitProjectId ) {
+                throw new BusinessModuleException(ContractBean.class, "contract", "");
             }
+            final UnitProject unitProject = em.find(UnitProject.class, unitProjectId);
+            if ( null == unitProject ) {
+                throw new BusinessModuleException(ContractBean.class, "contract", "");
+            }
+            final List<PouringPartSpec> specList = new LinkedList<PouringPartSpec>();
+            for ( CreatePouringPartSpecRequest item : request ) {
+                final PouringPartSpec spec = createPouringPartSpec(em, unitProject, item);
+                specList.add(spec);
+            }
+            return generateResponse(specList);
         } finally {
             em.close();
         }
+    }
+
+    private CreatePouringPartSpecResponse generateResponse(final List<PouringPartSpec> specList) {
+        PouringPartSpecInfo[] pouringPartSpecInfos = new PouringPartSpecInfo[specList.size()];
+        for ( int i = 0; i < specList.size(); i++ ) {
+            PouringPartSpecInfo info = new PouringPartSpecInfo();
+            info.setId(specList.get(i).getId());
+            pouringPartSpecInfos[i] = info;
+        }
+        final CreatePouringPartSpecResponse response = new CreatePouringPartSpecResponse();
+        response.setPouringPartSpecInfos(pouringPartSpecInfos);
+        return response;
+    }
+
+    private PouringPartSpec createPouringPartSpec(EntityManager em, final UnitProject unitProject,
+            CreatePouringPartSpecRequest item) throws BusinessModuleException {
+        final User user = UserSession.getUserSession().getUser();
+        final PouringPartSpec spec = new PouringPartSpec();
+        spec.setCreatedBy(user);
+        spec.setUpdatedBy(user);
+        spec.setCreatedOn(new Date());
+        spec.setUnitProject(unitProject);
+        // Create pouringPart
+        PouringPart pouringPart = new PouringPart();
+        pouringPart.setCreatedBy(user);
+        pouringPart.setUpdatedBy(user);
+        pouringPart.setCreatedOn(new Date());
+        final String pouringPartName = item.getPouringPartName();
+        if ( null == pouringPartName || 0 >= pouringPartName.length() ) {
+            throw new BusinessModuleException(ContractBean.class, "contract", "");
+        }
+        pouringPart.setName(pouringPartName);
+        pouringPart.setComment(item.getPouringPartComment());
+        spec.setPouringPart(pouringPart);
+        // Find mixture
+        Mixture mixture = getMixture(em, item.getMixtureId(), item.getMixtureGradeName());
+        spec.setMixture(mixture);
+        // Find additives
+        List<Additive> additives = new LinkedList<Additive>();
+        AdditiveInfo[] additivesInfo = item.getAdditives();
+        for ( AdditiveInfo info : additivesInfo ) {
+            long id = info.getId();
+            String name = info.getName();
+            Additive additive = getAdditive(em, id, name);
+            additives.add(additive);
+        }
+        spec.setAdditives(additives);
+        em.persist(spec);
+        return spec;
     }
 
     private Mixture getMixture(EntityManager em, long mixtureId, String gradeName) throws BusinessModuleException {
