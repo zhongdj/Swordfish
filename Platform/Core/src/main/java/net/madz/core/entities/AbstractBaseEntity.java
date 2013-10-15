@@ -11,14 +11,14 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 import net.madz.core.annotations.EntityAnnotationProcessor;
 import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
@@ -28,7 +28,7 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
  * @author Barry
  */
 @MappedSuperclass
-@XmlAccessorType(XmlAccessType.FIELD)
+@Access(AccessType.FIELD)
 public abstract class AbstractBaseEntity implements Serializable {
 
     private static final long serialVersionUID = -6885878862729201814L;

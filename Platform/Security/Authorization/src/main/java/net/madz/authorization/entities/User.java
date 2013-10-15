@@ -16,8 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.persistence.annotations.Index;
@@ -37,15 +35,13 @@ import org.eclipse.persistence.annotations.Index;
         @NamedQuery(name = "User.findByUsername",
                 query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
         @NamedQuery(name = "User.findByAccountNameFuzzy",
-                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
-        @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
+                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName")})
 @Index(name = "INDEX_USER_TENANT_FIRST", columnNames = { "TENANT_ID" })
 public class User extends StandardObject {
 
     private static final long serialVersionUID = 1L;
 
     @Column(unique = true, updatable = false, length = 60, nullable = false)
-    @XmlID
     private String username;
 
     @Column(nullable = false)
@@ -101,7 +97,6 @@ public class User extends StandardObject {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })
-    @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
@@ -112,7 +107,6 @@ public class User extends StandardObject {
                     @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                             referencedColumnName = "TENANT_ID"),
                     @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
-    @XmlIDREF
     private final List<Role> roles = new LinkedList<>();
 
     @Id
@@ -234,7 +228,6 @@ public class User extends StandardObject {
         this.oldPasswords = oldPasswords;
     }
 
-    @XmlTransient
     public List<Group> getGroups() {
         return groups;
     }

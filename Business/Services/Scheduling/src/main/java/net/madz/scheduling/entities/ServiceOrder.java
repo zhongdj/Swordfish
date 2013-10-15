@@ -10,8 +10,6 @@ import javax.persistence.Table;
 import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.contract.spec.entities.PouringPartSpec;
 
-import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
-
 @Entity
 @Table(name = "service_order")
 public class ServiceOrder extends MultiTenancyEntity {
@@ -32,7 +30,6 @@ public class ServiceOrder extends MultiTenancyEntity {
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "SUMMARY_PLAN_ID", nullable = false, insertable = true, updatable = false,
                     referencedColumnName = "ID") })
-    @XmlInverseReference(mappedBy = "resourceAllocatedTasks")
     private ServiceSummaryPlan summaryPlan;
 
     @ManyToOne

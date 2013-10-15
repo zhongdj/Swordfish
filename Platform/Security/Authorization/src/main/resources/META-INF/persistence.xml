@@ -3,6 +3,8 @@
   <persistence-unit name="CRMP-PU" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/crmp</jta-data-source>
+    <class>net.madz.authorization.entities.MultiTenancyEntity</class>
+    <class>net.madz.authorization.entities.StandardObject</class>
     <class>net.madz.authorization.entities.Group</class>
     <class>net.madz.authorization.entities.Role</class>
     <class>net.madz.authorization.entities.Tenant</class>

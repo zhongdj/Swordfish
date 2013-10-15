@@ -4,6 +4,8 @@
  */
 package net.madz.authorization.entities;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.MappedSuperclass;
 
@@ -16,6 +18,7 @@ import org.eclipse.persistence.annotations.TenantDiscriminatorColumn;
  * @author a
  */
 @MappedSuperclass
+@Access(AccessType.FIELD)
 @Multitenant(MultitenantType.SINGLE_TABLE)
 @TenantDiscriminatorColumn(name = "TENANT_ID", contextProperty = "tenant.id", discriminatorType = DiscriminatorType.INTEGER, primaryKey = true)
 public class MultiTenancyEntity extends StandardObject {

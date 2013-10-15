@@ -14,7 +14,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlIDREF;
 
 import net.madz.core.entities.AbstractBaseEntity;
 
@@ -79,7 +78,6 @@ public class Tenant extends AbstractBaseEntity {
             @JoinColumn(name = "UPDATED_BY", nullable = true, insertable = false, updatable = true,
                     referencedColumnName = "ID") })
     @ManyToOne(fetch = FetchType.LAZY)
-    @XmlIDREF
     protected User updatedBy;
 
     @Column(name = "UPDATED_ON")
@@ -92,7 +90,6 @@ public class Tenant extends AbstractBaseEntity {
             @JoinColumn(name = "CREATED_BY", nullable = true, insertable = false, updatable = true,
                     referencedColumnName = "ID") })
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @XmlIDREF
     protected User createdBy;
 
     @Column(name = "CREATED_ON")
@@ -112,7 +109,6 @@ public class Tenant extends AbstractBaseEntity {
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "ADMIN_USER_ID", nullable = true, insertable = true, updatable = true,
                     referencedColumnName = "ID") })
-    @XmlIDREF
     private User adminUser;
 
     public Tenant() {
