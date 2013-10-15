@@ -8,7 +8,7 @@ public class AdditiveTO {
 
     @XmlPath("id/text()")
     @Binding(name = "id")
-    private Long addtiveId;
+    private Long additiveId;
 
     @XmlPath("name/text()")
     @Binding(name = "name")
@@ -22,12 +22,12 @@ public class AdditiveTO {
     @Binding(name = "code")
     private String additiveCode;
 
-    public Long getAddtiveId() {
-        return addtiveId;
+    public Long getAdditiveId() {
+        return additiveId;
     }
 
-    public void setAddtiveId(Long addtiveId) {
-        this.addtiveId = addtiveId;
+    public void setAdditiveId(Long additiveId) {
+        this.additiveId = additiveId;
     }
 
     public String getAdditiveName() {
