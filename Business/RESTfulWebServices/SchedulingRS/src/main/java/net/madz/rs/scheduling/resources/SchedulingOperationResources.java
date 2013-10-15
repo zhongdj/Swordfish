@@ -18,9 +18,11 @@ import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
 import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
-import net.madz.scheduling.to.MixingPlantResourceTO;
+import net.madz.scheduling.to.CreateMixingPlantResourceRequest;
+import net.madz.scheduling.to.CreateMixingPlantResourceResponse;
+import net.madz.scheduling.to.CreateServiceSummaryPlanResponse;
 import net.madz.scheduling.to.ServiceOrderTO;
-import net.madz.scheduling.to.ServiceSummaryPlanTO;
+import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 
 @Stateless
 @Path("operation")
@@ -129,32 +131,29 @@ public class SchedulingOperationResources {
     }
 
     @POST
-    @Path("plantResource")
+    @Path("mixingPlantResource")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public MixingPlantResourceTO createPlantResource(PlantResourceParameters params) throws AppServiceException {
-        return operation.createPlantResource(params.mixingPlantName, params.operatorName);
-    }
-
-    public static class PlantResourceParameters {
-
-        public String mixingPlantName;
-
-        public String operatorName;
+    public CreateMixingPlantResourceResponse createPlantResource(CreateMixingPlantResourceRequest request)
+            throws AppServiceException {
+        return operation.createPlantResource(request);
     }
 
     @POST
     @Path("concreteTruckResource")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto) throws AppServiceException {
+    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto)
+            throws AppServiceException {
         return operation.createConcreteTruckResource(cto);
     }
+
     @POST
     @Path("serviceSummaryPlan")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ServiceSummaryPlanTO createServiceSummaryPlan(ServiceSummaryPlanTO sto) throws AppServiceException{
+    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sto)
+            throws AppServiceException {
         return operation.createServiceSummaryPlan(sto);
     }
 }

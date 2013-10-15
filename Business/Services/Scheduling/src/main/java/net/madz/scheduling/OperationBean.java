@@ -35,9 +35,11 @@ import net.madz.scheduling.entities.MixingPlantResource;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
 import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
 import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
-import net.madz.scheduling.to.MixingPlantResourceTO;
+import net.madz.scheduling.to.CreateMixingPlantResourceRequest;
+import net.madz.scheduling.to.CreateMixingPlantResourceResponse;
+import net.madz.scheduling.to.CreateServiceSummaryPlanResponse;
 import net.madz.scheduling.to.ServiceOrderTO;
-import net.madz.scheduling.to.ServiceSummaryPlanTO;
+import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 
 /**
  * 
@@ -88,15 +90,38 @@ public class OperationBean extends MultitenancyBean {
         return listMyPartsInConstructing();
     }
 
-    public MixingPlantResourceTO createPlantResource(String mixingPlantName, String operatorName)
+    public CreateMixingPlantResourceResponse createPlantResource(CreateMixingPlantResourceRequest request)
             throws AppServiceException {
         EntityManager em = em();
+        final String mixingPlantName = request.getMixingPlantName();
+        final String operatorName = request.getOperatorName();
         try {
             if ( null == mixingPlantName || 0 >= mixingPlantName.trim().length() ) {
-                throw new NullPointerException("mixing plant name is null.");
+                throw new NullPointerException(
+                        "MixingPlant resource information is incomplete, you must specify a name for a mixing plant resource");
             }
             if ( null == operatorName || 0 >= operatorName.trim().length() ) {
                 throw new NullPointerException("operator name is null.");
+            }
+
+            try {
+                Query query = em.createNamedQuery("MixingPlantResource.findByPlantName").setParameter(
+                        "mixingPlantName", mixingPlantName);
+                MixingPlantResource result = (net.madz.scheduling.entities.MixingPlantResource) query.getSingleResult();
+                if (null != result) {
+                    throw new IllegalStateException("The mixing plant resource is already exists. You can create only a mixing plant resource for a mixing plant.");
+                }
+            } catch (NoResultException expected) {
+                // Ignored
+            }
+            
+            User operator = null;
+            try {
+                Query query = em.createNamedQuery("User.findByUsername").setParameter("username", operatorName);
+                operator = (User) query.getSingleResult();
+            } catch (NoResultException e) {
+                throw new IllegalStateException(
+                        "Operator name is not valid.  Please specify an existing operator name. ");
             }
             MixingPlantResource plantResource = new MixingPlantResource();
             User user = UserSession.getUserSession().getUser();
@@ -106,13 +131,12 @@ public class OperationBean extends MultitenancyBean {
             mixingPlant.setCreatedBy(user);
             mixingPlant.setName(mixingPlantName);
             mixingPlant.setUpdatedBy(user);
-            Query query = em.createNamedQuery("User.findByUsername").setParameter("username", operatorName);
-            final User operator = (User) query.getSingleResult();
             mixingPlant.setOperator(operator);
             plantResource.setMixingPlant(mixingPlant);
             em.persist(plantResource);
             try {
-                return TransferObjectFactory.createTransferObject(MixingPlantResourceTO.class, plantResource);
+                return TransferObjectFactory.createTransferObject(CreateMixingPlantResourceResponse.class,
+                        plantResource);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }
@@ -122,7 +146,8 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto) throws AppServiceException {
+    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto)
+            throws AppServiceException {
         EntityManager em = em();
         try {
             if ( null == cto.getLicencePlateNumber() ) {
@@ -133,7 +158,7 @@ public class OperationBean extends MultitenancyBean {
                 throw new IllegalStateException(
                         "ConcreteTruck resource information is incomplete, you must specify ratedCapacity for a ConcreteTruck resource.");
             }
-            Query query = em.createNamedQuery("concreteTruck.findByLicencePlateNumber").setParameter(
+            Query query = em.createNamedQuery("ConcreteTruck.findByLicencePlateNumber").setParameter(
                     "licencePlateNumber", cto.getLicencePlateNumber());
             try {
                 Object singleResult = query.getSingleResult();
@@ -172,7 +197,7 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public ServiceSummaryPlanTO createServiceSummaryPlan(ServiceSummaryPlanTO sto) throws AppServiceException {
+    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sspr) throws AppServiceException {
         EntityManager em = em();
         try {
             ServiceSummaryPlan ssp = new ServiceSummaryPlan();
@@ -180,17 +205,17 @@ public class OperationBean extends MultitenancyBean {
             ssp.setCreatedBy(user);
             ssp.setUpdatedBy(user);
             ssp.setUpdatedOn(new Date());
-            ssp.setTotalVolume(sto.getTotalVolume());
+            ssp.setTotalVolume(sspr.getTotalVolume());
             PouringPartSpec spec = null;
             try {
-                spec = em.find(PouringPartSpec.class, sto.getId());
+                spec = em.find(PouringPartSpec.class, sspr.getSpecId());
             } catch (NoResultException ex) {
                 throw new NullPointerException("PouringPartSpec id is invalid, you must specify a valid spec id.");
             }
             ssp.setSpec(spec);
             em.persist(ssp);
             try {
-                return TransferObjectFactory.createTransferObject(ServiceSummaryPlanTO.class, ssp);
+                return TransferObjectFactory.createTransferObject(CreateServiceSummaryPlanResponse.class, ssp);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }

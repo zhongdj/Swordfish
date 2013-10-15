@@ -9,7 +9,7 @@ import net.madz.authorization.entities.MultiTenancyEntity;
 
 @Entity
 @Table(name = "concrete_truck")
-@NamedQuery(name = "concreteTruck.findByLicencePlateNumber",
+@NamedQuery(name = "ConcreteTruck.findByLicencePlateNumber",
         query = "SELECT OBJECT(c) from ConcreteTruck AS c WHERE c.licencePlateNumber = :licencePlateNumber")
 public class ConcreteTruck extends MultiTenancyEntity {
 
