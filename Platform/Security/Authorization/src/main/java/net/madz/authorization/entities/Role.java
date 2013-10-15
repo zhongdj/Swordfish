@@ -11,7 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -25,7 +24,6 @@ import javax.xml.bind.annotation.XmlIDREF;
  */
 @Entity
 @Table(name = "mrole")
-//@IdClass(ComposedPK.class)
 public class Role extends StandardObject {
 
     private static final long serialVersionUID = -8677837722180931934L;
