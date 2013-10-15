@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.eclipse.persistence.oxm.annotations.XmlPath;
 
 import net.madz.binding.annotation.Binding;
+import net.madz.binding.annotation.BindingTypeEnum;
 
 @XmlRootElement
 public class ServiceOrderTO implements Serializable {
@@ -97,7 +98,7 @@ public class ServiceOrderTO implements Serializable {
     private String mixtureGradeName;
 
     @XmlPath("additives/")
-    @Binding(name = "spec.additives")
+    @Binding(name = "spec.additives", bindingType = BindingTypeEnum.Entity, embeddedType = AdditiveTO.class)
     private List<AdditiveTO> additives;
 
     public Long getServiceOrderId() {
@@ -290,6 +291,4 @@ public class ServiceOrderTO implements Serializable {
                 + ", unitProjectId=" + unitProjectId + ", unitProjectName=" + unitProjectName + ", mixtureId="
                 + mixtureId + ", mixtureGradeName=" + mixtureGradeName + ", additives=" + additives + "]";
     }
-    
-    
 }
