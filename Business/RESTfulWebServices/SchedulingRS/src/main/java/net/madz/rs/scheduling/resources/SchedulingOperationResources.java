@@ -16,7 +16,8 @@ import net.madz.core.exceptions.AppServiceException;
 import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
-import net.madz.scheduling.to.ConcreteTruckResourceTO;
+import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
+import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.scheduling.to.ServiceSummaryPlanTO;
@@ -146,7 +147,7 @@ public class SchedulingOperationResources {
     @Path("concreteTruckResource")
     @Consumes({ "application/xml", "application/json" })
     @Produces({ "application/xml", "application/json" })
-    public ConcreteTruckResourceTO createConcreteTruckResource(ConcreteTruckResourceTO cto) throws AppServiceException {
+    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto) throws AppServiceException {
         return operation.createConcreteTruckResource(cto);
     }
     @POST

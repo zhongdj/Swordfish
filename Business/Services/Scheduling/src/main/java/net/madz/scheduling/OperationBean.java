@@ -33,7 +33,8 @@ import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
-import net.madz.scheduling.to.ConcreteTruckResourceTO;
+import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
+import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
 import net.madz.scheduling.to.MixingPlantResourceTO;
 import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.scheduling.to.ServiceSummaryPlanTO;
@@ -121,7 +122,7 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public ConcreteTruckResourceTO createConcreteTruckResource(ConcreteTruckResourceTO cto) throws AppServiceException {
+    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto) throws AppServiceException {
         EntityManager em = em();
         try {
             if ( null == cto.getLicencePlateNumber() ) {
@@ -159,8 +160,8 @@ public class OperationBean extends MultitenancyBean {
             ctr.setCreatedOn(new Date());
             em.persist(ctr);
             try {
-                final ConcreteTruckResourceTO result = TransferObjectFactory.createTransferObject(
-                        ConcreteTruckResourceTO.class, ctr);
+                final CreateConcreteTruckResourceResponse result = TransferObjectFactory.createTransferObject(
+                        CreateConcreteTruckResourceResponse.class, ctr);
                 return result;
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);

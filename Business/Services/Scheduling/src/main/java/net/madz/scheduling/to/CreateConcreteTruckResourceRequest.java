@@ -1,28 +1,18 @@
 package net.madz.scheduling.to;
 
-import net.madz.binding.annotation.Binding;
-
 import org.eclipse.persistence.oxm.annotations.XmlPath;
 
-public class ConcreteTruckResourceTO  {
+public class CreateConcreteTruckResourceRequest  {
 
-    @Binding(name = "id")
-    @XmlPath("id/text()")
-    private Long id;
-
-    @Binding(name = "concreteTruck.licencePlateNumber")
     @XmlPath("licencePlateNumber/text()")
     private String licencePlateNumber;
 
     @XmlPath("ratedCapacity/text()")
-    @Binding(name = "concreteTruck.ratedCapacity")
     private double ratedCapacity;
 
-    @Binding(name = "concreteTruck.driverName")
     @XmlPath("driverName/text()")
     private String driverName;
 
-    @Binding(name = "concreteTruck.driverPhoneNumber")
     @XmlPath("driverPhoneNumber/text()")
     private String driverPhoneNumber;
 
@@ -58,12 +48,5 @@ public class ConcreteTruckResourceTO  {
         this.driverPhoneNumber = driverPhoneNumber;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }
 
