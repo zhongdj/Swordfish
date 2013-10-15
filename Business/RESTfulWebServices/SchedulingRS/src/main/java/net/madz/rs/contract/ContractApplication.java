@@ -9,6 +9,7 @@ import javax.ws.rs.core.Application;
 import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 
 import net.madz.rs.contract.resources.ContractResources;
+import net.madz.rs.contract.resources.UnitProjectResources;
 import net.madz.rs.scheduling.providers.MadzExceptionMapper;
 
 @ApplicationPath("/contracting")
@@ -20,6 +21,7 @@ public class ContractApplication extends Application {
         resources.add(MOXyJsonProvider.class);
         resources.add(MadzExceptionMapper.class);
         resources.add(ContractResources.class);
+        resources.add(UnitProjectResources.class);
         return resources;
     }
 }

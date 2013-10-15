@@ -2,6 +2,7 @@ package net.madz.common.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import net.madz.core.annotations.PinYinIndex;
@@ -12,6 +13,7 @@ import org.eclipse.persistence.annotations.Index;
 @Entity
 @Table(name = "additive")
 @PinYinIndexed
+@NamedQuery(name = "Additive.findByName", query = "SELECT OBJECT(m) FROM Additive AS m WHERE m.name =:name")
 public class Additive extends CodedEntity {
 
     private static final long serialVersionUID = 2488317593704593687L;
