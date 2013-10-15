@@ -72,7 +72,6 @@
 	</dependencies>
 
 	<build>
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -136,118 +135,132 @@
 					<defaultLibBundleDir>lib</defaultLibBundleDir>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.glassfish.maven.plugin</groupId>
-				<artifactId>maven-glassfish-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<terse>false</terse>
-					<echo>true</echo>
-					<debug>true</debug>
-					<glassfishDirectory>${glassfish.glassfishDirectory}</glassfishDirectory>
-					<user>${glassfish.user}</user>
-					<passwordFile>${glassfish.passwordFile}</passwordFile>
-					<autoCreate>false</autoCreate>
-					<domain>
-						<name>${glassfish.domain.name}</name>
-						<host>${glassfish.domain.host}</host>
-						<adminPort>${glassfish.domain.adminPort}</adminPort>
-					</domain>
-					<components>
-						<component>
-							<name>${project.artifactId}</name>
-							<artifact>${project.build.directory}/${project.build.finalName}.ear</artifact>
-						</component>
-					</components>
-				</configuration>
-				<executions>
-					<execution>
-						<id>glassfish deploy</id>
-						<phase>install</phase>
-						<goals>
-							<goal>redeploy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-
-			<plugin>
-				<groupId>org.databene</groupId>
-				<artifactId>maven-benerator-plugin</artifactId>
-				<version>0.7.6</version>
-				<configuration>
-					<!-- <descriptor>src/test/benerator/myproject.ben.xml</descriptor> -->
-					<encoding>UTF-8</encoding>
-					<dbDriver>com.mysql.jdbc.Driver</dbDriver>
-					<dbUrl>jdbc:mysql://dbserver:3306/crmp</dbUrl>
-					<dbSchema>crmp</dbSchema>
-					<dbUser>root</dbUser>
-					<dbPassword>1q2w3e4r5t</dbPassword>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>mysql</groupId>
-						<artifactId>mysql-connector-java</artifactId>
-						<version>5.1.26</version>
-					</dependency>
-					<dependency>
-						<groupId>org.glassfish.hk2.external</groupId>
-						<artifactId>bean-validator</artifactId>
-						<version>2.2.0-b15</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<phase>deploy</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sql-maven-plugin</artifactId>
-				<version>1.5</version>
-				<dependencies>
-					<dependency>
-						<groupId>mysql</groupId>
-						<artifactId>mysql-connector-java</artifactId>
-						<version>5.1.26</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<driver>org.gjt.mm.mysql.Driver</driver>
-					<url>jdbc:mysql://dbserver:3306/crmp?useUnicode=true&amp;characterEncoding=UTF-8</url>
-					<password>1q2w3e4r5t</password>
-					<username>root</username>
-					<settingsKey>localhost</settingsKey>
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-integration-test-data</id>
-						<phase>install</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<orderFile>ascending</orderFile>
-							<fileset>
-								<basedir>${basedir}/src/main/scripts</basedir>
-								<includes>
-									<include>create-mixture-additives.sql</include>
-								</includes>
-							</fileset>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> <!---->
 		</plugins>
 		<finalName>crmp</finalName>
 	</build>
 	<properties>
 		<netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
 	</properties>
+	<profiles>
+		<profile>
+			<id>deploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.glassfish.maven.plugin</groupId>
+						<artifactId>maven-glassfish-plugin</artifactId>
+						<version>2.1</version>
+						<configuration>
+							<terse>false</terse>
+							<echo>true</echo>
+							<debug>true</debug>
+							<glassfishDirectory>${glassfish.glassfishDirectory}</glassfishDirectory>
+							<user>${glassfish.user}</user>
+							<passwordFile>${glassfish.passwordFile}</passwordFile>
+							<autoCreate>false</autoCreate>
+							<domain>
+								<name>${glassfish.domain.name}</name>
+								<host>${glassfish.domain.host}</host>
+								<adminPort>${glassfish.domain.adminPort}</adminPort>
+							</domain>
+							<components>
+								<component>
+									<name>${project.artifactId}</name>
+									<artifact>${project.build.directory}/${project.build.finalName}.ear</artifact>
+								</component>
+							</components>
+						</configuration>
+						<executions>
+							<execution>
+								<id>glassfish deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>redeploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.glassfish.maven.plugin</groupId>
+						<artifactId>maven-glassfish-plugin</artifactId>
+						<version>2.1</version>
+						<configuration>
+							<terse>false</terse>
+							<echo>true</echo>
+							<debug>true</debug>
+							<glassfishDirectory>${glassfish.glassfishDirectory}</glassfishDirectory>
+							<user>${glassfish.user}</user>
+							<passwordFile>${glassfish.passwordFile}</passwordFile>
+							<autoCreate>false</autoCreate>
+							<domain>
+								<name>${glassfish.domain.name}</name>
+								<host>${glassfish.domain.host}</host>
+								<adminPort>${glassfish.domain.adminPort}</adminPort>
+							</domain>
+							<components>
+								<component>
+									<name>${project.artifactId}</name>
+									<artifact>${project.build.directory}/${project.build.finalName}.ear</artifact>
+								</component>
+							</components>
+						</configuration>
+						<executions>
+							<execution>
+								<id>glassfish deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>redeploy</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>sql-maven-plugin</artifactId>
+						<version>1.5</version>
+						<dependencies>
+							<dependency>
+								<groupId>mysql</groupId>
+								<artifactId>mysql-connector-java</artifactId>
+								<version>5.1.26</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<driver>org.gjt.mm.mysql.Driver</driver>
+							<url>jdbc:mysql://dbserver:3306/crmp?useUnicode=true&amp;characterEncoding=UTF-8</url>
+							<password>1q2w3e4r5t</password>
+							<username>root</username>
+							<settingsKey>localhost</settingsKey>
+						</configuration>
+						<executions>
+							<execution>
+								<id>create-integration-test-data</id>
+								<phase>install</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<orderFile>ascending</orderFile>
+									<fileset>
+										<basedir>${basedir}/src/main/scripts</basedir>
+										<includes>
+											<include>create-mixture-additives.sql</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin> <!---->
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
