@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -20,6 +21,8 @@ import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 @Entity
 @Table(name = "mixing_plant_resource")
 @Indexes()
+@NamedQuery(name = "MixingPlantResource.findByPlantName",
+        query = "SELECT OBJECT(m) FROM MixingPlantResource AS m WHERE m.mixingPlant.name = :mixingPlantName")
 public class MixingPlantResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = -3622084568259603724L;
