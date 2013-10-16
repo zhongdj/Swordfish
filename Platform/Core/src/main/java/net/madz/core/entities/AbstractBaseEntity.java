@@ -28,7 +28,6 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
  * @author Barry
  */
 @MappedSuperclass
-@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractBaseEntity implements Serializable {
 
     private static final long serialVersionUID = -6885878862729201814L;
