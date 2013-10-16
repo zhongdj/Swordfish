@@ -99,11 +99,7 @@ public class Tenant extends AbstractBaseEntity {
     @Column(name = "DELETED", columnDefinition = "BOOL NOT NULL DEFAULT 0")
     protected boolean deleted;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "PARENT_TENANT_ID", referencedColumnName = "ID", nullable = true)
-    private Tenant parentTenant;
-
-    @OneToOne(cascade={CascadeType.PERSIST})
+    @OneToOne(cascade = { CascadeType.PERSIST })
     @JoinColumns(value = {
             @JoinColumn(name = "ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
@@ -150,14 +146,6 @@ public class Tenant extends AbstractBaseEntity {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
-    }
-
-    public Tenant getParentTenant() {
-        return parentTenant;
-    }
-
-    public void setParentTenant(Tenant parentCompany) {
-        this.parentTenant = parentCompany;
     }
 
     public void setArrearage(boolean arrearage) {
@@ -242,11 +230,13 @@ public class Tenant extends AbstractBaseEntity {
 
     @Override
     public String toString() {
-        return "Tenant [id=" + getId() + ", name=" + name + ", address=" + address + ", artificialPersonName="
-                + artificialPersonName + ", locked=" + locked + ", freezen=" + freezen + ", paymentDate=" + paymentDate
-                + ", payment=" + payment + ", historyServiceDays=" + historyServiceDays + ", serviceDaysPaid="
-                + serviceDaysPaid + ", serviceDaysLeft=" + serviceDaysLeft + ", maturityDate=" + maturityDate
-                + ", arrearage=" + arrearage + ", evaluated=" + evaluated + ", parentTenant=" + parentTenant + "]";
+        return "Tenant [name=" + name + ", address=" + address + ", artificialPersonName=" + artificialPersonName
+                + ", locked=" + locked + ", freezen=" + freezen + ", paymentDate=" + paymentDate + ", payment="
+                + payment + ", historyServiceDays=" + historyServiceDays + ", serviceDaysPaid=" + serviceDaysPaid
+                + ", serviceDaysLeft=" + serviceDaysLeft + ", maturityDate=" + maturityDate + ", arrearage="
+                + arrearage + ", evaluated=" + evaluated + ", updatedBy=" + updatedBy + ", updatedOn=" + updatedOn
+                + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", deleted=" + deleted + ", adminUser="
+                + adminUser + "]";
     }
 
     // Business Methods

@@ -17,7 +17,7 @@
 		<class>net.madz.common.entities.Mixture</class>
 		<class>net.madz.customer.entities.Contact</class>
 		<class>net.madz.customer.entities.CustomerAccount</class>
-		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:mysql://dbserver:3306/crmp?zeroDateTimeBehavior=convertToNull" />
@@ -31,6 +31,7 @@
 			<property name="eclipselink.deploy-on-startup" value="true" />
 			<property name="eclipselink.jpa.uppercase-column-names"
 				value="true" />
+			<property name="eclipselink.weaving.internal" value="false" />
 		</properties>
 	</persistence-unit>
 </persistence>

@@ -16,6 +16,12 @@
 	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 	</properties>
+	<repositories>
+		<repository>
+			<url>${eclipselink.maven.repo.url}</url>
+			<id>Eclipselink</id>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -30,28 +36,23 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.madz</groupId>
-			<artifactId>Contract</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<type>ejb</type>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>${javax.persistence.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.madz</groupId>
-			<artifactId>Authorization</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<type>ejb</type>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>${eclipselink.persistence.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.madz</groupId>
-			<artifactId>Lifecycle</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+			<version>${eclipselink.persistence.version}</version>
+			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>net.madz</groupId>
-			<artifactId>TOBinding</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.glassfish.main.extras</groupId>
 			<artifactId>glassfish-embedded-all</artifactId>
@@ -70,16 +71,43 @@
 			<version>${mysql.connector.java.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Contract</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>ejb</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Authorization</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>ejb</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Lifecycle</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>TOBinding</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Stochastic</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>TestUtils</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

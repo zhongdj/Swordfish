@@ -62,36 +62,52 @@
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Contract</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>ejb</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Scheduling</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>ejb</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>Authorization</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
 			<type>ejb</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>TOBinding</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${swordfish.release.version}</version>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.restfuse</groupId>
 			<artifactId>com.eclipsesource.restfuse</artifactId>
 			<version>${restfuse.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.main.extras</groupId>
 			<artifactId>glassfish-embedded-all</artifactId>
 			<version>${glassfish.extras.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>CommonUtils</artifactId>
+			<version>${swordfish.release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>TestUtils</artifactId>
+			<version>${swordfish.release.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -1,0 +1,31 @@
+[ { "coded-spec" : "C35H--1",
+    "part-info" : { "comment" : "建议使用C35浇筑",
+        "name" : "一层地面"
+      },
+    "spec-info" : { "additives" : [ { "id" : 1,
+              "name" : "冬季施工费零上10度"
+            },
+            { "id" : 16,
+              "name" : "缓凝剂"
+            }
+          ],
+        "mixtureGradeName" : "M10",
+        "mixtureId" : 4
+      }
+  },
+  { "coded-spec" : "C50H--1",
+    "part-info" : { "comment" : "建议使用C50浇筑",
+        "name" : "一层立柱"
+      },
+    "spec-info" : { "additives" : [ { "id" : 1,
+              "name" : "冬季施工费零上10度"
+            },
+            { "id" : 16,
+              "name" : "缓凝剂"
+            }
+          ],
+        "mixtureGradeName" : "C20",
+        "mixtureId" : 9
+      }
+  }
+]
