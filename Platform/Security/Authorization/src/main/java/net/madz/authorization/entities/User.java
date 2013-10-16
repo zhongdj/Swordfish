@@ -16,7 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlID;
 
 import org.eclipse.persistence.annotations.Index;
 
@@ -42,7 +41,6 @@ public class User extends StandardObject {
     private static final long serialVersionUID = 1L;
 
     @Column(unique = true, updatable = false, length = 60, nullable = false)
-    @XmlID
     private String username;
 
     @Column(nullable = false)
