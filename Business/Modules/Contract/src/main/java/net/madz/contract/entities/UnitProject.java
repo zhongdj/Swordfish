@@ -18,8 +18,6 @@ import net.madz.common.entities.Address;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.customer.entities.Contact;
 
-import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
-
 @Entity
 @Table(name = "unit_project")
 public class UnitProject extends MultiTenancyEntity {
@@ -48,7 +46,6 @@ public class UnitProject extends MultiTenancyEntity {
     private Contract contract;
 
     @OneToMany(mappedBy = "unitProject", fetch = FetchType.LAZY)
-    @XmlInverseReference(mappedBy = "unitProject")
     private final List<PouringPartSpec> pouringPartSpecs = new ArrayList<>();
 
     public String getName() {

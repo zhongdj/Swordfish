@@ -19,8 +19,6 @@ import javax.persistence.TemporalType;
 import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.customer.entities.CustomerAccount;
 
-import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
-
 @Entity
 @Table(name = "contract")
 public class Contract extends MultiTenancyEntity {
@@ -38,7 +36,6 @@ public class Contract extends MultiTenancyEntity {
     @Temporal(TemporalType.DATE)
     private Date endDate;
     @OneToMany(mappedBy = "contract", fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
-    @XmlInverseReference(mappedBy="contract")
     private final List<UnitProject> unitProjects = new ArrayList<>();
 
     public CustomerAccount getCustomer() {

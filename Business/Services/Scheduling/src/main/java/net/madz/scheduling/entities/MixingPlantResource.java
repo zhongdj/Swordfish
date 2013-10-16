@@ -16,7 +16,6 @@ import javax.persistence.Table;
 import net.madz.authorization.entities.MultiTenancyEntity;
 
 import org.eclipse.persistence.annotations.Indexes;
-import org.eclipse.persistence.oxm.annotations.XmlInverseReference;
 
 @Entity
 @Table(name = "mixing_plant_resource")
@@ -42,7 +41,6 @@ public class MixingPlantResource extends MultiTenancyEntity {
     private double plannedVolume;
 
     @OneToMany(mappedBy = "mixingPlantResource")
-    @XmlInverseReference(mappedBy = "mixingPlantResource")
     private final List<ServiceOrder> liveTasks = new ArrayList<>();
 
     public MixingPlant getMixingPlant() {
