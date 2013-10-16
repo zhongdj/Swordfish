@@ -17,7 +17,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
 
 import org.eclipse.persistence.annotations.Index;
 
@@ -99,7 +98,6 @@ public class User extends StandardObject {
             @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                     referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "GROUP_NAME", referencedColumnName = "NAME") })
-    @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
@@ -110,7 +108,6 @@ public class User extends StandardObject {
                     @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false,
                             referencedColumnName = "TENANT_ID"),
                     @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID") })
-    @XmlIDREF
     private final List<Role> roles = new LinkedList<>();
 
     @Id

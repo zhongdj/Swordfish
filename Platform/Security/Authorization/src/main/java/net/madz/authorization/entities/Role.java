@@ -16,7 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
 
 /**
  * 
@@ -31,10 +30,8 @@ public class Role extends StandardObject {
     @XmlID
     private String name;
     @ManyToMany(mappedBy = "roles")
-    @XmlIDREF
     private final List<User> users = new LinkedList<>();
     @ManyToMany(mappedBy = "roles")
-    @XmlIDREF
     private final List<Group> groups = new LinkedList<>();
     @Id
     @ManyToOne(fetch = FetchType.EAGER)

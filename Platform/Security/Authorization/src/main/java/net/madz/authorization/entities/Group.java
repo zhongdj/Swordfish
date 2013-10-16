@@ -16,7 +16,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
 
 /**
  * 
@@ -34,7 +33,6 @@ public class Group extends StandardObject {
     @XmlID
     private String name;
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
-    @XmlIDREF
     private List<User> users = new LinkedList<User>();
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "group_role", joinColumns = {

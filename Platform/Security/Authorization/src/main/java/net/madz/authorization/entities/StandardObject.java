@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlIDREF;
 
 import net.madz.core.entities.AbstractBaseEntity;
 
@@ -29,7 +28,6 @@ public abstract class StandardObject extends AbstractBaseEntity {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CREATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
-    @XmlIDREF
     protected User createdBy;
     @Column(name = "CREATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -39,7 +37,6 @@ public abstract class StandardObject extends AbstractBaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns(value = { @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "UPDATED_BY", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
-    @XmlIDREF
     protected User updatedBy;
     @Column(name = "UPDATED_ON")
     @Temporal(value = TemporalType.TIMESTAMP)
