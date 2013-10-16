@@ -9,19 +9,22 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.net.URL;
 import java.util.Date;
 
 import net.madz.test.annotations.FreeTrialTenant.ScriptProcessor;
 import net.madz.test.stochastic.core.AbsScriptEngine;
 import net.madz.test.stochastic.core.TestContext;
 import net.madz.test.stochastic.utilities.annotations.Processor;
+import net.madz.utils.FileUtils;
 
 import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.internal.InternalRequest;
 
 /**
- * FreeTrialTenant is a test script, which will be interpreted as:  <br/>
- * "To create a new free trial tenant in the running test context." <br/> <br/>
+ * FreeTrialTenant is a test script, which will be interpreted as: <br/>
+ * "To create a new free trial tenant in the running test context." <br/>
+ * <br/>
  * There are 3 phases: <br/>
  * 1. Before test method execution, create a free trial tenant and register
  * userName and password into thread local variables of
@@ -83,34 +86,41 @@ public @interface FreeTrialTenant {
 
         private void doRequestFreeTrailTenant(FreeTrialTenant t) throws IOException {
             final String url = "http://localhost:8080/api/auth/register/freeTrial";
-            InternalRequest request = new InternalRequest(url);
-            request.addHeader("Content-Type", "application/json");
-            request.addHeader("Accept", "application/json");
-            request.setContentType("application/json");
-            InputStream is = getClass().getResourceAsStream("freeTrialTenantTemplate.json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            StringBuilder contentBuilder = new StringBuilder();
-            while ( null != ( line = br.readLine() ) ) {
-                contentBuilder.append(line).append("\n");
-            }
-            String content = contentBuilder.toString();
+            final InternalRequest request = new InternalRequest(url);
+            addHearders(request);
+            final URL resource = getClass().getResource("freeTrialTenantTemplate.json");
+            String content = FileUtils.readFileContent(resource);
             try {
-                content = content.replaceAll("#\\{userName\\}", getUsername());
-                content = content.replaceAll("#\\{password\\}", getPassword());
-                debug("POST RESTful Request with content:");
-                increaseIndent();
-                debug(content);
-                decreaseIndent();
+                content = processContent(content);
+                {// format output
+                    debug("POST RESTful Request with content:");
+                    increaseIndent();
+                    debug(content);
+                    decreaseIndent();
+                }
                 request.setContent(new ByteArrayInputStream(content.getBytes()));
                 Response response = request.post();
-                debug("Server responsed with: ");
-                increaseIndent();
-                debug(response.getBody());
-                decreaseIndent();
+                {
+                    debug("Server responsed with: ");
+                    increaseIndent();
+                    debug(response.getBody());
+                    decreaseIndent();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private String processContent(String content) {
+            content = content.replaceAll("#\\{userName\\}", getUsername());
+            content = content.replaceAll("#\\{password\\}", getPassword());
+            return content;
+        }
+
+        private void addHearders(InternalRequest request) {
+            request.addHeader("Content-Type", "application/json");
+            request.addHeader("Accept", "application/json");
+            request.setContentType("application/json");
         }
 
         public static String getUsername() {
