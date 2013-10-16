@@ -12,7 +12,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import net.madz.authorization.entities.MultiTenancyEntity;
 import net.madz.common.entities.Additive;
@@ -22,7 +21,6 @@ import net.madz.contract.entities.UnitProject;
 
 @Entity
 @Table(name = "pouring_part_spec")
-@XmlRootElement(name = "pouring-part-spec")
 public class PouringPartSpec extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 7944091197152689276L;
