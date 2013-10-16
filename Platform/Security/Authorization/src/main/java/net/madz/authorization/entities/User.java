@@ -18,7 +18,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.eclipse.persistence.annotations.Index;
 
@@ -37,8 +36,7 @@ import org.eclipse.persistence.annotations.Index;
         @NamedQuery(name = "User.findByUsername",
                 query = "SELECT OBJECT(a) FROM User AS a WHERE a.username = :username"),
         @NamedQuery(name = "User.findByAccountNameFuzzy",
-                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName"),
-        @NamedQuery(name = "User.findByAccountIdFuzzy", query = "SELECT OBJECT(a) FROM User AS a WHERE a.id LIKE :id") })
+                query = "SELECT OBJECT(a) FROM User AS a WHERE a.username LIKE :accountName") })
 @Index(name = "INDEX_USER_TENANT_FIRST", columnNames = { "TENANT_ID" })
 public class User extends StandardObject {
 
@@ -59,7 +57,7 @@ public class User extends StandardObject {
 
     @Column
     private String phoneNumber;
-    
+
     @Column(columnDefinition = "BOOL NOT NULL DEFAULT 0")
     private boolean lockFlag;
 
@@ -234,7 +232,6 @@ public class User extends StandardObject {
         this.oldPasswords = oldPasswords;
     }
 
-    @XmlTransient
     public List<Group> getGroups() {
         return groups;
     }
@@ -278,7 +275,6 @@ public class User extends StandardObject {
         }
     }
 
-    @XmlTransient
     public List<Role> getRoles() {
         return roles;
     }
