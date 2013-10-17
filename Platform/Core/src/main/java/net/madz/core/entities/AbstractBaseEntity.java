@@ -66,7 +66,7 @@ public abstract class AbstractBaseEntity implements Serializable {
     private ArrayList<Pair> findProcessorsAt(Class<? extends Annotation> timing) {
         final ArrayList<Pair> processors = new ArrayList<>();
         for ( Class<?> c = getClass(); !c.equals(Object.class); c = c.getSuperclass() ) {
-            for ( final Annotation annotationOnEntity : c.getAnnotations() ) {
+            for ( final Annotation annotationOnEntity : c.getDeclaredAnnotations() ) {
                 final ExtendEntityAnnotationProcessor extEntityProcessorAnnotation = annotationOnEntity
                         .annotationType().getAnnotation(ExtendEntityAnnotationProcessor.class);
                 if ( null == extEntityProcessorAnnotation ) {

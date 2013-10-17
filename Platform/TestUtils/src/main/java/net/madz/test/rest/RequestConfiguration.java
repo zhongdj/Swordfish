@@ -10,6 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.madz.test.annotations.FreeTrialTenant;
+import net.madz.test.rest.annotations.MergeField;
+import net.madz.test.rest.annotations.MergeFields;
+import net.madz.test.rest.annotations.UriInjector;
+import net.madz.test.rest.annotations.UriParam;
 import net.madz.test.rest.annotations.VariableInjector;
 import net.madz.test.rest.annotations.processors.TemplateProcessor;
 import net.madz.utils.FileUtils;
@@ -28,11 +32,8 @@ import com.eclipsesource.restfuse.internal.InternalRequest;
 public class RequestConfiguration extends com.eclipsesource.restfuse.internal.RequestConfiguration {
 
     private static final String PATH_SEPARATOR = "/";
-
     private final String baseUrl;
-
     private final Description description;
-
     private final Object target;
 
     public RequestConfiguration(String baseUrl, Description description, Object target) {
@@ -46,6 +47,7 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
     public InternalRequest createRequest(RequestContext context) {
         HttpTest call = description.getAnnotation(HttpTest.class);
         String rawPath = combineUrlAndPath(baseUrl, call.path());
+        addUriParam(context);
         InternalRequest request = new InternalRequest(substituePathSegments(rawPath, context));
         addAuthentication(call, request);
         addContentType(call, request);
@@ -54,14 +56,36 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         return request;
     }
 
+    private void addUriParam(RequestContext context) {
+        UriParam[] uriParams = VariableContext.getInstance().getUriParams();
+        if ( null == uriParams ) {
+            return;
+        }
+        for ( UriParam uriParam : uriParams ) {
+            context.addPathSegment(uriParam.key(), VariableContext.getInstance().getVariable(uriParam.var()).toString());
+        }
+        Method method = null;
+        UriInjector injector = null;
+        try {
+            method = this.description.getTestClass().getMethod(this.description.getMethodName());
+            injector = method.getAnnotation(UriInjector.class);
+            if ( null != injector ) {
+                context.addPathSegment(injector.param(), VariableContext.getInstance().getVariable(injector.var())
+                        .toString());
+            }
+        } catch (Exception e) {}
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // hacking part Start
     // ////////////////////////////////////////////////////////////////////////
     private String transformContent(String content) {
+        content = transformContentWithVariableContext(content);
         Method method = null;
         VariableInjector injector = null;
         try {
             method = this.description.getTestClass().getMethod(this.description.getMethodName());
+            content = transformWithMergeFields(method, content);
             injector = method.getAnnotation(VariableInjector.class);
             if ( null == injector ) {
                 return content;
@@ -94,22 +118,46 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         try {
             method = this.description.getTestClass().getMethod(this.description.getMethodName());
             injector = method.getAnnotation(VariableInjector.class);
+            String content = FileUtils.readFileContent(resource);
+            // hack
+            content = transformContentWithVariableContext(content);
+            content = transformWithMergeFields(method, content);
             if ( null == injector ) {
-                return openFile(file, resource);
+                return getContentStream(content);
             }
+            TemplateProcessor injectProcessor;
+            try {
+                injectProcessor = injector.value().newInstance();
+            } catch (Exception e) {
+                throw new IllegalStateException("Cannot instantiate injector instance: " + injector.value(), e);
+            }
+            return getContentStream(injectProcessor.process(content));
         } catch (NoSuchMethodException e) {
             return openFile(file, resource);
         } catch (SecurityException e) {
             return openFile(file, resource);
         }
-        String content = FileUtils.readFileContent(resource);
-        TemplateProcessor injectProcessor;
-        try {
-            injectProcessor = injector.value().newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot instantiate injector instance: " + injector.value(), e);
+    }
+
+    private String transformWithMergeFields(Method method, String content) {
+        final MergeFields mergeFields = method.getAnnotation(MergeFields.class);
+        if ( null != mergeFields ) {
+            for ( MergeField mf : mergeFields.value() ) {
+                content = content.replaceAll("\\$\\{" + mf.key() + "\\}", VariableContext.getInstance()
+                        .getVariable(mf.var()).toString());
+            }
         }
-        return getContentStream(injectProcessor.process(content));
+        return content;
+    }
+
+    private String transformContentWithVariableContext(String content) {
+        final MergeField[] mergeFields = VariableContext.getInstance().getMergeFields();
+        if ( null == mergeFields ) return content;
+        for ( MergeField mergeField : mergeFields ) {
+            content = content.replaceAll("\\$\\{" + mergeField.key() + "\\}", VariableContext.getInstance()
+                    .getVariable(mergeField.var()).toString());
+        }
+        return content;
     }
 
     // ////////////////////////////////////////////////////////////////////////

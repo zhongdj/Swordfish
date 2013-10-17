@@ -17,7 +17,8 @@ import org.junit.runners.model.Statement;
 
 public class MadzTestRunner extends BlockJUnit4ClassRunner {
 
-    private Object target;
+    protected Object target;
+    protected RunNotifier notifier;
 
     public MadzTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -56,7 +57,7 @@ public class MadzTestRunner extends BlockJUnit4ClassRunner {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Statement withClassProcessables(Statement result) {
-        Annotation[] annotations = getTestClass().getAnnotations();
+        Annotation[] annotations = getTestClass().getJavaClass().getDeclaredAnnotations();
         for ( int i = annotations.length - 1; i >= 0; i-- ) {
             if ( null != annotations[i].annotationType().getAnnotation(Processor.class) ) {
                 result = new ScriptStatement(result, annotations[i], getTestClass().getJavaClass(), null);
@@ -68,11 +69,8 @@ public class MadzTestRunner extends BlockJUnit4ClassRunner {
     private class ScriptStatement<META extends Annotation, P extends AbsScriptEngine<META>> extends Statement {
 
         private final META script;
-
         private final AnnotatedElement container;
-
         private final Object target;
-
         private final Statement base;
 
         public ScriptStatement(Statement base, META script, AnnotatedElement container, Object target) {
@@ -95,8 +93,8 @@ public class MadzTestRunner extends BlockJUnit4ClassRunner {
             final TestContext context = new DefaultTestContext(base, getTestClass().getJavaClass(), method, target);
             try {
                 processor.executeScript(context, script);
-            } finally {
-            }
+            } finally {}
         }
     }
+
 }

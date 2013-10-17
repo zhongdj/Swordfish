@@ -15,7 +15,9 @@ public abstract class UserCredentialInjector implements TemplateProcessor {
         String content = template;
         logger.info("before processing: " + content);
         content = content.replaceAll("#\\{userName\\}", getUserName());
+        content = content.replaceAll("\\$\\{userName\\}", getUserName());
         content = content.replaceAll("#\\{password\\}", getPassword());
+        content = content.replaceAll("\\$\\{password\\}", getPassword());
         logger.info("after processing: " + content);
         return content;
     }

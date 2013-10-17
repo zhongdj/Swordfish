@@ -9,7 +9,6 @@ import org.junit.runners.model.Statement;
 
 import com.eclipsesource.restfuse.RequestContext;
 import com.eclipsesource.restfuse.annotation.HttpTest;
-import com.eclipsesource.restfuse.internal.HttpTestStatement;
 
 public class Destination implements TestRule {
 

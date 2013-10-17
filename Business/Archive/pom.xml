@@ -17,6 +17,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.madz</groupId>
+			<artifactId>TOBinding</artifactId>
+			<version>${swordfish.release.version}</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
 			<artifactId>Core</artifactId>
 			<version>${swordfish.release.version}</version>
 			<type>jar</type>
@@ -88,6 +94,11 @@
 				<version>2.8</version>
 				<configuration>
 					<modules>
+						<javaModule>
+							<groupId>net.madz</groupId>
+							<artifactId>TOBinding</artifactId>
+							<bundleFileName>TOBinding.jar</bundleFileName>
+						</javaModule>
 						<javaModule>
 							<groupId>net.madz</groupId>
 							<artifactId>Core</artifactId>

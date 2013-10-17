@@ -1,4 +1,4 @@
 { 
    "mixingPlantName":"第四号搅拌站",
-    "operatorName":"barry@gmail.com"
+    "operatorName":"${userName}"
 }

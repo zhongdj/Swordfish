@@ -4,6 +4,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+
+import net.madz.test.rest.HttpUnitRunner;
+import net.madz.test.rest.InternalHttpUnitRunner;
+import net.madz.test.rest.VariableContext;
+import net.madz.test.stochastic.core.AbsScriptEngine;
+import net.madz.test.stochastic.core.TestContext;
+import net.madz.test.stochastic.utilities.annotations.Processor;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.TestClass;
 
 /**
  * The @Create is a test script construct that describes a flexible RESTful POST
@@ -18,8 +30,9 @@ import java.lang.annotation.Target;
  * 
  * @author Tracy Lu
  */
-@Target(ElementType.METHOD)
+@Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
+@Processor(Create.Processor.class)
 public @interface Create {
 
     /**
@@ -47,4 +60,20 @@ public @interface Create {
      *         variables to RESTFul POST request URI parameters.
      */
     UriParam[] uriParams() default {};
+
+    public static class Processor extends AbsScriptEngine<Create> {
+
+        @Override
+        public void doProcess(final TestContext context, Create t) throws Throwable {
+            VariableContext.getInstance().pushScope(null == context.getTarget());
+            VariableContext.getInstance().setVariableBindings(t.uriParams(), t.mergeFields(), t.extractors());
+            try {
+                InternalHttpUnitRunner runner = new InternalHttpUnitRunner(context, t.action());
+                runner.run(new RunNotifier());
+            } finally {
+                VariableContext.getInstance().clearVariableBindings();
+                VariableContext.getInstance().popScope();
+            }
+        }
+    }
 }
