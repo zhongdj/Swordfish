@@ -107,12 +107,18 @@
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>TestUtils</artifactId>
-			<version>${swordfish.release.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
+
+		<testSourceDirectory>/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/RESTfulWebServices/SchedulingRS/src/api-test/java</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/RESTfulWebServices/SchedulingRS/src/api-test/resources</directory>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
