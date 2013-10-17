@@ -74,7 +74,9 @@ public class AllocateResourceTest {
     @HttpTest(method = Method.POST, path = CREATE_SERVICE_ORDER_URI, file = "positive.allocate.resource.json",
             headers = { @Header(name = CONTENT_TYPE, value = APPLICATION_JSON),
                     @Header(name = ACCEPT, value = APPLICATION_JSON) })
-    @UriInjector(param = "summaryPlanId", var = "summaryPlanId")
+    @UriInjector(param = "summaryPlanId", var = "mixingPlantResourceId")
+    @MergeFields({ @MergeField(key = "plantResourceId", var = "mixingPlantResourceId"),
+            @MergeField(key = "truckResourceId", var = "concreteTruckResourceId") })
     public void test_invalid_summaryPlanId() throws JAXBException {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
@@ -88,6 +90,8 @@ public class AllocateResourceTest {
                     @Header(name = CONTENT_TYPE, value = APPLICATION_JSON),
                     @Header(name = ACCEPT, value = APPLICATION_JSON) })
     @UriInjector(param = "summaryPlanId", var = "summaryPlanId")
+    @MergeFields({ @MergeField(key = "plantResourceId", var = "mixingPlantResourceId"),
+            @MergeField(key = "truckResourceId", var = "concreteTruckResourceId") })
     public void test_invalid_plantResourceId() throws JAXBException {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
@@ -101,6 +105,8 @@ public class AllocateResourceTest {
                     @Header(name = CONTENT_TYPE, value = APPLICATION_JSON),
                     @Header(name = ACCEPT, value = APPLICATION_JSON) })
     @UriInjector(param = "summaryPlanId", var = "summaryPlanId")
+    @MergeFields({ @MergeField(key = "plantResourceId", var = "mixingPlantResourceId"),
+            @MergeField(key = "truckResourceId", var = "concreteTruckResourceId") })
     public void test_invalid_concreteTruckResourceId() throws JAXBException {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);

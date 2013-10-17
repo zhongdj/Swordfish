@@ -1,1 +1,1 @@
-{"mixingPlantResourceId":2,"concreteTruckResourceId":1, "volume":3.0}
+{"mixingPlantResourceId":2,"concreteTruckResourceId":${truckResourceId}, "volume":3.0}
