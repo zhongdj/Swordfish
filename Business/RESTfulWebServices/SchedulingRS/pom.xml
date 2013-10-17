@@ -113,10 +113,10 @@
 
 	<build>
 
-		<testSourceDirectory>/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/RESTfulWebServices/SchedulingRS/src/api-test/java</testSourceDirectory>
+		<testSourceDirectory>src/api-test/java</testSourceDirectory>
 		<testResources>
 			<testResource>
-				<directory>/Users/Barry/Professional/Workspaces/seed/Swordfish/Business/RESTfulWebServices/SchedulingRS/src/api-test/resources</directory>
+				<directory>src/api-test/resources</directory>
 			</testResource>
 		</testResources>
 		<plugins>
