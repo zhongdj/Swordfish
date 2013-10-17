@@ -1,4 +1,4 @@
-package net.madz.test;
+package net.madz.test.rest;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -10,8 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.madz.test.annotations.FreeTrialTenant;
-import net.madz.test.annotations.VariableInjector;
-import net.madz.test.annotations.processors.TemplateProcessor;
+import net.madz.test.rest.annotations.VariableInjector;
+import net.madz.test.rest.annotations.processors.TemplateProcessor;
 import net.madz.utils.FileUtils;
 
 import org.junit.runner.Description;
@@ -24,9 +24,8 @@ import com.eclipsesource.restfuse.annotation.Header;
 import com.eclipsesource.restfuse.annotation.HttpTest;
 import com.eclipsesource.restfuse.internal.AuthenticationInfo;
 import com.eclipsesource.restfuse.internal.InternalRequest;
-import com.eclipsesource.restfuse.internal.RequestConfiguration;
 
-public class MadzRequestConfiguration extends RequestConfiguration {
+public class RequestConfiguration extends com.eclipsesource.restfuse.internal.RequestConfiguration {
 
     private static final String PATH_SEPARATOR = "/";
 
@@ -36,7 +35,7 @@ public class MadzRequestConfiguration extends RequestConfiguration {
 
     private final Object target;
 
-    public MadzRequestConfiguration(String baseUrl, Description description, Object target) {
+    public RequestConfiguration(String baseUrl, Description description, Object target) {
         super(baseUrl, description, target);
         this.baseUrl = baseUrl;
         this.description = description;

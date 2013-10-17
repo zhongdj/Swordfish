@@ -1,8 +1,10 @@
-package net.madz.test;
+package net.madz.test.rest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import net.madz.test.MadzTestRunner;
 
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
@@ -11,9 +13,9 @@ import org.junit.runners.model.InitializationError;
 import com.eclipsesource.restfuse.HttpOrderComparator;
 import com.eclipsesource.restfuse.annotation.HttpTest;
 
-public class MadzHttpUnitRunner extends MadzTestRunner {
+public class HttpUnitRunner extends MadzTestRunner {
 
-    public MadzHttpUnitRunner(Class<?> klass) throws InitializationError {
+    public HttpUnitRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }
 

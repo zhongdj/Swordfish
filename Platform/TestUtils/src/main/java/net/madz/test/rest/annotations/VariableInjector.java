@@ -1,11 +1,11 @@
-package net.madz.test.annotations;
+package net.madz.test.rest.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.madz.test.annotations.processors.TemplateProcessor;
+import net.madz.test.rest.annotations.processors.TemplateProcessor;
 
 /**
  * Inject variables into JSON template files.

@@ -1,4 +1,4 @@
-package net.madz.test.annotations.processors;
+package net.madz.test.rest.annotations.processors;
 
 public interface TemplateProcessor {
 

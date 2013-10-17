@@ -1,4 +1,4 @@
-package net.madz.test;
+package net.madz.test.rest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,16 +11,16 @@ import com.eclipsesource.restfuse.RequestContext;
 import com.eclipsesource.restfuse.annotation.HttpTest;
 import com.eclipsesource.restfuse.internal.HttpTestStatement;
 
-public class MadzDestination implements TestRule {
+public class Destination implements TestRule {
 
-    public MadzDestination(Object testObject, String baseUrl, String proxyHost, int proxyPort) {
+    public Destination(Object testObject, String baseUrl, String proxyHost, int proxyPort) {
         this(testObject, baseUrl);
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
         this.context = new RequestContext();
     }
 
-    public MadzDestination(Object testObject, String baseUrl) {
+    public Destination(Object testObject, String baseUrl) {
         checkBaseUrl(baseUrl);
         checkTestObject(testObject);
         this.testObject = testObject;
@@ -73,7 +73,7 @@ public class MadzDestination implements TestRule {
     public Statement apply(Statement base, Description description) {
         Statement result;
         if ( hasAnnotation(description) ) {
-            requestStatement = new MadzHttpTestStatement(base, description, testObject, baseUrl, proxyHost, proxyPort,
+            requestStatement = new HttpTestStatement(base, description, testObject, baseUrl, proxyHost, proxyPort,
                     context);
             result = requestStatement;
         } else {

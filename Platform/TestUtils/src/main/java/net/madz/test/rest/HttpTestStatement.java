@@ -1,4 +1,4 @@
-package net.madz.test;
+package net.madz.test.rest;
 
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -7,11 +7,10 @@ import com.eclipsesource.restfuse.Method;
 import com.eclipsesource.restfuse.RequestContext;
 import com.eclipsesource.restfuse.Response;
 import com.eclipsesource.restfuse.annotation.HttpTest;
-import com.eclipsesource.restfuse.internal.HttpTestStatement;
 import com.eclipsesource.restfuse.internal.InternalRequest;
 import com.eclipsesource.restfuse.internal.RequestConfiguration;
 
-public class MadzHttpTestStatement extends HttpTestStatement {
+public class HttpTestStatement extends com.eclipsesource.restfuse.internal.HttpTestStatement {
 
     private Description description;
 
@@ -21,7 +20,7 @@ public class MadzHttpTestStatement extends HttpTestStatement {
 
     private RequestContext context;
 
-    public MadzHttpTestStatement(Statement base, Description description, Object target, String baseUrl,
+    public HttpTestStatement(Statement base, Description description, Object target, String baseUrl,
             String proxyHost, int proxyPort, RequestContext context) {
         super(base, description, target, baseUrl, proxyHost, proxyPort, context);
         this.description = description;
@@ -55,7 +54,7 @@ public class MadzHttpTestStatement extends HttpTestStatement {
     }
 
     private InternalRequest buildRequest() {
-        RequestConfiguration requestConfiguration = new MadzRequestConfiguration(baseUrl, description, target);
+        RequestConfiguration requestConfiguration = new RequestConfiguration(baseUrl, description, target);
         return requestConfiguration.createRequest(context);
     }
 }
