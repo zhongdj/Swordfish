@@ -16,6 +16,7 @@ import com.eclipsesource.restfuse.internal.InternalRequest;
 
 public class HttpTestStatement extends com.eclipsesource.restfuse.internal.HttpTestStatement {
 
+    private static final Logger logger = Logger.getLogger(HttpTestStatement.class.getName());
     private Description description;
     private String baseUrl;
     private Object target;
@@ -65,6 +66,7 @@ public class HttpTestStatement extends com.eclipsesource.restfuse.internal.HttpT
     }
 
     public void tryInjectResponse(Response response) {
+        logger.info("Server response: " + response.getBody());
         for ( Class<? extends Object> eachClass = target.getClass(); !eachClass.equals(Object.class); eachClass = eachClass
                 .getSuperclass() ) {
             Field[] fields = eachClass.getDeclaredFields();
@@ -75,7 +77,7 @@ public class HttpTestStatement extends com.eclipsesource.restfuse.internal.HttpT
                 }
             }
         }
-        //hack
+        // hack
         VariableContext.getInstance().processResponse(response);
     }
 

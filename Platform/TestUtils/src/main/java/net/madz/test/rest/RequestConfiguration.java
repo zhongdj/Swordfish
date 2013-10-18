@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,7 @@ import com.eclipsesource.restfuse.internal.InternalRequest;
 
 public class RequestConfiguration extends com.eclipsesource.restfuse.internal.RequestConfiguration {
 
+    private static final Logger logger = Logger.getLogger(RequestConfiguration.class.getName());
     private static final String PATH_SEPARATOR = "/";
     private final String baseUrl;
     private final Description description;
@@ -122,6 +124,7 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
             // hack
             content = transformContentWithVariableContext(content);
             content = transformWithMergeFields(method, content);
+            logger.info("Transforming JSON Content: " + content);
             if ( null == injector ) {
                 return getContentStream(content);
             }
@@ -131,7 +134,9 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
             } catch (Exception e) {
                 throw new IllegalStateException("Cannot instantiate injector instance: " + injector.value(), e);
             }
-            return getContentStream(injectProcessor.process(content));
+            content = injectProcessor.process(content);
+            logger.info("JSON Content Injected: " + content);
+            return getContentStream(content);
         } catch (NoSuchMethodException e) {
             return openFile(file, resource);
         } catch (SecurityException e) {
@@ -143,8 +148,9 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         final MergeFields mergeFields = method.getAnnotation(MergeFields.class);
         if ( null != mergeFields ) {
             for ( MergeField mf : mergeFields.value() ) {
-                content = content.replaceAll("\\$\\{" + mf.key() + "\\}", VariableContext.getInstance()
-                        .getVariable(mf.var()).toString());
+                final String value = VariableContext.getInstance().getVariable(mf.var()).toString();
+                logger.info("transform with mergeField key = " + mf.key() + ", value = " + value);
+                content = content.replaceAll("\\$\\{" + mf.key() + "\\}", value);
             }
         }
         return content;
@@ -154,8 +160,9 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         final MergeField[] mergeFields = VariableContext.getInstance().getMergeFields();
         if ( null == mergeFields ) return content;
         for ( MergeField mergeField : mergeFields ) {
-            content = content.replaceAll("\\$\\{" + mergeField.key() + "\\}", VariableContext.getInstance()
-                    .getVariable(mergeField.var()).toString());
+            final String value = VariableContext.getInstance().getVariable(mergeField.var()).toString();
+            logger.info("transform with mergeField key = " + mergeField.key() + ", value = " + value);
+            content = content.replaceAll("\\$\\{" + mergeField.key() + "\\}", value);
         }
         return content;
     }
@@ -164,9 +171,10 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
     // hacking part End
     // ////////////////////////////////////////////////////////////////////////
     private void addAuthentication(HttpTest call, InternalRequest request) {
-        final String user = FreeTrialTenant.ScriptProcessor.getUsername();
-        final String password = FreeTrialTenant.ScriptProcessor.getPassword();
-        if ( null != user ) {
+        if ( null != FreeTrialTenant.ScriptProcessor.getUsername() ) {
+            final String user = FreeTrialTenant.ScriptProcessor.getUsername();
+            final String password = FreeTrialTenant.ScriptProcessor.getPassword();
+            logger.info("Add Authentication Information: userName = " + user + ", password = " + password);
             request.addAuthenticationInfo(new AuthenticationInfo(AuthenticationType.BASIC, user, password));
         } else {
             Authentication[] authentications = call.authentications();
@@ -176,6 +184,7 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
                     String iUser = authentication.user();
                     String iPassword = authentication.password();
                     request.addAuthenticationInfo(new AuthenticationInfo(type, iUser, iPassword));
+                    logger.info("Add Authentication Information: userName = " + iUser + ", password = " + iPassword);
                 }
             }
         }
@@ -185,6 +194,7 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         MediaType contentType = call.type();
         if ( contentType != null ) {
             request.setContentType(contentType.getMimeType());
+            logger.info("Add ContentType Information: contentType = " + contentType.getMimeType());
         }
     }
 
@@ -196,8 +206,10 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
     private void addHeadersFromContext(InternalRequest request, RequestContext context) {
         if ( context != null && !context.getHeaders().isEmpty() ) {
             Map<String, String> headers = context.getHeaders();
-            for ( String name : headers.keySet() )
+            for ( String name : headers.keySet() ) {
                 request.addHeader(name, headers.get(name));
+                logger.info("Add Header Information: name = " + name + ", value = " + headers.get(name));
+            }
         }
     }
 
@@ -206,6 +218,7 @@ public class RequestConfiguration extends com.eclipsesource.restfuse.internal.Re
         if ( header != null ) {
             for ( Header parameter : header ) {
                 request.addHeader(parameter.name(), parameter.value());
+                logger.info("Add Header Information: name = " + parameter.name() + ", value = " + parameter.value());
             }
         }
     }

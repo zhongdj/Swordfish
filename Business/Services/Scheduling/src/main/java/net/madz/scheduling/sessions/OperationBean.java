@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.madz.scheduling;
+package net.madz.scheduling.sessions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +24,7 @@ import net.madz.authorization.interceptor.UserSession.SessionBeanAuthorizationIn
 import net.madz.binding.TransferObjectFactory;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.core.exceptions.AppServiceException;
+import net.madz.core.exceptions.BONotFoundException;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
@@ -33,6 +34,7 @@ import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
 import net.madz.scheduling.entities.MixingPlantResource;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.sessions.Consts.ErrorCodes;
 import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
 import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
 import net.madz.scheduling.to.CreateMixingPlantResourceRequest;
@@ -50,7 +52,8 @@ import net.madz.scheduling.to.ServiceOrderTO;
 @Interceptors(SessionBeanAuthorizationInterceptor.class)
 public class OperationBean extends MultitenancyBean {
 
-    private static Logger logger = Logger.getLogger(OperationBean.class.getName());
+    private static final String SCHEDULING = "scheduling";
+    public static Logger logger = Logger.getLogger(OperationBean.class.getName());
 
     public List<PouringPartSpec> listMyPartsInConstructing() {
         final ArrayList<PouringPartSpec> result = new ArrayList<>();
@@ -63,15 +66,16 @@ public class OperationBean extends MultitenancyBean {
         try {
             final IServiceSummaryPlan summaryPlan = em.find(IServiceSummaryPlan.class, summaryPlanId);
             if ( null == summaryPlan ) {
-                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0001");
+                throw new BONotFoundException(OperationBean.class, SCHEDULING, ErrorCodes.SUMMARY_PLAN_ID_INVALID);
             }
             final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
             if ( null == plantResource ) {
-                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0006");
+                throw new BONotFoundException(OperationBean.class, SCHEDULING,
+                        ErrorCodes.MIXING_PLANT_RESOURCE_ID_INVALID);
             }
             final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
             if ( null == truckResource ) {
-                throw new BONotFoundException(OperationBean.class, "scheduling", "100-0004");
+                throw new BONotFoundException(OperationBean.class, SCHEDULING, ErrorCodes.TRUCK_RESOURCE_ID_INVALID);
             }
             final IServiceOrder serviceOrderBO = summaryPlan.createServiceOrder(plantResource, truckResource, volume);
             serviceOrderBO.persist(em);
@@ -79,8 +83,9 @@ public class OperationBean extends MultitenancyBean {
                 return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrderBO.get());
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
+                throw new AppServiceException(OperationBean.class, SCHEDULING, SCHEDULING,
+                        ErrorCodes.SERVER_INTENAL_ERROR, e);
             }
-            return null;
         } finally {
             em.close();
         }
@@ -103,18 +108,17 @@ public class OperationBean extends MultitenancyBean {
             if ( null == operatorName || 0 >= operatorName.trim().length() ) {
                 throw new NullPointerException("operator name is null.");
             }
-
             try {
                 Query query = em.createNamedQuery("MixingPlantResource.findByPlantName").setParameter(
                         "mixingPlantName", mixingPlantName);
                 MixingPlantResource result = (net.madz.scheduling.entities.MixingPlantResource) query.getSingleResult();
-                if (null != result) {
-                    throw new IllegalStateException("The mixing plant resource is already exists. You can create only a mixing plant resource for a mixing plant.");
+                if ( null != result ) {
+                    throw new IllegalStateException(
+                            "The mixing plant resource is already exists. You can create only a mixing plant resource for a mixing plant.");
                 }
             } catch (NoResultException expected) {
                 // Ignored
             }
-            
             User operator = null;
             try {
                 Query query = em.createNamedQuery("User.findByUsername").setParameter("username", operatorName);
@@ -197,7 +201,8 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sspr) throws AppServiceException {
+    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sspr)
+            throws AppServiceException {
         EntityManager em = em();
         try {
             ServiceSummaryPlan ssp = new ServiceSummaryPlan();

@@ -7,6 +7,8 @@ import java.net.URI;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import net.madz.scheduling.sessions.OperationBean;
+
 import org.glassfish.embeddable.CommandResult;
 import org.glassfish.embeddable.CommandRunner;
 import org.glassfish.embeddable.Deployer;

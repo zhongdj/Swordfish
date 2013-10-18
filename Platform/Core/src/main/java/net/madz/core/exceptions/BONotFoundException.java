@@ -1,6 +1,5 @@
-package net.madz.scheduling;
+package net.madz.core.exceptions;
 
-import net.madz.core.exceptions.AppServiceException;
 
 public class BONotFoundException extends AppServiceException {
 

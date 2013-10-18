@@ -105,7 +105,7 @@ public class SchedulingTestResources {
             @HttpTest(method = Method.POST, path = URI, file = "base.part.spec.json", headers = {
                     @Header(name = CONTENT_TYPE, value = APPLICATION_JSON),
                     @Header(name = ACCEPT, value = APPLICATION_JSON) })
-            void create() {
+           public  void create() {
                 logger.info(response.getBody());
             }
         }

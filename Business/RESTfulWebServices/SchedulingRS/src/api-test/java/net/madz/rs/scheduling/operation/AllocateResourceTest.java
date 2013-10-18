@@ -8,6 +8,7 @@ import net.madz.rs.scheduling.operation.SchedulingTestResources.Post.PartSpecs;
 import net.madz.rs.scheduling.operation.SchedulingTestResources.Post.PlantResources;
 import net.madz.rs.scheduling.operation.SchedulingTestResources.Post.SummaryPlans;
 import net.madz.rs.scheduling.providers.ErrorTO;
+import net.madz.scheduling.sessions.Consts.ErrorCodes;
 import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.test.annotations.FreeTrialTenant;
 import net.madz.test.rest.Destination;
@@ -81,7 +82,7 @@ public class AllocateResourceTest {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
         ErrorTO value = MOXyUtils.unmarshal(response, ErrorTO.class, new Class[] { ErrorTO.class });
-        Assert.assertEquals("100-0001", value.getErrorCode());
+        Assert.assertEquals(ErrorCodes.SUMMARY_PLAN_ID_INVALID, value.getErrorCode());
         System.out.println(value);
     }
 
@@ -96,7 +97,7 @@ public class AllocateResourceTest {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
         ErrorTO value = MOXyUtils.unmarshal(response, ErrorTO.class, new Class[] { ErrorTO.class });
-        Assert.assertEquals("100-0006", value.getErrorCode());
+        Assert.assertEquals(ErrorCodes.MIXING_PLANT_RESOURCE_ID_INVALID, value.getErrorCode());
         System.out.println(value);
     }
 
@@ -111,7 +112,7 @@ public class AllocateResourceTest {
         System.out.println(response.getBody());
         com.eclipsesource.restfuse.Assert.assertNotFound(response);
         ErrorTO value = MOXyUtils.unmarshal(response, ErrorTO.class, new Class[] { ErrorTO.class });
-        Assert.assertEquals("100-0004", value.getErrorCode());
+        Assert.assertEquals(ErrorCodes.TRUCK_RESOURCE_ID_INVALID, value.getErrorCode());
         System.out.println(value);
     }
 }

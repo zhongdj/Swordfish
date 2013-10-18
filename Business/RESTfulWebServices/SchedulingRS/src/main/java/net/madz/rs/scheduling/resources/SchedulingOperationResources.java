@@ -13,16 +13,16 @@ import javax.ws.rs.Produces;
 
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.core.exceptions.AppServiceException;
-import net.madz.scheduling.OperationBean;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ServiceSummaryPlan;
+import net.madz.scheduling.sessions.OperationBean;
 import net.madz.scheduling.to.CreateConcreteTruckResourceRequest;
 import net.madz.scheduling.to.CreateConcreteTruckResourceResponse;
 import net.madz.scheduling.to.CreateMixingPlantResourceRequest;
 import net.madz.scheduling.to.CreateMixingPlantResourceResponse;
+import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 import net.madz.scheduling.to.CreateServiceSummaryPlanResponse;
 import net.madz.scheduling.to.ServiceOrderTO;
-import net.madz.scheduling.to.CreateServiceSummaryPlanRequest;
 
 @Stateless
 @Path("operation")

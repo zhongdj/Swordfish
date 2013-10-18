@@ -1,6 +1,7 @@
 package net.madz.scheduling;
 
 import net.madz.core.exceptions.AppServiceException;
+import net.madz.core.exceptions.BONotFoundException;
 import net.madz.scheduling.to.ServiceOrderTO;
 import net.madz.test.MadzTestRunner;
 import net.madz.test.annotations.FreeTrialTenant;
@@ -10,7 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(MadzTestRunner.class)
 @FreeTrialTenant

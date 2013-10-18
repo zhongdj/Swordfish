@@ -36,6 +36,7 @@ import net.madz.util.ClassUtils;
  */
 public class TransferObjectFactory {
 
+    private static Logger logger = Logger.getLogger(TransferObjectFactory.class.getName());
     @SuppressWarnings("rawtypes")
     private static ThreadLocal _cache = new ThreadLocal();
 
@@ -88,6 +89,9 @@ public class TransferObjectFactory {
             };
             Future<T> future = executor.submit(callable);
             return future.get();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            throw ex;
         } finally {
             executor.shutdownNow();
         }

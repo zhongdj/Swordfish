@@ -38,6 +38,7 @@ public class VariableContext {
     }
 
     public void registerLocalVariable(String key, Object value) {
+        logger.info("registering local variable: key = " + key + ", value = " + value);
         Map<String, Object> localVars = localVariables.get();
         if ( null == localVars ) {
             localVars = new HashMap<String, Object>();
@@ -47,6 +48,7 @@ public class VariableContext {
     }
 
     public void registerStaticVariable(String key, Object value) {
+        logger.info("registering static variable: key = " + key + ", value = " + value);
         Map<String, Object> staticVars = staticVariables.get();
         if ( null == staticVars ) {
             staticVars = new HashMap<String, Object>();

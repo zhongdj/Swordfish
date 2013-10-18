@@ -7,9 +7,7 @@ import java.util.ResourceBundle;
 public abstract class MadzException extends Exception {
 
     private static final long serialVersionUID = 163564734666783236L;
-
     protected final String errorCode;
-
     protected final String bundle;
 
     public MadzException(Class<?> cls, String bundle, String errorCode, Throwable cause) {
@@ -30,6 +28,12 @@ public abstract class MadzException extends Exception {
         this.bundle = bundle;
     }
 
+    public MadzException(Class<?> cls, String bundle, String errorCode, String[] messageVars) {
+        super(getBundledMessage(cls, bundle, errorCode, messageVars));
+        this.errorCode = errorCode;
+        this.bundle = bundle;
+    }
+
     protected static String getBundledMessage(Class<?> cls, String bundle, String errorCode) {
         return getBundledMessage(cls, bundle, errorCode, new String[0]);
     }
@@ -40,6 +44,15 @@ public abstract class MadzException extends Exception {
 
     public String getBundle() {
         return bundle;
+    }
+
+    @Override
+    public String getMessage() {
+        if ( null == getCause() ) {
+            return super.getMessage();
+        } else {
+            return super.getMessage() + "\nCaused By:\n" + getCause().getStackTrace().toString();
+        }
     }
 
     public abstract String getCategory();

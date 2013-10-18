@@ -5,7 +5,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import net.madz.core.exceptions.AppServiceException;
-import net.madz.scheduling.BONotFoundException;
+import net.madz.core.exceptions.BONotFoundException;
 import net.madz.utils.MadzException;
 
 @Provider

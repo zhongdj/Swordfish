@@ -22,6 +22,7 @@ import net.madz.common.entities.Mixture;
 import net.madz.contract.entities.Contract;
 import net.madz.contract.entities.PouringPart;
 import net.madz.contract.entities.UnitProject;
+import net.madz.contract.sessions.Consts.ErrorCodes;
 import net.madz.contract.sessions.CreateContractRequest.UnitProjectInfo;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.customer.entities.Contact;
@@ -99,7 +100,7 @@ public class ContractBean extends MultitenancyBean {
             response.setUnitProjectIds(unitProjectIds);
             return response;
         } catch (Exception ex) {
-            throw new BusinessModuleException(ContractBean.class, "contract", "");
+            throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME, ErrorCodes.SERVER_INTERNAL_ERROR, ex);
         } finally {
             em.close();
         }
@@ -110,11 +111,11 @@ public class ContractBean extends MultitenancyBean {
         EntityManager em = em();
         try {
             if ( null == unitProjectId ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME, ErrorCodes.UNIT_PROJECT_ID_NULL);
             }
             final UnitProject unitProject = em.find(UnitProject.class, unitProjectId);
             if ( null == unitProject ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME, ErrorCodes.UNIT_PROJECT_ID_INVALID);
             }
             final List<PouringPartSpec> specList = new LinkedList<PouringPartSpec>();
             for ( CreatePouringPartSpecRequest item : request ) {
@@ -154,13 +155,13 @@ public class ContractBean extends MultitenancyBean {
         pouringPart.setCreatedOn(new Date());
         final String pouringPartName = item.getPouringPartName();
         if ( null == pouringPartName || 0 >= pouringPartName.length() ) {
-            throw new BusinessModuleException(ContractBean.class, "contract", "");
+            throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME, ErrorCodes.POURING_PART_NAME_EMPTY);
         }
         pouringPart.setName(pouringPartName);
         pouringPart.setComment(item.getPouringPartComment());
         spec.setPouringPart(pouringPart);
         // Find mixture
-        Mixture mixture = getMixture(em, item.getMixtureId(), item.getMixtureGradeName());
+        Mixture mixture = findMixture(em, item.getMixtureId(), item.getMixtureGradeName());
         spec.setMixture(mixture);
         // Find additives
         List<Additive> additives = new LinkedList<Additive>();
@@ -168,7 +169,7 @@ public class ContractBean extends MultitenancyBean {
         for ( AdditiveInfo info : additivesInfo ) {
             long id = info.getId();
             String name = info.getName();
-            Additive additive = getAdditive(em, id, name);
+            Additive additive = findAdditive(em, id, name);
             additives.add(additive);
         }
         spec.setAdditives(additives);
@@ -176,44 +177,50 @@ public class ContractBean extends MultitenancyBean {
         return spec;
     }
 
-    private Mixture getMixture(EntityManager em, long mixtureId, String gradeName) throws BusinessModuleException {
+    private Mixture findMixture(EntityManager em, long mixtureId, String gradeName) throws BusinessModuleException {
         if ( mixtureId > 0 ) {
             Mixture result = em.find(Mixture.class, mixtureId);
             if ( null == result ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.MIXTURE_ID_NOT_EXIST, new String[] { String.valueOf(mixtureId) });
             }
             return result;
         } else {
             if ( null == gradeName || 0 > gradeName.trim().length() ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.MIXTURE_GRADE_NAME_EMPTY);
             }
             try {
                 Query query = em.createNamedQuery("Mixture.findByGradeName").setParameter("gradeName", gradeName);
                 Mixture result = (Mixture) query.getSingleResult();
                 return result;
             } catch (NoResultException ex) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.MIXTURE_NOT_FOUND_WITH_GRADE_NAME, new String[] { gradeName });
             }
         }
     }
 
-    private Additive getAdditive(EntityManager em, long id, String name) throws BusinessModuleException {
+    private Additive findAdditive(EntityManager em, long id, String name) throws BusinessModuleException {
         if ( id > 0 ) {
             Additive result = em.find(Additive.class, id);
             if ( null == result ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.ADDITIVE_ID_INVALID, new String[] { String.valueOf(id) });
             }
             return result;
         } else {
             if ( null == name || 0 >= name.trim().length() ) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.ADDITIVE_NAME_EMPTY);
             }
             try {
                 Query query = em.createNamedQuery("Additive.findByName").setParameter("name", name);
                 Additive result = (Additive) query.getSingleResult();
                 return result;
             } catch (NoResultException ex) {
-                throw new BusinessModuleException(ContractBean.class, "contract", "");
+                throw new BusinessModuleException(ContractBean.class, Consts.MODULE_NAME,
+                        ErrorCodes.ADDITIVE_NAME_INVALID);
             }
         }
     }

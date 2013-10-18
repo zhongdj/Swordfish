@@ -3,8 +3,12 @@ package net.madz.utils;
 public class BusinessModuleException extends MadzException {
 
     private static final long serialVersionUID = -3563350052341747701L;
-
     private final String moduleName;
+
+    public BusinessModuleException(Class<?> cls, String bundle, String errorCode, String[] messageVars) {
+        super(cls, bundle, errorCode, messageVars);
+        this.moduleName = bundle;
+    }
 
     public BusinessModuleException(Class<?> cls, String bundle, String errorCode, String[] messageVars, Throwable cause) {
         super(cls, bundle, errorCode, messageVars, cause);
