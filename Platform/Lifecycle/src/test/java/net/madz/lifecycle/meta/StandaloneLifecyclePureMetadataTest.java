@@ -46,7 +46,7 @@ public class StandaloneLifecyclePureMetadataTest {
 
     @BeforeClass
     public static void setup() {
-        final StateMachineRegistry registry = new StateMachineRegistry();
+        registry = new StateMachineRegistry();
         machineMetadata = registry.getStateMachineMeta(ServiceableLifecycleMeta.class);
         stateMachineInst = registry.getStateMachineInst(IServiceOrder.class);
     }
