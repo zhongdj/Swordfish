@@ -17,8 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 import net.madz.core.annotations.EntityAnnotationProcessor;
 import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
@@ -31,7 +29,6 @@ import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
 public abstract class AbstractBaseEntity implements Serializable {
 
     private static final long serialVersionUID = -6885878862729201814L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     protected long id;
@@ -101,7 +98,6 @@ public abstract class AbstractBaseEntity implements Serializable {
     private class Pair {
 
         public final Annotation a;
-
         @SuppressWarnings("rawtypes")
         public final EntityAnnotationProcessor p;
 
@@ -111,4 +107,5 @@ public abstract class AbstractBaseEntity implements Serializable {
             this.p = p;
         }
     }
+
 }
