@@ -1,5 +1,7 @@
 Terminology normalized definition
 
+BASIC PART
+
 +for 1-N, * for mandatory 1, default for optional 
 
 StateMachine {
@@ -95,3 +97,14 @@ Relation {
 ConditionSet {
   Condition //Will be evaluated to the next State in StateSet
 }
+
+ADVANCED
+
+Inheritance
+
+StateMachine extends StateMachine 
+StateSet extends StateSet
+TransitionSet extends TransitionSet
+RelationSet extends RelationSet
+ConditionSet extends ConditionSet
+
