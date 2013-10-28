@@ -2,7 +2,6 @@ package net.madz.lifecycle.meta.impl;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
-import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
@@ -15,7 +14,7 @@ import net.madz.verification.VerificationFailureSet;
 
 public class StateMachineMetadataImpl implements StateMachineMetadata {
 
-    public StateMachineMetadataImpl(StateMachineMetaBuilder stateMachineMetaBuilder) {
+    public StateMachineMetadataImpl(StateMachineMetadata stateMachineMeta) {
         // TODO Auto-generated constructor stub
     }
 
