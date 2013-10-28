@@ -191,7 +191,6 @@ public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaB
 
     @Override
     public MetaDataBuilder<StateMachineMetadata, StateMachineMetadata> build(Class<?> clazz) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

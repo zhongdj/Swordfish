@@ -11,12 +11,14 @@ import net.madz.util.StringPrintWriter;
 import net.madz.util.json.io.JsonWriter;
 
 public class VerificationFailure implements Dumpable, Cloneable {
+
     private final Object source;
     private final DottedPath errorKey;
     private final String defaultErrorMessage;
     private final Object[] details;
     private final Throwable cause;
     private final StackTraceElement[] stack;
+    private String errorCode;
 
     public void writeJson(JsonWriter writer) throws IOException {
         writer.startObject("Error");
@@ -26,6 +28,12 @@ public class VerificationFailure implements Dumpable, Cloneable {
         } finally {
             writer.endObject();
         }
+    }
+
+    public VerificationFailure(Throwable cause, Object source, String errorKey, String errorCode,
+            String defaultErrorMessage, Object... details) {
+        this(cause, source, errorKey, defaultErrorMessage, details);
+        this.errorCode = errorCode;
     }
 
     /**
@@ -41,10 +49,12 @@ public class VerificationFailure implements Dumpable, Cloneable {
      * @param details
      *            Error parameters
      */
-    public VerificationFailure(Throwable cause, Object source, String errorKey, String defaultErrorMessage, Object... details) {
+    public VerificationFailure(Throwable cause, Object source, String errorKey, String defaultErrorMessage,
+            Object... details) {
         this.cause = cause;
         this.source = source;
-        this.errorKey = source instanceof MetaData ? ((MetaData) source).getDottedPath().append(errorKey) : DottedPath.parse(errorKey);
+        this.errorKey = source instanceof MetaData ? ( (MetaData) source ).getDottedPath().append(errorKey)
+                : DottedPath.parse(errorKey);
         this.defaultErrorMessage = defaultErrorMessage;
         this.details = details;
         this.stack = Thread.currentThread().getStackTrace();
@@ -65,6 +75,11 @@ public class VerificationFailure implements Dumpable, Cloneable {
      */
     public VerificationFailure(Object source, String errorKey, String defaultErrorMessage, Object... details) {
         this(null, source, errorKey, defaultErrorMessage, details);
+    }
+
+    public VerificationFailure(Object source, String errorKey, String errorCode, String defaultErrorMessage,
+            Object... details) {
+        this(null, source, errorKey, errorCode, defaultErrorMessage, details);
     }
 
     /** Clone constructor */
@@ -90,15 +105,19 @@ public class VerificationFailure implements Dumpable, Cloneable {
     }
 
     /**
-     * Zuora error key for verification failure
+     * Madz error key for verification failure
      */
     public DottedPath getErrorKey() {
         return this.errorKey;
     }
 
+    public String getErrorCode() {
+        return this.errorCode;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof VerificationFailure) {
+        if ( obj instanceof VerificationFailure ) {
             VerificationFailure comp = (VerificationFailure) obj;
             return comp.source.equals(this.source) && comp.errorKey.equals(this.errorKey);
         }
@@ -107,7 +126,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
 
     @Override
     public int hashCode() {
-        return (source.hashCode() * 7) + errorKey.hashCode();
+        return ( source.hashCode() * 7 ) + errorKey.hashCode();
     }
 
     @Override
@@ -122,7 +141,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
     @Override
     public void dump(Dumper dumper) {
         dumper.print(errorKey).print(": ").println(String.format(defaultErrorMessage, details));
-        if (null != cause) {
+        if ( null != cause ) {
             StringPrintWriter str = new StringPrintWriter();
             this.cause.printStackTrace(str);
             dumper.indent().println(str);
@@ -130,4 +149,5 @@ public class VerificationFailure implements Dumpable, Cloneable {
             dumper.indent().dump(stack);
         }
     }
+
 }

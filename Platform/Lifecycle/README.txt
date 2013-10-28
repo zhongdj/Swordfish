@@ -299,12 +299,12 @@ public interface IDownloadProcess {
     }
 }
 
-Lifecycle exists since variations happening always. A subset of data varies together, and others do not. To simplify describing system states(data) 
+Lifecycle exists since information variations happening always. A subset of information varies together, and others do not. To simplify describing system states(data) 
 manipulation by instructions, a block of data and a few blocks of instructions were introduced to make the expression more concisely and clearly, 
-such as structs and functions constructs in C programming language, or class in java (OO) programming language. 
+such as the concepts: Struct and Function constructs in C programming language, or Class in java (OO) programming language. 
 
 C's structure or Java's Class can shrink the scope of data or states of system, based on structure or class, 
-new concepts (types) can be created to describe a new scope. Granularity always be there while talking about scope, because scope is relative.
+new concepts (types) can be created to describe a new SCOPE. Granularity always be there while talking about scope, because scope is relative.
 One subset of information(data) was created and was destroyed at the moment of another subset might be just destroyed and recreated again. And
 once go into one subset of data, the states inside also can vary at different stage or moment. A subset of defects happen because some state should 
 be changed at some stage but it did not, or some state changed incorrectly, or some state should be recognized but they were missed.  

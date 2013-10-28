@@ -26,11 +26,16 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class StandaloneLifecyclePureMetadataTest {
 
@@ -42,10 +47,14 @@ public class StandaloneLifecyclePureMetadataTest {
 
     @LifecycleRegistry(IServiceOrder.class)
     @StateMachineMetadataBuilder(AnnotationBasedStateMachineMetaBuilder.class)
-    private static class StateMachineRegistry extends AbstractStateMachineRegistry {}
+    private static class StateMachineRegistry extends AbstractStateMachineRegistry {
+
+        protected StateMachineRegistry() throws VerificationException {
+            super();
+        }}
 
     @BeforeClass
-    public static void setup() {
+    public static void setup() throws VerificationException {
         registry = new StateMachineRegistry();
         machineMetadata = registry.getStateMachineMeta(ServiceableLifecycleMeta.class);
         stateMachineInst = registry.getStateMachineInst(IServiceOrder.class);

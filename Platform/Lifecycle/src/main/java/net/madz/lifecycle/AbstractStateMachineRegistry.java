@@ -9,11 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.utils.BundleUtils;
+import net.madz.verification.VerificationException;
+import net.madz.verification.VerificationFailure;
+import net.madz.verification.VerificationFailureSet;
 
 public abstract class AbstractStateMachineRegistry {
 
@@ -29,7 +34,6 @@ public abstract class AbstractStateMachineRegistry {
          */
         Class<?>[] value();
     }
-
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     public static @interface StateMachineMetadataBuilder {
@@ -42,7 +46,6 @@ public abstract class AbstractStateMachineRegistry {
     }
 
     protected static final Logger logger = Logger.getLogger(AbstractStateMachineRegistry.class.getName());
-
     /**
      * The key might be class object as:
      * The life cycle interface itself that has a @StateMachine,
@@ -52,10 +55,9 @@ public abstract class AbstractStateMachineRegistry {
      * or simple name, or class full name
      */
     protected final HashMap<Object, StateMachineMetadata> typeMap = new HashMap<>();
-
     protected final HashMap<Object, StateMachineInst> instanceMap = new HashMap<>();
 
-    protected AbstractStateMachineRegistry() {
+    protected AbstractStateMachineRegistry() throws VerificationException {
         registerStateMachines();
     }
 
@@ -63,7 +65,7 @@ public abstract class AbstractStateMachineRegistry {
      * To process all the registered class to build the corresponding state
      * machines.
      */
-    private void registerStateMachines() {
+    private void registerStateMachines() throws VerificationException {
         final LifecycleRegistry lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
         final StateMachineMetadataBuilder builderMeta = getClass().getAnnotation(StateMachineMetadataBuilder.class);
         if ( null == lifecycleRegistry || null == builderMeta ) {
@@ -72,19 +74,28 @@ public abstract class AbstractStateMachineRegistry {
         }
         final Class<?>[] toRegister = lifecycleRegistry.value();
         final StateMachineMetaBuilder builder = createBuilder(builderMeta);
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
         for ( Class<?> clazz : toRegister ) {
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
                 final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
+                metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
+                metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
-                addInstance(clazz, metaData.newInstance(clazz));
+                StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
+                stateMachineInstance.verifyMetaData(failureSet);
+                addInstance(clazz, stateMachineInstance);
             } else {
-                logger.warning("Class "
-                        + clazz.getName()
-                        + " is not a valid class to process, since there is no @StateMachine or @LifecycleMeta defined on it.");
+                final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
+                        Errors.REGISTERED_META_ERROR, new String[] { clazz.getName() });
+                failureSet.add(new VerificationFailure(this, getClass().getName(), Errors.REGISTERED_META_ERROR, errorMessage));
             }
+        }
+        if ( failureSet.size() > 0 ) {
+            failureSet.dump(new Dumper(System.out));
+            throw new VerificationException(failureSet);
         }
     }
 
@@ -108,7 +119,8 @@ public abstract class AbstractStateMachineRegistry {
         }
     }
 
-    private StateMachineMetaBuilder createBuilder(final StateMachineMetadataBuilder builderMeta) {
+    private StateMachineMetaBuilder createBuilder(final StateMachineMetadataBuilder builderMeta)
+            throws VerificationException {
         final Class<? extends StateMachineMetaBuilder> builderClass = builderMeta.value();
         final StateMachineMetaBuilder builder;
         try {
