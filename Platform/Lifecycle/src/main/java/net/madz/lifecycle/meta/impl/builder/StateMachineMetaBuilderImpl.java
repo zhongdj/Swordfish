@@ -1,21 +1,28 @@
 package net.madz.lifecycle.meta.impl.builder;
 
-import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.impl.StateMachineInstImpl;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.meta.KeySet;
 import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataBuilder;
 import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
+import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaBuilder<StateMachineMetadata, MetaData>
-        implements StateMachineMetaBuilder {
+public class StateMachineMetaBuilderImpl extends
+        AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata> implements StateMachineMetaBuilder {
+
+    public StateMachineMetaBuilderImpl(StateMachineMetadata parent, String name) {
+        super(parent, name);
+    }
+
+    public StateMachineMetaBuilderImpl(String name) {
+        this(null, name);
+    }
 
     @Override
     public boolean hasSuper() {
@@ -33,12 +40,6 @@ public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaB
     public boolean hasParent() {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public StateMachineMetadata getParent() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -121,14 +122,7 @@ public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaB
 
     @Override
     public StateMachineInst newInstance(Class<?> clazz) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DottedPath getDottedPath() {
-        // TODO Auto-generated method stub
-        return null;
+        return new StateMachineInstBuilderImpl(this, clazz.getSimpleName()).build(clazz).getMetaData();
     }
 
     @Override
@@ -138,12 +132,6 @@ public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaB
 
     @Override
     public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public KeySet getKeySet() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -190,7 +178,7 @@ public class AnnotationBasedStateMachineMetaBuilder extends AnnotationBasedMetaB
     }
 
     @Override
-    public MetaDataBuilder<StateMachineMetadata, StateMachineMetadata> build(Class<?> clazz) {
-        return null;
+    public StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException {
+        return this;
     }
 }

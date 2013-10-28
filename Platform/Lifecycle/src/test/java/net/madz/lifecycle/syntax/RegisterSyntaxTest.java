@@ -15,7 +15,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
-import net.madz.lifecycle.meta.impl.builder.AnnotationBasedStateMachineMetaBuilder;
+import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.lifecycle.syntax.RegisterSyntaxTest.CorrectStateMachineSyntax.Transitions.TransitionOne;
 import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
@@ -24,7 +24,8 @@ import net.madz.verification.VerificationFailureSet;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RegisterSyntaxTest {
 
@@ -58,7 +59,7 @@ public class RegisterSyntaxTest {
     private static class WithoutMetadataAnnotationErrorSyntax {}
     
     @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
-    @StateMachineMetadataBuilder(AnnotationBasedStateMachineMetaBuilder.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
     private static class CorrectRegistry extends AbstractStateMachineRegistry {
 
         protected CorrectRegistry() throws VerificationException {
@@ -66,7 +67,7 @@ public class RegisterSyntaxTest {
         }
     }
     @LifecycleRegistry(WithoutMetadataAnnotationErrorSyntax.class)
-    @StateMachineMetadataBuilder(AnnotationBasedStateMachineMetaBuilder.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
     private static class IncorrectStateMachineRegistry extends AbstractStateMachineRegistry {
 
         protected IncorrectStateMachineRegistry() throws VerificationException {

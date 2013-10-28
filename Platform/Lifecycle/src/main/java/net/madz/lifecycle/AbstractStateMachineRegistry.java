@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,9 +74,9 @@ public abstract class AbstractStateMachineRegistry {
                     "A subclass of AbstractStateMachineRegistry must have both @LifecycleRegistry and @StateMachineMetadataBuilder annotated on Type.");
         }
         final Class<?>[] toRegister = lifecycleRegistry.value();
-        final StateMachineMetaBuilder builder = createBuilder(builderMeta);
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         for ( Class<?> clazz : toRegister ) {
+            final StateMachineMetaBuilder builder = createBuilder(builderMeta, clazz.getName());
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
                 final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
                 metaData.verifyMetaData(failureSet);
@@ -90,7 +91,8 @@ public abstract class AbstractStateMachineRegistry {
             } else {
                 final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
                         Errors.REGISTERED_META_ERROR, new String[] { clazz.getName() });
-                failureSet.add(new VerificationFailure(this, getClass().getName(), Errors.REGISTERED_META_ERROR, errorMessage));
+                failureSet.add(new VerificationFailure(this, getClass().getName(), Errors.REGISTERED_META_ERROR,
+                        errorMessage));
             }
         }
         if ( failureSet.size() > 0 ) {
@@ -119,18 +121,15 @@ public abstract class AbstractStateMachineRegistry {
         }
     }
 
-    private StateMachineMetaBuilder createBuilder(final StateMachineMetadataBuilder builderMeta)
+    private StateMachineMetaBuilder createBuilder(final StateMachineMetadataBuilder builderMeta, String metadataClass)
             throws VerificationException {
         final Class<? extends StateMachineMetaBuilder> builderClass = builderMeta.value();
-        final StateMachineMetaBuilder builder;
         try {
-            builder = builderClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new IllegalStateException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            Constructor<? extends StateMachineMetaBuilder> c = builderClass.getConstructor(String.class);
+            return c.newInstance(metadataClass);
+        } catch (Throwable t) {
+            throw new IllegalStateException(t);
         }
-        return builder;
     }
 
     public Map<Object, StateMachineMetadata> getStateMachineTypes() {

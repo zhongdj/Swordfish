@@ -18,7 +18,7 @@ import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.C
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Finish;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Schedule;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Start;
-import net.madz.lifecycle.meta.impl.builder.AnnotationBasedStateMachineMetaBuilder;
+import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.lifecycle.meta.instance.StateInst;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.instance.TransitionInst;
@@ -46,7 +46,7 @@ public class StandaloneLifecyclePureMetadataTest {
     private static StateMachineRegistry registry;
 
     @LifecycleRegistry(IServiceOrder.class)
-    @StateMachineMetadataBuilder(AnnotationBasedStateMachineMetaBuilder.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
     private static class StateMachineRegistry extends AbstractStateMachineRegistry {
 
         protected StateMachineRegistry() throws VerificationException {
