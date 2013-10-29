@@ -10,8 +10,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-
-public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData{
+public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
 
     @Test
     public void test_correct_metadata_without_syntax_error() {
@@ -30,4 +29,20 @@ public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData{
         }
     }
 
+    @Test
+    public void test_correct_inheritance_statemachine() {
+        @LifecycleRegistry({ CorrectStateMachineInheritanceChildSyntax.class })
+        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        class CorrectInheritanceRegistry extends AbsStateMachineRegistry {
+
+            protected CorrectInheritanceRegistry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new CorrectInheritanceRegistry();
+        } catch (VerificationException ex) {
+            fail("No Exception expected.");
+        }
+    }
 }
