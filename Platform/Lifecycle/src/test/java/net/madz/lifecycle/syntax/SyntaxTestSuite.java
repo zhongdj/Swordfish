@@ -5,5 +5,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ RegisterSyntaxNegativeTest.class, RegisterSyntaxPositiveTest.class, StateSetSyntaxPositiveTest.class })
+@SuiteClasses({ RegisterSyntaxNegativeTest.class, RegisterSyntaxPositiveTest.class, StateSetSyntaxPositiveTest.class,
+        StateSetSyntaxNegativeTest.class })
 public class SyntaxTestSuite {}

@@ -8,12 +8,10 @@ import net.madz.verification.VerificationException;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
 
     @Test
-    public void test_correct_metadata_without_syntax_error() {
+    public void test_correct_metadata_without_syntax_error() throws VerificationException {
         @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
         @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
@@ -22,15 +20,11 @@ public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
                 super();
             }
         }
-        try {
-            new CorrectRegistry();
-        } catch (VerificationException e) {
-            fail("No Exception expected");
-        }
+        new CorrectRegistry();
     }
 
     @Test
-    public void test_correct_inheritance_statemachine() {
+    public void test_correct_inheritance_statemachine() throws VerificationException {
         @LifecycleRegistry({ CorrectStateMachineInheritanceChildSyntax.class })
         @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectInheritanceRegistry extends AbsStateMachineRegistry {
@@ -39,10 +33,6 @@ public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
                 super();
             }
         }
-        try {
-            new CorrectInheritanceRegistry();
-        } catch (VerificationException ex) {
-            fail("No Exception expected.");
-        }
+        new CorrectInheritanceRegistry();
     }
 }
