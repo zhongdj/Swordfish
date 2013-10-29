@@ -10,6 +10,7 @@ public interface Errors {
     public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2203";
     public static final String STATEMACHINE_MULTIPLE_TRANSITIONSET = "002-2204";
     public static final String STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES = "002-2205";
+    public static final String STATEMACHINE_MULTIPLE_CONDITIONSET = "002-2206";
     public static final String STATESET_WITHOUT_STATE = "002-2300";
     public static final String STATESET_WITHOUT_INITAL_STATE = "002-2400";
     public static final String STATESET_MULTIPLE_INITAL_STATES = "002-2401";

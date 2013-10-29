@@ -13,6 +13,7 @@ public interface TransitionMetadata extends MetaData, Dumpable, Template<Transit
         Corrupt,
         Recover,
         Redo,
+        Fail,
         Common,
         Other
     }

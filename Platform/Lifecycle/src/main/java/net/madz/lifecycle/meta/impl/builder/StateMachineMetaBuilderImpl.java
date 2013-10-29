@@ -2,17 +2,23 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.madz.common.Dumper;
+import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -27,24 +33,33 @@ import net.madz.verification.VerificationFailureSet;
 public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata>
         implements StateMachineMetaBuilder {
 
-    public StateMachineMetaBuilderImpl(StateMachineMetadata parent, String name) {
-        super(parent, name);
+    private StateMachineMetadata superStateMachineMetadata;
+    private final ArrayList<TransitionMetadata> transitionList = new ArrayList<>();
+    private final HashMap<Object, TransitionMetadata> transitionMap = new HashMap<>();
+    private final ArrayList<ConditionMetadata> conditionList = new ArrayList<>();
+    private final HashMap<Object, ConditionMetadata> conditionMap = new HashMap<>();
+    private TransitionMetadata corruptTransition;
+    private TransitionMetadata recoverTransition;
+    private TransitionMetadata redoTransition;
+    private TransitionMetadata failTransition;
+
+    public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
+        this(name);
+        this.registry = registry;
     }
 
     public StateMachineMetaBuilderImpl(String name) {
-        this(null, name);
+        super(null, name);
     }
 
     @Override
     public boolean hasSuper() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != this.superStateMachineMetadata;
     }
 
     @Override
     public StateMachineMetadata getSuperStateMachine() {
-        // TODO Auto-generated method stub
-        return null;
+        return superStateMachineMetadata;
     }
 
     @Override
@@ -97,8 +112,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public TransitionMetadata getTransition(Object transitionKey) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.transitionMap.get(transitionKey);
     }
 
     @Override
@@ -192,8 +206,133 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException {
-        verifySyntax(clazz);
+        // Step 1. Syntax Validation
+        {
+            verifySyntax(clazz);
+        }
+        // Step 2. Configure StateMachine
+        {
+            configureSuperStateMachine(clazz);
+            configureConditionSet(clazz);
+            configureTransitionSet(clazz);
+            configureStateSetBasic(clazz);
+            configureFunctions(clazz);
+            configureRelationSet(clazz);
+            configureStateSetRelations(clazz);
+        }
         return this;
+    }
+
+    private void configureSuperStateMachine(Class<?> clazz) throws VerificationException {
+        if ( hasSuperMetadataClass(clazz) ) {
+            StateMachineMetadata superStateMachineMetadata = load(getSuperMetadataClass(clazz));
+            this.superStateMachineMetadata = superStateMachineMetadata;
+        }
+    }
+
+    private void configureFunctions(Class<?> clazz) {
+        // TODO Auto-generated method stub
+    }
+
+    private void configureStateSetRelations(Class<?> clazz) {
+        // TODO Auto-generated method stub
+    }
+
+    private void configureRelationSet(Class<?> clazz) {
+        // TODO Auto-generated method stub
+    }
+
+    private void configureStateSetBasic(Class<?> clazz) {
+        // TODO Auto-generated method stub
+    }
+
+    private void configureTransitionSet(Class<?> clazz) {
+        List<Class<?>> transitionSetClasses = findClass(clazz.getDeclaredClasses(), TransitionSet.class);
+        if ( 0 >= transitionSetClasses.size() ) {
+            return;
+        }
+        final Class<?>[] transitionClasses = transitionSetClasses.get(0).getDeclaredClasses();
+        TransitionMetaBuilder transitionMetaBuilder = null;
+        for ( Class<?> klass : transitionClasses ) {
+            transitionMetaBuilder = new TransitionMetaBuilderImpl(this, klass.getSimpleName());
+            final TransitionMetadata transitionMetadata = transitionMetaBuilder.build(klass, this).getMetaData();
+            addTransitionMetadata(clazz, transitionMetadata);
+        }
+    }
+
+    private void addTransitionMetadata(Class<?> transitionClass, TransitionMetadata transitionMetadata) {
+        this.transitionList.add(transitionMetadata);
+        this.transitionMap.put(transitionMetadata.getDottedPath(), transitionMetadata);
+        this.transitionMap.put(transitionMetadata.getDottedPath().getAbsoluteName(), transitionMetadata);
+        this.transitionMap.put(transitionClass, transitionMetadata);
+        this.transitionMap.put(transitionClass.getName(), transitionMetadata);
+        switch (transitionMetadata.getType()) {
+            case Corrupt:
+                this.corruptTransition = transitionMetadata;
+                break;
+            case Recover:
+                this.recoverTransition = transitionMetadata;
+                break;
+            case Redo:
+                this.redoTransition = transitionMetadata;
+                break;
+            case Fail:
+                this.failTransition = transitionMetadata;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void configureConditionSet(Class<?> clazz) throws VerificationException {
+        List<Class<?>> conditionSetClasses = findClass(clazz.getDeclaredClasses(), ConditionSet.class);
+        if ( 0 >= conditionSetClasses.size() ) {
+            return;
+        }
+        if ( 1 != conditionSetClasses.size() ) {
+            throw newVerificationException(clazz.getName() + ".ConditionSet",
+                    Errors.STATEMACHINE_MULTIPLE_CONDITIONSET, clazz.getName());
+        }
+        final Class<?>[] conditionClasses = conditionSetClasses.get(0).getDeclaredClasses();
+        ConditionMetaBuilder conditionMetaBuilder = null;
+        for ( Class<?> klass : conditionClasses ) {
+            conditionMetaBuilder = new ConditionMetaBuilderImpl(this, klass.getSimpleName());
+            final ConditionMetadata conditionMetadata = conditionMetaBuilder.build(klass, this).getMetaData();
+            addConditionMetadata(clazz, conditionMetadata);
+        }
+    }
+
+    private void addConditionMetadata(Class<?> clazz, ConditionMetadata conditionMetadata) {
+        this.conditionList.add(conditionMetadata);
+        this.conditionMap.put(conditionMetadata.getDottedPath(), conditionMetadata);
+        this.conditionMap.put(conditionMetadata.getDottedPath().getAbsoluteName(), conditionMetadata);
+        this.conditionMap.put(clazz, conditionMetadata);
+        this.conditionMap.put(clazz.getName(), conditionMetadata);
+    }
+
+    private StateMachineMetadata load(Class<?> stateMachineClass) throws VerificationException {
+        StateMachineMetadata stateMachineMetadata = registry.getStateMachineMeta(stateMachineClass);
+        if ( null != stateMachineMetadata ) {
+            return stateMachineMetadata;
+        } else {
+            StateMachineMetaBuilder superStateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry,
+                    stateMachineClass.getName());
+            stateMachineMetadata = superStateMachineMetaBuilder.build(stateMachineClass).getMetaData();
+            registry.addTemplate(stateMachineMetadata);
+            return stateMachineMetadata;
+        }
+    }
+
+    private Class<?> getSuperMetadataClass(Class<?> clazz) {
+        if ( !hasSuperMetadataClass(clazz) ) {
+            throw new IllegalStateException("Class " + clazz + " has no super class");
+        }
+        if ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) ) {
+            return clazz.getSuperclass();
+        } else {
+            // if clazz is interface or clazz implements an interface.
+            return clazz.getInterfaces()[0];
+        }
     }
 
     private void verifySyntax(Class<?> clazz) throws VerificationException {
@@ -204,7 +343,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     private void verifyRequiredComponents(Class<?> clazz) throws VerificationException {
         final String stateSetPath = clazz.getName() + ".StateSet";
         final String transitionSetPath = clazz.getName() + ".TransitionSet";
-        if ( hasSuper(clazz) ) {
+        if ( hasSuperMetadataClass(clazz) ) {
             return;
         }
         final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
@@ -291,7 +430,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         return stateClasses;
     }
 
-    private boolean hasSuper(Class<?> clazz) {
+    private boolean hasSuperMetadataClass(Class<?> clazz) {
         return ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) )
                 || ( 1 <= clazz.getInterfaces().length );
     }
@@ -316,7 +455,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
     }
 
-    private VerificationException newVerificationException(String dottedPathName, String errorCode, Object[] args) {
+    private VerificationException newVerificationException(String dottedPathName, String errorCode, Object... args) {
         return new VerificationException(new VerificationFailure(this, dottedPathName, errorCode,
                 BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR_BUNDLE, errorCode, args)));
     }

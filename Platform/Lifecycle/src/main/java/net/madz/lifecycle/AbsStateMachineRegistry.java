@@ -66,7 +66,7 @@ public abstract class AbsStateMachineRegistry {
      * To process all the registered class to build the corresponding state
      * machines.
      */
-    private void registerStateMachines() throws VerificationException {
+    private synchronized void registerStateMachines() throws VerificationException {
         final LifecycleRegistry lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
         final StateMachineMetadataBuilder builderMeta = getClass().getAnnotation(StateMachineMetadataBuilder.class);
         if ( null == lifecycleRegistry || null == builderMeta ) {
@@ -103,12 +103,12 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
-    private void addInstance(Class<?> clazz, StateMachineInst stateMachine) {
+    public synchronized void addInstance(Class<?> clazz, StateMachineInst stateMachine) {
         instanceMap.put(clazz, stateMachine);
         instanceMap.put(clazz.getName(), stateMachine);
     }
 
-    private void addTemplate(final StateMachineMetadata metaData) {
+    public synchronized void addTemplate(final StateMachineMetadata metaData) {
         for ( Object key : metaData.getKeySet() ) {
             StateMachineMetadata existedStateMachine = typeMap.get(key);
             if ( typeMap.containsKey(key) && null == existedStateMachine ) {
@@ -134,19 +134,19 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
-    public Map<Object, StateMachineMetadata> getStateMachineTypes() {
+    public synchronized Map<Object, StateMachineMetadata> getStateMachineTypes() {
         return Collections.unmodifiableMap(this.typeMap);
     }
 
-    public Map<Object, StateMachineInst> getStateMachineInstances() {
+    public synchronized Map<Object, StateMachineInst> getStateMachineInstances() {
         return Collections.unmodifiableMap(this.instanceMap);
     }
 
-    public StateMachineMetadata getStateMachineMeta(Object key) {
+    public synchronized StateMachineMetadata getStateMachineMeta(Object key) {
         return this.typeMap.get(key);
     }
 
-    public StateMachineInst getStateMachineInst(Object key) {
+    public synchronized StateMachineInst getStateMachineInst(Object key) {
         return this.instanceMap.get(key);
     }
 }
