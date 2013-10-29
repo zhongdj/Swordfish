@@ -193,7 +193,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         } else if ( clazz.isInterface() &&  clazz.getInterfaces().length > 0 ) {
             if ( clazz.getInterfaces().length > 1 ) {
                 throw newVerificationException(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
-                        new Object[] { getClass().getName() });
+                        new Object[] { clazz.getName() });
             }
             Class<?> clz = clazz.getInterfaces()[0];
             if ( null == clz.getAnnotation(StateMachine.class) ) {
@@ -206,6 +206,6 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     private VerificationException newVerificationException(String errorCode, Object[] args) {
         return new VerificationException(new VerificationFailure(this, this.getClass().getName(), errorCode,
-                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR, errorCode), args));
+                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR, errorCode, args)));
     }
 }
