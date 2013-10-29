@@ -306,13 +306,13 @@ such as the concepts: Struct and Function constructs in C programming language, 
 C's structure or Java's Class can shrink the scope of data or states of system, based on structure or class, 
 new concepts (types) can be created to describe a new SCOPE. Granularity always be there while talking about scope, because scope is relative.
 One subset of information(data) was created and was destroyed at the moment of another subset might be just destroyed and recreated again. And
-once go into one subset of data, the states inside also can vary at different stage or moment. A subset of defects happen because some state should 
-be changed at some stage but it did not, or some state changed incorrectly, or some state should be recognized but they were missed.  
+once go into one subset of data, the states inside also can vary at different stage or moment. Defects happen because some state should 
+be changed at some stage but it did not, or some state changed incorrectly, or some state should be recognized but they were missed, or scoping incorrectly, or ignore the relationships states validation during state change.  
 
 To reduce defects creation, at logical concept layer, programming language provides many constructs (class, interface, inheritance and etc.) and experts create many design principles. 
 Such as Single Responsibility Principle, which is actually down-sizing the scope of the subset of data and the scope of instructions blocks to make
-it to become easier to manage the variations on the data. On the contrary side, once much more data or state be included in some scope (struct or class),
-there will be much more scopes inside the above scope (struct or class), which will make the above scope(struct or class) be too hard and too complicated to understand and to maintain.  
+it to become easier to manage the variations on the data. On the contrary side, once much more data or state be included in a certain scope (struct or class),
+there will be much more scopes inside the enclosing scope (struct or class), which will make the enclosing scope(struct or class) be too hard and too complicated to understand and to maintain.  
 
 Life cycle is a fundamental concept and a tool to help to identify, and describe the variation rules of a subset data,  and to design scopes from the variation rule. 
 And this is called abstraction, which is defined as to Understand, to Differentiate, to Name, to Express. 
@@ -324,8 +324,8 @@ During a brief life cycle of JMSQueue, such as Created, Initialized, Running, St
 That's a kind of difference between Entities and Relationships. 
 
 Sometimes an entity or a relationship's life cycle is naturally simple, and some times life cycle is naturally complex. 
-While the complexity is identified among entities, dependencies, aggregation, composition, and so on, then many boring state validity checks should be coded and performed appropriately.    
-Lacking of validation check will lead to mis-operation on the scoped data, which will make system state a chaos, especially after the error state get into system, and it had been
+While the complexity is identified among entities, such as: dependencies, aggregation, composition, and so on. And then many boring state validity checks should be coded and performed appropriately.    
+Lacking of validation check on the scope itself or the scopes related will lead to mis-operation on the scoped data, which will make system state a chaos, especially after the error state get into system, and it had been
 processed for a lot of operations. So both state validity check and appropriate state set are important for reducing defect numbers and constructing robust systems.  
 
 Lifecycle project aims at describing an entity's or a relationship's life cycle by define a StateMachine, and provides life cycle definition in a declarative style, 

@@ -184,13 +184,22 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException {
+        verifySyntax(clazz);
+        return this;
+    }
+
+    private void verifySyntax(Class<?> clazz) throws VerificationException {
+        verifyStateMachineDefinition(clazz);
+    }
+
+    private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
             Class<?> superclass = clazz.getSuperclass();
             if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
                 throw newVerificationException(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
                         new Object[] { superclass.getName() });
             }
-        } else if ( clazz.isInterface() &&  clazz.getInterfaces().length > 0 ) {
+        } else if ( clazz.isInterface() && clazz.getInterfaces().length > 0 ) {
             if ( clazz.getInterfaces().length > 1 ) {
                 throw newVerificationException(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
                         new Object[] { clazz.getName() });
@@ -201,7 +210,6 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
                         new Object[] { clz.getName() });
             }
         }
-        return this;
     }
 
     private VerificationException newVerificationException(String errorCode, Object[] args) {
