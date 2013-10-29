@@ -18,24 +18,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class RegisterSyntaxTest extends RegisterSyntaxTestMetaData {
-
-    @Test
-    public void test_correct_metadata_without_syntax_error() {
-        @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
-        class CorrectRegistry extends AbsStateMachineRegistry {
-
-            protected CorrectRegistry() throws VerificationException {
-                super();
-            }
-        }
-        try {
-            new CorrectRegistry();
-        } catch (VerificationException e) {
-            fail("No Exception expected");
-        }
-    }
+public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
 
     @Test
     public void test_incorrect_registering_without_StateMachine_or_LifecycleMeta() {
