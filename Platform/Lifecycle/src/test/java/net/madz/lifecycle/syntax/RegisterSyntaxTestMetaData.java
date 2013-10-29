@@ -12,7 +12,7 @@ import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineI
 import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineSyntax.Transitions.TransitionOne;
 import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.IncorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionThree;
 
-public class RegisterSyntaxTestMetaData {
+public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
 
     @StateMachine
     public static interface CorrectStateMachineSyntax {
@@ -21,9 +21,7 @@ public class RegisterSyntaxTestMetaData {
         static interface States {
 
             @Initial
-            @Function(
-                    transition = TransitionOne.class,
-                    value = StateB.class)
+            @Function(transition = TransitionOne.class, value = StateB.class)
             static interface StateA {}
             @End
             static interface StateB {}
@@ -40,14 +38,12 @@ public class RegisterSyntaxTestMetaData {
         private String state;
 
         @Transition(TransitionOne.class)
-        public void foo() {
-        }
+        public void foo() {}
 
         public String getState() {
             return state;
         }
     }
-    
     protected static class WithoutMetadataAnnotationErrorSyntax {}
     @StateMachine
     public static interface CorrectStateMachineInheritanceSuperSyntax {

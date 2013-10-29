@@ -9,6 +9,7 @@ public interface Errors {
     public static final String STATEMACHINE_MULTIPLE_STATESET = "002-2202";
     public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2203";
     public static final String STATEMACHINE_MULTIPLE_TRANSITIONSET = "002-2204";
+    public static final String STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES = "002-2205";
     public static final String STATESET_WITHOUT_STATE = "002-2300";
     public static final String STATESET_WITHOUT_INITAL_STATE = "002-2400";
     public static final String STATESET_MULTIPLE_INITAL_STATES = "002-2401";
@@ -30,5 +31,5 @@ public interface Errors {
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3202";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3203";
     public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
-    public static final String SYNTAX_ERROR = "syntax_error";
+    public static final String SYNTAX_ERROR_BUNDLE = "syntax_error";
 }

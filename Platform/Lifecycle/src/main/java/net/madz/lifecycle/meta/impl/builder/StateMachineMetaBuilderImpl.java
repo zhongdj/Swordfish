@@ -214,6 +214,6 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     private VerificationException newVerificationException(String errorCode, Object[] args) {
         return new VerificationException(new VerificationFailure(this, this.getClass().getName(), errorCode,
-                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR, errorCode, args)));
+                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR_BUNDLE, errorCode, args)));
     }
 }

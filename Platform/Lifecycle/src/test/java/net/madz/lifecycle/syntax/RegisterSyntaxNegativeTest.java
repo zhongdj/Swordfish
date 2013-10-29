@@ -6,9 +6,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
 import net.madz.lifecycle.Errors;
-import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
-import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
@@ -39,8 +37,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             assertEquals(1, failureSet.size());
             while ( iterator.hasNext() ) {
                 VerificationFailure failure = iterator.next();
-                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
-                        "syntax_error", Errors.REGISTERED_META_ERROR,
+                final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR,
                         new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
                 final String actualErrorMessage = failure.getErrorMessage(null);
                 assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -68,8 +65,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             assertEquals(1, failureSet.size());
             while ( iterator.hasNext() ) {
                 VerificationFailure failure = iterator.next();
-                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
-                        "syntax_error", Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
+                final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
                         new String[] { IncorrectStateMachineInheritanceSuperSyntax.class.getName() });
                 final String actualErrorMessage = failure.getErrorMessage(null);
                 assertEquals(expectedErrorMessage, actualErrorMessage);
@@ -96,8 +92,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = actualFailureSet.iterator();
             while ( iterator.hasNext() ) {
                 VerificationFailure failure = iterator.next();
-                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
-                        Errors.SYNTAX_ERROR, Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
+                final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
                         new String[] { IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class
                                 .getName() });
                 final String actualErrorMessage = failure.getErrorMessage(null);
