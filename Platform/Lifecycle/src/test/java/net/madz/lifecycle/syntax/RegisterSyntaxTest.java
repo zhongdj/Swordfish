@@ -2,9 +2,9 @@ package net.madz.lifecycle.syntax;
 
 import java.util.Iterator;
 
-import net.madz.lifecycle.AbstractStateMachineRegistry;
-import net.madz.lifecycle.AbstractStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbstractStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -48,29 +48,23 @@ public class RegisterSyntaxTest {
         }
     }
     @LifecycleMeta(CorrectStateMachineSyntax.class)
-    private static class CorrectLifecycleMetaSyntax {
+    static class CorrectLifecycleMetaSyntax {
 
         private String state;
 
         @Transition(TransitionOne.class)
         public void foo() {
         }
-    }
-    private static class WithoutMetadataAnnotationErrorSyntax {}
-    
-    @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
-    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
-    private static class CorrectRegistry extends AbstractStateMachineRegistry {
 
-        protected CorrectRegistry() throws VerificationException {
-            super();
+        public String getState() {
+            return state;
         }
     }
-    @LifecycleRegistry(WithoutMetadataAnnotationErrorSyntax.class)
+    @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
     @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
-    private static class IncorrectStateMachineRegistry extends AbstractStateMachineRegistry {
+    private static class CorrectRegistry extends AbsStateMachineRegistry {
 
-        protected IncorrectStateMachineRegistry() throws VerificationException {
+        protected CorrectRegistry() throws VerificationException {
             super();
         }
     }
@@ -81,6 +75,16 @@ public class RegisterSyntaxTest {
             new CorrectRegistry();
         } catch (VerificationException e) {
             fail("No Exception expected");
+        }
+    }
+
+    private static class WithoutMetadataAnnotationErrorSyntax {}
+    @LifecycleRegistry(WithoutMetadataAnnotationErrorSyntax.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+    private static class IncorrectStateMachineRegistry extends AbsStateMachineRegistry {
+
+        protected IncorrectStateMachineRegistry() throws VerificationException {
+            super();
         }
     }
 
@@ -95,12 +99,87 @@ public class RegisterSyntaxTest {
             assertEquals(1, failureSet.size());
             while ( iterator.hasNext() ) {
                 VerificationFailure failure = iterator.next();
-                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class, "syntax_error",
-                        Errors.REGISTERED_META_ERROR, new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
+                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
+                        "syntax_error", Errors.REGISTERED_META_ERROR,
+                        new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
                 final String actualErrorMessage = failure.getErrorMessage(null);
                 assertEquals(expectedErrorMessage, actualErrorMessage);
                 assertEquals(Errors.REGISTERED_META_ERROR, failure.getErrorCode());
             }
         }
     }
+
+    @StateMachine
+    public static interface CorrectStateMachineInheritanceSuperSyntax {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = TransitionOne.class, value = StateB.class)
+            static interface StateA {}
+            @End
+            static interface StateB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionOne {}
+        }
+    }
+    
+    @StateMachine
+    public static interface CorrectStateMachineInheritanceChildSyntax extends CorrectStateMachineInheritanceSuperSyntax {}
+    
+    public static interface IncorrectStateMachineInheritanceSuperSyntax {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = TransitionOne.class, value = StateB.class)
+            static interface StateA {}
+            @End
+            static interface StateB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionOne {}
+        }
+    }
+    
+    @StateMachine
+    public static interface IncorrectStateMachineInheritanceChildSyntax extends IncorrectStateMachineInheritanceSuperSyntax {}
+    
+    @LifecycleRegistry(IncorrectStateMachineInheritanceChildSyntax.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+    public static class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
+
+        protected IncorrectStateMachineInheritanceRegistry() throws VerificationException {
+            super();
+        }
+    }
+    
+    @Test
+    public void test_incorrect_registering_superclass_without_StateMachine() {
+        try {
+            new IncorrectStateMachineInheritanceRegistry();
+            fail("Verification Exception expected.");
+        } catch (VerificationException ex) {
+            VerificationFailureSet failureSet = ex.getVerificationFailureSet();
+            Iterator<VerificationFailure> iterator = failureSet.iterator();
+            assertEquals(1, failureSet.size());
+            while ( iterator.hasNext() ) {
+                VerificationFailure failure = iterator.next();
+                final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
+                        "syntax_error", Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
+                        new String[] { IncorrectStateMachineInheritanceSuperSyntax.class.getName() });
+                final String actualErrorMessage = failure.getErrorMessage(null);
+                assertEquals(expectedErrorMessage, actualErrorMessage);
+                assertEquals(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());
+            }
+        }
+    }
+
 }

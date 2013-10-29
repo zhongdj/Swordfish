@@ -4,6 +4,7 @@ public interface Errors {
 
     public static final String REGISTERED_META_ERROR = "002-1000";
     public static final String STATEMACHINE_SUPER_MUST_BE_STATEMACHINE = "002-2100";
+    public static final String STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE = "002-2101";
     public static final String STATEMACHINE_WITHOUT_STATESET = "002-2201";
     public static final String STATEMACHINE_MULTIPLE_STATESET = "002-2202";
     public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2203";
@@ -29,4 +30,5 @@ public interface Errors {
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3202";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3203";
     public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
+    public static final String SYNTAX_ERROR = "syntax_error";
 }

@@ -4,9 +4,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import net.madz.common.DottedPath;
-import net.madz.lifecycle.AbstractStateMachineRegistry;
-import net.madz.lifecycle.AbstractStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbstractStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
 import net.madz.lifecycle.demo.standalone.IServiceOrder;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Cancelled;
@@ -47,7 +47,7 @@ public class StandaloneLifecyclePureMetadataTest {
 
     @LifecycleRegistry(IServiceOrder.class)
     @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
-    private static class StateMachineRegistry extends AbstractStateMachineRegistry {
+    private static class StateMachineRegistry extends AbsStateMachineRegistry {
 
         protected StateMachineRegistry() throws VerificationException {
             super();

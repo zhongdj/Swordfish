@@ -21,7 +21,7 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
 
-public abstract class AbstractStateMachineRegistry {
+public abstract class AbsStateMachineRegistry {
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -46,7 +46,7 @@ public abstract class AbstractStateMachineRegistry {
         Class<? extends StateMachineMetaBuilder> value();
     }
 
-    protected static final Logger logger = Logger.getLogger(AbstractStateMachineRegistry.class.getName());
+    protected static final Logger logger = Logger.getLogger(AbsStateMachineRegistry.class.getName());
     /**
      * The key might be class object as:
      * The life cycle interface itself that has a @StateMachine,
@@ -58,7 +58,7 @@ public abstract class AbstractStateMachineRegistry {
     protected final HashMap<Object, StateMachineMetadata> typeMap = new HashMap<>();
     protected final HashMap<Object, StateMachineInst> instanceMap = new HashMap<>();
 
-    protected AbstractStateMachineRegistry() throws VerificationException {
+    protected AbsStateMachineRegistry() throws VerificationException {
         registerStateMachines();
     }
 
@@ -77,6 +77,7 @@ public abstract class AbstractStateMachineRegistry {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         for ( Class<?> clazz : toRegister ) {
             final StateMachineMetaBuilder builder = createBuilder(builderMeta, clazz.getName());
+            builder.setRegistry(this);
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
                 final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
                 metaData.verifyMetaData(failureSet);
