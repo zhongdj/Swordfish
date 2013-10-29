@@ -315,9 +315,9 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         if ( null != stateMachineMetadata ) {
             return stateMachineMetadata;
         } else {
-            StateMachineMetaBuilder superStateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry,
+            StateMachineMetaBuilder stateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry,
                     stateMachineClass.getName());
-            stateMachineMetadata = superStateMachineMetaBuilder.build(stateMachineClass).getMetaData();
+            stateMachineMetadata = stateMachineMetaBuilder.build(stateMachineClass).getMetaData();
             registry.addTemplate(stateMachineMetadata);
             return stateMachineMetadata;
         }
