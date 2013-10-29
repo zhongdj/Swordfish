@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class StateSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
+public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
 
     @Test(expected = VerificationException.class)
     public void test_StateMachine_without_InnerClasses() throws VerificationException {
@@ -68,5 +68,36 @@ public class StateSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
             }
             throw e;
         }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_StateMachine_with_Multi_StateSet_And_Multi_TransitionSet() throws VerificationException {
+        @LifecycleRegistry({ Negative_Multi_StateSet_Multi_TransitionSet.class })
+        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException ex) {
+            assertEquals(2, ex.getVerificationFailureSet().size());
+            Iterator<VerificationFailure> iterator = ex.getVerificationFailureSet().iterator();
+            final VerificationFailure failureOne = iterator.next();
+            final VerificationFailure failureTwo = iterator.next();
+            assertFailure(Errors.STATEMACHINE_MULTIPLE_STATESET,
+                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() }, failureOne);
+            assertFailure(Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
+                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() }, failureTwo);
+            throw ex;
+        }
+    }
+
+    private void assertFailure(String errorCode, Object[] args, VerificationFailure failure) {
+        assertEquals(errorCode, failure.getErrorCode());
+        final String expectedMessage = getMessage(errorCode, args);
+        assertEquals(expectedMessage, failure.getErrorMessage(null));
     }
 }
