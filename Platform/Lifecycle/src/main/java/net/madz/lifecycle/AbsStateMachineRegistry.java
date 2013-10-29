@@ -83,7 +83,8 @@ public abstract class AbsStateMachineRegistry {
                 metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
-                final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
+                final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
+                final StateMachineMetadata metaData = builder.build(stateMachineClass).getMetaData();
                 metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);

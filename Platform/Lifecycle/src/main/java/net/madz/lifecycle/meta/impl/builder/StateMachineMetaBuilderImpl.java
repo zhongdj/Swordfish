@@ -190,6 +190,23 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     private void verifySyntax(Class<?> clazz) throws VerificationException {
         verifyStateMachineDefinition(clazz);
+        verifyInnerClasses(clazz);
+    }
+
+    private void verifyInnerClasses(Class<?> clazz) throws VerificationException {
+        if ( hasSuper(clazz) ) {
+            return;
+        }
+        final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
+        if ( 0 == declaredClasses.length ) {
+            throw newVerificationException(Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
+                    new Object[] { clazz.getName() });
+        }
+    }
+
+    private boolean hasSuper(Class<?> clazz) {
+        return ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) )
+                || ( 1 <= clazz.getInterfaces().length );
     }
 
     private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
