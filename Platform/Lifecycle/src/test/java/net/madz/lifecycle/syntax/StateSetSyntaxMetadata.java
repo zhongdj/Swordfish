@@ -46,25 +46,24 @@ public class StateSetSyntaxMetadata extends BaseMetaDataTest {
             static interface T {};
         }
     }
-    
     @StateMachine
     protected static interface Negative_Multi_StateSet_Multi_TransitionSet {
+
         @StateSet
-        static interface StatesA {
-            
-        }
+        static interface StatesA {}
         @StateSet
-        static interface StatesB {
-            
-        }
-        
+        static interface StatesB {}
         @TransitionSet
-        static interface TransitionsA {
-            
-        }
+        static interface TransitionsA {}
         @TransitionSet
-        static interface TransitionsB {
-            
-        }
+        static interface TransitionsB {}
+    }
+    @StateMachine
+    protected static interface Negative_No_State_No_Transition {
+
+        @StateSet
+        static interface States {}
+        @TransitionSet
+        static interface Transitions {}
     }
 }

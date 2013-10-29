@@ -200,6 +200,8 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     }
 
     private void verifyRequiredComponents(Class<?> clazz) throws VerificationException {
+        final String stateSetPath = clazz.getName() + ".StateSet";
+        final String transitionSetPath = clazz.getName() + ".TransitionSet";
         if ( hasSuper(clazz) ) {
             return;
         }
@@ -210,23 +212,56 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
         final List<Class<?>> stateClasses = findClass(declaredClasses, StateSet.class);
         final List<Class<?>> transitionClasses = findClass(declaredClasses, TransitionSet.class);
-        VerificationFailureSet vs = new VerificationFailureSet();
-        if ( stateClasses.size() <= 0 ) {
-            vs.add(newVerificationException(clazz.getName() + ".StateSet", Errors.STATEMACHINE_WITHOUT_STATESET,
-                    new Object[] { clazz.getName() }));
-        } else if ( stateClasses.size() > 1 ) {
-            vs.add(newVerificationException(clazz.getName() + ".StateSet", Errors.STATEMACHINE_MULTIPLE_STATESET,
-                    new Object[] { clazz.getName() }));
-        }
-        if ( transitionClasses.size() <= 0 ) {
-            vs.add(newVerificationException(clazz.getName() + ".TransitionSet",
-                    Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, new Object[] { clazz.getName() }));
-        } else if ( transitionClasses.size() > 1 ) {
-            vs.add(newVerificationException(clazz.getName() + ".TransitionSet",
-                    Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET, new Object[] { clazz.getName() }));
-        }
+        final VerificationFailureSet vs = new VerificationFailureSet();
+        verifyStateSetSize(clazz, stateSetPath, stateClasses, vs);
+        verifyTransitionSetSize(clazz, transitionSetPath, transitionClasses, vs);
         if ( vs.size() > 0 ) {
             throw new VerificationException(vs);
+        }
+    }
+
+    private VerificationFailureSet verifyStateSetSize(Class<?> clazz, final String stateSetPath,
+            final List<Class<?>> stateClasses, final VerificationFailureSet vs) {
+        if ( stateClasses.size() <= 0 ) {
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET,
+                    new Object[] { clazz.getName() }));
+        } else if ( stateClasses.size() > 1 ) {
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_MULTIPLE_STATESET,
+                    new Object[] { clazz.getName() }));
+        } else {
+            verifyStateSetComponent(stateSetPath, stateClasses.get(0), vs);
+        }
+        return vs;
+    }
+
+    private void verifyTransitionSetSize(Class<?> clazz, final String transitionSetPath,
+            final List<Class<?>> transitionClasses, final VerificationFailureSet vs) {
+        if ( transitionClasses.size() <= 0 ) {
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
+                    new Object[] { clazz.getName() }));
+        } else if ( transitionClasses.size() > 1 ) {
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
+                    new Object[] { clazz.getName() }));
+        } else {
+            verifyTransitionSetComponent(transitionSetPath, transitionClasses.get(0), vs);
+        }
+    }
+
+    private void verifyTransitionSetComponent(final String dottedPath, final Class<?> transitionClass,
+            final VerificationFailureSet vs) {
+        final Class<?>[] transitionSetClasses = transitionClass.getDeclaredClasses();
+        if ( 0 == transitionSetClasses.length ) {
+            vs.add(newVerificationException(dottedPath, Errors.TRANSITIONSET_WITHOUT_TRANSITION,
+                    new Object[] { transitionClass.getName() }));
+        }
+    }
+
+    private void verifyStateSetComponent(final String stateSetPath, final Class<?> stateClass,
+            final VerificationFailureSet vs) {
+        final Class<?>[] stateSetClasses = stateClass.getDeclaredClasses();
+        if ( 0 == stateSetClasses.length ) {
+            vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE,
+                    new Object[] { stateClass.getName() }));
         }
     }
 

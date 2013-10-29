@@ -76,9 +76,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
         @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-                super();
-            }
+            protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
@@ -92,6 +90,26 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             assertFailure(Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
                     new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() }, failureTwo);
             throw ex;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_StateSet_no_states() throws VerificationException {
+        @LifecycleRegistry({ Negative_No_State_No_Transition.class })
+        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
+            assertFailure(Errors.STATESET_WITHOUT_STATE,
+                    new Object[] { Negative_No_State_No_Transition.States.class.getName() }, iterator.next());
+            assertFailure(Errors.TRANSITIONSET_WITHOUT_TRANSITION,
+                    new Object[] { Negative_No_State_No_Transition.Transitions.class.getName() }, iterator.next());
+            throw e;
         }
     }
 
