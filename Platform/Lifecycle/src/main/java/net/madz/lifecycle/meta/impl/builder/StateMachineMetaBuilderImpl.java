@@ -269,6 +269,9 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
             if ( initialClasses.size() == 0 ) {
                 vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE,
                         new Object[] { stateSetClass.getName() }));
+            } else if ( initialClasses.size() > 1 ) {
+                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_MULTIPLE_INITAL_STATES,
+                        new Object[] { stateSetClass.getName() }));
             }
             List<Class<?>> endClasses = findClass(stateSetClasses, End.class);
             if ( endClasses.size() == 0 ) {

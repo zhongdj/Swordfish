@@ -81,4 +81,23 @@ public class StateSetSyntaxMetadata extends BaseMetaDataTest {
             static interface Queue {}
         }
     }
+    @StateMachine
+    protected static interface Negative_StateSet_With_Multi_InitalState {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            static interface Start {}
+            @Initial
+            static interface Queued {}
+            @End
+            static interface Ended {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Queue {}
+        }
+    }
 }

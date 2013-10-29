@@ -11,7 +11,6 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -87,10 +86,10 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             Iterator<VerificationFailure> iterator = ex.getVerificationFailureSet().iterator();
             final VerificationFailure failureOne = iterator.next();
             final VerificationFailure failureTwo = iterator.next();
-            assertFailure(failureOne,
-                    Errors.STATEMACHINE_MULTIPLE_STATESET, new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
-            assertFailure(failureTwo,
-                    Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET, new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
+            assertFailure(failureOne, Errors.STATEMACHINE_MULTIPLE_STATESET,
+                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
+            assertFailure(failureTwo, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
+                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
             throw ex;
         }
     }
@@ -107,10 +106,10 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             new Registry();
         } catch (VerificationException e) {
             Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(iterator.next(),
-                    Errors.STATESET_WITHOUT_STATE, new Object[] { Negative_No_State_No_Transition.States.class.getName() });
-            assertFailure(iterator.next(),
-                    Errors.TRANSITIONSET_WITHOUT_TRANSITION, new Object[] { Negative_No_State_No_Transition.Transitions.class.getName() });
+            assertFailure(iterator.next(), Errors.STATESET_WITHOUT_STATE,
+                    new Object[] { Negative_No_State_No_Transition.States.class.getName() });
+            assertFailure(iterator.next(), Errors.TRANSITIONSET_WITHOUT_TRANSITION,
+                    new Object[] { Negative_No_State_No_Transition.Transitions.class.getName() });
             throw e;
         }
     }
@@ -129,7 +128,6 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
 
             protected Registry() throws VerificationException {}
         }
-        
         try {
             new Registry();
         } catch (VerificationException e) {
@@ -138,13 +136,28 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             VerificationFailure failureOne = iterator.next();
             VerificationFailure failureTwo = iterator.next();
-            assertFailure(failureOne, Errors.STATESET_WITHOUT_INITAL_STATE,Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
-            assertFailure(failureTwo, Errors.STATESET_WITHOUT_FINAL_STATE, Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
+            assertFailure(failureOne, Errors.STATESET_WITHOUT_INITAL_STATE,
+                    Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
+            assertFailure(failureTwo, Errors.STATESET_WITHOUT_FINAL_STATE,
+                    Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
             throw e;
         }
     }
 
     @Test(expected = VerificationException.class)
-    @Ignore
-    public void test_StateSet_With_Multi_InitialState() {}
+    public void test_StateSet_With_Multi_InitialState() throws VerificationException {
+        @LifecycleRegistry(Negative_StateSet_With_Multi_InitalState.class)
+        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATESET_MULTIPLE_INITAL_STATES,
+                    Negative_StateSet_With_Multi_InitalState.States.class.getName());
+            throw e;
+        }
+    }
 }
