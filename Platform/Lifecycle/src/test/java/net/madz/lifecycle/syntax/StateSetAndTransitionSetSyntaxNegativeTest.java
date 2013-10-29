@@ -9,6 +9,7 @@ import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
+import net.madz.verification.VerificationFailureSet;
 
 import org.junit.Test;
 
@@ -85,10 +86,10 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             Iterator<VerificationFailure> iterator = ex.getVerificationFailureSet().iterator();
             final VerificationFailure failureOne = iterator.next();
             final VerificationFailure failureTwo = iterator.next();
-            assertFailure(Errors.STATEMACHINE_MULTIPLE_STATESET,
-                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() }, failureOne);
-            assertFailure(Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
-                    new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() }, failureTwo);
+            assertFailure(failureOne,
+                    Errors.STATEMACHINE_MULTIPLE_STATESET, new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
+            assertFailure(failureTwo,
+                    Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET, new Object[] { Negative_Multi_StateSet_Multi_TransitionSet.class.getName() });
             throw ex;
         }
     }
@@ -105,17 +106,42 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             new Registry();
         } catch (VerificationException e) {
             Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(Errors.STATESET_WITHOUT_STATE,
-                    new Object[] { Negative_No_State_No_Transition.States.class.getName() }, iterator.next());
-            assertFailure(Errors.TRANSITIONSET_WITHOUT_TRANSITION,
-                    new Object[] { Negative_No_State_No_Transition.Transitions.class.getName() }, iterator.next());
+            assertFailure(iterator.next(),
+                    Errors.STATESET_WITHOUT_STATE, new Object[] { Negative_No_State_No_Transition.States.class.getName() });
+            assertFailure(iterator.next(),
+                    Errors.TRANSITIONSET_WITHOUT_TRANSITION, new Object[] { Negative_No_State_No_Transition.Transitions.class.getName() });
             throw e;
         }
     }
 
-    private void assertFailure(String errorCode, Object[] args, VerificationFailure failure) {
+    private void assertFailure(VerificationFailure failure, String errorCode, Object... args) {
         assertEquals(errorCode, failure.getErrorCode());
         final String expectedMessage = getMessage(errorCode, args);
         assertEquals(expectedMessage, failure.getErrorMessage(null));
     }
+
+    @Test(expected = VerificationException.class)
+    public void test_StateSet_Without_InitialState_And_EndState() {
+        @LifecycleRegistry(Negative_StateSet_Without_InitalState_And_EndState.class)
+        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            VerificationFailureSet failureSet = e.getVerificationFailureSet();
+            assertEquals(2, failureSet.size());
+            Iterator<VerificationFailure> iterator = failureSet.iterator();
+            VerificationFailure failureOne = iterator.next();
+            VerificationFailure failureTwo = iterator.next();
+            assertFailure(failureOne, Errors.STATESET_WITHOUT_INITAL_STATE,Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
+            assertFailure(failureTwo, Errors.STATESET_WITHOUT_FINAL_STATE, Negative_StateSet_Without_InitalState_And_EndState.States.class.getName());
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_StateSet_With_Multi_InitialState() {}
 }
