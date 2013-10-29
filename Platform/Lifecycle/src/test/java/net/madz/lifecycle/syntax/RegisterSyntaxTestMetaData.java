@@ -1,0 +1,99 @@
+package net.madz.lifecycle.syntax;
+
+import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.annotations.LifecycleMeta;
+import net.madz.lifecycle.annotations.StateMachine;
+import net.madz.lifecycle.annotations.StateSet;
+import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.state.End;
+import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionTwo;
+import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineSyntax.Transitions.TransitionOne;
+import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.IncorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionThree;
+
+public class RegisterSyntaxTestMetaData {
+
+    @StateMachine
+    public static interface CorrectStateMachineSyntax {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(
+                    transition = TransitionOne.class,
+                    value = StateB.class)
+            static interface StateA {}
+            @End
+            static interface StateB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionOne {}
+        }
+    }
+    @LifecycleMeta(CorrectStateMachineSyntax.class)
+    protected static class CorrectLifecycleMetaSyntax {
+
+        private String state;
+
+        @Transition(TransitionOne.class)
+        public void foo() {
+        }
+
+        public String getState() {
+            return state;
+        }
+    }
+    
+    protected static class WithoutMetadataAnnotationErrorSyntax {}
+    @StateMachine
+    public static interface CorrectStateMachineInheritanceSuperSyntax {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = TransitionTwo.class, value = StateD.class)
+            static interface StateC {}
+            @End
+            static interface StateD {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionTwo {}
+        }
+    }
+    @StateMachine
+    public static interface CorrectStateMachineInheritanceChildSyntax extends CorrectStateMachineInheritanceSuperSyntax {}
+    public static interface IncorrectStateMachineInheritanceSuperSyntax {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = TransitionThree.class, value = StateF.class)
+            static interface StateE {}
+            @End
+            static interface StateF {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionThree {}
+        }
+    }
+    @StateMachine
+    public static interface IncorrectStateMachineInheritanceChildSyntax extends
+            IncorrectStateMachineInheritanceSuperSyntax {}
+    @StateMachine
+    public static interface IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax extends
+            CorrectStateMachineInheritanceSuperSyntax, IncorrectStateMachineInheritanceSuperSyntax {}
+
+    public RegisterSyntaxTestMetaData() {
+        super();
+    }
+}
