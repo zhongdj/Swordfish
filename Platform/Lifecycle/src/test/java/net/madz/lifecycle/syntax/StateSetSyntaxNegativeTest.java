@@ -1,5 +1,7 @@
 package net.madz.lifecycle.syntax;
 
+import java.util.Iterator;
+
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
@@ -37,7 +39,7 @@ public class StateSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
 
     @Test(expected = VerificationException.class)
     public void test_StateMachine_without_StateSet_and_TransitionSet() throws VerificationException {
-        @LifecycleRegistry(Negative_No_StateSet_Aand_TransitionSet.class)
+        @LifecycleRegistry(Negative_No_StateSet_and_TransitionSet.class)
         @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
@@ -47,21 +49,22 @@ public class StateSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertEquals(2, e.getVerificationFailureSet().size());
-            final VerificationFailure failureOne = e.getVerificationFailureSet().iterator().next();
-            final VerificationFailure failureTwo = e.getVerificationFailureSet().iterator().next();
+            Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
+            final VerificationFailure failureOne = iterator.next();
+            final VerificationFailure failureTwo = iterator.next();
             {
                 assertEquals(Errors.STATEMACHINE_WITHOUT_STATESET, failureOne.getErrorCode());
                 assertEquals(Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, failureTwo.getErrorCode());
             }
             {
                 final String expectedMessage = getMessage(Errors.STATEMACHINE_WITHOUT_STATESET,
-                        new Object[] { Negative_No_StateSet_Aand_TransitionSet.class.getName() });
+                        new Object[] { Negative_No_StateSet_and_TransitionSet.class.getName() });
                 assertEquals(expectedMessage, failureOne.getErrorMessage(null));
             }
             {
                 final String expectedMessage = getMessage(Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
-                        new Object[] { Negative_No_StateSet_Aand_TransitionSet.class.getName() });
-                assertEquals(expectedMessage, failureOne.getErrorMessage(null));
+                        new Object[] { Negative_No_StateSet_and_TransitionSet.class.getName() });
+                assertEquals(expectedMessage, failureTwo.getErrorMessage(null));
             }
             throw e;
         }

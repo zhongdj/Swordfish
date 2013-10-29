@@ -31,7 +31,7 @@ public class StateSetSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     protected static interface Negative_No_InnerClasses {}
     @StateMachine
-    protected static interface Negative_No_StateSet_Aand_TransitionSet {
+    protected static interface Negative_No_StateSet_and_TransitionSet {
 
         static interface States {
 

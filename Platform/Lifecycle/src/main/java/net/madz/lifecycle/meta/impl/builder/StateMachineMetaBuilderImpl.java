@@ -1,8 +1,14 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.madz.common.Dumper;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.StateMachine;
+import net.madz.lifecycle.annotations.StateSet;
+import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
@@ -190,18 +196,40 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     private void verifySyntax(Class<?> clazz) throws VerificationException {
         verifyStateMachineDefinition(clazz);
-        verifyInnerClasses(clazz);
+        verifyRequiredComponents(clazz);
     }
 
-    private void verifyInnerClasses(Class<?> clazz) throws VerificationException {
+    private void verifyRequiredComponents(Class<?> clazz) throws VerificationException {
         if ( hasSuper(clazz) ) {
             return;
         }
         final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
         if ( 0 == declaredClasses.length ) {
-            throw newVerificationException(Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
-                    new Object[] { clazz.getName() });
+            throw newVerificationException(clazz.getName(),
+                    Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES, new Object[] { clazz.getName() });
         }
+        final List<Class<?>> stateClasses = findClass(declaredClasses, StateSet.class);
+        final List<Class<?>> transitionClasses = findClass(declaredClasses, TransitionSet.class);
+        VerificationFailureSet vs = new VerificationFailureSet();
+        if ( stateClasses.size() <= 0 ) {
+            vs.add(newVerificationException(clazz.getName() + ".StateSet", Errors.STATEMACHINE_WITHOUT_STATESET, new Object[] { clazz.getName() }));
+        }
+        if ( transitionClasses.size() <= 0 ) {
+            vs.add(newVerificationException(clazz.getName() + ".TransitionSet", Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, new Object[] { clazz.getName() }));
+        }
+        if ( vs.size() > 0 ) {
+            throw new VerificationException(vs);
+        }
+    }
+
+    private List<Class<?>> findClass(final Class<?>[] declaredClasses, Class<? extends Annotation> annotationClass) {
+        ArrayList<Class<?>> stateClasses = new ArrayList<>();
+        for ( Class<?> klass : declaredClasses ) {
+            if ( null != klass.getAnnotation(annotationClass) ) {
+                stateClasses.add(klass);
+            }
+        }
+        return stateClasses;
     }
 
     private boolean hasSuper(Class<?> clazz) {
@@ -213,24 +241,24 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
             Class<?> superclass = clazz.getSuperclass();
             if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
-                throw newVerificationException(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                        new Object[] { superclass.getName() });
+                throw newVerificationException(clazz.getName(),
+                        Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, new Object[] { superclass.getName() });
             }
         } else if ( clazz.isInterface() && clazz.getInterfaces().length > 0 ) {
             if ( clazz.getInterfaces().length > 1 ) {
-                throw newVerificationException(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
-                        new Object[] { clazz.getName() });
+                throw newVerificationException(clazz.getName(),
+                        Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, new Object[] { clazz.getName() });
             }
             Class<?> clz = clazz.getInterfaces()[0];
             if ( null == clz.getAnnotation(StateMachine.class) ) {
-                throw newVerificationException(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                        new Object[] { clz.getName() });
+                throw newVerificationException(clazz.getName(),
+                        Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, new Object[] { clz.getName() });
             }
         }
     }
 
-    private VerificationException newVerificationException(String errorCode, Object[] args) {
-        return new VerificationException(new VerificationFailure(this, this.getClass().getName(), errorCode,
+    private VerificationException newVerificationException(String dottedPathName, String errorCode, Object[] args) {
+        return new VerificationException(new VerificationFailure(this, dottedPathName, errorCode,
                 BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR_BUNDLE, errorCode, args)));
     }
 }
