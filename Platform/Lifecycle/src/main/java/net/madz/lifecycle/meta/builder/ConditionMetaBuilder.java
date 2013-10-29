@@ -4,6 +4,7 @@ import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.MetaDataBuilder;
 
-public interface ConditionMetaBuilder extends MetaDataBuilder<ConditionMetadata, StateMachineMetadata> {
+public interface ConditionMetaBuilder extends MetaDataBuilder<ConditionMetadata, StateMachineMetadata>, ConditionMetadata {
+
     ConditionMetaBuilder build(Class<?> klass, StateMachineMetaBuilder builder);
 }
