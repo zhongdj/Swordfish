@@ -181,5 +181,40 @@ public class RegisterSyntaxTest {
             }
         }
     }
+    
+    
+    @StateMachine
+    public static interface IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax extends CorrectStateMachineInheritanceSuperSyntax, IncorrectStateMachineInheritanceSuperSyntax {}
+    
+
+    @LifecycleRegistry(IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class)
+    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+    public static class IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry extends AbsStateMachineRegistry {
+
+        protected IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry() throws VerificationException {
+            super();
+        }
+    }
+    @Test
+    public void test_incorrect_registering_with_multi_super_interfaces() {
+        try {
+            new IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry();
+        } catch (VerificationException ex) {
+             VerificationFailureSet actualFailureSet = ex.getVerificationFailureSet();
+             assertEquals(1, actualFailureSet.size());
+             Iterator<VerificationFailure> iterator = actualFailureSet.iterator();
+             while (iterator.hasNext()) {
+                 VerificationFailure failure = iterator.next();
+                 final String expectedErrorMessage = BundleUtils.getBundledMessage(StateMachineMetaBuilder.class,
+                         Errors.SYNTAX_ERROR, Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
+                         new String[] { IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class.getName() });
+                 final String actualErrorMessage = failure.getErrorMessage(null);
+                 assertEquals(expectedErrorMessage, actualErrorMessage);
+                 assertEquals(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, failure.getErrorCode());
+             }
+             
+        }
+    }
+    
 
 }
