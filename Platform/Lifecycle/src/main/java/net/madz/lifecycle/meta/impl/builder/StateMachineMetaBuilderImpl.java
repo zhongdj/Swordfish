@@ -9,6 +9,8 @@ import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.state.End;
+import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
@@ -213,14 +215,14 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         final List<Class<?>> stateClasses = findClass(declaredClasses, StateSet.class);
         final List<Class<?>> transitionClasses = findClass(declaredClasses, TransitionSet.class);
         final VerificationFailureSet vs = new VerificationFailureSet();
-        verifyStateSetSize(clazz, stateSetPath, stateClasses, vs);
-        verifyTransitionSetSize(clazz, transitionSetPath, transitionClasses, vs);
+        verifyStateSet(clazz, stateSetPath, stateClasses, vs);
+        verifyTransitionSet(clazz, transitionSetPath, transitionClasses, vs);
         if ( vs.size() > 0 ) {
             throw new VerificationException(vs);
         }
     }
 
-    private VerificationFailureSet verifyStateSetSize(Class<?> clazz, final String stateSetPath,
+    private VerificationFailureSet verifyStateSet(Class<?> clazz, final String stateSetPath,
             final List<Class<?>> stateClasses, final VerificationFailureSet vs) {
         if ( stateClasses.size() <= 0 ) {
             vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET,
@@ -234,7 +236,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         return vs;
     }
 
-    private void verifyTransitionSetSize(Class<?> clazz, final String transitionSetPath,
+    private void verifyTransitionSet(Class<?> clazz, final String transitionSetPath,
             final List<Class<?>> transitionClasses, final VerificationFailureSet vs) {
         if ( transitionClasses.size() <= 0 ) {
             vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
@@ -256,12 +258,23 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
     }
 
-    private void verifyStateSetComponent(final String stateSetPath, final Class<?> stateClass,
+    private void verifyStateSetComponent(final String stateSetPath, final Class<?> stateSetClass,
             final VerificationFailureSet vs) {
-        final Class<?>[] stateSetClasses = stateClass.getDeclaredClasses();
+        final Class<?>[] stateSetClasses = stateSetClass.getDeclaredClasses();
         if ( 0 == stateSetClasses.length ) {
             vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE,
-                    new Object[] { stateClass.getName() }));
+                    new Object[] { stateSetClass.getName() }));
+        } else {
+            List<Class<?>> initialClasses = findClass(stateSetClasses, Initial.class);
+            if ( initialClasses.size() == 0 ) {
+                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE,
+                        new Object[] { stateSetClass.getName() }));
+            }
+            List<Class<?>> endClasses = findClass(stateSetClasses, End.class);
+            if ( endClasses.size() == 0 ) {
+                vs.add(newVerificationException(stateSetPath + ".Final", Errors.STATESET_WITHOUT_FINAL_STATE,
+                        new Object[] { stateSetClass.getName() }));
+            }
         }
     }
 
