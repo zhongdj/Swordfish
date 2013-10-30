@@ -190,7 +190,6 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     @Override
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         verifySyntax(clazz);
-        
         addKeys(clazz);
         return this;
     }
@@ -203,19 +202,40 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     public void configureFunctions(Class<?> stateClass) throws VerificationException {}
 
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {
-        if ( null == stateClass.getAnnotation(End.class) ) {
-            final ArrayList<Function> functionList = new ArrayList<>();
-            if ( null != stateClass.getAnnotation(Function.class) ) {
-                functionList.add(stateClass.getAnnotation(Function.class));
-            } else if ( null != stateClass.getAnnotation(Functions.class) ) {
-                for ( Function function : stateClass.getAnnotation(Functions.class).value() ) {
-                    functionList.add(function);
-                }
-            }
-            if ( 0 == functionList.size() ) {
-                throw newVerificationException(getDottedPath().getAbsoluteName(),
-                        Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
+        if ( isFinalState(stateClass) ) {
+            return;
+        }
+        final ArrayList<Function> functionList = new ArrayList<>();
+        if ( null != stateClass.getAnnotation(Function.class) ) {
+            functionList.add(stateClass.getAnnotation(Function.class));
+        } else if ( null != stateClass.getAnnotation(Functions.class) ) {
+            for ( Function function : stateClass.getAnnotation(Functions.class).value() ) {
+                functionList.add(function);
             }
         }
+        if ( 0 == functionList.size() ) {
+            throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
+                    stateClass.getName());
+        }
+        for ( Function function : functionList ) {
+            verifyFunction(stateClass, function);
+        }
+    }
+
+    private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
+        Class<?> transitionClz = function.transition();
+        Class<?>[] stateCandidates = function.value();
+        TransitionMetadata transition = null;
+        for ( StateMachineMetadata sm = this.parent; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
+            transition = sm.getTransition(transitionClz);
+        }
+        if ( null == transition ) {
+            throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.INVALID_TRANSITION_REFERENCE,
+                    function, stateClass.getName(), transitionClz.getName());
+        }
+    }
+
+    private boolean isFinalState(Class<?> stateClass) {
+        return null != stateClass.getAnnotation(End.class);
     }
 }

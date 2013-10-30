@@ -24,7 +24,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
         @SuppressWarnings("unchecked")
         final SELF self = (SELF) this;
 
-        if (null == this.parent) {
+        if (null == parent) {
             this.parent = null;
             this.path = DottedPath.parse(name);
         } else {

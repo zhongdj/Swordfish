@@ -34,17 +34,17 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         implements StateMachineMetaBuilder {
 
     private StateMachineMetadata superStateMachineMetadata;
-    private final ArrayList<TransitionMetadata> transitionList = new ArrayList<>();
-    private final HashMap<Object, TransitionMetadata> transitionMap = new HashMap<>();
+    private final ArrayList<TransitionMetaBuilder> transitionList = new ArrayList<>();
+    private final HashMap<Object, TransitionMetaBuilder> transitionMap = new HashMap<>();
     private final ArrayList<ConditionMetadata> conditionList = new ArrayList<>();
     private final HashMap<Object, ConditionMetadata> conditionMap = new HashMap<>();
     private final ArrayList<StateMetaBuilder> stateList = new ArrayList<>();
     private final HashMap<Object, StateMetaBuilder> stateMap = new HashMap<>();
     private ArrayList<StateMetaBuilder> finalStateList = new ArrayList<>();
-    private TransitionMetadata corruptTransition;
-    private TransitionMetadata recoverTransition;
-    private TransitionMetadata redoTransition;
-    private TransitionMetadata failTransition;
+    private TransitionMetaBuilder corruptTransition;
+    private TransitionMetaBuilder recoverTransition;
+    private TransitionMetaBuilder redoTransition;
+    private TransitionMetaBuilder failTransition;
     private StateMetaBuilder initialState;
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
@@ -284,12 +284,12 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         TransitionMetaBuilder transitionMetaBuilder = null;
         for ( Class<?> klass : transitionClasses ) {
             transitionMetaBuilder = new TransitionMetaBuilderImpl(this, klass.getSimpleName());
-            final TransitionMetadata transitionMetadata = transitionMetaBuilder.build(klass, this).getMetaData();
+            final TransitionMetaBuilder transitionMetadata = transitionMetaBuilder.build(klass, this);
             addTransitionMetadata(clazz, transitionMetadata);
         }
     }
 
-    private void addTransitionMetadata(Class<?> transitionClass, TransitionMetadata transitionMetadata) {
+    private void addTransitionMetadata(Class<?> transitionClass, TransitionMetaBuilder transitionMetadata) {
         this.transitionList.add(transitionMetadata);
         final Iterator<Object> iterator = transitionMetadata.getKeySet().iterator();
         while ( iterator.hasNext() ) {
