@@ -7,8 +7,10 @@ import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.States.A;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.C;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.D;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.States.E;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.Transitions.Y;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.S5.states.S5_A;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -63,8 +65,26 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, E.class.getAnnotation(Function.class),
+                    Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION,  E.class.getAnnotation(Function.class),
                     E.class.getName(), Y.class.getName());
+            throw e;
+        }
+    }
+    
+    @Test(expected = VerificationException.class)
+    public void test_state_function_with_invalid_next_state() throws VerificationException {
+        @LifecycleRegistry(S5.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, S5_A.class.getAnnotation(Function.class),
+                    S5_A.class.getName(), S5.class.getName(),D.class.getName());
             throw e;
         }
     }
