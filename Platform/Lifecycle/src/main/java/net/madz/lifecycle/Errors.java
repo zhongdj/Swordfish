@@ -20,6 +20,7 @@ public interface Errors {
     public static final String TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE = "002-2612";
     public static final String TRANSITION_MUST_BE_NOT_ON_END_STATE = "002-2613";
     public static final String TRANSITIONSET_WITHOUT_TRANSITION = "002-2614";
+    public static final String NON_FINAL_STATE_WITHOUT_FUNCTIONS = "002-2615";
     public static final String NEXT_STATESET_OF_FUNCTION_INVALID = "002-2700";
     public static final String SHORT_CUT_INVALID = "002-2800";
     public static final String SHORT_CUT_MUST_WORK_WITH_END = "002-2801";

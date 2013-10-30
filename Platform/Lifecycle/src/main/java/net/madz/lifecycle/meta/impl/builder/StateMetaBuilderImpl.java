@@ -1,6 +1,12 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.util.ArrayList;
+
 import net.madz.common.Dumper;
+import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.annotations.Functions;
+import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.template.RelationMetadata;
@@ -10,13 +16,17 @@ import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
+import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetadata, StateMachineMetadata> implements
         StateMetaBuilder, StateMetadata {
 
+    private boolean end;
+    private boolean initial;
+
     protected StateMetaBuilderImpl(StateMachineMetadata parent, String name) {
-        super(parent, name);
+        super(parent, "StateSet." + name);
     }
 
     @Override
@@ -91,14 +101,12 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
 
     @Override
     public boolean isInitial() {
-        // TODO Auto-generated method stub
-        return false;
+        return initial;
     }
 
     @Override
     public boolean isFinal() {
-        // TODO Auto-generated method stub
-        return false;
+        return end;
     }
 
     @Override
@@ -180,7 +188,34 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     }
 
     @Override
-    public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) {
+    public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
+        verifySyntax(clazz);
+        
+        addKeys(clazz);
         return this;
+    }
+
+    private void verifySyntax(Class<?> clazz) throws VerificationException {
+        verifyFunctions(clazz);
+    }
+
+    @Override
+    public void configureFunctions(Class<?> stateClass) throws VerificationException {}
+
+    private void verifyFunctions(Class<?> stateClass) throws VerificationException {
+        if ( null == stateClass.getAnnotation(End.class) ) {
+            final ArrayList<Function> functionList = new ArrayList<>();
+            if ( null != stateClass.getAnnotation(Function.class) ) {
+                functionList.add(stateClass.getAnnotation(Function.class));
+            } else if ( null != stateClass.getAnnotation(Functions.class) ) {
+                for ( Function function : stateClass.getAnnotation(Functions.class).value() ) {
+                    functionList.add(function);
+                }
+            }
+            if ( 0 == functionList.size() ) {
+                throw newVerificationException(getDottedPath().getAbsoluteName(),
+                        Errors.NON_FINAL_STATE_WITHOUT_FUNCTIONS, stateClass.getName());
+            }
+        }
     }
 }

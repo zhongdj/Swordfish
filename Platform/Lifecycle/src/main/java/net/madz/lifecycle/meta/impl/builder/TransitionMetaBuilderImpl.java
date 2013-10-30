@@ -25,6 +25,7 @@ public class TransitionMetaBuilderImpl extends AnnotationBasedMetaBuilder<Transi
 
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) {
+        addKeys(clazz);
         return this;
     }
 

@@ -1,9 +1,13 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
+import net.madz.lifecycle.Errors;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataBuilder;
 import net.madz.meta.impl.MetaDataBuilderBase;
+import net.madz.utils.BundleUtils;
+import net.madz.verification.VerificationException;
+import net.madz.verification.VerificationFailure;
 
 public abstract class AnnotationBasedMetaBuilder<SELF extends MetaData, PARENT extends MetaData> extends
         MetaDataBuilderBase<SELF, PARENT> implements MetaDataBuilder<SELF, PARENT> {
@@ -17,6 +21,18 @@ public abstract class AnnotationBasedMetaBuilder<SELF extends MetaData, PARENT e
 
     public void setRegistry(AbsStateMachineRegistry registry) {
         this.registry = registry;
+    }
+
+    protected VerificationException newVerificationException(String dottedPathName, String errorCode, Object... args) {
+        return new VerificationException(new VerificationFailure(this, dottedPathName, errorCode,
+                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR_BUNDLE, errorCode, args)));
+    }
+
+    protected void addKeys(Class<?> clazz) {
+        addKey(getDottedPath());
+        addKey(getDottedPath().getAbsoluteName());
+        addKey(clazz);
+        addKey(clazz.getName());
     }
 
     protected AnnotationBasedMetaBuilder(PARENT parent, String name) {

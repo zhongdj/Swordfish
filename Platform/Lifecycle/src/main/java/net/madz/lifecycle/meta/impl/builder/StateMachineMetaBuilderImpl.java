@@ -9,6 +9,8 @@ import java.util.List;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
@@ -24,13 +26,10 @@ import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.meta.KeySet;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
-import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
-import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
 
 public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata>
@@ -41,14 +40,14 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     private final HashMap<Object, TransitionMetadata> transitionMap = new HashMap<>();
     private final ArrayList<ConditionMetadata> conditionList = new ArrayList<>();
     private final HashMap<Object, ConditionMetadata> conditionMap = new HashMap<>();
+    private final ArrayList<StateMetaBuilder> stateList = new ArrayList<>();
+    private final HashMap<Object, StateMetaBuilder> stateMap = new HashMap<>();
+    private ArrayList<StateMetaBuilder> finalStateList = new ArrayList<>();
     private TransitionMetadata corruptTransition;
     private TransitionMetadata recoverTransition;
     private TransitionMetadata redoTransition;
     private TransitionMetadata failTransition;
-    private final ArrayList<StateMetadata> stateList = new ArrayList<>();
-    private final HashMap<Object, StateMetadata> stateMap = new HashMap<>();
-    private ArrayList<StateMetadata> finalStateList = new ArrayList<>();
-    private StateMetadata initialState;
+    private StateMetaBuilder initialState;
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         this(name);
@@ -177,38 +176,32 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public boolean hasRedoTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != redoTransition;
     }
 
     @Override
     public TransitionMetadata getRedoTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return redoTransition;
     }
 
     @Override
     public boolean hasRecoverTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != recoverTransition;
     }
 
     @Override
     public TransitionMetadata getRecoverTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return recoverTransition;
     }
 
     @Override
     public boolean hasCorruptTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != corruptTransition;
     }
 
     @Override
     public TransitionMetadata getCorruptTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return corruptTransition;
     }
 
     @Override
@@ -237,19 +230,27 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
     }
 
-    private void configureFunctions(Class<?> clazz) {
+    private void configureFunctions(Class<?> clazz) throws VerificationException {
+        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
+        if ( 0 >= stateSetClasses.size() ) {
+            return;
+        }
+        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
+        for ( Class<?> stateClass : stateClasses ) {
+            StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
+            stateMetaBuilder.configureFunctions(stateClass);
+        }
+    }
+
+    private void configureStateSetRelations(Class<?> clazz) throws VerificationException {
         // TODO Auto-generated method stub
     }
 
-    private void configureStateSetRelations(Class<?> clazz) {
+    private void configureRelationSet(Class<?> clazz) throws VerificationException {
         // TODO Auto-generated method stub
     }
 
-    private void configureRelationSet(Class<?> clazz) {
-        // TODO Auto-generated method stub
-    }
-
-    private void configureStateSetBasic(Class<?> clazz) {
+    private void configureStateSetBasic(Class<?> clazz) throws VerificationException {
         final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
         if ( 0 >= stateSetClasses.size() ) {
             return;
@@ -258,12 +259,12 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         StateMetaBuilder stateBuilder = null;
         for ( Class<?> klass : stateClasses ) {
             stateBuilder = new StateMetaBuilderImpl(this, klass.getName());
-            final StateMetadata stateMetadata = stateBuilder.build(klass, this).getMetaData();
-            addStateMetadata(klass, stateMetadata);
+            final StateMetaBuilder stateMetaBuilder = stateBuilder.build(klass, this);
+            addStateMetadata(klass, stateMetaBuilder);
         }
     }
 
-    private void addStateMetadata(Class<?> stateClass, StateMetadata stateMetadata) {
+    private void addStateMetadata(Class<?> stateClass, StateMetaBuilder stateMetadata) {
         this.stateList.add(stateMetadata);
         final Iterator<Object> iterator = stateMetadata.getKeySet().iterator();
         while ( iterator.hasNext() ) {
@@ -483,10 +484,5 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
                         new Object[] { clz.getName() });
             }
         }
-    }
-
-    private VerificationException newVerificationException(String dottedPathName, String errorCode, Object... args) {
-        return new VerificationException(new VerificationFailure(this, dottedPathName, errorCode,
-                BundleUtils.getBundledMessage(getClass(), Errors.SYNTAX_ERROR_BUNDLE, errorCode, args)));
     }
 }
