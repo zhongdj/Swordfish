@@ -3,6 +3,7 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import net.madz.common.Dumper;
@@ -16,12 +17,14 @@ import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
+import net.madz.meta.KeySet;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
@@ -42,6 +45,10 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     private TransitionMetadata recoverTransition;
     private TransitionMetadata redoTransition;
     private TransitionMetadata failTransition;
+    private final ArrayList<StateMetadata> stateList = new ArrayList<>();
+    private final HashMap<Object, StateMetadata> stateMap = new HashMap<>();
+    private ArrayList<StateMetadata> finalStateList = new ArrayList<>();
+    private StateMetadata initialState;
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         this(name);
@@ -243,11 +250,34 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     }
 
     private void configureStateSetBasic(Class<?> clazz) {
-        // TODO Auto-generated method stub
+        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
+        if ( 0 >= stateSetClasses.size() ) {
+            return;
+        }
+        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
+        StateMetaBuilder stateBuilder = null;
+        for ( Class<?> klass : stateClasses ) {
+            stateBuilder = new StateMetaBuilderImpl(this, klass.getName());
+            final StateMetadata stateMetadata = stateBuilder.build(klass, this).getMetaData();
+            addStateMetadata(klass, stateMetadata);
+        }
+    }
+
+    private void addStateMetadata(Class<?> stateClass, StateMetadata stateMetadata) {
+        this.stateList.add(stateMetadata);
+        final Iterator<Object> iterator = stateMetadata.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            this.stateMap.put(iterator.next(), stateMetadata);
+        }
+        if ( stateMetadata.isInitial() ) {
+            this.initialState = stateMetadata;
+        } else if ( stateMetadata.isFinal() ) {
+            this.finalStateList.add(stateMetadata);
+        }
     }
 
     private void configureTransitionSet(Class<?> clazz) {
-        List<Class<?>> transitionSetClasses = findClass(clazz.getDeclaredClasses(), TransitionSet.class);
+        final List<Class<?>> transitionSetClasses = findClass(clazz.getDeclaredClasses(), TransitionSet.class);
         if ( 0 >= transitionSetClasses.size() ) {
             return;
         }
@@ -262,10 +292,10 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     private void addTransitionMetadata(Class<?> transitionClass, TransitionMetadata transitionMetadata) {
         this.transitionList.add(transitionMetadata);
-        this.transitionMap.put(transitionMetadata.getDottedPath(), transitionMetadata);
-        this.transitionMap.put(transitionMetadata.getDottedPath().getAbsoluteName(), transitionMetadata);
-        this.transitionMap.put(transitionClass, transitionMetadata);
-        this.transitionMap.put(transitionClass.getName(), transitionMetadata);
+        final Iterator<Object> iterator = transitionMetadata.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            this.transitionMap.put(iterator.next(), transitionMetadata);
+        }
         switch (transitionMetadata.getType()) {
             case Corrupt:
                 this.corruptTransition = transitionMetadata;
