@@ -214,7 +214,7 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
             }
             if ( 0 == functionList.size() ) {
                 throw newVerificationException(getDottedPath().getAbsoluteName(),
-                        Errors.NON_FINAL_STATE_WITHOUT_FUNCTIONS, stateClass.getName());
+                        Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
             }
         }
     }

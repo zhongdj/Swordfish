@@ -6,7 +6,7 @@ import java.util.Map;
 import net.madz.common.DottedPath;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.demo.standalone.IServiceOrder;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.States.Cancelled;
@@ -46,7 +46,7 @@ public class StandaloneLifecyclePureMetadataTest {
     private static StateMachineRegistry registry;
 
     @LifecycleRegistry(IServiceOrder.class)
-    @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+    @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
     private static class StateMachineRegistry extends AbsStateMachineRegistry {
 
         protected StateMachineRegistry() throws VerificationException {

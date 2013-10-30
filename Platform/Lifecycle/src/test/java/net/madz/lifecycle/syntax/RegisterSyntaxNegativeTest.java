@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
@@ -20,7 +20,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     @Test(expected = VerificationException.class)
     public void test_incorrect_registering_without_StateMachine_or_LifecycleMeta() throws VerificationException {
         @LifecycleRegistry(WithoutMetadataAnnotationErrorSyntax.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineRegistry extends AbsStateMachineRegistry {
 
             protected IncorrectStateMachineRegistry() throws VerificationException {
@@ -46,7 +46,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     @Test(expected = VerificationException.class)
     public void test_incorrect_registering_superclass_without_StateMachine() throws VerificationException {
         @LifecycleRegistry(IncorrectStateMachineInheritanceChildSyntax.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
 
             protected IncorrectStateMachineInheritanceRegistry() throws VerificationException {
@@ -72,7 +72,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     @Test(expected = VerificationException.class)
     public void test_incorrect_registering_with_multi_super_interfaces() throws VerificationException {
         @LifecycleRegistry(IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry extends AbsStateMachineRegistry {
 
             protected IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry() throws VerificationException {

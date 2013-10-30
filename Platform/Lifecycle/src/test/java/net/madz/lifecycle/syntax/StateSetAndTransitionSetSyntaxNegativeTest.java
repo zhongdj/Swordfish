@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
@@ -20,7 +20,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     @Test(expected = VerificationException.class)
     public void test_StateMachine_without_InnerClasses() throws VerificationException {
         @LifecycleRegistry(Negative_No_InnerClasses.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}
@@ -41,7 +41,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     @Test(expected = VerificationException.class)
     public void test_StateMachine_without_StateSet_and_TransitionSet() throws VerificationException {
         @LifecycleRegistry(Negative_No_StateSet_and_TransitionSet.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}
@@ -74,7 +74,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     @Test(expected = VerificationException.class)
     public void test_StateMachine_with_Multi_StateSet_And_Multi_TransitionSet() throws VerificationException {
         @LifecycleRegistry({ Negative_Multi_StateSet_Multi_TransitionSet.class })
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}
@@ -97,7 +97,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     @Test(expected = VerificationException.class)
     public void test_StateSet_no_states() throws VerificationException {
         @LifecycleRegistry({ Negative_No_State_No_Transition.class })
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}
@@ -114,16 +114,10 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
         }
     }
 
-    private void assertFailure(VerificationFailure failure, String errorCode, Object... args) {
-        assertEquals(errorCode, failure.getErrorCode());
-        final String expectedMessage = getMessage(errorCode, args);
-        assertEquals(expectedMessage, failure.getErrorMessage(null));
-    }
-
     @Test(expected = VerificationException.class)
     public void test_StateSet_Without_InitialState_And_EndState() throws VerificationException {
         @LifecycleRegistry(Negative_StateSet_Without_InitalState_And_EndState.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}
@@ -147,7 +141,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     @Test(expected = VerificationException.class)
     public void test_StateSet_With_Multi_InitialState() throws VerificationException {
         @LifecycleRegistry(Negative_StateSet_With_Multi_InitalState.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {}

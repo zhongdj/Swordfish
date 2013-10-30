@@ -14,6 +14,7 @@ import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.utils.BundleUtils;
@@ -37,13 +38,13 @@ public abstract class AbsStateMachineRegistry {
     }
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface StateMachineMetadataBuilder {
+    public static @interface StateMachineBuilder {
 
         /**
          * @return a concrete StateMachineMetaBuilder implementation class,
          *         which can build state machines from value of @LifecycleRegisty
          */
-        Class<? extends StateMachineMetaBuilder> value();
+        Class<? extends StateMachineMetaBuilder> value() default StateMachineMetaBuilderImpl.class;
     }
 
     protected static final Logger logger = Logger.getLogger(AbsStateMachineRegistry.class.getName());
@@ -68,7 +69,7 @@ public abstract class AbsStateMachineRegistry {
      */
     private synchronized void registerStateMachines() throws VerificationException {
         final LifecycleRegistry lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
-        final StateMachineMetadataBuilder builderMeta = getClass().getAnnotation(StateMachineMetadataBuilder.class);
+        final StateMachineBuilder builderMeta = getClass().getAnnotation(StateMachineBuilder.class);
         if ( null == lifecycleRegistry || null == builderMeta ) {
             throw new NullPointerException(
                     "A subclass of AbstractStateMachineRegistry must have both @LifecycleRegistry and @StateMachineMetadataBuilder annotated on Type.");
@@ -123,7 +124,7 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
-    private StateMachineMetaBuilder createBuilder(final StateMachineMetadataBuilder builderMeta, String metadataClass)
+    private StateMachineMetaBuilder createBuilder(final StateMachineBuilder builderMeta, String metadataClass)
             throws VerificationException {
         final Class<? extends StateMachineMetaBuilder> builderClass = builderMeta.value();
         try {

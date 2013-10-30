@@ -2,7 +2,7 @@ package net.madz.lifecycle.syntax;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
-import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineMetadataBuilder;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 
@@ -14,7 +14,7 @@ public class StateSetSyntaxPositiveTest extends StateSetSyntaxMetadata {
     @Test
     public void test_positive_state_set_syntax() {
         @LifecycleRegistry(Positive.class)
-        @StateMachineMetadataBuilder(StateMachineMetaBuilderImpl.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
             protected Registry() throws VerificationException {

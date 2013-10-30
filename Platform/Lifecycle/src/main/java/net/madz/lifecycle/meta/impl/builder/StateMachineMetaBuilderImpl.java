@@ -9,8 +9,6 @@ import java.util.List;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.Errors;
-import net.madz.lifecycle.annotations.Function;
-import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
