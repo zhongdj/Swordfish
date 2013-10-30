@@ -194,12 +194,12 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
         return this;
     }
 
-    private void verifySyntax(Class<?> clazz) throws VerificationException {
-        verifyFunctions(clazz);
-    }
+    private void verifySyntax(Class<?> clazz) throws VerificationException {}
 
     @Override
-    public void configureFunctions(Class<?> stateClass) throws VerificationException {}
+    public void configureFunctions(Class<?> clazz) throws VerificationException {
+        verifyFunctions(clazz);
+    }
 
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {
         if ( isFinalState(stateClass) ) {
@@ -225,14 +225,53 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
         Class<?> transitionClz = function.transition();
         Class<?>[] stateCandidates = function.value();
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        TransitionMetadata transition = findTransitionMetadata(transitionClz);
+        if ( null == transition ) {
+            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                    Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
+                    transitionClz.getName()));
+        }
+        if ( 0 == stateCandidates.length ) {
+            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                    Errors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function, stateClass.getName(),
+                    transitionClz.getName()));
+        } else if ( 1 < stateCandidates.length ) {
+            if ( !transition.isConditional() ) {
+                failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
+                        Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(),
+                        transitionClz.getName()));
+            }
+        }
+        for ( int i = 0; i < stateCandidates.length; i++ ) {
+            final Class<?> stateCandidateClass = stateCandidates[i];
+            StateMetadata stateMetadata = findStateMetadata(stateCandidateClass);
+            if ( null == stateMetadata ) {
+                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                        Errors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, function, stateClass.getName(), parent
+                                .getDottedPath().getAbsoluteName(), stateCandidateClass.getName()));
+            }
+        }
+        if ( 0 < failureSet.size() ) {
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    private StateMetadata findStateMetadata(final Class<?> stateCandidateClass) {
+        StateMetadata stateMetadata = null;
+        for ( StateMachineMetadata sm = this.parent; sm != null && null == stateMetadata; sm = sm
+                .getSuperStateMachine() ) {
+            stateMetadata = sm.getState(stateCandidateClass);
+        }
+        return stateMetadata;
+    }
+
+    private TransitionMetadata findTransitionMetadata(Class<?> transitionClz) {
         TransitionMetadata transition = null;
         for ( StateMachineMetadata sm = this.parent; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
             transition = sm.getTransition(transitionClz);
         }
-        if ( null == transition ) {
-            throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.INVALID_TRANSITION_REFERENCE,
-                    function, stateClass.getName(), transitionClz.getName());
-        }
+        return transition;
     }
 
     private boolean isFinalState(Class<?> stateClass) {

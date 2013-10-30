@@ -20,7 +20,6 @@ import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
-import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -34,10 +33,11 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         implements StateMachineMetaBuilder {
 
     private StateMachineMetadata superStateMachineMetadata;
+    private StateMachineMetadata parentStateMachineMetadata;
     private final ArrayList<TransitionMetaBuilder> transitionList = new ArrayList<>();
     private final HashMap<Object, TransitionMetaBuilder> transitionMap = new HashMap<>();
-    private final ArrayList<ConditionMetadata> conditionList = new ArrayList<>();
-    private final HashMap<Object, ConditionMetadata> conditionMap = new HashMap<>();
+    private final ArrayList<ConditionMetaBuilder> conditionList = new ArrayList<>();
+    private final HashMap<Object, ConditionMetaBuilder> conditionMap = new HashMap<>();
     private final ArrayList<StateMetaBuilder> stateList = new ArrayList<>();
     private final HashMap<Object, StateMetaBuilder> stateMap = new HashMap<>();
     private ArrayList<StateMetaBuilder> finalStateList = new ArrayList<>();
@@ -68,8 +68,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public boolean hasParent() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != parentStateMachineMetadata;
     }
 
     @Override
@@ -86,32 +85,27 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public StateMetadata[] getStateSet() {
-        // TODO Auto-generated method stub
-        return null;
+        return stateList.toArray(new StateMetadata[stateList.size()]);
     }
 
     @Override
     public StateMetadata getState(Object stateKey) {
-        // TODO Auto-generated method stub
-        return null;
+        return stateMap.get(stateKey);
     }
 
     @Override
     public StateMetadata getInitialState() {
-        // TODO Auto-generated method stub
-        return null;
+        return initialState;
     }
 
     @Override
     public StateMetadata[] getFinalStates() {
-        // TODO Auto-generated method stub
-        return null;
+        return finalStateList.toArray(new StateMetadata[finalStateList.size()]);
     }
 
     @Override
     public TransitionMetadata[] getTransitionSet() {
-        // TODO Auto-generated method stub
-        return null;
+        return transitionList.toArray(new TransitionMetadata[transitionList.size()]);
     }
 
     @Override
@@ -326,17 +320,17 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         ConditionMetaBuilder conditionMetaBuilder = null;
         for ( Class<?> klass : conditionClasses ) {
             conditionMetaBuilder = new ConditionMetaBuilderImpl(this, klass.getSimpleName());
-            final ConditionMetadata conditionMetadata = conditionMetaBuilder.build(klass, this).getMetaData();
+            final ConditionMetaBuilder conditionMetadata = conditionMetaBuilder.build(klass, this);
             addConditionMetadata(clazz, conditionMetadata);
         }
     }
 
-    private void addConditionMetadata(Class<?> clazz, ConditionMetadata conditionMetadata) {
-        this.conditionList.add(conditionMetadata);
-        this.conditionMap.put(conditionMetadata.getDottedPath(), conditionMetadata);
-        this.conditionMap.put(conditionMetadata.getDottedPath().getAbsoluteName(), conditionMetadata);
-        this.conditionMap.put(clazz, conditionMetadata);
-        this.conditionMap.put(clazz.getName(), conditionMetadata);
+    private void addConditionMetadata(Class<?> clazz, ConditionMetaBuilder conditionMetaBuilder) {
+        this.conditionList.add(conditionMetaBuilder);
+        final Iterator<Object> iterator = conditionMetaBuilder.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            conditionMap.put(iterator.next(), conditionMetaBuilder);
+        }
     }
 
     private StateMachineMetadata load(Class<?> stateMachineClass) throws VerificationException {

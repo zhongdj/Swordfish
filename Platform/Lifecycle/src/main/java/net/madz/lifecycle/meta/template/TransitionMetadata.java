@@ -22,4 +22,6 @@ public interface TransitionMetadata extends MetaData, Dumpable, Template<Transit
     TransitionTypeEnum getType();
 
     long getTimeout();
+
+    boolean isConditional();
 }

@@ -18,6 +18,7 @@ public class ConditionMetaBuilderImpl extends AnnotationBasedMetaBuilder<Conditi
 
     @Override
     public ConditionMetaBuilder build(Class<?> klass, StateMachineMetaBuilder builder) {
+        addKeys(klass);
         return this;
     }
 }

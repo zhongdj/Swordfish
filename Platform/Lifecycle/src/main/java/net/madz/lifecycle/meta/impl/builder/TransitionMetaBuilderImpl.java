@@ -1,6 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.common.Dumper;
+import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.TransitionInst;
@@ -15,6 +16,9 @@ public class TransitionMetaBuilderImpl extends AnnotationBasedMetaBuilder<Transi
         implements TransitionMetaBuilder {
 
     private TransitionTypeEnum type = TransitionTypeEnum.Common;
+    private boolean conditional;
+    private Class<?> conditionClass;
+    private Class<?> judgerClass;
 
     protected TransitionMetaBuilderImpl(StateMachineMetadata parent, String name) {
         super(parent, "TransitionSet." + name);
@@ -25,8 +29,20 @@ public class TransitionMetaBuilderImpl extends AnnotationBasedMetaBuilder<Transi
 
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) {
+        configureCondition(clazz);
         addKeys(clazz);
         return this;
+    }
+
+    private void configureCondition(Class<?> clazz) {
+        Conditional conditionalAnno = clazz.getAnnotation(Conditional.class);
+        if ( null != conditionalAnno ) {
+            conditional = true;
+            conditionClass = conditionalAnno.condition();
+            judgerClass = conditionalAnno.judger();
+        } else {
+            conditional = false;
+        }
     }
 
     @Override
@@ -60,5 +76,10 @@ public class TransitionMetaBuilderImpl extends AnnotationBasedMetaBuilder<Transi
     public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean isConditional() {
+        return conditional;
     }
 }

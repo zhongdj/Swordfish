@@ -43,7 +43,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.INVALID_TRANSITION_REFERENCE,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.FUNCTION_INVALID_TRANSITION_REFERENCE,
                     C.class.getAnnotation(Function.class), C.class.getName(),
                     net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.Transitions.X.class.getName());
             throw e;
@@ -63,8 +63,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.CONDITIONAL_TRANSITION_WITHOUT_CONDITION, E.class.getAnnotation(Function.class),
-                    E.class.getName(), Y.class);
+                    Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, E.class.getAnnotation(Function.class),
+                    E.class.getName(), Y.class.getName());
             throw e;
         }
     }
