@@ -29,8 +29,7 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata>
-        implements StateMachineMetaBuilder {
+public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata> implements StateMachineMetaBuilder {
 
     private StateMachineMetadata superStateMachineMetadata;
     private StateMachineMetadata parentStateMachineMetadata;
@@ -290,20 +289,20 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
             this.transitionMap.put(iterator.next(), transitionMetadata);
         }
         switch (transitionMetadata.getType()) {
-            case Corrupt:
-                this.corruptTransition = transitionMetadata;
-                break;
-            case Recover:
-                this.recoverTransition = transitionMetadata;
-                break;
-            case Redo:
-                this.redoTransition = transitionMetadata;
-                break;
-            case Fail:
-                this.failTransition = transitionMetadata;
-                break;
-            default:
-                break;
+        case Corrupt:
+            this.corruptTransition = transitionMetadata;
+            break;
+        case Recover:
+            this.recoverTransition = transitionMetadata;
+            break;
+        case Redo:
+            this.redoTransition = transitionMetadata;
+            break;
+        case Fail:
+            this.failTransition = transitionMetadata;
+            break;
+        default:
+            break;
         }
     }
 
@@ -313,8 +312,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
             return;
         }
         if ( 1 != conditionSetClasses.size() ) {
-            throw newVerificationException(clazz.getName() + ".ConditionSet",
-                    Errors.STATEMACHINE_MULTIPLE_CONDITIONSET, clazz.getName());
+            throw newVerificationException(clazz.getName() + ".ConditionSet", Errors.STATEMACHINE_MULTIPLE_CONDITIONSET, clazz.getName());
         }
         final Class<?>[] conditionClasses = conditionSetClasses.get(0).getDeclaredClasses();
         ConditionMetaBuilder conditionMetaBuilder = null;
@@ -338,8 +336,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         if ( null != stateMachineMetadata ) {
             return stateMachineMetadata;
         } else {
-            StateMachineMetaBuilder stateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry,
-                    stateMachineClass.getName());
+            StateMachineMetaBuilder stateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry, stateMachineClass.getName());
             stateMachineMetadata = stateMachineMetaBuilder.build(stateMachineClass).getMetaData();
             registry.addTemplate(stateMachineMetadata);
             return stateMachineMetadata;
@@ -371,8 +368,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
         final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
         if ( 0 == declaredClasses.length ) {
-            throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
-                    new Object[] { clazz.getName() });
+            throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES, new Object[] { clazz.getName() });
         }
         final List<Class<?>> stateClasses = findClass(declaredClasses, StateSet.class);
         final List<Class<?>> transitionClasses = findClass(declaredClasses, TransitionSet.class);
@@ -384,61 +380,48 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
     }
 
-    private VerificationFailureSet verifyStateSet(Class<?> clazz, final String stateSetPath,
-            final List<Class<?>> stateClasses, final VerificationFailureSet vs) {
+    private VerificationFailureSet verifyStateSet(Class<?> clazz, final String stateSetPath, final List<Class<?>> stateClasses, final VerificationFailureSet vs) {
         if ( stateClasses.size() <= 0 ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET, new Object[] { clazz.getName() }));
         } else if ( stateClasses.size() > 1 ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_MULTIPLE_STATESET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_MULTIPLE_STATESET, new Object[] { clazz.getName() }));
         } else {
             verifyStateSetComponent(stateSetPath, stateClasses.get(0), vs);
         }
         return vs;
     }
 
-    private void verifyTransitionSet(Class<?> clazz, final String transitionSetPath,
-            final List<Class<?>> transitionClasses, final VerificationFailureSet vs) {
+    private void verifyTransitionSet(Class<?> clazz, final String transitionSetPath, final List<Class<?>> transitionClasses, final VerificationFailureSet vs) {
         if ( transitionClasses.size() <= 0 ) {
-            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, new Object[] { clazz.getName() }));
         } else if ( transitionClasses.size() > 1 ) {
-            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET, new Object[] { clazz.getName() }));
         } else {
             verifyTransitionSetComponent(transitionSetPath, transitionClasses.get(0), vs);
         }
     }
 
-    private void verifyTransitionSetComponent(final String dottedPath, final Class<?> transitionClass,
-            final VerificationFailureSet vs) {
+    private void verifyTransitionSetComponent(final String dottedPath, final Class<?> transitionClass, final VerificationFailureSet vs) {
         final Class<?>[] transitionSetClasses = transitionClass.getDeclaredClasses();
         if ( 0 == transitionSetClasses.length ) {
-            vs.add(newVerificationException(dottedPath, Errors.TRANSITIONSET_WITHOUT_TRANSITION,
-                    new Object[] { transitionClass.getName() }));
+            vs.add(newVerificationException(dottedPath, Errors.TRANSITIONSET_WITHOUT_TRANSITION, new Object[] { transitionClass.getName() }));
         }
     }
 
-    private void verifyStateSetComponent(final String stateSetPath, final Class<?> stateSetClass,
-            final VerificationFailureSet vs) {
+    private void verifyStateSetComponent(final String stateSetPath, final Class<?> stateSetClass, final VerificationFailureSet vs) {
         final Class<?>[] stateSetClasses = stateSetClass.getDeclaredClasses();
         if ( 0 == stateSetClasses.length ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE,
-                    new Object[] { stateSetClass.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE, new Object[] { stateSetClass.getName() }));
         } else {
             List<Class<?>> initialClasses = findClass(stateSetClasses, Initial.class);
             if ( initialClasses.size() == 0 ) {
-                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE,
-                        new Object[] { stateSetClass.getName() }));
+                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE, new Object[] { stateSetClass.getName() }));
             } else if ( initialClasses.size() > 1 ) {
-                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_MULTIPLE_INITAL_STATES,
-                        new Object[] { stateSetClass.getName() }));
+                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_MULTIPLE_INITAL_STATES, new Object[] { stateSetClass.getName() }));
             }
             List<Class<?>> endClasses = findClass(stateSetClasses, End.class);
             if ( endClasses.size() == 0 ) {
-                vs.add(newVerificationException(stateSetPath + ".Final", Errors.STATESET_WITHOUT_FINAL_STATE,
-                        new Object[] { stateSetClass.getName() }));
+                vs.add(newVerificationException(stateSetPath + ".Final", Errors.STATESET_WITHOUT_FINAL_STATE, new Object[] { stateSetClass.getName() }));
             }
         }
     }
@@ -454,26 +437,26 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     }
 
     private boolean hasSuperMetadataClass(Class<?> clazz) {
-        return ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) )
-                || ( 1 <= clazz.getInterfaces().length );
+        return ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) ) || ( 1 <= clazz.getInterfaces().length );
     }
 
     private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
             Class<?> superclass = clazz.getSuperclass();
             if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
-                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                        new Object[] { superclass.getName() });
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, new Object[] { superclass.getName() });
             }
         } else if ( clazz.isInterface() && clazz.getInterfaces().length > 0 ) {
             if ( clazz.getInterfaces().length > 1 ) {
-                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
-                        new Object[] { clazz.getName() });
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, new Object[] { clazz.getName() });
             }
             Class<?> clz = clazz.getInterfaces()[0];
             if ( null == clz.getAnnotation(StateMachine.class) ) {
-                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                        new Object[] { clz.getName() });
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, new Object[] { clz.getName() });
+            }
+        } else if ( clazz.isInterface() && clazz.getInterfaces().length <= 0 ) {
+            if ( null == clazz.getAnnotation(StateMachine.class) ) {
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION, clazz.getName());
             }
         }
     }

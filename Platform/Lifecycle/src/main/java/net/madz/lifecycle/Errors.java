@@ -7,6 +7,7 @@ public interface Errors {
     // StateMachine
     public static final String STATEMACHINE_SUPER_MUST_BE_STATEMACHINE = "002-2100";
     public static final String STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE = "002-2101";
+    public static final String STATEMACHINE_CLASS_WITHOUT_ANNOTATION = "002-2102";
     public static final String STATEMACHINE_WITHOUT_STATESET = "002-2201";
     public static final String STATEMACHINE_MULTIPLE_STATESET = "002-2202";
     public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2203";
@@ -38,7 +39,6 @@ public interface Errors {
     public static final String RELATION_ATTRIBUTE_OF_VALIDWHILE_INVALID = "002-2921";
     public static final String ON_ATTRIBUTE_OF_VALIDWHILE_INVALID = "002-2922";
     // LifecycleMeta
-    public static final String LM_VALUE_MUST_BE_STATEMACHINE = "002-3100";
     public static final String LM_MUST_CONCRETE_ALL_TRANSITIONS = "002-3201";
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3202";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3203";

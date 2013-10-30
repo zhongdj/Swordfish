@@ -34,8 +34,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR,
-                    new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
+            final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR, new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(Errors.REGISTERED_META_ERROR, failure.getErrorCode());
@@ -86,13 +85,30 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             assertEquals(1, actualFailureSet.size());
             Iterator<VerificationFailure> iterator = actualFailureSet.iterator();
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(
-                    Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
+            final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
                     new String[] { IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class.getName() });
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, failure.getErrorCode());
             throw ex;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation() throws VerificationException {
+        @LifecycleRegistry(value = { WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation.class })
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
+                    WrongStateMachineSyntaxWithoutAnnotation.class.getName());
+            throw e;
         }
     }
 }
