@@ -19,4 +19,15 @@ public class StateSyntaxPositiveTest extends StateSyntaxMetadata {
         }
         new Registry();
     }
+    
+    @Test
+    public void test_state_function_with_valid_next_state_set() throws VerificationException {
+        @LifecycleRegistry(S7.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        new Registry();
+    }
 }
