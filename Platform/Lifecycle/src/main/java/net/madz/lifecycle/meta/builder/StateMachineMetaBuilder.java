@@ -11,4 +11,8 @@ public interface StateMachineMetaBuilder extends MetaDataBuilder<StateMachineMet
     StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException;
 
     void setRegistry(AbsStateMachineRegistry registry);
+
+    void setComposite(boolean b);
+
+    void setOwningState(StateMetaBuilder stateMetaBuilderImpl);
 }

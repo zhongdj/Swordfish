@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import net.madz.common.Dumper;
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.state.End;
@@ -19,13 +20,15 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetadata, StateMachineMetadata> implements
-        StateMetaBuilder, StateMetadata {
+public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBuilder, StateMachineMetaBuilder>
+        implements StateMetaBuilder {
 
     private boolean end;
     private boolean initial;
+    private boolean compositeState;
+    private StateMachineMetaBuilder compositeStateMachine;
 
-    protected StateMetaBuilderImpl(StateMachineMetadata parent, String name) {
+    protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
     }
 
@@ -82,9 +85,8 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     }
 
     @Override
-    public StateMachineMetadata getStateMachine() {
-        // TODO Auto-generated method stub
-        return null;
+    public StateMachineMetaBuilder getStateMachine() {
+        return parent;
     }
 
     @Override
@@ -201,6 +203,21 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
         verifyFunctions(clazz);
     }
 
+    @Override
+    public void configureCompositeStateMachine(Class<?> stateClass) throws VerificationException {
+        final CompositeStateMachine csm = stateClass.getAnnotation(CompositeStateMachine.class);
+        if ( null == csm ) {
+            return;
+        }
+        final StateMachineMetaBuilder compositeStateMachine = new StateMachineMetaBuilderImpl("CompositeStateMachine."
+                + stateClass.getSimpleName());
+        compositeStateMachine.setComposite(true);
+        compositeStateMachine.setOwningState(this);
+        this.compositeState = true;
+        this.compositeStateMachine = compositeStateMachine;
+        compositeStateMachine.build(stateClass);
+    }
+
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {
         if ( isFinalState(stateClass) ) {
             return;
@@ -228,9 +245,21 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         TransitionMetadata transition = findTransitionMetadata(transitionClz);
         if ( null == transition ) {
-            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                    Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
-                    transitionClz.getName()));
+            if ( this.parent.isComposite() ) {
+                if ( null != findTransitionMetadata(transitionClz, this.parent.getOwningStateMachine()) ) {
+                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                            Errors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function,
+                            stateClass.getName(), transitionClz.getName()));
+                } else {
+                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                            Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
+                            transitionClz.getName()));
+                }
+            } else {
+                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
+                        Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
+                        transitionClz.getName()));
+            }
         }
         if ( 0 == stateCandidates.length ) {
             failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
@@ -267,8 +296,12 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetada
     }
 
     private TransitionMetadata findTransitionMetadata(Class<?> transitionClz) {
+        return findTransitionMetadata(transitionClz, this.parent);
+    }
+
+    private TransitionMetadata findTransitionMetadata(Class<?> transitionClz, StateMachineMetadata stateMachine) {
         TransitionMetadata transition = null;
-        for ( StateMachineMetadata sm = this.parent; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
+        for ( StateMachineMetadata sm = stateMachine; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
             transition = sm.getTransition(transitionClz);
         }
         return transition;

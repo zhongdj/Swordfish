@@ -5,6 +5,8 @@ import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_B.CStates.NSC1_CB;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.States.A;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.C;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.D;
@@ -45,9 +47,9 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.FUNCTION_INVALID_TRANSITION_REFERENCE,
-                    C.class.getAnnotation(Function.class), C.class.getName(),
-                    net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.Transitions.X.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, C.class.getAnnotation(Function.class),
+                    C.class.getName(), net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.Transitions.X.class.getName());
             throw e;
         }
     }
@@ -65,12 +67,12 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION,  E.class.getAnnotation(Function.class),
+                    Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, E.class.getAnnotation(Function.class),
                     E.class.getName(), Y.class.getName());
             throw e;
         }
     }
-    
+
     @Test(expected = VerificationException.class)
     public void test_state_function_with_invalid_next_state() throws VerificationException {
         @LifecycleRegistry(S5.class)
@@ -84,7 +86,25 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, S5_A.class.getAnnotation(Function.class),
-                    S5_A.class.getName(), S5.class.getName(),D.class.getName());
+                    S5_A.class.getName(), S5.class.getName(), D.class.getName());
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_composite_state_with_reference_transition_beyond_scope() throws VerificationException {
+        @LifecycleRegistry(NSC1.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE,
+                    NSC1_CB.class.getAnnotation(Function.class), NSC1_CB.class.getName(), NSC1_X.class.getName());
             throw e;
         }
     }

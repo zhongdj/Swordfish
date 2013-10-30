@@ -11,6 +11,9 @@ import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
@@ -232,6 +235,48 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
 
             static interface PCS1_X {}
             static interface PCS1_Y {}
+        }
+    }
+    
+    @StateMachine
+    static interface NSC1 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NSC1_X.class, value = NSC1_B.class)
+            static interface NSC1_A {}
+            @CompositeStateMachine
+            @Function(transition = NSC1_Y.class, value = NSC1_C.class)
+            static interface NSC1_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = NSC1_CX.class, value = NSC1_CB.class)
+                    static interface NSC1_CA {}
+                    @Function(transition = NSC1_X.class, value = NSC1_CC.class)
+                    static interface NSC1_CB {}
+                    @End
+                    @ShortCut(NSC1_C.class)
+                    static interface NSC1_CC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface NSC1_CX {}
+                }
+            }
+            @End
+            static interface NSC1_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface NSC1_X {}
+            static interface NSC1_Y {}
         }
     }
 }

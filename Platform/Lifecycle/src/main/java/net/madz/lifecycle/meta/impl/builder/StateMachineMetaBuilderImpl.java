@@ -15,6 +15,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
@@ -45,6 +46,19 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     private TransitionMetaBuilder redoTransition;
     private TransitionMetaBuilder failTransition;
     private StateMetaBuilder initialState;
+    /* //////////////////////////////////////////////////// */
+    /* //////// Fields For Composite State Machine /////// */
+    /* //////////////////////////////////////////////////// */
+    // If this state machine is a composite state machine, this.composite = true
+    private boolean composite;
+    // If this state machine is a composite state machine, owningState is the
+    // enclosing state
+    private StateMetaBuilder owningState;
+    // If this state machine is a composite state machine, owningStateMachine is
+    // the enclosing state's (parent) StateMachine
+    private StateMachineMetaBuilder owningStateMachine;
+    // Also for composite State Machine
+    private ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         this(name);
@@ -114,31 +128,6 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
 
     @Override
     public TransitionMetadata getStateSynchronizationTransition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isComposite() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public StateMachineMetadata getOwningStateMachine() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public StateMetadata getCompositeState() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public StateMetadata[] getShortcutStateSet() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -195,6 +184,43 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         return corruptTransition;
     }
 
+    /* //////////////////////////////////////////////////// */
+    /* //////// Methods For Composite State Machine /////// */
+    /* //////////////////////////////////////////////////// */
+    @Override
+    public boolean isComposite() {
+        return composite;
+    }
+
+    @Override
+    public void setComposite(boolean b) {
+        this.composite = b;
+    }
+
+    @Override
+    public StateMachineMetadata getOwningStateMachine() {
+        return owningStateMachine;
+    }
+
+    @Override
+    public StateMetadata getCompositeState() {
+        return owningState;
+    }
+
+    @Override
+    public void setOwningState(StateMetaBuilder stateMetaBuilder) {
+        this.owningState = stateMetaBuilder;
+        this.owningStateMachine = stateMetaBuilder.getStateMachine();
+    }
+
+    @Override
+    public StateMetadata[] getShortcutStateSet() {
+        return shortcutStateList.toArray(new StateMetadata[shortcutStateList.size()]);
+    }
+
+    /* //////////////////////////////////////////////////// */
+    /* //////// Methods For Builder /////// */
+    /* //////////////////////////////////////////////////// */
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException {
         // Step 1. Syntax Validation
@@ -207,11 +233,24 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
             configureConditionSet(clazz);
             configureTransitionSet(clazz);
             configureStateSetBasic(clazz);
+            configureCompositeStateMachine(clazz);
             configureFunctions(clazz);
             configureRelationSet(clazz);
             configureStateSetRelations(clazz);
         }
         return this;
+    }
+
+    private void configureCompositeStateMachine(Class<?> clazz) throws VerificationException {
+        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
+        if ( 0 >= stateSetClasses.size() ) {
+            return;
+        }
+        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
+        for ( Class<?> stateClass : stateClasses ) {
+            StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
+            stateMetaBuilder.configureCompositeStateMachine(stateClass);
+        }
     }
 
     private void configureSuperStateMachine(Class<?> clazz) throws VerificationException {
@@ -265,6 +304,9 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
             this.initialState = stateMetadata;
         } else if ( stateMetadata.isFinal() ) {
             this.finalStateList.add(stateMetadata);
+        }
+        if ( null != stateClass.getAnnotation(ShortCut.class) ) {
+            this.shortcutStateList.add(stateMetadata);
         }
     }
 

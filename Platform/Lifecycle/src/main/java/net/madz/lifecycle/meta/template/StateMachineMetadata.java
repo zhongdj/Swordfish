@@ -46,6 +46,17 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
 
     TransitionMetadata getStateSynchronizationTransition();
 
+    /**
+     * @param clazz
+     *            defined with @LifecycleMeta, and with @Transition
+     *            , @StateIndicator, @Relation.
+     * 
+     * @return a concrete instance of StateMachineMetadata, whose abstract
+     *         part is concreted by the clazz param.
+     */
+    @Override
+    StateMachineInst newInstance(Class<?> clazz);
+    
     /* //////////////////////////////////////////////////// */
     /* //////// Methods For Composite State Machine /////// */
     /* //////////////////////////////////////////////////// */
@@ -60,15 +71,4 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     StateMetadata getCompositeState();
 
     StateMetadata[] getShortcutStateSet();
-
-    /**
-     * @param clazz
-     *            defined with @LifecycleMeta, and with @Transition
-     *            , @StateIndicator, @Relation.
-     * 
-     * @return a concrete instance of StateMachineMetadata, whose abstract
-     *         part is concreted by the clazz param.
-     */
-    @Override
-    StateMachineInst newInstance(Class<?> clazz);
 }
