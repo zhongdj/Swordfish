@@ -39,9 +39,9 @@ public interface SummaryPlanLifecycleMeta {
     @TransitionSet
     public static class Transitions {
 
-        @Conditional(condition = VolumeMeasurableTransition.class)
+        @Conditional(judger = VolumeMeasurableTransition.class, condition = VolumeMeasurable.class)
         public static class CreateServiceOrder {}
-        @Conditional(condition = VolumeMeasurableTransition.class)
+        @Conditional(judger = VolumeMeasurableTransition.class, condition = VolumeMeasurable.class)
         public static class AdjustTotalVolume {}
         public static class ConfirmFinish {}
     }
