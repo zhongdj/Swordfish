@@ -133,6 +133,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States {
 
+            @Initial
             @Function(transition = S5_Super_Start.class, value = { S5_Super_B.class })
             static interface S5_Super_A {}
             @End
