@@ -1,5 +1,6 @@
 package net.madz.lifecycle.syntax;
 
+import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -9,6 +10,10 @@ import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.Transitions.Y;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.Conditions.CompareWithZero;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.States.I;
@@ -91,7 +96,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         @TransitionSet
         static interface Transitions {
 
-            @Conditional(judger = ConcreteCondition.class, condition=CompareWithZero.class)
+            @Conditional(judger = ConcreteCondition.class, condition = CompareWithZero.class)
             static interface Z {}
         }
         @ConditionSet
@@ -117,4 +122,46 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             }
         }
     }
+    @StateMachine
+    static interface PCS1 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = PCS1_X.class, value = PCS1_B.class)
+            static interface PCS1_A {}
+            @CompositeStateMachine
+            @Function(transition = PCS1_Y.class, value=PCS1_C.class)
+            static interface PCS1_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition=PCS1_CX.class, value=PCS1_CB.class)
+                    static interface PCS1_CA {}
+                    @Function(transition=PCS1_CX.class, value=PCS1_CC.class)
+                    static interface PCS1_CB {}
+                    @End
+                    @ShortCut(PCS1_C.class)
+                    static interface PCS1_CC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+                    static interface PCS1_CX {}
+                }
+            }
+            @End
+            static interface PCS1_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface PCS1_X {}
+            static interface PCS1_Y {}
+        }
+    }
+    
+    
 }
