@@ -15,32 +15,40 @@ public class LMSyntaxPositiveTest extends LMSyntaxMetadata {
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-            }
+            protected Registry() throws VerificationException {}
         }
         new Registry();
     }
-    
+
     @Test
-    public void test_LM_concrete_all_transitions_with_explicit_transition_name () throws VerificationException {
+    public void test_LM_concrete_all_transitions_with_explicit_transition_name() throws VerificationException {
         @LifecycleRegistry(PLM_2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-            }
+            protected Registry() throws VerificationException {}
         }
         new Registry();
     }
-    
+
     @Test
-    public void test_LM_concrete_all_transitions_with_implicit_transition_name () throws VerificationException {
+    public void test_LM_concrete_all_transitions_with_implicit_transition_name() throws VerificationException {
         @LifecycleRegistry(PLM_3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-            }
+            protected Registry() throws VerificationException {}
+        }
+        new Registry();
+    }
+
+    @Test
+    public void test_transitions_with_corrupt_redo_recover_with_only_one_method() throws VerificationException {
+        @LifecycleRegistry(PLM_4.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
         }
         new Registry();
     }
