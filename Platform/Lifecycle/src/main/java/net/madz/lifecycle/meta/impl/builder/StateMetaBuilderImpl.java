@@ -28,6 +28,7 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
     private boolean initial;
     private boolean compositeState;
     private StateMachineMetaBuilder compositeStateMachine;
+    private StateMetadata owningState;
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -168,20 +169,17 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
 
     @Override
     public boolean isCompositeState() {
-        // TODO Auto-generated method stub
-        return false;
+        return compositeState;
     }
 
     @Override
     public StateMetadata getOwningState() {
-        // TODO Auto-generated method stub
-        return null;
+        return owningState;
     }
 
     @Override
     public StateMachineMetadata getCompositeStateMachine() {
-        // TODO Auto-generated method stub
-        return null;
+        return compositeStateMachine;
     }
 
     @Override
