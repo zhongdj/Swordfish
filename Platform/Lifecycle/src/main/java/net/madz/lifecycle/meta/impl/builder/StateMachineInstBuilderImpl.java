@@ -101,7 +101,7 @@ public class StateMachineInstBuilderImpl extends
                 if ( value > 1 ) {
                     failureSet.add(newVerificationFailure(meta.getDottedPath(),
                             Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, meta.getDottedPath()
-                                    .getName(), this.parent.getDottedPath(), klass.getName()));
+                                    .getName(), this.parent.getDottedPath(), klass.getName(), "@"+type.name()));
                 }
             }
         }
