@@ -45,9 +45,9 @@ public class StateMachineInstBuilderImpl extends
             final Transition annotation = method.getAnnotation(Transition.class);
             if ( null != annotation ) {
                 if ( null != annotation.value() ) {
-                    actualTranstionMethods.put(annotation.value().getSimpleName(), method);
+                    actualTranstionMethods.put("TransitionSet." + annotation.value().getSimpleName(), method);
                 } else {
-                    actualTranstionMethods.put(upperFirstChar(method.getName()), method);
+                    actualTranstionMethods.put("TransitionSet." + upperFirstChar(method.getName()), method);
                 }
             }
         }
@@ -56,15 +56,23 @@ public class StateMachineInstBuilderImpl extends
             TransitionMetadata transition = this.parent.getTransition(transitionClassName);
             Method method = actualTranstionMethods.get(transitionClassName);
             if ( null == transition ) {
-                failureSet.add(newVerificationFailure(method.getName(), Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, klass.getName(),
-                        transitionClassName, method.getName(), this.parent.getDottedPath()));
+                failureSet.add(newVerificationFailure(method.getName(),
+                        Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, klass.getName(), transitionClassName,
+                        method.getName(), this.parent.getDottedPath()));
             }
         }
         // Compare whether transitions are covered by methods in LM.
+        for ( TransitionMetadata transition : expectedTransitionSet ) {
+            String expectedTransitionName = transition.getDottedPath().getName();
+            if ( null == actualTranstionMethods.get(expectedTransitionName) ) {
+                failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
+                        Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, klass.getSimpleName(), transition.getDottedPath().getName().split("\\.")[1],
+                        this.parent.getDottedPath().getAbsoluteName()));
+            }
+        }
         // Make sure transition annotated with @Corrupt,or @Redo, or @Recover
         // has only 1 method in LM.
-        
-        if (failureSet.size() > 0) {
+        if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
     }
