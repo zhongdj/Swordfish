@@ -376,12 +376,19 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     private void verifyRelation(Annotation a, final Class<?>[] relatedStateClasses, final Class<?> relationClass,
             final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet) {
-        if (!hasRelation(relationClass)) {
-            failureSet.add(newVerificationFailure(getDottedPath(), Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass, parent.getDottedPath()));
+        if ( !hasRelation(relationClass) ) {
+            failureSet.add(newVerificationFailure(getDottedPath(),
+                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass,
+                    parent.getDottedPath()));
             return;
         }
         final StateMachineMetadata relatedStateMachine = findRelatedStateMachine(relationClass);
-                
+        verifyOnRelatedStates(a, relatedStateClasses, stateClass, failureSet, relatedStateMachine);
+        verifyErrorMessages(a, errorMessages, stateClass, failureSet, relatedStateMachine);
+    }
+
+    private void verifyOnRelatedStates(Annotation a, final Class<?>[] relatedStateClasses, Class<?> stateClass,
+            VerificationFailureSet failureSet, final StateMachineMetadata relatedStateMachine) {
         for ( final Class<?> relateStateClass : relatedStateClasses ) {
             if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                 if ( a instanceof InboundWhile ) {
@@ -392,6 +399,25 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                     failureSet.add(newVerificationFailure(getDottedPath(),
                             Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
                             relatedStateMachine.getDottedPath()));
+                }
+            }
+        }
+    }
+
+    private void verifyErrorMessages(Annotation a, final ErrorMessage[] errorMessages, Class<?> stateClass,
+            VerificationFailureSet failureSet, final StateMachineMetadata relatedStateMachine) {
+        for ( ErrorMessage error : errorMessages ) {
+            for ( final Class<?> relateStateClass : error.states() ) {
+                if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
+                    if ( a instanceof InboundWhile ) {
+                        failureSet.add(newVerificationFailure(getDottedPath(),
+                                Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass,
+                                relatedStateMachine.getDottedPath()));
+                    } else {
+                        failureSet.add(newVerificationFailure(getDottedPath(),
+                                Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass,
+                                relatedStateMachine.getDottedPath()));
+                    }
                 }
             }
         }
