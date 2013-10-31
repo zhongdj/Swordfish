@@ -8,6 +8,7 @@ import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.state.End;
+import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.template.RelationMetadata;
@@ -191,12 +192,38 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
 
     @Override
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
-        verifySyntax(clazz);
+        verifyBasicSyntax(clazz);
         addKeys(clazz);
         return this;
     }
 
-    private void verifySyntax(Class<?> clazz) throws VerificationException {}
+    private void verifyBasicSyntax(Class<?> clazz) throws VerificationException {
+        verifyShortcutSyntax(clazz);
+    }
+
+    private void verifyShortcutSyntax(Class<?> clazz) throws VerificationException {
+        if ( !parent.isComposite() ) {
+            return;
+        }
+        if ( isFinalState(clazz) && !isShortCut(clazz) ) {
+            throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT,
+                    clazz);
+        } else if ( isShortCut(clazz) && !isFinalState(clazz) ) {
+            throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, clazz);
+        } else if ( isShortCut(clazz) ) {
+            final ShortCut shortCut = clazz.getAnnotation(ShortCut.class);
+            final Class<?> targetStateClass = shortCut.value();
+            StateMetadata found = findStateMetadata(targetStateClass, parent.getOwningStateMachine());
+            if ( null == found ) {
+                throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID,
+                        shortCut, clazz, targetStateClass);
+            }
+        }
+    }
+
+    private boolean isShortCut(Class<?> clazz) {
+        return null != clazz.getAnnotation(ShortCut.class);
+    }
 
     @Override
     public void configureFunctions(Class<?> clazz) throws VerificationException {
@@ -287,8 +314,12 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
     }
 
     private StateMetadata findStateMetadata(final Class<?> stateCandidateClass) {
+        return findStateMetadata(stateCandidateClass, this.parent);
+    }
+
+    private StateMetadata findStateMetadata(final Class<?> stateCandidateClass, StateMachineMetadata stateMachine) {
         StateMetadata stateMetadata = null;
-        for ( StateMachineMetadata sm = this.parent; sm != null && null == stateMetadata; sm = sm
+        for ( StateMachineMetadata sm = stateMachine; sm != null && null == stateMetadata; sm = sm
                 .getSuperStateMachine() ) {
             stateMetadata = sm.getState(stateCandidateClass);
         }

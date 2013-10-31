@@ -31,7 +31,9 @@ public interface Errors {
     public static final String FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID = "002-2700";
     // State's Shortcut
     public static final String SHORT_CUT_INVALID = "002-2800";
-    public static final String SHORT_CUT_MUST_WORK_WITH_END = "002-2801";
+    public static final String COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END = "002-2801";
+    public static final String COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT = "002-2802";
+    public static final String COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID = "002-2803";
     // State's Relation
     public static final String RELATION_ATTRIBUTE_OF_INBOUNDWHILE_INVALID = "002-2911";
     public static final String ON_ATTRIBUTE_OF_INBOUNDWHILE_INVALID = "002-2912";

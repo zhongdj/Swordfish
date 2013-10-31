@@ -11,7 +11,17 @@ import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.States.NCS2_B.CTransitions.NCS2_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.Transitions.NCS2_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.Transitions.NCS2_Y;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.States.NCS3_B.CTransitions.NCS3_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.Transitions.NCS3_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.Transitions.NCS3_Y;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.States.NCS4_B.CTransitions.NCS4_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.Transitions.NCS4_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.Transitions.NCS4_Y;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_C;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
 import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
@@ -237,7 +247,6 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             static interface PCS1_Y {}
         }
     }
-    
     @StateMachine
     static interface NSC1 {
 
@@ -277,6 +286,129 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
 
             static interface NSC1_X {}
             static interface NSC1_Y {}
+        }
+    }
+    @StateMachine
+    static interface NCS2 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NCS2_X.class, value = NCS2_B.class)
+            static interface NCS2_A {}
+            @CompositeStateMachine
+            @Function(transition = NCS2_Y.class, value = NCS2_C.class)
+            static interface NCS2_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = NCS2_CX.class, value = NCS2_CC.class)
+                    static interface NCS2_CA {}
+                    @End
+                    @ShortCut(NSC1_C.class)
+                    static interface NCS2_CC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface NCS2_CX {}
+                }
+            }
+            @End
+            static interface NCS2_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface NCS2_X {}
+            static interface NCS2_Y {}
+        }
+    }
+    
+    @StateMachine
+    static interface NCS3 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NCS3_X.class, value = NCS3_B.class)
+            static interface NCS3_A {}
+            @CompositeStateMachine
+            @Function(transition = NCS3_Y.class, value = NCS3_C.class)
+            static interface NCS3_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = NCS3_CX.class, value = NCS3_CB.class)
+                    static interface NCS3_CA {}
+                    @Function(transition = NCS3_X.class, value = NCS3_CC.class)
+                    static interface NCS3_CB {}
+                    @End
+                    static interface NCS3_CC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface NCS3_CX {}
+                }
+            }
+            @End
+            static interface NCS3_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface NCS3_X {}
+            static interface NCS3_Y {}
+        }
+    }
+    
+    @StateMachine
+    static interface NCS4 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NCS4_X.class, value = NCS4_B.class)
+            static interface NCS4_A {}
+            @CompositeStateMachine
+            @Function(transition = NCS4_Y.class, value = NCS4_C.class)
+            static interface NCS4_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = NCS4_CX.class, value = NCS4_CB.class)
+                    static interface NCS4_CA {}
+                    @Function(transition = NCS4_X.class, value = NCS4_CC.class)
+                    static interface NCS4_CB {}
+                    @ShortCut(NCS4_C.class)
+                    static interface NCS4_CC {}
+                    @End
+                    static interface NCS4_CD {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface NCS4_CX {}
+                }
+            }
+            @End
+            static interface NCS4_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface NCS4_X {}
+            static interface NCS4_Y {}
         }
     }
 }
