@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
@@ -44,7 +45,7 @@ public class StateMachineInstBuilderImpl extends
         for ( Method method : declaredMethods ) {
             final Transition annotation = method.getAnnotation(Transition.class);
             if ( null != annotation ) {
-                if ( null != annotation.value() ) {
+                if ( Null.class != annotation.value() ) {
                     actualTranstionMethods.put("TransitionSet." + annotation.value().getSimpleName(), method);
                 } else {
                     actualTranstionMethods.put("TransitionSet." + upperFirstChar(method.getName()), method);
@@ -56,9 +57,14 @@ public class StateMachineInstBuilderImpl extends
             TransitionMetadata transition = this.parent.getTransition(transitionClassName);
             Method method = actualTranstionMethods.get(transitionClassName);
             if ( null == transition ) {
-                failureSet.add(newVerificationFailure(method.getName(),
-                        Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, klass.getName(), transitionClassName,
-                        method.getName(), this.parent.getDottedPath()));
+                if ( method.getAnnotation(Transition.class).value() != Null.class ) {
+                    failureSet.add(newVerificationFailure(method.getName(),
+                            Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, klass.getName(),
+                            transitionClassName, method.getName(), this.parent.getDottedPath()));
+                } else {
+                    failureSet.add(newVerificationFailure(method.getName(), Errors.LM_METHOD_NAME_INVALID,
+                            this.parent.getDottedPath(), method.getName(), klass.getName()));
+                }
             }
         }
         // Compare whether transitions are covered by methods in LM.
@@ -66,8 +72,8 @@ public class StateMachineInstBuilderImpl extends
             String expectedTransitionName = transition.getDottedPath().getName();
             if ( null == actualTranstionMethods.get(expectedTransitionName) ) {
                 failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
-                        Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, klass.getSimpleName(), transition.getDottedPath().getName().split("\\.")[1],
-                        this.parent.getDottedPath().getAbsoluteName()));
+                        Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, klass.getSimpleName(), transition.getDottedPath()
+                                .getName().split("\\.")[1], this.parent.getDottedPath().getAbsoluteName()));
             }
         }
         // Make sure transition annotated with @Corrupt,or @Redo, or @Recover
@@ -78,8 +84,12 @@ public class StateMachineInstBuilderImpl extends
     }
 
     private String upperFirstChar(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        if ( name.length() > 1 ) {
+            return name.substring(0, 1).toUpperCase().concat(name.substring(1));
+        } else if ( name.length() == 1 ) {
+            return name.toUpperCase();
+        }
+        return name;
     }
 
     @Override
