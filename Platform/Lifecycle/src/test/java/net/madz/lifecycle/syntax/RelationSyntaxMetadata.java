@@ -8,6 +8,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.RelationSet;
+import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 
@@ -58,6 +59,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = PStandalone.Transitions.PX.class, value = PB.class)
             @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PStandalone.Relations.PR.class)
+            @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PStandalone.Relations.PR.class)
             static interface PA {}
             @End
             static interface PB {}
@@ -166,6 +168,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = Super.Transitions.SX.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { RelatedSM.States.RB.class })
+            @ValidWhile(relation = Super.Relations.SR.class, on = { RelatedSM.States.RB.class })
             static interface SA {}
             @End
             static interface SB {}
@@ -228,16 +231,56 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = NCC.class)
+            @Function(transition = Super.Transitions.SX.class, value = NC2C.class)
             static interface NCA extends Super.States.SA {}
-            @Function(transition = NChild2.Transitions.NCX.class, value = SB.class)
+            @Function(transition = NChild2.Transitions.NC2X.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { InvalidRelationReferenceSM.States.B.class })
-            static interface NCC {}
+            static interface NC2C {}
         }
         @TransitionSet
         static interface Transitions extends Super.Transitions {
 
-            static interface NCX {};
+            static interface NC2X {};
+        }
+    }
+    @StateMachine
+    static interface NChild3 extends Super {
+        
+        static String error = Errors.RELATION_VALIDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+        
+        @StateSet
+        static interface States extends Super.States {
+            
+            @Function(transition = Super.Transitions.SX.class, value = NC3C.class)
+            static interface NC3A extends Super.States.SA {}
+            @Function(transition = NChild3.Transitions.NC3X.class, value = SB.class)
+            @InboundWhile(relation = PStandalone.Relations.PR.class, on = { InvalidRelationReferenceSM.States.B.class })
+            static interface NC3C {}
+        }
+        @TransitionSet
+        static interface Transitions extends Super.Transitions {
+            
+            static interface NC3X {};
+        }
+    }
+    @StateMachine
+    static interface NChild4 extends Super {
+        
+        static String error = Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION;
+        
+        @StateSet
+        static interface States extends Super.States {
+            
+            @Function(transition = Super.Transitions.SX.class, value = NC4C.class)
+            static interface NC4A extends Super.States.SA {}
+            @Function(transition = NChild4.Transitions.NC4X.class, value = SB.class)
+            @InboundWhile(relation = Super.Relations.SR.class, on = { InvalidRelationReferenceSM.States.B.class })
+            static interface NC4C {}
+        }
+        @TransitionSet
+        static interface Transitions extends Super.Transitions {
+            
+            static interface NC4X {};
         }
     }
 }
