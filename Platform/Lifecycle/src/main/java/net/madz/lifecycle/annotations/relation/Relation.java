@@ -1,11 +1,15 @@
-package net.madz.lifecycle.annotations.state;
+package net.madz.lifecycle.annotations.relation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+import net.madz.lifecycle.annotations.Null;
+
+@Target({ ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RelationSet {
+public @interface Relation {
+
+    Class<?> value() default Null.class;
 }

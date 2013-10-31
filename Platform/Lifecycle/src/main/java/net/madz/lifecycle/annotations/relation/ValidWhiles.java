@@ -1,15 +1,13 @@
-package net.madz.lifecycle.annotations.state;
+package net.madz.lifecycle.annotations.relation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.madz.lifecycle.annotations.Null;
-
-@Target({ ElementType.PARAMETER })
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Relation {
+public @interface ValidWhiles {
 
-    Class<?> value() default Null.class;
+    ValidWhile[] value();
 }
