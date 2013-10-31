@@ -14,12 +14,15 @@ public class BaseMetaDataTest {
     }
 
     protected String getMessage(String errorCode, Object[] args) {
-        return BundleUtils.getBundledMessage(StateMachineMetaBuilder.class, Errors.SYNTAX_ERROR_BUNDLE, errorCode, args);
+        return BundleUtils
+                .getBundledMessage(StateMachineMetaBuilder.class, Errors.SYNTAX_ERROR_BUNDLE, errorCode, args);
     }
 
     protected void assertFailure(VerificationFailure failure, String errorCode, Object... args) {
         assertEquals(errorCode, failure.getErrorCode());
         final String expectedMessage = getMessage(errorCode, args);
+        System.out.println("ExpectedMessages:" + expectedMessage + "\n" + "  FailureMessage:"
+                + failure.getErrorMessage(null));
         assertEquals(expectedMessage, failure.getErrorMessage(null));
     }
 }
