@@ -1,5 +1,7 @@
 package net.madz.lifecycle.syntax;
 
+import java.util.Iterator;
+
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
@@ -8,6 +10,7 @@ import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.verification.VerificationException;
+import net.madz.verification.VerificationFailure;
 
 import org.junit.Test;
 
@@ -59,14 +62,15 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
+            final Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
+            assertFailure(iterator.next(),
                     Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(InboundWhile.class), NStandalone5.States.N5A.class,
-                    RelatedSM.class);
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    RelatedSM.class.getName());
+            assertFailure(iterator.next(),
                     Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(ValidWhile.class), NStandalone5.States.N5A.class,
-                    RelatedSM.class);
+                    RelatedSM.class.getName());
             throw e;
         }
     }

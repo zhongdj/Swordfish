@@ -3,6 +3,7 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
+import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
@@ -392,16 +393,24 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         for ( final Class<?> relateStateClass : relatedStateClasses ) {
             if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                 if ( a instanceof InboundWhile ) {
-                    failureSet.add(newVerificationFailure(getDottedPath(),
+                    failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
                             Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass,
                             relatedStateMachine.getDottedPath()));
                 } else {
-                    failureSet.add(newVerificationFailure(getDottedPath(),
+                    failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
                             Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
                             relatedStateMachine.getDottedPath()));
                 }
             }
         }
+    }
+
+    private DottedPath getValidWhilePath(final Class<?> relateStateClass) {
+        return getDottedPath().append(ValidWhile.class.getSimpleName()).append(relateStateClass.getSimpleName());
+    }
+
+    private DottedPath getInboundWhilePath(final Class<?> relateStateClass) {
+        return getDottedPath().append(InboundWhile.class.getSimpleName()).append(relateStateClass.getSimpleName());
     }
 
     private void verifyErrorMessages(Annotation a, final ErrorMessage[] errorMessages, Class<?> stateClass,
@@ -410,11 +419,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             for ( final Class<?> relateStateClass : error.states() ) {
                 if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                     if ( a instanceof InboundWhile ) {
-                        failureSet.add(newVerificationFailure(getDottedPath(),
+                        failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
                                 Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass,
                                 relatedStateMachine.getDottedPath()));
                     } else {
-                        failureSet.add(newVerificationFailure(getDottedPath(),
+                        failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
                                 Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass,
                                 relatedStateMachine.getDottedPath()));
                     }
