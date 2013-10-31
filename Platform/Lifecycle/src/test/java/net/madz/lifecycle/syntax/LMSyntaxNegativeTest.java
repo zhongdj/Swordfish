@@ -23,11 +23,11 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NLM_1.class.getSimpleName(),NS1_Z.class.getSimpleName(), S2.class.getName());
+                    NLM_1.class.getSimpleName(), NS1_Z.class.getSimpleName(), S2.class.getName());
             throw e;
-        } 
+        }
     }
-    
+
     @Test(expected = VerificationException.class)
     public void test_LM_partial_concreting_transitions_B() throws VerificationException {
         @LifecycleRegistry(NLM_2.class)
@@ -40,8 +40,25 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NLM_2.class.getSimpleName(),NS1_Z.class.getSimpleName(), S2.class.getName());
+                    NLM_2.class.getSimpleName(), NS1_Z.class.getSimpleName(), S2.class.getName());
             throw e;
-        } 
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_LM_method_name_invalid() throws VerificationException {
+        @LifecycleRegistry(NLM_3.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_METHOD_NAME_INVALID,
+                    S2.class.getName(), "nS1_Xyz", NLM_3.class.getName());
+            throw e;
+        }
     }
 }

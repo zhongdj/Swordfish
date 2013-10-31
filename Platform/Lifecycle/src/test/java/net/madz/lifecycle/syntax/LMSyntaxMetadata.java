@@ -140,7 +140,9 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition
         public void nS1_Xyz(); // Method name is inconsistent with transition
                                // name
-
+        @Transition
+        public void nS1_X();
+        
         @Transition
         public void nS1_Y();
 
