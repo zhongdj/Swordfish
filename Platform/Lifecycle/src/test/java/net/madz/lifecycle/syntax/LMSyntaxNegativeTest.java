@@ -4,7 +4,6 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
-import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Y;

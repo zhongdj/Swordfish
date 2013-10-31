@@ -106,7 +106,6 @@
 		<dependency>
 			<groupId>net.madz</groupId>
 			<artifactId>TestUtils</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

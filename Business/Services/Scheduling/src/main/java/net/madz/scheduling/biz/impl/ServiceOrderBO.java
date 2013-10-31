@@ -13,7 +13,6 @@ import net.madz.core.biz.AbstractBO;
 import net.madz.customer.entities.Contact;
 import net.madz.scheduling.biz.IConcreteTruckResource;
 import net.madz.scheduling.biz.IMixingPlantResource;
-import net.madz.scheduling.biz.IPlantScheduleOrder;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ServiceOrder;
