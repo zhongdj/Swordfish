@@ -4,6 +4,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
 import net.madz.verification.VerificationException;
 
@@ -58,6 +59,24 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_METHOD_NAME_INVALID,
                     S2.class.getName(), "nS1_Xyz", NLM_3.class.getName());
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_LM_method_transition_beyond_stateMachine() throws VerificationException {
+        @LifecycleRegistry(NLM_4.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, NLM_4.class.getName(),
+                    "TransitionSet."+S1_X.class.getSimpleName(), "nS1_X", S2.class.getName());
             throw e;
         }
     }
