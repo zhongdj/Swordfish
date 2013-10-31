@@ -21,7 +21,7 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBuilder, StateMachineMetaBuilder>
+public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBuilder, StateMachineMetaBuilder>
         implements StateMetaBuilder {
 
     private boolean end;
@@ -240,7 +240,7 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
         compositeStateMachine.setOwningState(this);
         this.compositeState = true;
         this.compositeStateMachine = compositeStateMachine;
-        compositeStateMachine.build(stateClass);
+        compositeStateMachine.build(stateClass, this.parent);
     }
 
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {

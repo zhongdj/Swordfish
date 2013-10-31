@@ -2,14 +2,12 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
-import net.madz.lifecycle.meta.template.ConditionMetadata;
-import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.verification.VerificationFailureSet;
 
-public class ConditionMetaBuilderImpl extends AnnotationBasedMetaBuilder<ConditionMetadata, StateMachineMetadata>
+public class ConditionMetaBuilderImpl extends AnnotationMetaBuilderBase<ConditionMetaBuilder, StateMachineMetaBuilder>
         implements ConditionMetaBuilder {
 
-    protected ConditionMetaBuilderImpl(StateMachineMetadata parent, String name) {
+    protected ConditionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, name);
     }
 

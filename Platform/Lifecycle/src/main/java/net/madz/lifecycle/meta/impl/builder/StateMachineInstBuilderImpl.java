@@ -3,15 +3,17 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.reflect.Method;
 
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
+import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateInst;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.lifecycle.meta.instance.TransitionInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineInstBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineInst, StateMachineMetadata> implements StateMachineInstBuilder {
+public class StateMachineInstBuilderImpl extends
+        AnnotationMetaBuilderBase<StateMachineInstBuilder, StateMachineMetaBuilder> implements StateMachineInstBuilder {
 
-    public StateMachineInstBuilderImpl(StateMachineMetadata parent, String name) {
+    public StateMachineInstBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, name);
     }
 
@@ -70,5 +72,10 @@ public class StateMachineInstBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     public StateMachineMetadata getTemplate() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public StateMachineInstBuilder build(Class<?> klass, StateMachineMetaBuilder parent) throws VerificationException {
+        return this;
     }
 }

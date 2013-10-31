@@ -31,8 +31,8 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMachineMetadata, StateMachineMetadata>
-        implements StateMachineMetaBuilder {
+public class StateMachineMetaBuilderImpl extends
+        AnnotationMetaBuilderBase<StateMachineMetaBuilder, StateMachineMetaBuilder> implements StateMachineMetaBuilder {
 
     private StateMachineMetadata superStateMachineMetadata;
     private StateMachineMetadata parentStateMachineMetadata;
@@ -228,7 +228,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
     /* //////// Methods For Builder /////// */
     /* //////////////////////////////////////////////////// */
     @Override
-    public StateMachineMetaBuilder build(Class<?> clazz) throws VerificationException {
+    public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         // Step 1. Syntax Validation
         {
             verifySyntax(clazz);
@@ -316,7 +316,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         }
     }
 
-    private void configureTransitionSet(Class<?> clazz) {
+    private void configureTransitionSet(Class<?> clazz) throws VerificationException {
         final List<Class<?>> transitionSetClasses = findClass(clazz.getDeclaredClasses(), TransitionSet.class);
         if ( 0 >= transitionSetClasses.size() ) {
             return;
@@ -387,7 +387,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         } else {
             StateMachineMetaBuilder stateMachineMetaBuilder = new StateMachineMetaBuilderImpl(registry,
                     stateMachineClass.getName());
-            stateMachineMetadata = stateMachineMetaBuilder.build(stateMachineClass).getMetaData();
+            stateMachineMetadata = stateMachineMetaBuilder.build(stateMachineClass, this).getMetaData();
             registry.addTemplate(stateMachineMetadata);
             return stateMachineMetadata;
         }

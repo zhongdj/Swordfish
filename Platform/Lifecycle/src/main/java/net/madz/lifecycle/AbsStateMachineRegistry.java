@@ -80,12 +80,12 @@ public abstract class AbsStateMachineRegistry {
             final StateMachineMetaBuilder builder = createBuilder(builderMeta, clazz.getName());
             builder.setRegistry(this);
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
-                final StateMachineMetadata metaData = builder.build(clazz).getMetaData();
+                final StateMachineMetadata metaData = builder.build(clazz, null).getMetaData();
                 metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
-                final StateMachineMetadata metaData = builder.build(stateMachineClass).getMetaData();
+                final StateMachineMetadata metaData = builder.build(stateMachineClass, null).getMetaData();
                 metaData.verifyMetaData(failureSet);
                 addTemplate(metaData);
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);

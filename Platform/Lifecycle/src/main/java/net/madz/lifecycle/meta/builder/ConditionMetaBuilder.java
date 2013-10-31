@@ -1,14 +1,10 @@
 package net.madz.lifecycle.meta.builder;
 
 import net.madz.lifecycle.meta.template.ConditionMetadata;
-import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.KeySet;
-import net.madz.meta.MetaDataBuilder;
 
-public interface ConditionMetaBuilder extends MetaDataBuilder<ConditionMetadata, StateMachineMetadata>,
+public interface ConditionMetaBuilder extends AnnotationMetaBuilder<ConditionMetaBuilder, StateMachineMetaBuilder>,
         ConditionMetadata {
-
-    ConditionMetaBuilder build(Class<?> klass, StateMachineMetaBuilder builder);
 
     KeySet getKeySet();
 }
