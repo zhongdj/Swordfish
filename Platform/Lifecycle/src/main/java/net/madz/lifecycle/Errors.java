@@ -42,8 +42,9 @@ public interface Errors {
     public static final String RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION = "002-2922";
     public static final String RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE = "002-2931";
     // LifecycleMeta
-    public static final String LM_MUST_CONCRETE_ALL_TRANSITIONS = "002-3201";
-    public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3202";
-    public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3203";
+    public static final String LM_MUST_CONCRETE_ALL_TRANSITIONS = "002-3210";
+    public static final String LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION = "002-3211";
+    public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
+    public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3230";
     public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
 }

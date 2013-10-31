@@ -138,7 +138,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public StateMachineInst newInstance(Class<?> clazz) {
+    public StateMachineInst newInstance(Class<?> clazz) throws VerificationException {
         final StateMachineInstBuilderImpl builder = new StateMachineInstBuilderImpl(this, clazz.getSimpleName());
         builder.setRegistry(registry);
         return builder.build(clazz).getMetaData();
