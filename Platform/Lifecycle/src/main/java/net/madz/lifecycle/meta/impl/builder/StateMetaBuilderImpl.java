@@ -234,8 +234,8 @@ public class StateMetaBuilderImpl extends AnnotationBasedMetaBuilder<StateMetaBu
         if ( null == csm ) {
             return;
         }
-        final StateMachineMetaBuilder compositeStateMachine = new StateMachineMetaBuilderImpl("CompositeStateMachine."
-                + stateClass.getSimpleName());
+        final StateMachineMetaBuilder compositeStateMachine = new StateMachineMetaBuilderImpl(this.parent,
+                "CompositeStateMachine." + stateClass.getSimpleName());
         compositeStateMachine.setComposite(true);
         compositeStateMachine.setOwningState(this);
         this.compositeState = true;

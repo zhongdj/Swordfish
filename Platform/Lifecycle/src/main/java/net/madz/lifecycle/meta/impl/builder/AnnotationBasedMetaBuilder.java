@@ -45,5 +45,6 @@ public abstract class AnnotationBasedMetaBuilder<SELF extends MetaData, PARENT e
 
     protected AnnotationBasedMetaBuilder(PARENT parent, String name) {
         super(parent, name);
+        System.out.println(getDottedPath().getAbsoluteName());
     }
 }

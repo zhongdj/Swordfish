@@ -71,6 +71,10 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         super(null, name);
     }
 
+    public StateMachineMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
+        super(parent, name);
+    }
+
     @Override
     public boolean hasSuper() {
         return null != this.superStateMachineMetadata;
