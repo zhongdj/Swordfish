@@ -160,6 +160,40 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
+    static interface NStandalone4 {
+        
+        static String error = Errors.RELATIONSET_MULTIPLE;
+        
+        @StateSet
+        static interface States {
+            
+            @Initial
+            @Function(transition = NStandalone4.Transitions.NX.class, value = NStandalone4.States.NB.class)
+            @InboundWhile(on = { InvalidRelationReferenceSM.States.B.class },
+            relation = NStandalone2.Relations.NR.class)
+            static interface NA {}
+            @End
+            static interface NB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+            
+            static interface NX {}
+        }
+        @RelationSet
+        static interface Relations {
+            
+            @RelateTo(NStandalone4.Transitions.NX.class)
+            static interface NR {}
+        }
+        @RelationSet
+        static interface Relations2 {
+            
+            @RelateTo(NStandalone4.Transitions.NX.class)
+            static interface NR {}
+        }
+    }
+    @StateMachine
     static interface Super {
 
         @StateSet

@@ -31,6 +31,23 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
+    public void test_multiple_relationset() throws VerificationException {
+        @LifecycleRegistry(NStandalone4.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.RELATIONSET_MULTIPLE,
+                    NStandalone4.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
     public void test_relation_not_defined_in_relation_set() throws VerificationException {
         @LifecycleRegistry(NStandalone.class)
         @StateMachineBuilder
@@ -105,12 +122,13 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
     public void test_inheritance_validWhile_relation_not_defined_in_relation_set() throws VerificationException {
         @LifecycleRegistry(NChild3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
@@ -118,18 +136,18 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild3.States.NC3C.class
-                    .getAnnotation(InboundWhile.class).relation(), NChild3.States.NC3C.class,
+                            .getAnnotation(InboundWhile.class).relation(), NChild3.States.NC3C.class,
                     NChild3.class.getName());
             throw e;
         }
     }
-    
+
     @Test(expected = VerificationException.class)
     public void test_inheritance_validWhile_relation_on_not_matching_relation() throws VerificationException {
         @LifecycleRegistry(NChild4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
