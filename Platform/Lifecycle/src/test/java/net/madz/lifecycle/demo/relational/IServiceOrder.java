@@ -3,7 +3,7 @@ package net.madz.lifecycle.demo.relational;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.annotations.state.Relation;
+import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Relations.ConcreteTruckResource;
 import net.madz.lifecycle.demo.relational.meta.ServiceableLifecycleMeta.Relations.PlantResource;
