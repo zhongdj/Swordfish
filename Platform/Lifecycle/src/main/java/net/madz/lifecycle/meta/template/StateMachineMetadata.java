@@ -6,6 +6,7 @@ import net.madz.lifecycle.meta.Template;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
 import net.madz.meta.FlavorMetaData;
 import net.madz.meta.MetaData;
+import net.madz.verification.VerificationException;
 
 public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>, Dumpable, Recoverable,
         Template<StateMachineInst> {
@@ -53,9 +54,10 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      * 
      * @return a concrete instance of StateMachineMetadata, whose abstract
      *         part is concreted by the clazz param.
+     * @throws VerificationException 
      */
     @Override
-    StateMachineInst newInstance(Class<?> clazz);
+    StateMachineInst newInstance(Class<?> clazz) throws VerificationException;
     
     /* //////////////////////////////////////////////////// */
     /* //////// Methods For Composite State Machine /////// */
