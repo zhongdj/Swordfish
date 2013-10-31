@@ -21,5 +21,17 @@ public class RelationSyntaxPositiveTest extends RelationSyntaxMetadata {
         new Registry();
     }
     
+    @Test
+    public void test_relation_syntax_positive_inheritance() throws VerificationException {
+        @LifecycleRegistry(PChild.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+            
+            protected Registry() throws VerificationException {}
+        }
+        
+        new Registry();
+    }
+    
     
 }
