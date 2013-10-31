@@ -27,4 +27,21 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             throw e;
         } 
     }
+    
+    @Test(expected = VerificationException.class)
+    public void test_LM_partial_concreting_transitions_B() throws VerificationException {
+        @LifecycleRegistry(NLM_2.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
+                    NLM_2.class.getSimpleName(),NS1_Z.class.getSimpleName(), S2.class.getName());
+            throw e;
+        } 
+    }
 }
