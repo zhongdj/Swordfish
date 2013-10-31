@@ -41,6 +41,7 @@ public abstract class AnnotationBasedMetaBuilder<SELF extends MetaData, PARENT e
         addKey(getDottedPath().getAbsoluteName());
         addKey(clazz);
         addKey(clazz.getName());
+        addKey(clazz.getSimpleName());
     }
 
     protected AnnotationBasedMetaBuilder(PARENT parent, String name) {
