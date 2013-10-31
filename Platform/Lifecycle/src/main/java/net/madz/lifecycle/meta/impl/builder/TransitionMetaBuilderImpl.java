@@ -2,6 +2,10 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.action.Conditional;
+import net.madz.lifecycle.annotations.action.Corrupt;
+import net.madz.lifecycle.annotations.action.Fail;
+import net.madz.lifecycle.annotations.action.Recover;
+import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.TransitionInst;
@@ -11,8 +15,8 @@ import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationFailureSet;
 
-public class TransitionMetaBuilderImpl extends AnnotationMetaBuilderBase<TransitionMetaBuilder, StateMachineMetaBuilder>
-        implements TransitionMetaBuilder {
+public class TransitionMetaBuilderImpl extends
+        AnnotationMetaBuilderBase<TransitionMetaBuilder, StateMachineMetaBuilder> implements TransitionMetaBuilder {
 
     private TransitionTypeEnum type = TransitionTypeEnum.Common;
     private boolean conditional;
@@ -29,8 +33,23 @@ public class TransitionMetaBuilderImpl extends AnnotationMetaBuilderBase<Transit
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) {
         configureCondition(clazz);
+        configureType(clazz);
         addKeys(clazz);
         return this;
+    }
+
+    private void configureType(Class<?> clazz) {
+        if ( null != clazz.getAnnotation(Corrupt.class) ) {
+            type = TransitionTypeEnum.Corrupt;
+        } else if ( null != clazz.getAnnotation(Redo.class) ) {
+            type = TransitionTypeEnum.Redo;
+        } else if ( null != clazz.getAnnotation(Recover.class) ) {
+            type = TransitionTypeEnum.Recover;
+        } else if ( null != clazz.getAnnotation(Fail.class) ) {
+            type = TransitionTypeEnum.Fail;
+        } else {
+            type = TransitionTypeEnum.Common;
+        }
     }
 
     private void configureCondition(Class<?> clazz) {
