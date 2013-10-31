@@ -47,4 +47,8 @@ public interface Errors {
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3230";
     public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
+    // @ConditionSet
+    public static final String CONDITIONSET_MULTIPLE = "002-3400";
+    // @RelationSet
+    public static final String RELATIONSET_MULTIPLE = "002-3500";
 }

@@ -31,6 +31,10 @@ public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT ex
         return new VerificationException(newVerificationFailure(dottedPath.getAbsoluteName(), errorCode, args));
     }
 
+    protected VerificationFailure newVerificationFailure(DottedPath dottedPath, String errorCode, Object... args) {
+        return newVerificationFailure(dottedPath.getAbsoluteName(), errorCode, args);
+    }
+
     protected VerificationFailure newVerificationFailure(String dottedPathName, String errorCode, Object... args) {
         return new VerificationFailure(this, dottedPathName, errorCode, BundleUtils.getBundledMessage(getClass(),
                 Errors.SYNTAX_ERROR_BUNDLE, errorCode, args));

@@ -14,10 +14,13 @@ import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.ConditionSet;
+import net.madz.lifecycle.annotations.relation.RelateTo;
+import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
+import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
@@ -27,7 +30,6 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
-import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
@@ -36,17 +38,33 @@ public class StateMachineMetaBuilderImpl extends
 
     private StateMachineMetadata superStateMachineMetadata;
     private StateMachineMetadata parentStateMachineMetadata;
+    /* //////////////////////////////////////////////////// */
+    /* //////// Fields For Related State Machine ////////// */
+    /* //////////////////////////////////////////////////// */
+    private ArrayList<RelationMetaBuilder> relationList = new ArrayList<>();
+    private HashMap<Object, RelationMetaBuilder> relationMap = new HashMap<>();
+    private HashMap<Object, StateMachineMetadata> relatedStateMachineMap = new HashMap<>();
+    private ArrayList<StateMachineMetadata> relatedStateMachineList = new ArrayList<>();
+    /* //////////////////////////////////////////////////// */
+    /* ////////////// Fields For Transitions ////////////// */
+    /* //////////////////////////////////////////////////// */
     private final ArrayList<TransitionMetaBuilder> transitionList = new ArrayList<>();
     private final HashMap<Object, TransitionMetaBuilder> transitionMap = new HashMap<>();
-    private final ArrayList<ConditionMetaBuilder> conditionList = new ArrayList<>();
-    private final HashMap<Object, ConditionMetaBuilder> conditionMap = new HashMap<>();
-    private final ArrayList<StateMetaBuilder> stateList = new ArrayList<>();
-    private final HashMap<Object, StateMetaBuilder> stateMap = new HashMap<>();
-    private ArrayList<StateMetaBuilder> finalStateList = new ArrayList<>();
     private TransitionMetaBuilder corruptTransition;
     private TransitionMetaBuilder recoverTransition;
     private TransitionMetaBuilder redoTransition;
     private TransitionMetaBuilder failTransition;
+    /* //////////////////////////////////////////////////// */
+    /* ////////////// Fields For Condition /////////////// */
+    /* //////////////////////////////////////////////////// */
+    private final ArrayList<ConditionMetaBuilder> conditionList = new ArrayList<>();
+    private final HashMap<Object, ConditionMetaBuilder> conditionMap = new HashMap<>();
+    /* //////////////////////////////////////////////////// */
+    /* /////////////////// Fields For State /////////////// */
+    /* //////////////////////////////////////////////////// */
+    private final ArrayList<StateMetaBuilder> stateList = new ArrayList<>();
+    private final HashMap<Object, StateMetaBuilder> stateMap = new HashMap<>();
+    private ArrayList<StateMetaBuilder> finalStateList = new ArrayList<>();
     private StateMetaBuilder initialState;
     /* //////////////////////////////////////////////////// */
     /* //////// Fields For Composite State Machine /////// */
@@ -92,14 +110,17 @@ public class StateMachineMetaBuilderImpl extends
 
     @Override
     public boolean hasRelations() {
-        // TODO Auto-generated method stub
-        return false;
+        return relationList.size() > 0;
     }
 
     @Override
     public StateMachineMetadata[] getRelatedStateMachineMetadata() {
-        // TODO Auto-generated method stub
-        return null;
+        return relatedStateMachineList.toArray(new StateMachineMetadata[relatedStateMachineList.size()]);
+    }
+
+    @Override
+    public StateMachineMetadata getRelatedStateMachine(Class<?> relationClass) {
+        return relatedStateMachineMap.get(relationClass);
     }
 
     @Override
@@ -150,9 +171,8 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        // TODO Auto-generated method stub
-        return null;
+    public StateMachineMetaBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
+        return this;
     }
 
     @Override
@@ -225,7 +245,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     /* //////////////////////////////////////////////////// */
-    /* //////// Methods For Builder /////// */
+    /* ////////////// Methods For Builder ///////////////// */
     /* //////////////////////////////////////////////////// */
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
@@ -248,12 +268,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private void configureCompositeStateMachine(Class<?> clazz) throws VerificationException {
-        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
-        if ( 0 >= stateSetClasses.size() ) {
-            return;
-        }
-        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
-        for ( Class<?> stateClass : stateClasses ) {
+        for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
             StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
             stateMetaBuilder.configureCompositeStateMachine(stateClass);
         }
@@ -261,37 +276,59 @@ public class StateMachineMetaBuilderImpl extends
 
     private void configureSuperStateMachine(Class<?> clazz) throws VerificationException {
         if ( hasSuperMetadataClass(clazz) ) {
-            StateMachineMetadata superStateMachineMetadata = load(getSuperMetadataClass(clazz));
+            final StateMachineMetadata superStateMachineMetadata = load(getSuperMetadataClass(clazz));
             this.superStateMachineMetadata = superStateMachineMetadata;
         }
     }
 
     private void configureFunctions(Class<?> clazz) throws VerificationException {
-        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
-        if ( 0 >= stateSetClasses.size() ) {
-            return;
-        }
-        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
-        for ( Class<?> stateClass : stateClasses ) {
-            StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
+        for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
+            final StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
             stateMetaBuilder.configureFunctions(stateClass);
         }
     }
 
     private void configureStateSetRelations(Class<?> clazz) throws VerificationException {
-        // TODO Auto-generated method stub
+        for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
+            final StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
+            stateMetaBuilder.configureRelations(stateClass);
+        }
     }
 
     private void configureRelationSet(Class<?> clazz) throws VerificationException {
-        // TODO Auto-generated method stub
+        RelationMetaBuilder relationBuilder = null;
+        for ( Class<?> klass : findComponentClasses(clazz, RelationSet.class) ) {
+            relationBuilder = new RelationMetaBuilderImpl(this, klass.getSimpleName());
+            relationBuilder.build(klass, this);
+            addRelationMetadata(klass, relationBuilder);
+            RelateTo relateTo = klass.getAnnotation(RelateTo.class);
+            Class<?> relatedStateMachineClass = relateTo.value();
+            try {
+                StateMachineMetadata relatedStateMachineMetadata = load(relatedStateMachineClass);
+                this.relatedStateMachineList.add(relatedStateMachineMetadata);
+                this.relatedStateMachineMap.put(klass, relatedStateMachineMetadata);
+                this.relatedStateMachineMap.put(klass.getName(), relatedStateMachineMetadata);
+                this.relatedStateMachineMap.put(klass.getSimpleName(), relatedStateMachineMetadata);
+            } catch (VerificationException e) {
+                if ( Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION.equals(e.getVerificationFailureSet().iterator()
+                        .next().getErrorCode()) ) {
+                    throw newVerificationException(getDottedPath(),
+                            Errors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE, relateTo);
+                }
+            }
+        }
+    }
+
+    private void addRelationMetadata(Class<?> klass, RelationMetaBuilder relationBuilder) {
+        this.relationList.add(relationBuilder);
+        final Iterator<Object> iterator = relationBuilder.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            this.relationMap.put(iterator.next(), relationBuilder);
+        }
     }
 
     private void configureStateSetBasic(Class<?> clazz) throws VerificationException {
-        final List<Class<?>> stateSetClasses = findClass(clazz.getDeclaredClasses(), StateSet.class);
-        if ( 0 >= stateSetClasses.size() ) {
-            return;
-        }
-        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
+        final Class<?>[] stateClasses = findComponentClasses(clazz, StateSet.class);
         StateMetaBuilder stateBuilder = null;
         for ( Class<?> klass : stateClasses ) {
             stateBuilder = new StateMetaBuilderImpl(this, klass.getSimpleName());
@@ -317,7 +354,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private void configureTransitionSet(Class<?> clazz) throws VerificationException {
-        final List<Class<?>> transitionSetClasses = findClass(clazz.getDeclaredClasses(), TransitionSet.class);
+        final List<Class<?>> transitionSetClasses = findComponentClass(clazz.getDeclaredClasses(), TransitionSet.class);
         if ( 0 >= transitionSetClasses.size() ) {
             return;
         }
@@ -355,17 +392,8 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private void configureConditionSet(Class<?> clazz) throws VerificationException {
-        List<Class<?>> conditionSetClasses = findClass(clazz.getDeclaredClasses(), ConditionSet.class);
-        if ( 0 >= conditionSetClasses.size() ) {
-            return;
-        }
-        if ( 1 != conditionSetClasses.size() ) {
-            throw newVerificationException(clazz.getName() + ".ConditionSet",
-                    Errors.STATEMACHINE_MULTIPLE_CONDITIONSET, clazz.getName());
-        }
-        final Class<?>[] conditionClasses = conditionSetClasses.get(0).getDeclaredClasses();
         ConditionMetaBuilder conditionMetaBuilder = null;
-        for ( Class<?> klass : conditionClasses ) {
+        for ( Class<?> klass : findComponentClasses(clazz, ConditionSet.class) ) {
             conditionMetaBuilder = new ConditionMetaBuilderImpl(this, klass.getSimpleName());
             final ConditionMetaBuilder conditionMetadata = conditionMetaBuilder.build(klass, this);
             addConditionMetadata(clazz, conditionMetadata);
@@ -380,7 +408,7 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
-    private StateMachineMetadata load(Class<?> stateMachineClass) throws VerificationException {
+    protected StateMachineMetadata load(Class<?> stateMachineClass) throws VerificationException {
         StateMachineMetadata stateMachineMetadata = registry.getStateMachineMeta(stateMachineClass);
         if ( null != stateMachineMetadata ) {
             return stateMachineMetadata;
@@ -405,9 +433,32 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
+    /* //////////////////////////////////////////////////// */
+    /* ////////////// Methods For Syntax Verification ///// */
+    /* //////////////////////////////////////////////////// */
     private void verifySyntax(Class<?> clazz) throws VerificationException {
         verifyStateMachineDefinition(clazz);
         verifyRequiredComponents(clazz);
+        verifyOptionalComponents(clazz);
+    }
+
+    private void verifyOptionalComponents(Class<?> klass) throws VerificationException {
+        verifyRelationSet(klass);
+        verifyConditionSet(klass);
+    }
+
+    private void verifyRelationSet(Class<?> klass) throws VerificationException {
+        final List<Class<?>> relationSetClass = findComponentClass(klass.getDeclaredClasses(), RelationSet.class);
+        if ( 1 < relationSetClass.size() ) {
+            throw newVerificationException(getDottedPath(), Errors.RELATIONSET_MULTIPLE, klass);
+        }
+    }
+
+    private void verifyConditionSet(Class<?> klass) throws VerificationException {
+        final List<Class<?>> conditionSetClasses = findComponentClass(klass.getDeclaredClasses(), ConditionSet.class);
+        if ( 1 < conditionSetClasses.size() ) {
+            throw newVerificationException(getDottedPath(), Errors.CONDITIONSET_MULTIPLE, klass);
+        }
     }
 
     private void verifyRequiredComponents(Class<?> clazz) throws VerificationException {
@@ -421,8 +472,8 @@ public class StateMachineMetaBuilderImpl extends
             throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
                     new Object[] { clazz.getName() });
         }
-        final List<Class<?>> stateClasses = findClass(declaredClasses, StateSet.class);
-        final List<Class<?>> transitionClasses = findClass(declaredClasses, TransitionSet.class);
+        final List<Class<?>> stateClasses = findComponentClass(declaredClasses, StateSet.class);
+        final List<Class<?>> transitionClasses = findComponentClass(declaredClasses, TransitionSet.class);
         final VerificationFailureSet vs = new VerificationFailureSet();
         verifyStateSet(clazz, stateSetPath, stateClasses, vs);
         verifyTransitionSet(clazz, transitionSetPath, transitionClasses, vs);
@@ -474,7 +525,7 @@ public class StateMachineMetaBuilderImpl extends
             vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE,
                     new Object[] { stateSetClass.getName() }));
         } else {
-            List<Class<?>> initialClasses = findClass(stateSetClasses, Initial.class);
+            List<Class<?>> initialClasses = findComponentClass(stateSetClasses, Initial.class);
             if ( initialClasses.size() == 0 ) {
                 vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE,
                         new Object[] { stateSetClass.getName() }));
@@ -482,22 +533,12 @@ public class StateMachineMetaBuilderImpl extends
                 vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_MULTIPLE_INITAL_STATES,
                         new Object[] { stateSetClass.getName() }));
             }
-            List<Class<?>> endClasses = findClass(stateSetClasses, End.class);
+            List<Class<?>> endClasses = findComponentClass(stateSetClasses, End.class);
             if ( endClasses.size() == 0 ) {
                 vs.add(newVerificationException(stateSetPath + ".Final", Errors.STATESET_WITHOUT_FINAL_STATE,
                         new Object[] { stateSetClass.getName() }));
             }
         }
-    }
-
-    private List<Class<?>> findClass(final Class<?>[] declaredClasses, Class<? extends Annotation> annotationClass) {
-        ArrayList<Class<?>> stateClasses = new ArrayList<>();
-        for ( Class<?> klass : declaredClasses ) {
-            if ( null != klass.getAnnotation(annotationClass) ) {
-                stateClasses.add(klass);
-            }
-        }
-        return stateClasses;
     }
 
     private boolean hasSuperMetadataClass(Class<?> clazz) {
@@ -529,5 +570,30 @@ public class StateMachineMetaBuilderImpl extends
                         clazz.getName());
             }
         }
+    }
+
+    private Class<?>[] findComponentClasses(Class<?> clazz, Class<? extends Annotation> componentClass) {
+        final List<Class<?>> stateSetClasses = findComponentClass(clazz.getDeclaredClasses(), componentClass);
+        if ( 0 >= stateSetClasses.size() ) {
+            return new Class<?>[0];
+        }
+        final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
+        return stateClasses;
+    }
+
+    private List<Class<?>> findComponentClass(final Class<?>[] declaredClasses,
+            Class<? extends Annotation> annotationClass) {
+        ArrayList<Class<?>> stateClasses = new ArrayList<>();
+        for ( Class<?> klass : declaredClasses ) {
+            if ( null != klass.getAnnotation(annotationClass) ) {
+                stateClasses.add(klass);
+            }
+        }
+        return stateClasses;
+    }
+
+    @Override
+    public boolean hasRelation(Class<?> relationClass) {
+        return relationMap.containsKey(relationClass);
     }
 }

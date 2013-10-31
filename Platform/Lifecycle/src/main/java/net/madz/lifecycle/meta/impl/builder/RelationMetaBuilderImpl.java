@@ -7,6 +7,8 @@ import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.RelationInst;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
+import net.madz.meta.MetaData;
+import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
@@ -43,7 +45,12 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
 
     @Override
     public RelationMetaBuilder build(Class<?> klass, StateMachineMetaBuilder parent) throws VerificationException {
-        // TODO Auto-generated method stub
-        return null;
+        addKeys(klass);
+        return this;
+    }
+
+    @Override
+    public RelationMetaBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
+        return this;
     }
 }

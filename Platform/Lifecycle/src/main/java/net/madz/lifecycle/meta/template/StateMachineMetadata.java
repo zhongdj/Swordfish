@@ -25,6 +25,10 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     boolean hasRelations();
 
     StateMachineMetadata[] getRelatedStateMachineMetadata();
+    
+    boolean hasRelation(Class<?> relationClass);
+
+    StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
 
     /* //////////////////////////////////////////////////// */
     /* /////////////// State Related Methods ////////////// */
@@ -54,11 +58,11 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      * 
      * @return a concrete instance of StateMachineMetadata, whose abstract
      *         part is concreted by the clazz param.
-     * @throws VerificationException 
+     * @throws VerificationException
      */
     @Override
     StateMachineInst newInstance(Class<?> clazz) throws VerificationException;
-    
+
     /* //////////////////////////////////////////////////// */
     /* //////// Methods For Composite State Machine /////// */
     /* //////////////////////////////////////////////////// */

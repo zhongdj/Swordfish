@@ -1,5 +1,6 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
 import net.madz.common.Dumper;
@@ -7,6 +8,11 @@ import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
+import net.madz.lifecycle.annotations.relation.ErrorMessage;
+import net.madz.lifecycle.annotations.relation.InboundWhile;
+import net.madz.lifecycle.annotations.relation.InboundWhiles;
+import net.madz.lifecycle.annotations.relation.ValidWhile;
+import net.madz.lifecycle.annotations.relation.ValidWhiles;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
@@ -338,5 +344,100 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     private boolean isFinalState(Class<?> stateClass) {
         return null != stateClass.getAnnotation(End.class);
+    }
+
+    @Override
+    public void configureRelations(Class<?> clazz) throws VerificationException {
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
+            verifyInboundWhile(inboundWhile, clazz, failureSet);
+        }
+        for ( ValidWhile validWhile : findValidWhiles(clazz) ) {
+            verifyValidWhile(validWhile, clazz, failureSet);
+        }
+        if ( 0 < failureSet.size() ) {
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    private void verifyValidWhile(ValidWhile validWhile, Class<?> clazz, VerificationFailureSet failureSet) {
+        final Class<?>[] relatedStateClasses = validWhile.on();
+        final Class<?> relationClass = validWhile.relation();
+        final ErrorMessage[] errorMessages = validWhile.otherwise();
+        verifyRelation(validWhile, relatedStateClasses, relationClass, errorMessages, clazz, failureSet);
+    }
+
+    private void verifyInboundWhile(InboundWhile inboundWhile, Class<?> clazz, VerificationFailureSet failureSet) {
+        final Class<?>[] relatedStateClasses = inboundWhile.on();
+        final Class<?> relationClass = inboundWhile.relation();
+        final ErrorMessage[] errorMessages = inboundWhile.otherwise();
+        verifyRelation(inboundWhile, relatedStateClasses, relationClass, errorMessages, clazz, failureSet);
+    }
+
+    private void verifyRelation(Annotation a, final Class<?>[] relatedStateClasses, final Class<?> relationClass,
+            final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet) {
+        if (!hasRelation(relationClass)) {
+            failureSet.add(newVerificationFailure(getDottedPath(), Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass, parent.getDottedPath()));
+            return;
+        }
+        final StateMachineMetadata relatedStateMachine = findRelatedStateMachine(relationClass);
+                
+        for ( final Class<?> relateStateClass : relatedStateClasses ) {
+            if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
+                if ( a instanceof InboundWhile ) {
+                    failureSet.add(newVerificationFailure(getDottedPath(),
+                            Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass,
+                            relatedStateMachine.getDottedPath()));
+                } else {
+                    failureSet.add(newVerificationFailure(getDottedPath(),
+                            Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
+                            relatedStateMachine.getDottedPath()));
+                }
+            }
+        }
+    }
+
+    private boolean hasRelation(final Class<?> relationClass) {
+        boolean result = false;
+        for ( StateMachineMetadata smd = parent; !result && smd != null; smd = smd.getSuperStateMachine() ) {
+            result = smd.hasRelation(relationClass);
+        }
+        return result;
+    }
+
+    private StateMachineMetadata findRelatedStateMachine(Class<?> relationClass) {
+        StateMachineMetadata relatedSm = null;
+        for ( StateMachineMetadata smd = parent; relatedSm == null && smd != null; smd = smd.getSuperStateMachine() ) {
+            relatedSm = smd.getRelatedStateMachine(relationClass);
+        }
+        return relatedSm;
+    }
+
+    private ArrayList<ValidWhile> findValidWhiles(Class<?> clazz) {
+        final ArrayList<ValidWhile> validWhileList = new ArrayList<>();
+        final ValidWhiles validWhiles = clazz.getAnnotation(ValidWhiles.class);
+        final ValidWhile validWhile = clazz.getAnnotation(ValidWhile.class);
+        if ( null != validWhiles ) {
+            for ( ValidWhile valid : validWhiles.value() ) {
+                validWhileList.add(valid);
+            }
+        } else if ( null != validWhile ) {
+            validWhileList.add(validWhile);
+        }
+        return validWhileList;
+    }
+
+    private ArrayList<InboundWhile> findInboundWhiles(Class<?> clazz) {
+        final ArrayList<InboundWhile> inboundWhileList = new ArrayList<>();
+        final InboundWhiles inboundWhiles = clazz.getAnnotation(InboundWhiles.class);
+        final InboundWhile inboundWhile = clazz.getAnnotation(InboundWhile.class);
+        if ( null != inboundWhiles ) {
+            for ( InboundWhile inbound : inboundWhiles.value() ) {
+                inboundWhileList.add(inbound);
+            }
+        } else if ( null != inboundWhile ) {
+            inboundWhileList.add(inboundWhile);
+        }
+        return inboundWhileList;
     }
 }

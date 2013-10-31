@@ -14,7 +14,6 @@ import net.madz.lifecycle.syntax.RelationSyntaxMetadata.InvalidRelationReference
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.NChild.Transitions.NCX;
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.NStandalone.Transitions.NX;
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.NStandalone2.Relations.NR;
-import net.madz.lifecycle.syntax.RelationSyntaxMetadata.NStandalone3.States.NA;
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.PChild.Transitions.PCX;
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.PStandalone.Relations.PR;
 import net.madz.lifecycle.syntax.RelationSyntaxMetadata.PStandalone.Transitions.PX;
@@ -119,7 +118,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
 
             @Initial
-            @Function(transition = NX.class, value = NB.class)
+            @Function(transition = NStandalone2.Transitions.NX.class, value = NStandalone2.States.NB.class)
             @InboundWhile(on = { InvalidRelationReferenceSM.States.B.class }, relation = NR.class)
             static interface NA {}
             @End
@@ -144,7 +143,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
             
             @Initial
-            @Function(transition = NX.class, value = NB.class)
+            @Function(transition = NStandalone3.Transitions.NX.class, value = NStandalone3.States.NB.class)
             @InboundWhile(on = { InvalidRelationReferenceSM.States.B.class }, relation = NR.class)
             static interface NA {}
             @End
@@ -158,7 +157,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @RelationSet
         static interface Relations {
             
-            @RelateTo(NA.class)
+            @RelateTo(NStandalone3.Transitions.NX.class)
             static interface NR {}
         }
     }
@@ -231,7 +230,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             
             @Function(transition = SX.class, value = NCC.class)
             static interface NCA extends Super.States.SA {}
-            @Function(transition = NCX.class, value = SB.class)
+            @Function(transition = NChild2.Transitions.NCX.class, value = SB.class)
             @InboundWhile(relation = SR.class, on = { InvalidRelationReferenceSM.States.B.class })
             static interface NCC {}
         }

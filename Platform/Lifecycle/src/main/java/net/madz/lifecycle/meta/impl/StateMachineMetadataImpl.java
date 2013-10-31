@@ -189,4 +189,16 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public StateMachineMetadata getRelatedStateMachine(Class<?> relationClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean hasRelation(Class<?> relationClass) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

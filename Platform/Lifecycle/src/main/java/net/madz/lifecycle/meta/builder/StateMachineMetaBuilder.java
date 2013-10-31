@@ -11,4 +11,8 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
     void setComposite(boolean b);
 
     void setOwningState(StateMetaBuilder stateMetaBuilderImpl);
+
+    StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
+
+    
 }

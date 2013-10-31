@@ -1,7 +1,5 @@
 package net.madz.lifecycle.syntax;
 
-import javax.print.attribute.standard.MediaSize.NA;
-
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
@@ -44,8 +42,9 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET,
-                    NA.class.getAnnotation(InboundWhile.class).relation(), NA.class, NStandalone.class.getName());
+                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NStandalone.States.NA.class
+                            .getAnnotation(InboundWhile.class).relation(), NStandalone.States.NA.class,
+                    NStandalone.class.getName());
             throw e;
         }
     }
@@ -81,8 +80,8 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild.States.NCA.class
-                            .getAnnotation(InboundWhile.class).relation(), NChild.States.NCA.class,
+                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild.States.NCC.class
+                            .getAnnotation(InboundWhile.class).relation(), NChild.States.NCC.class,
                     NChild.class.getName());
             throw e;
         }
@@ -101,7 +100,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
-                    NChild2.States.NCA.class.getAnnotation(InboundWhile.class), NChild2.States.NCA.class,
+                    NChild2.States.NCC.class.getAnnotation(InboundWhile.class), NChild2.States.NCC.class,
                     RelatedSM.class.getName());
             throw e;
         }
