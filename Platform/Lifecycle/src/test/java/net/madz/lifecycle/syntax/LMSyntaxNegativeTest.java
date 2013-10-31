@@ -6,6 +6,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
+import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Y;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -75,8 +76,26 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, NLM_4.class.getName(),
-                    "TransitionSet."+S1_X.class.getSimpleName(), "nS1_X", S2.class.getName());
+                    Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, NLM_4.class.getName(), "TransitionSet."
+                            + S1_X.class.getSimpleName(), "nS1_X", S2.class.getName());
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_LM_some_mandatory_transitions_have_multi_methods() throws VerificationException {
+        @LifecycleRegistry(NLM_5.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
+                    "TransitionSet." + S3_Y.class.getSimpleName(), S3.class.getName(), NLM_4.class.getName());
             throw e;
         }
     }
