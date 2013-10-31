@@ -77,17 +77,18 @@ public abstract class AbsStateMachineRegistry {
         final Class<?>[] toRegister = lifecycleRegistry.value();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         for ( Class<?> clazz : toRegister ) {
-            final StateMachineMetaBuilder builder = createBuilder(builderMeta, clazz.getName());
-            builder.setRegistry(this);
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
-                final StateMachineMetadata metaData = builder.build(clazz, null).getMetaData();
-                metaData.verifyMetaData(failureSet);
-                addTemplate(metaData);
+                if ( isRegistered(clazz) ) {
+                    return;
+                }
+                buildStateMachineMetadata(builderMeta,failureSet,clazz);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
-                final StateMachineMetadata metaData = builder.build(stateMachineClass, null).getMetaData();
-                metaData.verifyMetaData(failureSet);
-                addTemplate(metaData);
+                if ( isRegistered(stateMachineClass) ) {
+                    return;
+                }
+                final StateMachineMetadata metaData = buildStateMachineMetadata(builderMeta, failureSet,
+                        stateMachineClass);
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
@@ -102,6 +103,20 @@ public abstract class AbsStateMachineRegistry {
             failureSet.dump(new Dumper(System.out));
             throw new VerificationException(failureSet);
         }
+    }
+
+    private StateMachineMetadata buildStateMachineMetadata(final StateMachineBuilder builderMeta,
+            final VerificationFailureSet failureSet, final Class<?> stateMachineClass) throws VerificationException {
+        final StateMachineMetaBuilder builder = createBuilder(builderMeta, stateMachineClass.getName());
+        builder.setRegistry(this);
+        final StateMachineMetadata metaData = builder.build(stateMachineClass, null).getMetaData();
+        metaData.verifyMetaData(failureSet);
+        addTemplate(metaData);
+        return metaData;
+    }
+
+    private boolean isRegistered(Class<?> clazz) {
+        return null != this.typeMap.get(clazz.getName());
     }
 
     public synchronized void addInstance(Class<?> clazz, StateMachineInst stateMachine) {
