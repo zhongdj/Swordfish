@@ -47,6 +47,7 @@ public interface Errors {
     public static final String LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION = "002-3211";
     public static final String LM_TRANSITION_NOT_CONCRETED_IN_LM = "002-3212";
     public static final String LM_METHOD_NAME_INVALID = "002-3213";
+    public static final String LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD = "002-3214";
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3230";
     public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
