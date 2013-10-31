@@ -290,7 +290,7 @@ public class StateMachineMetaBuilderImpl extends AnnotationBasedMetaBuilder<Stat
         final Class<?>[] stateClasses = stateSetClasses.get(0).getDeclaredClasses();
         StateMetaBuilder stateBuilder = null;
         for ( Class<?> klass : stateClasses ) {
-            stateBuilder = new StateMetaBuilderImpl(this, klass.getName());
+            stateBuilder = new StateMetaBuilderImpl(this, klass.getSimpleName());
             final StateMetaBuilder stateMetaBuilder = stateBuilder.build(klass, this);
             addStateMetadata(klass, stateMetaBuilder);
         }
