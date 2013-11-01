@@ -30,25 +30,21 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = S1_X.class, value = { S1_B.class })
             static interface S1_A {}
-
             @End
             static interface S1_B {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             static interface S1_X {}
         }
     }
-
     @LifecycleMeta(PS1.class)
     static interface PLM_1 {
 
         @Transition(S1_X.class)
         void test();
     }
-
     @StateMachine
     static interface S2 {
 
@@ -58,28 +54,21 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NS1_X.class, value = { NS1_B.class })
             static interface NS1_A {}
-
             @Function(transition = NS1_Y.class, value = { NS1_C.class })
             static interface NS1_B {}
-
             @Function(transition = NS1_Z.class, value = { NS1_C.class })
             static interface NS1_C {}
-
             @End
             static interface NS1_D {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             static interface NS1_X {}
-
             static interface NS1_Y {}
-
             static interface NS1_Z {}
         }
     }
-
     // Positive: all transitions are covered by methods
     @LifecycleMeta(S2.class)
     static interface PLM_2 {
@@ -93,7 +82,6 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition(NS1_Z.class)
         void m3();
     }
-
     // Positive: all transitions are covered by methods, using default method
     // name
     @LifecycleMeta(S2.class)
@@ -108,8 +96,7 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition
         public void nS1_Z();
     }
-
-    // Transition NS1_Z has no method in LM
+    // Transition NS1_Z has no binding method in LM
     @LifecycleMeta(S2.class)
     static interface NLM_1 {
 
@@ -119,7 +106,6 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition(NS1_Y.class)
         public void m2();
     }
-
     // Transition NS1_Z has no method in LM
     @LifecycleMeta(S2.class)
     static interface NLM_2 {
@@ -133,23 +119,22 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition(NS1_Y.class)
         public void m3();
     }
-
     @LifecycleMeta(S2.class)
     static interface NLM_3 {
 
         @Transition
-        public void nS1_Xyz(); // Method name is inconsistent with transition
-                               // name
+        public void nS1_Xyz(); // Method nS1_Xyz can not bind to any transition
+                               // in S2.
+
         @Transition
         public void nS1_X();
-        
+
         @Transition
         public void nS1_Y();
 
         @Transition
         public void nS1_Z();
     }
-
     @LifecycleMeta(S2.class)
     static interface NLM_4 {
 
@@ -163,7 +148,6 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition
         public void nS1_Z();
     }
-
     @StateMachine
     static interface S3 {
 
@@ -173,32 +157,25 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = S3_X.class, value = { S3_B.class })
             static interface S3_A {}
-
             @Function(transition = S3_Y.class, value = { S3_C.class })
             static interface S3_B {}
-
             @Function(transition = S3_Z.class, value = { S3_D.class })
             static interface S3_C {}
-
             @End
             static interface S3_D {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             @Corrupt
             static interface S3_X {}
-
             @Redo
             static interface S3_Y {}
-
             @Recover
             static interface S3_Z {}
         }
     }
-
-    //Positive LM: Corrupt, Redo, Recover transition has only 1 method
+    // Positive LM: Corrupt, Redo, Recover transition can bind to only 1 method.
     @LifecycleMeta(S3.class)
     static interface PLM_4 {
 
@@ -211,11 +188,10 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition
         void s3_Z();
     }
-
-    //Negative LM: Redo transition has more than 1 method
+    // Negative LM: Redo transition binds to more than 1 method
     @LifecycleMeta(S3.class)
     static interface NLM_5 {
-
+        
         @Transition
         void s3_X();
 
