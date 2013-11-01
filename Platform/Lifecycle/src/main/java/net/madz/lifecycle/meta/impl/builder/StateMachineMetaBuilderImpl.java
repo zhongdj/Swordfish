@@ -125,12 +125,12 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public StateMetadata[] getStateSet() {
+    public StateMetadata[] getDeclaredStateSet() {
         return stateList.toArray(new StateMetadata[stateList.size()]);
     }
 
     @Override
-    public StateMetadata getState(Object stateKey) {
+    public StateMetadata getDeclaredState(Object stateKey) {
         return stateMap.get(stateKey);
     }
 
@@ -648,5 +648,51 @@ public class StateMachineMetaBuilderImpl extends
     @Override
     public StateMachineMetaBuilder[] getCompositeStateMachines() {
         return compositeStateMachineList.toArray(new StateMachineMetaBuilder[0]);
+    }
+
+    @Override
+    public StateMetadata[] getAllStates() {
+        final ArrayList<StateMetadata> results = new ArrayList<StateMetadata>();
+        populateStateMetadatas(this, results);
+        return results.toArray(new StateMetadata[0]);
+    }
+
+    private void populateStateMetadatas(final StateMachineMetadata stateMachine, final ArrayList<StateMetadata> results) {
+        if ( null == stateMachine ) {
+            return;
+        }
+        populateStates(results, stateMachine);
+        for ( final StateMachineMetadata stateMachineMeta : stateMachine.getCompositeStateMachines() ) {
+            populateStates(results, stateMachineMeta);
+        }
+        populateStateMetadatas(stateMachine.getSuperStateMachine(), results);
+    }
+
+    private void populateStates(final ArrayList<StateMetadata> results, final StateMachineMetadata stateMachineMeta) {
+        for ( StateMetadata stateMetadata : stateMachineMeta.getDeclaredStateSet() ) {
+            results.add(stateMetadata);
+        }
+    }
+
+    @Override
+    public StateMetadata getState(Object stateKey) {
+        return findState(this, stateKey);
+    }
+
+    private StateMetadata findState(final StateMachineMetadata stateMachine, final Object stateKey) {
+        if ( null == stateMachine ) {
+            return null;
+        }
+        final StateMetadata declaredState = stateMachine.getDeclaredState(stateKey);
+        if ( null != declaredState ) {
+            return declaredState;
+        }
+        for ( final StateMachineMetadata stateMachineMetadata : stateMachine.getCompositeStateMachines() ) {
+            final StateMetadata state = stateMachineMetadata.getDeclaredState(stateKey);
+            if ( null != state ) {
+                return state;
+            }
+        }
+        return findState(stateMachine.getSuperStateMachine(), stateKey);
     }
 }
