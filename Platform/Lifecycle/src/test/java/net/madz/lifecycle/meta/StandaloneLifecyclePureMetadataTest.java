@@ -171,34 +171,34 @@ public class StandaloneLifecyclePureMetadataTest {
     @Test
     public void testStateMetadataSummary() throws Exception {
         final StateMachineMetadata m = machineMetadata;
-        assertNotNull(m.getState(Created.class));
-        assertNotNull(m.getState(Queued.class));
-        assertNotNull(m.getState(Ongoing.class));
-        assertNotNull(m.getState(Finished.class));
-        assertNotNull(m.getState(Cancelled.class));
-        assertNotNull(m.getState(Created.class.getName()));
-        assertNotNull(m.getState(Queued.class.getName()));
-        assertNotNull(m.getState(Ongoing.class.getName()));
-        assertNotNull(m.getState(Finished.class.getName()));
-        assertNotNull(m.getState(Cancelled.class.getName()));
-        assertNotNull(m.getState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
+        assertNotNull(m.getDeclaredState(Created.class));
+        assertNotNull(m.getDeclaredState(Queued.class));
+        assertNotNull(m.getDeclaredState(Ongoing.class));
+        assertNotNull(m.getDeclaredState(Finished.class));
+        assertNotNull(m.getDeclaredState(Cancelled.class));
+        assertNotNull(m.getDeclaredState(Created.class.getName()));
+        assertNotNull(m.getDeclaredState(Queued.class.getName()));
+        assertNotNull(m.getDeclaredState(Ongoing.class.getName()));
+        assertNotNull(m.getDeclaredState(Finished.class.getName()));
+        assertNotNull(m.getDeclaredState(Cancelled.class.getName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Created.class.getSimpleName()));
         assertNotNull(m
-                .getState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Queued.class.getSimpleName()));
-        assertNotNull(m.getState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
+                .getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Queued.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Ongoing.class.getSimpleName()));
-        assertNotNull(m.getState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Finished.class.getSimpleName()));
-        assertNotNull(m.getState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Cancelled.class.getSimpleName()));
-        assertEquals(5, m.getStateSet().length);
-        assertEquals(m.getState(Created.class), m.getInitialState());
+        assertEquals(5, m.getDeclaredStateSet().length);
+        assertEquals(m.getDeclaredState(Created.class), m.getInitialState());
         assertEquals(2, m.getFinalStates().length);
         assertTrue(m.getFinalStates()[0] != m.getFinalStates()[1]);
-        assertTrue(m.getFinalStates()[0] == m.getState(Finished.class)
-                || m.getFinalStates()[0] == m.getState(Cancelled.class));
-        assertTrue(m.getFinalStates()[1] == m.getState(Finished.class)
-                || m.getFinalStates()[1] == m.getState(Cancelled.class));
+        assertTrue(m.getFinalStates()[0] == m.getDeclaredState(Finished.class)
+                || m.getFinalStates()[0] == m.getDeclaredState(Cancelled.class));
+        assertTrue(m.getFinalStates()[1] == m.getDeclaredState(Finished.class)
+                || m.getFinalStates()[1] == m.getDeclaredState(Cancelled.class));
     }
 
     // //////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ public class StandaloneLifecyclePureMetadataTest {
     public void testStateMetadatas() {
         final StateMachineMetadata m = machineMetadata;
         {
-            final StateMetadata created = m.getState(Created.class);
+            final StateMetadata created = m.getDeclaredState(Created.class);
             // Transition Validation
             assertNotNull(created.getTransition(Schedule.class));
             assertNull(created.getTransition(Start.class));
@@ -224,7 +224,7 @@ public class StandaloneLifecyclePureMetadataTest {
             simpleStateValidation(m, created);
         }
         {
-            final StateMetadata queued = m.getState(Queued.class);
+            final StateMetadata queued = m.getDeclaredState(Queued.class);
             // Transition Validation
             assertNull(queued.getTransition(Schedule.class));
             assertNotNull(queued.getTransition(Start.class));
@@ -240,7 +240,7 @@ public class StandaloneLifecyclePureMetadataTest {
             simpleStateValidation(m, queued);
         }
         {
-            final StateMetadata ongoing = m.getState(Ongoing.class);
+            final StateMetadata ongoing = m.getDeclaredState(Ongoing.class);
             // Transition Validation
             assertNull(ongoing.getTransition(Schedule.class));
             assertNull(ongoing.getTransition(Start.class));
@@ -256,7 +256,7 @@ public class StandaloneLifecyclePureMetadataTest {
             simpleStateValidation(m, ongoing);
         }
         {
-            final StateMetadata finished = m.getState(Finished.class);
+            final StateMetadata finished = m.getDeclaredState(Finished.class);
             // Transition Validation
             assertNull(finished.getTransition(Schedule.class));
             assertNull(finished.getTransition(Start.class));
@@ -272,7 +272,7 @@ public class StandaloneLifecyclePureMetadataTest {
             simpleStateValidation(m, finished);
         }
         {
-            final StateMetadata cancelled = m.getState(Cancelled.class);
+            final StateMetadata cancelled = m.getDeclaredState(Cancelled.class);
             // Transition Validation
             assertNull(cancelled.getTransition(Schedule.class));
             assertNull(cancelled.getTransition(Start.class));
@@ -335,11 +335,11 @@ public class StandaloneLifecyclePureMetadataTest {
         assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Finished.class.getSimpleName()));
         assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Cancelled.class.getSimpleName()));
         final StateMachineMetadata m = machineMetadata;
-        assertEquals(m.getState(Created.class), i.getState(Created.class).getTemplate());
-        assertEquals(m.getState(Queued.class), i.getState(Queued.class).getTemplate());
-        assertEquals(m.getState(Ongoing.class), i.getState(Ongoing.class).getTemplate());
-        assertEquals(m.getState(Finished.class), i.getState(Finished.class).getTemplate());
-        assertEquals(m.getState(Cancelled.class), i.getState(Cancelled.class).getTemplate());
+        assertEquals(m.getDeclaredState(Created.class), i.getState(Created.class).getTemplate());
+        assertEquals(m.getDeclaredState(Queued.class), i.getState(Queued.class).getTemplate());
+        assertEquals(m.getDeclaredState(Ongoing.class), i.getState(Ongoing.class).getTemplate());
+        assertEquals(m.getDeclaredState(Finished.class), i.getState(Finished.class).getTemplate());
+        assertEquals(m.getDeclaredState(Cancelled.class), i.getState(Cancelled.class).getTemplate());
     }
 
     @Test

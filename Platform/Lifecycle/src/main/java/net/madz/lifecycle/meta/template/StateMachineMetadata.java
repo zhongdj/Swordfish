@@ -33,8 +33,21 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     /* //////////////////////////////////////////////////// */
     /* /////////////// State Related Methods ////////////// */
     /* //////////////////////////////////////////////////// */
-    StateMetadata[] getStateSet();
+    StateMetadata[] getDeclaredStateSet();
 
+    StateMetadata getDeclaredState(Object stateKey);
+
+    /**
+     * @return all states in current StateMachine, current StateMachine's
+     *         composite StateMachine, super StateMachine, super StateMachine's
+     *         composite StateMachine.
+     */
+    StateMetadata[] getAllStates();
+
+    /**
+     * @param stateKey
+     * @return state in allStates by specified stateKey.
+     */
     StateMetadata getState(Object stateKey);
 
     StateMetadata getInitialState();
@@ -91,6 +104,6 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     StateMetadata getCompositeState();
 
     StateMetadata[] getShortcutStateSet();
-    
+
     StateMachineMetadata[] getCompositeStateMachines();
 }

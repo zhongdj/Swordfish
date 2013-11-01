@@ -326,7 +326,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         StateMetadata stateMetadata = null;
         for ( StateMachineMetadata sm = stateMachine; sm != null && null == stateMetadata; sm = sm
                 .getSuperStateMachine() ) {
-            stateMetadata = sm.getState(stateCandidateClass);
+            stateMetadata = sm.getDeclaredState(stateCandidateClass);
         }
         return stateMetadata;
     }

@@ -119,13 +119,13 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     }
 
     @Override
-    public StateMetadata[] getStateSet() {
+    public StateMetadata[] getDeclaredStateSet() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public StateMetadata getState(Object stateKey) {
+    public StateMetadata getDeclaredState(Object stateKey) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -216,6 +216,18 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
 
     @Override
     public StateMachineMetadata[] getCompositeStateMachines() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public StateMetadata[] getAllStates() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public StateMetadata getState(Object stateKey) {
         // TODO Auto-generated method stub
         return null;
     }
