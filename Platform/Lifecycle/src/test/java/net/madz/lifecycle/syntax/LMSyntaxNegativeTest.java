@@ -26,7 +26,7 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NLM_1.class.getSimpleName(), NS1_Z.class.getSimpleName(), S2.class.getName());
+                    NS1_Z.class.getSimpleName(), S2.class.getName(), NLM_1.class.getSimpleName());
             throw e;
         }
     }
@@ -43,7 +43,7 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NLM_2.class.getSimpleName(), NS1_Z.class.getSimpleName(), S2.class.getName());
+                    NS1_Z.class.getSimpleName(), S2.class.getName(), NLM_2.class.getSimpleName());
             throw e;
         }
     }
@@ -78,8 +78,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, NLM_4.class.getName(), NLM_4.class
-                            .getMethod("nS1_X").getAnnotation(Transition.class), "nS1_X", S2.class.getName());
+                    Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, NLM_4.class.getMethod("nS1_X")
+                            .getAnnotation(Transition.class), "nS1_X", NLM_4.class.getName(), S2.class.getName());
             throw e;
         }
     }
@@ -96,8 +96,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
-                    S3_Y.class.getSimpleName(), S3.class.getName(), NLM_5.class.getName(), "@Redo");
+                    Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, S3_Y.class.getSimpleName(),
+                    S3.class.getName(), NLM_5.class.getName(), "@Redo");
             throw e;
         }
     }

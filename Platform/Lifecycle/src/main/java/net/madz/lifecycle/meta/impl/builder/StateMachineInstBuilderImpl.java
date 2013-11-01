@@ -62,8 +62,8 @@ public class StateMachineInstBuilderImpl extends
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(),
-                    Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, klass.getSimpleName(), transitionMetadata.getDottedPath()
-                            .getName(), getTemplate().getDottedPath().getAbsoluteName()));
+                    Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath()
+                            .getName(), getTemplate().getDottedPath().getAbsoluteName(),klass.getSimpleName()));
         }
     }
 
@@ -160,8 +160,8 @@ public class StateMachineInstBuilderImpl extends
                 }
             } else if ( !getTemplate().hasTransition(transition.value()) ) {
                 failureSet.add(newVerificationFailure(getMethodDottedPath(method),
-                        Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, method.getDeclaringClass()
-                                .getName(), transition, method.getName(), getTemplate().getDottedPath()));
+                        Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(),
+                        method.getDeclaringClass().getName(), getTemplate().getDottedPath()));
             }
         }
     }
