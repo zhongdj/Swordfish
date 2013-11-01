@@ -96,8 +96,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, S3_Y.class.getSimpleName(),
-                    S3.class.getName(), NLM_5.class.getName(), "@Redo");
+                    Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, S3_Y.class.getSimpleName(), "@Redo",
+                    S3.class.getName(), NLM_5.class.getName());
             throw e;
         }
     }

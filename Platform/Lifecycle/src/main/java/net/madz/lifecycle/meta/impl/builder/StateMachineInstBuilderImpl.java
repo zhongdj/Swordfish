@@ -103,8 +103,8 @@ public class StateMachineInstBuilderImpl extends
             if ( isUniqueTransition(type) ) {
                 failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
                         Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
-                                .getDottedPath().getName(), getTemplate().getDottedPath(), getDottedPath()
-                                .getAbsoluteName(), "@" + type.name()));
+                                .getDottedPath().getName(),"@" + type.name(), getTemplate().getDottedPath(), getDottedPath()
+                                .getAbsoluteName()));
             }
         }
 
