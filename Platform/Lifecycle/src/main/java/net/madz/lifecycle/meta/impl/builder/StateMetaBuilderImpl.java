@@ -338,7 +338,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private TransitionMetadata findTransitionMetadata(Class<?> transitionClz, StateMachineMetadata stateMachine) {
         TransitionMetadata transition = null;
         for ( StateMachineMetadata sm = stateMachine; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
-            transition = sm.getTransition(transitionClz);
+            transition = sm.getDeclaredTransition(transitionClz);
         }
         return transition;
     }

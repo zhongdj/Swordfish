@@ -90,28 +90,28 @@ public class StandaloneLifecyclePureMetadataTest {
         assertEquals(m, stateMachineInst.getTemplate());
         {
             // Class Key Validation
-            assertNotNull(m.getTransition(Schedule.class));
-            assertNotNull(m.getTransition(Start.class));
-            assertNotNull(m.getTransition(Finish.class));
-            assertNotNull(m.getTransition(Cancel.class));
+            assertNotNull(m.getDeclaredTransition(Schedule.class));
+            assertNotNull(m.getDeclaredTransition(Start.class));
+            assertNotNull(m.getDeclaredTransition(Finish.class));
+            assertNotNull(m.getDeclaredTransition(Cancel.class));
             // Class Name Key Validation
-            assertNotNull(m.getTransition(Schedule.class.getName()));
-            assertNotNull(m.getTransition(Start.class.getName()));
-            assertNotNull(m.getTransition(Finish.class.getName()));
-            assertNotNull(m.getTransition(Cancel.class.getName()));
+            assertNotNull(m.getDeclaredTransition(Schedule.class.getName()));
+            assertNotNull(m.getDeclaredTransition(Start.class.getName()));
+            assertNotNull(m.getDeclaredTransition(Finish.class.getName()));
+            assertNotNull(m.getDeclaredTransition(Cancel.class.getName()));
             // Dotted Path Key Validation
-            assertNotNull(m.getTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
                     + Schedule.class.getSimpleName()));
-            assertNotNull(m.getTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
                     + Start.class.getSimpleName()));
-            assertNotNull(m.getTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
                     + Finish.class.getSimpleName()));
-            assertNotNull(m.getTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
                     + Cancel.class.getSimpleName()));
         }
         // Check 4 transition metadata
         {
-            final TransitionMetadata scheduleTransition = m.getTransition(Schedule.class);
+            final TransitionMetadata scheduleTransition = m.getDeclaredTransition(Schedule.class);
             assertEquals(m, scheduleTransition.getStateMachine());
             assertEquals(0, scheduleTransition.getTimeout());
             assertEquals(m, scheduleTransition.getParent());
@@ -122,7 +122,7 @@ public class StandaloneLifecyclePureMetadataTest {
                     scheduleTransition.getDottedPath());
         }
         {
-            final TransitionMetadata startTransition = m.getTransition(Start.class);
+            final TransitionMetadata startTransition = m.getDeclaredTransition(Start.class);
             assertEquals(m, startTransition.getStateMachine());
             assertEquals(0, startTransition.getTimeout());
             assertEquals(m, startTransition.getParent());
@@ -132,7 +132,7 @@ public class StandaloneLifecyclePureMetadataTest {
                     startTransition.getDottedPath());
         }
         {
-            final TransitionMetadata finishTransition = m.getTransition(Finish.class);
+            final TransitionMetadata finishTransition = m.getDeclaredTransition(Finish.class);
             assertEquals(m, finishTransition.getStateMachine());
             assertEquals(0, finishTransition.getTimeout());
             assertEquals(m, finishTransition.getParent());
@@ -143,7 +143,7 @@ public class StandaloneLifecyclePureMetadataTest {
                     finishTransition.getDottedPath());
         }
         {
-            final TransitionMetadata cancelTransition = m.getTransition(Cancel.class);
+            final TransitionMetadata cancelTransition = m.getDeclaredTransition(Cancel.class);
             assertEquals(m, cancelTransition.getStateMachine());
             assertEquals(0, cancelTransition.getTimeout());
             assertEquals(m, cancelTransition.getParent());

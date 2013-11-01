@@ -29,7 +29,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
             this.path = DottedPath.parse(name);
         } else {
             this.parent = parent;
-            this.path = parent.getDottedPath().append(name);
+            this.path = DottedPath.parse(parent.getDottedPath().append(name).getAbsoluteName());
         }
         this.keySet = new KeySet.Builder(3);
         this.flavorMap = new MetaDataMap.Builder(self, 3);

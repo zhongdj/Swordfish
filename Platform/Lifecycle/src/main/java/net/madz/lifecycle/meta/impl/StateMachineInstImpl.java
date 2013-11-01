@@ -15,7 +15,6 @@ public class StateMachineInstImpl implements StateMachineInst {
 
     @Override
     public StateMachineMetadata getTemplate() {
-        // TODO Auto-generated method stub
         return null;
     }
 

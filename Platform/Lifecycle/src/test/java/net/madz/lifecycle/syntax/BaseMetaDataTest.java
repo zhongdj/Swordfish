@@ -19,6 +19,7 @@ public class BaseMetaDataTest {
     }
 
     protected void assertFailure(VerificationFailure failure, String errorCode, Object... args) {
+        System.out.println("ExpectedErrorCode:" + errorCode + ",ActualErrorCode:" + failure.getErrorCode());
         assertEquals(errorCode, failure.getErrorCode());
         final String expectedMessage = getMessage(errorCode, args);
         System.out.println("ExpectedMessages:" + expectedMessage + "\n" + "  FailureMessage:"

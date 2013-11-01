@@ -143,13 +143,13 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     }
 
     @Override
-    public TransitionMetadata[] getTransitionSet() {
+    public TransitionMetadata[] getDeclaredTransitionSet() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public TransitionMetadata getTransition(Object transitionKey) {
+    public TransitionMetadata getDeclaredTransition(Object transitionKey) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -200,5 +200,23 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     public boolean hasRelation(Class<?> relationClass) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public TransitionMetadata[] getAllTransitions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public TransitionMetadata getTransition(Object transitionKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public StateMachineMetadata[] getCompositeStateMachines() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -25,7 +25,7 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     boolean hasRelations();
 
     StateMachineMetadata[] getRelatedStateMachineMetadata();
-    
+
     boolean hasRelation(Class<?> relationClass);
 
     StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
@@ -44,9 +44,23 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     /* //////////////////////////////////////////////////// */
     /* ///////////// Transtion Related Methods //////////// */
     /* //////////////////////////////////////////////////// */
-    TransitionMetadata[] getTransitionSet();
+    TransitionMetadata[] getDeclaredTransitionSet();
 
     // TransitionMetadata[] getSuperTransitionSet();
+    TransitionMetadata getDeclaredTransition(Object transitionKey);
+
+    /**
+     * @return transitions in current StateMachine, current StateMachine's
+     *         CompositeStateMachine, super StateMachines, super
+     *         StateMachines'composite
+     *         StateMachines.
+     */
+    TransitionMetadata[] getAllTransitions();
+
+    /**
+     * @param transitionKey
+     * @return transition in allTransitionSet by specified transitionKey
+     */
     TransitionMetadata getTransition(Object transitionKey);
 
     TransitionMetadata getStateSynchronizationTransition();
@@ -77,4 +91,6 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     StateMetadata getCompositeState();
 
     StateMetadata[] getShortcutStateSet();
+    
+    StateMachineMetadata[] getCompositeStateMachines();
 }

@@ -4,6 +4,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
 import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Y;
@@ -65,7 +66,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_LM_method_transition_beyond_stateMachine() throws VerificationException {
+    public void test_LM_method_transition_beyond_stateMachine() throws VerificationException, NoSuchMethodException,
+            SecurityException {
         @LifecycleRegistry(NLM_4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -76,8 +78,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION, NLM_4.class.getName(), "TransitionSet."
-                            + S1_X.class.getSimpleName(), "nS1_X", S2.class.getName());
+                    Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, NLM_4.class.getName(), NLM_4.class
+                            .getMethod("nS1_X").getAnnotation(Transition.class), "nS1_X", S2.class.getName());
             throw e;
         }
     }
@@ -95,7 +97,7 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
-                    "TransitionSet." + S3_Y.class.getSimpleName(), S3.class.getName(), NLM_5.class.getName(), "@Redo");
+                    S3_Y.class.getSimpleName(), S3.class.getName(), NLM_5.class.getName(), "@Redo");
             throw e;
         }
     }

@@ -44,7 +44,7 @@ public interface Errors {
     public static final String RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE = "002-2931";
     // LifecycleMeta
     public static final String LM_MUST_CONCRETE_ALL_TRANSITIONS = "002-3210";
-    public static final String LM_TRANSITION_METHOD_WITH_OUTBOUNDED_TRANSITION = "002-3211";
+    public static final String LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE = "002-3211";
     public static final String LM_TRANSITION_NOT_CONCRETED_IN_LM = "002-3212";
     public static final String LM_METHOD_NAME_INVALID = "002-3213";
     public static final String LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD = "002-3214";

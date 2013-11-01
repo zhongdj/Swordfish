@@ -78,7 +78,8 @@ public class StateMachineMetaBuilderImpl extends
     // the enclosing state's (parent) StateMachine
     private StateMachineMetaBuilder owningStateMachine;
     // Also for composite State Machine
-    private ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
+    private final ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
+    private final ArrayList<RelationMetaBuilder> compositeStateMachineList = new ArrayList<>();
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         this(name);
@@ -144,12 +145,12 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public TransitionMetadata[] getTransitionSet() {
+    public TransitionMetadata[] getDeclaredTransitionSet() {
         return transitionList.toArray(new TransitionMetadata[transitionList.size()]);
     }
 
     @Override
-    public TransitionMetadata getTransition(Object transitionKey) {
+    public TransitionMetadata getDeclaredTransition(Object transitionKey) {
         return this.transitionMap.get(transitionKey);
     }
 
@@ -160,7 +161,7 @@ public class StateMachineMetaBuilderImpl extends
 
     @Override
     public StateMachineInst newInstance(Class<?> clazz) throws VerificationException {
-        final StateMachineInstBuilderImpl builder = new StateMachineInstBuilderImpl(this, clazz.getSimpleName());
+        final StateMachineInstBuilderImpl builder = new StateMachineInstBuilderImpl(this, clazz.getName());
         builder.setRegistry(registry);
         return builder.build(clazz).getMetaData();
     }
@@ -276,8 +277,7 @@ public class StateMachineMetaBuilderImpl extends
 
     private void configureSuperStateMachine(Class<?> clazz) throws VerificationException {
         if ( hasSuperMetadataClass(clazz) ) {
-            final StateMachineMetadata superStateMachineMetadata = load(getSuperMetadataClass(clazz));
-            this.superStateMachineMetadata = superStateMachineMetadata;
+            this.superStateMachineMetadata = load(getSuperMetadataClass(clazz));
         }
     }
 
@@ -595,5 +595,58 @@ public class StateMachineMetaBuilderImpl extends
     @Override
     public boolean hasRelation(Class<?> relationClass) {
         return relationMap.containsKey(relationClass);
+    }
+
+    @Override
+    public TransitionMetadata[] getAllTransitions() {
+        final ArrayList<TransitionMetadata> result = new ArrayList<>();
+        loadTransitions(this, result);
+        return result.toArray(new TransitionMetadata[0]);
+    }
+
+    private void loadTransitions(final StateMachineMetaBuilder stateMachineMetaBuilder,
+            final ArrayList<TransitionMetadata> result) {
+        populateTransitions(stateMachineMetaBuilder, result);
+        for ( final StateMachineMetaBuilder compositeStateMachine : stateMachineMetaBuilder.getCompositeStateMachines() ) {
+            populateTransitions(compositeStateMachine, result);
+        }
+        if ( null != stateMachineMetaBuilder.getSuperStateMachine() ) {
+            loadTransitions(stateMachineMetaBuilder, result);
+        }
+    }
+
+    private void populateTransitions(StateMachineMetaBuilder stateMachineMetaBuilder,
+            ArrayList<TransitionMetadata> result) {
+        for ( TransitionMetadata transition : stateMachineMetaBuilder.getDeclaredTransitionSet() ) {
+            result.add(transition);
+        }
+    }
+
+    @Override
+    public TransitionMetadata getTransition(Object transitionKey) {
+        return findTransition(this, transitionKey);
+    }
+
+    private TransitionMetadata findTransition(StateMachineMetadata stateMachineMetaBuilder, Object transitionKey) {
+        if ( null == stateMachineMetaBuilder ) return null;
+        TransitionMetadata transitionMetadata = stateMachineMetaBuilder.getDeclaredTransition(transitionKey);
+        if ( null != transitionMetadata ) {
+            return transitionMetadata;
+        }
+        for ( StateMachineMetadata builder : stateMachineMetaBuilder.getCompositeStateMachines() ) {
+            transitionMetadata = builder.getDeclaredTransition(transitionKey);
+            if ( null != transitionMetadata ) return transitionMetadata;
+        }
+        return findTransition(getSuperStateMachine(), transitionKey);
+    }
+
+    @Override
+    public boolean hasTransition(Object transitionKey) {
+        return null != getTransition(transitionKey);
+    }
+
+    @Override
+    public StateMachineMetaBuilder[] getCompositeStateMachines() {
+        return compositeStateMachineList.toArray(new StateMachineMetaBuilder[0]);
     }
 }
