@@ -556,4 +556,71 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             static interface PCR {}
         }
     }
+    @StateMachine
+    static interface NOwningStateMachine {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NOwningStateMachine.Transitions.NOwningX.class, value = NOwningB.class)
+            static interface NOwningA {}
+            @CompositeStateMachine
+            @Function(transition = NOwningStateMachine.Transitions.NOwningY.class, value = NOwningC.class)
+            static interface NOwningB {
+
+                @StateSet
+                static interface NCStates {
+
+                    @Initial
+                    @Function(transition = NOwningB.CTransitions.NCompositeX.class,
+                            value = NOwningB.NCStates.NCompositeB.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NOwningB.CRelations.NCR.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface NCompositeA {}
+                    @Function(transition = NOwningB.CTransitions.NCompositeX.class,
+                            value = NOwningB.NCStates.NCompositeC.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NOwningB.CRelations.NCR.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface NCompositeB {}
+                    @End
+                    @ShortCut(NOwningC.class)
+                    static interface NCompositeC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface NCompositeX {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    @Parent
+                    @Overrides // It's illegal whether overrides or not
+                    @RelateTo(RelatedSM.class)
+                    static interface NCR {}
+                }
+            }
+            @End
+            static interface NOwningC {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface NOwningX {}
+            static interface NOwningY {}
+        }
+        
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface NR {}
+        }
+    }
 }

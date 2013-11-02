@@ -63,12 +63,10 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             final Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(iterator.next(),
-                    Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+            assertFailure(iterator.next(), Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(InboundWhile.class), NStandalone5.States.N5A.class,
                     RelatedSM.class.getName());
-            assertFailure(iterator.next(),
-                    Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
+            assertFailure(iterator.next(), Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(ValidWhile.class), NStandalone5.States.N5A.class,
                     RelatedSM.class.getName());
             throw e;
@@ -188,29 +186,30 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
-    public void test_multiple_parent_relation_standalone () throws VerificationException {
+    public void test_multiple_parent_relation_standalone() throws VerificationException {
         @LifecycleRegistry(NStandaloneParent.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_MULTIPLE_PARENT_RELATION,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.RELATION_MULTIPLE_PARENT_RELATION,
                     NStandaloneParent.class);
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
-    public void test_forget_to_override_super_state_machine_parent_relation () throws VerificationException {
+    public void test_forget_to_override_super_state_machine_parent_relation() throws VerificationException {
         @LifecycleRegistry(NParentRelationChild.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
@@ -219,6 +218,28 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
                     NParentRelationChild.class, PParentRelationSuper.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_illegal_to_override_owning_state_machine_parent_relation() throws VerificationException {
+        @LifecycleRegistry(NOwningStateMachine.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(
+                    e.getVerificationFailureSet().iterator().next(),
+                    Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
+                    NOwningStateMachine.class + ".CompositeStateMachine."
+                            + NOwningStateMachine.States.NOwningB.class.getSimpleName(),
+                    NOwningStateMachine.States.NOwningB.CRelations.NCR.class, NOwningStateMachine.class,
+                    NOwningStateMachine.Relations.NR.class);
             throw e;
         }
     }

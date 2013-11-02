@@ -64,4 +64,12 @@ public interface Errors {
      * @param {1} super stateMachine class
      */
     public static final String RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION = "002-3502";
+    
+    /**
+     * @param {0} composite stateMachine dottedPath
+     * @param {1} parent relation class of composite stateMachine class
+     * @param {2} owning stateMachine class
+     * @param {3} parent relation class of owning stateMachine class
+     */
+    public static final String RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION = "002-3503";
 }
