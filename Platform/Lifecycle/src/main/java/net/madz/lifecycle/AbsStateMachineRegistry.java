@@ -84,13 +84,16 @@ public abstract class AbsStateMachineRegistry {
                 if ( isRegistered(clazz) ) {
                     return;
                 }
-                buildStateMachineMetadata(failureSet, clazz);
+                createStateMachineMetaBuilder(clazz, null, failureSet);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
                 if ( isRegistered(stateMachineClass) ) {
                     return;
                 }
-                final StateMachineMetadata metaData = buildStateMachineMetadata(failureSet, stateMachineClass);
+                final StateMachineMetadata metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
+                if (null == metaData) {
+                    continue;
+                }
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
@@ -105,20 +108,6 @@ public abstract class AbsStateMachineRegistry {
             failureSet.dump(new Dumper(System.out));
             throw new VerificationException(failureSet);
         }
-    }
-
-    private StateMachineMetadata buildStateMachineMetadata(final VerificationFailureSet failureSet,
-            final Class<?> stateMachineClass) throws VerificationException {
-        final StateMachineMetaBuilder builder = createBuilder(stateMachineClass);
-        builder.setRegistry(this);
-        if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
-            builder.setComposite(true);
-            builder.addKey(stateMachineClass);
-        }
-        final StateMachineMetadata metaData = builder.build(stateMachineClass, null).getMetaData();
-        metaData.verifyMetaData(failureSet);
-        addTemplate(metaData);
-        return metaData;
     }
 
     private boolean isRegistered(Class<?> clazz) {
@@ -171,30 +160,56 @@ public abstract class AbsStateMachineRegistry {
         return this.instanceMap.get(key);
     }
 
-    public StateMachineMetaBuilder loadStateMachineMetaBuilder(Class<?> stateMachineClass,
-            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
-        if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
-            final Class<?> stateClass = stateMachineClass;
-            final StateMachineMetaBuilder compositeStateMachine = createCompositeBuilder(stateMachineClass,
-                    owningStateMachine);
-            compositeStateMachine.setComposite(true);
-            compositeStateMachine.addKey(stateClass);
-            return compositeStateMachine;
-        } else {
-            return createBuilder(stateMachineClass);
+    private StateMachineMetadata createStateMachineMetaBuilder(Class<?> stateMachineClass,
+            StateMachineMetaBuilder owningStateMachine, VerificationFailureSet failureSet) throws VerificationException {
+        StateMachineMetaBuilder metaBuilder = null;
+        try {
+            if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
+                metaBuilder = createCompositeBuilder(stateMachineClass, owningStateMachine);
+            } else {
+                metaBuilder = createBuilder(stateMachineClass);
+            }
+            final StateMachineMetadata metaData = metaBuilder.build(stateMachineClass, null).getMetaData();
+            addTemplate(metaData);
+            if ( null != failureSet ) {
+                metaData.verifyMetaData(failureSet);
+            } else {
+                VerificationFailureSet tmpSet = new VerificationFailureSet();
+                metaData.verifyMetaData(tmpSet);
+                if ( 0 < tmpSet.size() ) {
+                    throw new VerificationException(tmpSet);
+                }
+            }
+            return metaData;
+        } catch (VerificationException ex) {
+            if ( null == failureSet ) {
+                throw ex;
+            } else {
+                failureSet.add(ex);
+            }
         }
+        return null;
+    }
+
+    public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass,
+            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
+        StateMachineMetadata stateMachineMeta = getStateMachineMeta(stateMachineClass);
+        if ( null != stateMachineMeta ) return stateMachineMeta;
+        return createStateMachineMetaBuilder(stateMachineClass, owningStateMachine, null);
     }
 
     private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass,
-            StateMachineMetaBuilder owningStateMachine) {
+            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
         Constructor<? extends StateMachineMetaBuilder> c;
         try {
             c = builderMeta.value().getConstructor(StateMachineMetaBuilder.class, String.class);
             final StateMachineMetaBuilder compositeStateMachine = c.newInstance(owningStateMachine,
                     "CompositeStateMachine." + stateMachineClass.getSimpleName());
-            compositeStateMachine.setComposite(true);
             return compositeStateMachine;
         } catch (Throwable t) {
+            if ( t.getCause() instanceof VerificationException ) {
+                throw (VerificationException) t.getCause();
+            }
             throw new IllegalStateException(t);
         }
     }

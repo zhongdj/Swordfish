@@ -3,7 +3,6 @@ package net.madz.lifecycle.meta.builder;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
-import net.madz.verification.VerificationException;
 
 public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetaBuilder, StateMachineMetaBuilder>,
         StateMachineMetadata {
@@ -22,6 +21,4 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
     
     AbsStateMachineRegistry getRegistry();
 
-    StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException;
-    
 }

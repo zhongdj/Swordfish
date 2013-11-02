@@ -259,7 +259,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             return;
         }
         this.compositeState = true;
-        this.compositeStateMachine = parent.loadStateMachineMetadata(stateClass);
+        this.compositeStateMachine = parent.getRegistry().loadStateMachineMetadata(stateClass, parent);
     }
 
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {

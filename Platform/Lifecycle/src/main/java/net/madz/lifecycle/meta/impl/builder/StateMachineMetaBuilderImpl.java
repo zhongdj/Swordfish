@@ -79,7 +79,7 @@ public class StateMachineMetaBuilderImpl extends
     private StateMetadata owningState;
     // If this state machine is a composite state machine, owningStateMachine is
     // the enclosing state's (parent) StateMachine
-    private StateMachineMetadata owningStateMachine;
+    // private StateMachineMetadata owningStateMachine;
     // Also for composite State Machine
     private final ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
     private final ArrayList<StateMachineMetaBuilder> compositeStateMachineList = new ArrayList<>();
@@ -226,7 +226,7 @@ public class StateMachineMetaBuilderImpl extends
 
     @Override
     public StateMachineMetadata getOwningStateMachine() {
-        return owningStateMachine;
+        return getParent();
     }
 
     @Override
@@ -237,7 +237,6 @@ public class StateMachineMetaBuilderImpl extends
     @Override
     public void setOwningState(StateMetadata stateMetaBuilder) {
         this.owningState = stateMetaBuilder;
-        this.owningStateMachine = stateMetaBuilder.getStateMachine();
     }
 
     @Override
@@ -250,6 +249,7 @@ public class StateMachineMetaBuilderImpl extends
     /* //////////////////////////////////////////////////// */
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
+        preConfigureStateMachineType(clazz);
         // Step 1. Syntax Validation
         {
             verifySyntax(clazz);
@@ -267,6 +267,13 @@ public class StateMachineMetaBuilderImpl extends
         }
         addKeys(clazz);
         return this;
+    }
+
+    private void preConfigureStateMachineType(Class<?> clazz) {
+        if ( isCompositeStateMachine(clazz) ) {
+            setOwningState(getOwningStateMachine().getState(clazz));
+            setComposite(true);
+        }
     }
 
     private void configureCompositeStateMachine(Class<?> clazz) throws VerificationException {
@@ -298,9 +305,9 @@ public class StateMachineMetaBuilderImpl extends
         if ( isComposite() && isState(getSuperMetadataClass(clazz)) ) {
             this.superStateMachineMetadata = null;
         } else if ( isComposite() ) {
-            this.superStateMachineMetadata = loadStateMachineMetadata(getSuperMetadataClass(clazz));
+            this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
         } else if ( hasSuperMetadataClass(clazz) ) {
-            this.superStateMachineMetadata = loadStateMachineMetadata(getSuperMetadataClass(clazz));
+            this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
         }
     }
 
@@ -380,14 +387,14 @@ public class StateMachineMetaBuilderImpl extends
         final RelateTo relateTo = relationClass.getAnnotation(RelateTo.class);
         final Class<?> relatedStateMachineClass = relateTo.value();
         try {
-            final StateMachineMetadata relatedStateMachineMetadata = loadStateMachineMetadata(relatedStateMachineClass);
+            final StateMachineMetadata relatedStateMachineMetadata = registry.loadStateMachineMetadata(relatedStateMachineClass, this);
             this.relatedStateMachineList.add(relatedStateMachineMetadata);
             final Iterator<Object> keyIterator = relatedStateMachineMetadata.getKeySet().iterator();
             while ( keyIterator.hasNext() ) {
                 this.relatedStateMachineMap.put(keyIterator.next(), relatedStateMachineMetadata);
             }
             this.relatedStateMachineMap.put(relationClass, relatedStateMachineMetadata);
-            if (hasParent(relationClass)) {
+            if ( hasParent(relationClass) ) {
                 this.parentStateMachineMetadata = relatedStateMachineMetadata;
             }
         } catch (VerificationException e) {
@@ -480,25 +487,8 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
-    @Override
-    public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException {
-        StateMachineMetadata stateMachineMetadata = registry.getStateMachineMeta(stateMachineClass);
-        if ( null != stateMachineMetadata ) {
-            return stateMachineMetadata;
-        }
-        final StateMachineMetaBuilder machineMetaBuilder;
-        if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
-            machineMetaBuilder = registry.loadStateMachineMetaBuilder(stateMachineClass, this);
-            final StateMachineMetaBuilder compositeStateMachine = machineMetaBuilder;
-            final Class<?> stateClass = stateMachineClass;
-            compositeStateMachine.setOwningState(getState(stateClass));
-            stateMachineMetadata = compositeStateMachine.build(stateMachineClass, this).getMetaData();
-        } else {
-            machineMetaBuilder = registry.loadStateMachineMetaBuilder(stateMachineClass, this);
-            stateMachineMetadata = machineMetaBuilder.build(stateMachineClass, this).getMetaData();
-        }
-        registry.addTemplate(stateMachineMetadata);
-        return stateMachineMetadata;
+    private boolean isCompositeStateMachine(Class<?> stateMachineClass) {
+        return null != stateMachineClass.getAnnotation(CompositeStateMachine.class);
     }
 
     private Class<?> getSuperMetadataClass(Class<?> clazz) {
