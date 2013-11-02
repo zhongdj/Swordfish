@@ -56,7 +56,7 @@ public class RelationSyntaxPositiveTest extends RelationSyntaxMetadata {
 
     @Test
     public void test_parent_relation_in_child_state_machine_syntax_positive_standalone() throws VerificationException {
-        @LifecycleRegistry(PParentRlationChild.class)
+        @LifecycleRegistry(PParentRelationChild.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 

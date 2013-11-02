@@ -497,7 +497,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
-    static interface PParentRlationChild extends PParentRelationSuper {
+    static interface PParentRelationChild extends PParentRelationSuper {
 
         @RelationSet
         static interface Relations {
@@ -508,8 +508,6 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             static interface PCR {}
         }
     }
-    
-    
     @StateMachine
     static interface NStandaloneParent {
 
@@ -544,6 +542,18 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Parent
             @RelateTo(RelatedSM.class)
             static interface PPR2 {}
+        }
+    }
+    @StateMachine
+    static interface NParentRelationChild extends PParentRelationSuper {
+
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            // Forget to @Overrides
+            static interface PCR {}
         }
     }
 }

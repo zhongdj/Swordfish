@@ -59,4 +59,9 @@ public interface Errors {
      * @param {0} stateMachine class
      */
     public static final String RELATION_MULTIPLE_PARENT_RELATION = "002-3501";
+    /**
+     * @param {0} child stateMachine class
+     * @param {1} super stateMachine class
+     */
+    public static final String RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION = "002-3502";
 }

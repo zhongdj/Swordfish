@@ -205,4 +205,21 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             throw e;
         }
     }
+    @Test(expected = VerificationException.class)
+    public void test_forget_to_override_super_state_machine_parent_relation () throws VerificationException {
+        @LifecycleRegistry(NParentRelationChild.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+            
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
+                    NParentRelationChild.class, PParentRelationSuper.class);
+            throw e;
+        }
+    }
 }
