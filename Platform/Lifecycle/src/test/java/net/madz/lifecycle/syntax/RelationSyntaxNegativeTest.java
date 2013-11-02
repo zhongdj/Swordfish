@@ -234,10 +234,9 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(
-                    e.getVerificationFailureSet().iterator().next(),
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
-                    NOwningStateMachine.class + ".CompositeStateMachine."
+                    NOwningStateMachine.class.getName() + ".CompositeStateMachine."
                             + NOwningStateMachine.States.NOwningB.class.getSimpleName(),
                     NOwningStateMachine.States.NOwningB.CRelations.NCR.class, NOwningStateMachine.class,
                     NOwningStateMachine.Relations.NR.class);
@@ -259,7 +258,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
-                    N2OwningStateMachine.class + ".CompositeStateMachine."
+                    N2OwningStateMachine.class.getName() + ".CompositeStateMachine."
                             + N2OwningStateMachine.States.N2OwningB.class.getSimpleName(),
                     N2OwningStateMachine.States.N2OwningB.CRelations.N2CR.class, N2OwningStateMachine.class,
                     N2OwningStateMachine.Relations.N2R.class);

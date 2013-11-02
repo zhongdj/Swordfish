@@ -14,10 +14,12 @@ import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.ConditionSet;
+import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
@@ -79,7 +81,7 @@ public class StateMachineMetaBuilderImpl extends
     private StateMachineMetaBuilder owningStateMachine;
     // Also for composite State Machine
     private final ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
-    private final ArrayList<RelationMetaBuilder> compositeStateMachineList = new ArrayList<>();
+    private final ArrayList<StateMachineMetaBuilder> compositeStateMachineList = new ArrayList<>();
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         super(null, name);
@@ -262,7 +264,6 @@ public class StateMachineMetaBuilderImpl extends
             configureRelationSet(clazz);
             configureStateSetRelations(clazz);
         }
-        
         addKeys(clazz);
         return this;
     }
@@ -271,6 +272,21 @@ public class StateMachineMetaBuilderImpl extends
         for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
             StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
             stateMetaBuilder.configureCompositeStateMachine(stateClass);
+            verifyCompositeParentRelationSyntax(clazz, stateClass, stateMetaBuilder.getCompositeStateMachine());
+        }
+    }
+
+    private void verifyCompositeParentRelationSyntax(Class<?> owningStateMachineClass, final Class<?> stateClass,
+            final StateMachineMetadata compositeStateMachine) throws VerificationException {
+        final Class<?> owningParentRelation = getDeclaredParentRelation(owningStateMachineClass);
+        if ( null != compositeStateMachine ) {
+            final Class<?> compositeParentRelation = getDeclaredParentRelation(stateClass);
+            if ( null != owningParentRelation && null != compositeParentRelation ) {
+                throw newVerificationException(compositeStateMachine.getDottedPath(),
+                        Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
+                        compositeStateMachine.getDottedPath(), compositeParentRelation, owningStateMachineClass,
+                        owningParentRelation);
+            }
         }
     }
 
@@ -295,34 +311,74 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private void configureRelationSet(Class<?> clazz) throws VerificationException {
-        RelationMetaBuilder relationBuilder = null;
-        for ( Class<?> klass : findComponentClasses(clazz, RelationSet.class) ) {
-            relationBuilder = new RelationMetaBuilderImpl(this, klass.getSimpleName());
-            relationBuilder.build(klass, this);
-            addRelationMetadata(klass, relationBuilder);
-            RelateTo relateTo = klass.getAnnotation(RelateTo.class);
-            Class<?> relatedStateMachineClass = relateTo.value();
-            try {
-                StateMachineMetadata relatedStateMachineMetadata = load(relatedStateMachineClass);
-                this.relatedStateMachineList.add(relatedStateMachineMetadata);
-                this.relatedStateMachineMap.put(klass, relatedStateMachineMetadata);
-                this.relatedStateMachineMap.put(klass.getName(), relatedStateMachineMetadata);
-                this.relatedStateMachineMap.put(klass.getSimpleName(), relatedStateMachineMetadata);
-            } catch (VerificationException e) {
-                if ( Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION.equals(e.getVerificationFailureSet().iterator()
-                        .next().getErrorCode()) ) {
-                    throw newVerificationException(getDottedPath(),
-                            Errors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE, relateTo);
+        verifyParentRelationSyntax(clazz);
+        for ( Class<?> relationClass : findComponentClasses(clazz, RelationSet.class) ) {
+            addRelationMetadata(relationClass);
+            addRelatedStateMachine(relationClass);
+        }
+    }
+
+    private Class<?> getDeclaredParentRelation(Class<?> clazz) {
+        for ( Class<?> relationClass : findComponentClasses(clazz, RelationSet.class) ) {
+            if ( hasParent(relationClass) ) {
+                return relationClass;
+            }
+        }
+        return null;
+    }
+
+    private void verifyParentRelationSyntax(Class<?> clazz) throws VerificationException {
+        boolean hasParentRelation = false;
+        for ( Class<?> relationClass : findComponentClasses(clazz, RelationSet.class) ) {
+            if ( hasParentRelation && hasParent(relationClass) ) {
+                throw newVerificationException(getDottedPath(), Errors.RELATION_MULTIPLE_PARENT_RELATION, clazz);
+            } else if ( hasParent(relationClass) ) {
+                hasParentRelation = true;
+                if ( hasSuper() ) {
+                    if ( getSuperStateMachine().hasParent() && null == relationClass.getAnnotation(Overrides.class) ) {
+                        throw newVerificationException(getDottedPath(),
+                                Errors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION, clazz,
+                                getSuperMetadataClass(clazz));
+                    }
                 }
             }
         }
     }
 
-    private void addRelationMetadata(Class<?> klass, RelationMetaBuilder relationBuilder) {
+    private boolean hasParent(Class<?> relationClass) {
+        return null != relationClass.getAnnotation(Parent.class);
+    }
+
+    private void addRelationMetadata(Class<?> relationClass) throws VerificationException {
+        RelationMetaBuilder relationBuilder = new RelationMetaBuilderImpl(this, relationClass.getSimpleName());
+        relationBuilder.build(relationClass, this);
         this.relationList.add(relationBuilder);
         final Iterator<Object> iterator = relationBuilder.getKeySet().iterator();
         while ( iterator.hasNext() ) {
             this.relationMap.put(iterator.next(), relationBuilder);
+        }
+    }
+
+    private void addRelatedStateMachine(Class<?> relationClass) throws VerificationException {
+        final RelateTo relateTo = relationClass.getAnnotation(RelateTo.class);
+        final Class<?> relatedStateMachineClass = relateTo.value();
+        try {
+            final StateMachineMetadata relatedStateMachineMetadata = load(relatedStateMachineClass);
+            this.relatedStateMachineList.add(relatedStateMachineMetadata);
+            final Iterator<Object> keyIterator = relatedStateMachineMetadata.getKeySet().iterator();
+            while ( keyIterator.hasNext() ) {
+                this.relatedStateMachineMap.put(keyIterator.next(), relatedStateMachineMetadata);
+            }
+            this.relatedStateMachineMap.put(relationClass, relatedStateMachineMetadata);
+            if (hasParent(relationClass)) {
+                this.parentStateMachineMetadata = relatedStateMachineMetadata;
+            }
+        } catch (VerificationException e) {
+            if ( Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION.equals(e.getVerificationFailureSet().iterator().next()
+                    .getErrorCode()) ) {
+                throw newVerificationException(getDottedPath(), Errors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE,
+                        relateTo);
+            }
         }
     }
 
