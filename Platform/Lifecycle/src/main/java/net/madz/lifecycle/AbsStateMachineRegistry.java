@@ -111,7 +111,7 @@ public abstract class AbsStateMachineRegistry {
             final Class<?> stateMachineClass) throws VerificationException {
         final StateMachineMetaBuilder builder = createBuilder(stateMachineClass);
         builder.setRegistry(this);
-        if (null != stateMachineClass.getAnnotation(CompositeStateMachine.class)) {
+        if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
             builder.setComposite(true);
             builder.addKey(stateMachineClass);
         }
@@ -149,14 +149,7 @@ public abstract class AbsStateMachineRegistry {
         try {
             final Constructor<? extends StateMachineMetaBuilder> c = builderMeta.value().getConstructor(
                     AbsStateMachineRegistry.class, String.class);
-            if ( null != metadataClass.getAnnotation(CompositeStateMachine.class) ) {
-                final StateMachineMetaBuilder compositeStateMachine = c.newInstance(this, "CompositeStateMachine."
-                        + metadataClass.getSimpleName());
-                compositeStateMachine.setComposite(true);
-                return compositeStateMachine;
-            } else {
-                return c.newInstance(this, metadataClass.getName());
-            }
+            return c.newInstance(this, metadataClass.getName());
         } catch (Throwable t) {
             throw new IllegalStateException(t);
         }
@@ -178,15 +171,31 @@ public abstract class AbsStateMachineRegistry {
         return this.instanceMap.get(key);
     }
 
-    public StateMachineMetaBuilder loadStateMachineMetaBuilder(Class<?> stateMachineClass) throws VerificationException {
+    public StateMachineMetaBuilder loadStateMachineMetaBuilder(Class<?> stateMachineClass,
+            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
         if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
             final Class<?> stateClass = stateMachineClass;
-            final StateMachineMetaBuilder compositeStateMachine = createBuilder(stateMachineClass);
+            final StateMachineMetaBuilder compositeStateMachine = createCompositeBuilder(stateMachineClass,
+                    owningStateMachine);
             compositeStateMachine.setComposite(true);
             compositeStateMachine.addKey(stateClass);
             return compositeStateMachine;
         } else {
             return createBuilder(stateMachineClass);
+        }
+    }
+
+    private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass,
+            StateMachineMetaBuilder owningStateMachine) {
+        Constructor<? extends StateMachineMetaBuilder> c;
+        try {
+            c = builderMeta.value().getConstructor(StateMachineMetaBuilder.class, String.class);
+            final StateMachineMetaBuilder compositeStateMachine = c.newInstance(owningStateMachine,
+                    "CompositeStateMachine." + stateMachineClass.getSimpleName());
+            compositeStateMachine.setComposite(true);
+            return compositeStateMachine;
+        } catch (Throwable t) {
+            throw new IllegalStateException(t);
         }
     }
 }
