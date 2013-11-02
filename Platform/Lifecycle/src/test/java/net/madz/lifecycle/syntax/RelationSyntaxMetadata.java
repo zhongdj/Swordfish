@@ -14,10 +14,10 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
+import net.madz.lifecycle.syntax.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningX;
+import net.madz.lifecycle.syntax.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningY;
 
 public class RelationSyntaxMetadata extends BaseMetaDataTest {
 
@@ -405,42 +405,44 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
-    static interface PCS1 {
+    static interface POwningStateMachine {
 
         @StateSet
         static interface States {
 
             @Initial
-            @Function(transition = PCS1_X.class, value = PCS1_B.class)
-            static interface PCS1_A {}
+            @Function(transition = OwningX.class, value = OwningB.class)
+            static interface OwningA {}
             @CompositeStateMachine
-            @Function(transition = PCS1_Y.class, value = PCS1_C.class)
-            static interface PCS1_B {
+            @Function(transition = OwningY.class, value = OwningC.class)
+            static interface OwningB {
 
                 @StateSet
                 static interface CStates {
 
                     @Initial
-                    @Function(transition = PCS1_CX.class, value = PCS1_CB.class)
-                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PCS1_B.CRelations.PCS1R.class,
+                    @Function(transition = OwningB.CTransitions.CompositeX.class,
+                            value = OwningB.CStates.CompositeB.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = OwningB.CRelations.PCS1R.class,
                             otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
                                     code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
-                    static interface PCS1_CA {}
-                    @Function(transition = PCS1_CX.class, value = PCS1_CC.class)
-                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PCS1_B.CRelations.PCS1R.class,
+                    static interface CompositeA {}
+                    @Function(transition = OwningB.CTransitions.CompositeX.class,
+                            value = OwningB.CStates.CompositeC.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = OwningB.CRelations.PCS1R.class,
                             otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
                                     code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
-                    static interface PCS1_CB {}
+                    static interface CompositeB {}
                     @End
-                    @ShortCut(PCS1_C.class)
-                    static interface PCS1_CC {}
+                    @ShortCut(OwningC.class)
+                    static interface CompositeC {}
                 }
                 @TransitionSet
                 static interface CTransitions {
 
-                    static interface PCS1_CX {}
+                    static interface CompositeX {}
                 }
                 @RelationSet
                 static interface CRelations {
@@ -451,13 +453,59 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                 }
             }
             @End
-            static interface PCS1_C {}
+            static interface OwningC {}
         }
         @TransitionSet
         static interface Transitions {
 
-            static interface PCS1_X {}
-            static interface PCS1_Y {}
+            static interface OwningX {}
+            static interface OwningY {}
+        }
+    }
+    @StateMachine
+    static interface PParentRelationSuper {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = PParentRelationSuper.Transitions.PPX.class,
+                    value = PParentRelationSuper.States.PPB.class)
+            @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PParentRelationSuper.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PParentRelationSuper.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            static interface PPA {}
+            @End
+            static interface PPB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface PPX {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface PPR {}
+        }
+    }
+    @StateMachine
+    static interface PParentRlationChild extends PParentRelationSuper {
+
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            @Overrides
+            static interface PCR {}
         }
     }
 }
