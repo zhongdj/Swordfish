@@ -18,4 +18,6 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
 
     StateMachineMetaBuilder[] getCompositeStateMachines();
     
+    AbsStateMachineRegistry getRegistry();
+    
 }
