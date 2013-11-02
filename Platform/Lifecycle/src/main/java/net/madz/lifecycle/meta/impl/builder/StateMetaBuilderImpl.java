@@ -15,6 +15,7 @@ import net.madz.lifecycle.annotations.relation.InboundWhiles;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.relation.ValidWhiles;
 import net.madz.lifecycle.annotations.state.End;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
@@ -36,6 +37,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private boolean compositeState;
     private StateMachineMetaBuilder compositeStateMachine;
     private StateMetadata owningState;
+    private boolean overriding = false;
+    private StateMetadata superStateMetadata;
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -140,14 +143,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public boolean isOverriding() {
-        // TODO Auto-generated method stub
-        return false;
+        return overriding;
     }
 
     @Override
     public StateMetadata getSuperStateMetadata() {
-        // TODO Auto-generated method stub
-        return null;
+        return superStateMetadata;
     }
 
     @Override
@@ -199,7 +200,23 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         verifyBasicSyntax(clazz);
         addKeys(clazz);
+        configureSupperState(clazz);
         return this;
+    }
+
+    private void configureSupperState(Class<?> clazz) {
+        final Class<?>[] interfaces = clazz.getInterfaces();
+        if ( interfaces.length > 0 ) {
+            if ( null != clazz.getAnnotation(Overrides.class) ) {
+                this.overriding = true;
+            } else {
+                this.overriding = false;
+            }
+            this.superStateMetadata = findStateMetadata(interfaces[0]);
+        } else {
+            this.overriding = false;
+            this.superStateMetadata = null;
+        }
     }
 
     private void verifyBasicSyntax(Class<?> clazz) throws VerificationException {
