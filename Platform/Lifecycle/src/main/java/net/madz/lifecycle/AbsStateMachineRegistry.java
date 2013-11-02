@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.madz.common.Dumper;
+import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
@@ -58,8 +59,12 @@ public abstract class AbsStateMachineRegistry {
      */
     protected final HashMap<Object, StateMachineMetadata> typeMap = new HashMap<>();
     protected final HashMap<Object, StateMachineInst> instanceMap = new HashMap<>();
+    private final LifecycleRegistry lifecycleRegistry;
+    private final StateMachineBuilder builderMeta;
 
     protected AbsStateMachineRegistry() throws VerificationException {
+        lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
+        builderMeta = getClass().getAnnotation(StateMachineBuilder.class);
         registerStateMachines();
     }
 
@@ -68,8 +73,6 @@ public abstract class AbsStateMachineRegistry {
      * machines.
      */
     private synchronized void registerStateMachines() throws VerificationException {
-        final LifecycleRegistry lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
-        final StateMachineBuilder builderMeta = getClass().getAnnotation(StateMachineBuilder.class);
         if ( null == lifecycleRegistry || null == builderMeta ) {
             throw new NullPointerException(
                     "A subclass of AbstractStateMachineRegistry must have both @LifecycleRegistry and @StateMachineMetadataBuilder annotated on Type.");
@@ -81,14 +84,13 @@ public abstract class AbsStateMachineRegistry {
                 if ( isRegistered(clazz) ) {
                     return;
                 }
-                buildStateMachineMetadata(builderMeta, failureSet, clazz);
+                buildStateMachineMetadata(failureSet, clazz);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
                 if ( isRegistered(stateMachineClass) ) {
                     return;
                 }
-                final StateMachineMetadata metaData = buildStateMachineMetadata(builderMeta, failureSet,
-                        stateMachineClass);
+                final StateMachineMetadata metaData = buildStateMachineMetadata(failureSet, stateMachineClass);
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
@@ -105,10 +107,14 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
-    private StateMachineMetadata buildStateMachineMetadata(final StateMachineBuilder builderMeta,
-            final VerificationFailureSet failureSet, final Class<?> stateMachineClass) throws VerificationException {
-        final StateMachineMetaBuilder builder = createBuilder(builderMeta, stateMachineClass.getName());
+    private StateMachineMetadata buildStateMachineMetadata(final VerificationFailureSet failureSet,
+            final Class<?> stateMachineClass) throws VerificationException {
+        final StateMachineMetaBuilder builder = createBuilder(stateMachineClass);
         builder.setRegistry(this);
+        if (null != stateMachineClass.getAnnotation(CompositeStateMachine.class)) {
+            builder.setComposite(true);
+            builder.addKey(stateMachineClass);
+        }
         final StateMachineMetadata metaData = builder.build(stateMachineClass, null).getMetaData();
         metaData.verifyMetaData(failureSet);
         addTemplate(metaData);
@@ -139,13 +145,18 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
-    private StateMachineMetaBuilder createBuilder(final StateMachineBuilder builderMeta, String metadataClass)
-            throws VerificationException {
-        final Class<? extends StateMachineMetaBuilder> builderClass = builderMeta.value();
+    private StateMachineMetaBuilder createBuilder(Class<?> metadataClass) throws VerificationException {
         try {
-            Constructor<? extends StateMachineMetaBuilder> c = builderClass.getConstructor(
+            final Constructor<? extends StateMachineMetaBuilder> c = builderMeta.value().getConstructor(
                     AbsStateMachineRegistry.class, String.class);
-            return c.newInstance(this, metadataClass);
+            if ( null != metadataClass.getAnnotation(CompositeStateMachine.class) ) {
+                final StateMachineMetaBuilder compositeStateMachine = c.newInstance(this, "CompositeStateMachine."
+                        + metadataClass.getSimpleName());
+                compositeStateMachine.setComposite(true);
+                return compositeStateMachine;
+            } else {
+                return c.newInstance(this, metadataClass.getName());
+            }
         } catch (Throwable t) {
             throw new IllegalStateException(t);
         }
@@ -165,5 +176,17 @@ public abstract class AbsStateMachineRegistry {
 
     public synchronized StateMachineInst getStateMachineInst(Object key) {
         return this.instanceMap.get(key);
+    }
+
+    public StateMachineMetaBuilder loadStateMachineMetaBuilder(Class<?> stateMachineClass) throws VerificationException {
+        if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
+            final Class<?> stateClass = stateMachineClass;
+            final StateMachineMetaBuilder compositeStateMachine = createBuilder(stateMachineClass);
+            compositeStateMachine.setComposite(true);
+            compositeStateMachine.addKey(stateClass);
+            return compositeStateMachine;
+        } else {
+            return createBuilder(stateMachineClass);
+        }
     }
 }

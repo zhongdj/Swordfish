@@ -2,6 +2,8 @@ package net.madz.lifecycle.meta.builder;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.lifecycle.meta.template.StateMetadata;
+import net.madz.verification.VerificationException;
 
 public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetaBuilder, StateMachineMetaBuilder>,
         StateMachineMetadata {
@@ -10,7 +12,7 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
 
     void setComposite(boolean b);
 
-    void setOwningState(StateMetaBuilder stateMetaBuilderImpl);
+    void setOwningState(StateMetadata stateMetaBuilderImpl);
 
     StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
 
@@ -19,5 +21,7 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
     StateMachineMetaBuilder[] getCompositeStateMachines();
     
     AbsStateMachineRegistry getRegistry();
+
+    StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException;
     
 }

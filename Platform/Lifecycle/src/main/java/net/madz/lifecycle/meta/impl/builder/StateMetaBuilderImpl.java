@@ -35,7 +35,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private boolean end;
     private boolean initial;
     private boolean compositeState;
-    private StateMachineMetaBuilder compositeStateMachine;
+    private StateMachineMetadata compositeStateMachine;
     private StateMetadata owningState;
     private boolean overriding = false;
     private StateMetadata superStateMetadata;
@@ -258,13 +258,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         if ( null == csm ) {
             return;
         }
-        final StateMachineMetaBuilder compositeStateMachine = new StateMachineMetaBuilderImpl(this.parent,
-                "CompositeStateMachine." + stateClass.getSimpleName());
-        compositeStateMachine.setComposite(true);
-        compositeStateMachine.setOwningState(this);
         this.compositeState = true;
-        this.compositeStateMachine = compositeStateMachine;
-        compositeStateMachine.build(stateClass, this.parent);
+        this.compositeStateMachine = parent.loadStateMachineMetadata(stateClass);
     }
 
     private void verifyFunctions(Class<?> stateClass) throws VerificationException {
@@ -279,7 +274,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 functionList.add(function);
             }
         }
-        if ( 0 == functionList.size() ) {
+        if ( 0 == functionList.size()  && ! this.compositeState) {
             throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
                     stateClass.getName());
         }
