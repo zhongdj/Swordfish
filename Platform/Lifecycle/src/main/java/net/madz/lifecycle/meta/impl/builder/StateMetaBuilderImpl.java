@@ -275,10 +275,10 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         Class<?> transitionClz = function.transition();
         Class<?>[] stateCandidates = function.value();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        TransitionMetadata transition = findTransitionMetadata(transitionClz);
+        TransitionMetadata transition = parent.getTransition(transitionClz);
         if ( null == transition ) {
             if ( this.parent.isComposite() ) {
-                if ( null != findTransitionMetadata(transitionClz, this.parent.getOwningStateMachine()) ) {
+                if ( null != this.parent.getOwningStateMachine().getTransition(transitionClz) ) {
                     failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
                             Errors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function,
                             stateClass.getName(), transitionClz.getName()));
@@ -329,18 +329,6 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             stateMetadata = sm.getDeclaredState(stateCandidateClass);
         }
         return stateMetadata;
-    }
-
-    private TransitionMetadata findTransitionMetadata(Class<?> transitionClz) {
-        return findTransitionMetadata(transitionClz, this.parent);
-    }
-
-    private TransitionMetadata findTransitionMetadata(Class<?> transitionClz, StateMachineMetadata stateMachine) {
-        TransitionMetadata transition = null;
-        for ( StateMachineMetadata sm = stateMachine; sm != null && null == transition; sm = sm.getSuperStateMachine() ) {
-            transition = sm.getDeclaredTransition(transitionClz);
-        }
-        return transition;
     }
 
     private boolean isFinalState(Class<?> stateClass) {
