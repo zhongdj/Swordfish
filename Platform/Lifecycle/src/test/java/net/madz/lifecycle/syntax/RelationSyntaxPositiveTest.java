@@ -17,22 +17,20 @@ public class RelationSyntaxPositiveTest extends RelationSyntaxMetadata {
 
             protected Registry() throws VerificationException {}
         }
-        
         new Registry();
     }
-    
+
     @Test
     public void test_relation_syntax_positive_inheritance() throws VerificationException {
         @LifecycleRegistry(PChild.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
-        
         new Registry();
     }
-    
+
     @Test
     public void test_parent_relation_syntax_positive_standalone() throws VerificationException {
         @LifecycleRegistry(PStandaloneParent.class)
@@ -41,7 +39,18 @@ public class RelationSyntaxPositiveTest extends RelationSyntaxMetadata {
 
             protected Registry() throws VerificationException {}
         }
-        
+        new Registry();
+    }
+
+    @Test
+    public void test_parent_relation_in_composite_state_machine_syntax_positive_standalone()
+            throws VerificationException {
+        @LifecycleRegistry(PCS1.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
         new Registry();
     }
 }

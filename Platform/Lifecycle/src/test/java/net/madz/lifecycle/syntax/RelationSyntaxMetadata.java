@@ -1,6 +1,7 @@
 package net.madz.lifecycle.syntax;
 
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -13,7 +14,10 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.RelationSyntaxMetadata.PStandalone.States.PB;
+import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
+import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
 
 public class RelationSyntaxMetadata extends BaseMetaDataTest {
 
@@ -398,6 +402,62 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Parent
             @RelateTo(RelatedSM.class)
             static interface PPR {}
+        }
+    }
+    @StateMachine
+    static interface PCS1 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = PCS1_X.class, value = PCS1_B.class)
+            static interface PCS1_A {}
+            @CompositeStateMachine
+            @Function(transition = PCS1_Y.class, value = PCS1_C.class)
+            static interface PCS1_B {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = PCS1_CX.class, value = PCS1_CB.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PCS1_B.CRelations.PCS1R.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface PCS1_CA {}
+                    @Function(transition = PCS1_CX.class, value = PCS1_CC.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PCS1_B.CRelations.PCS1R.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface PCS1_CB {}
+                    @End
+                    @ShortCut(PCS1_C.class)
+                    static interface PCS1_CC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface PCS1_CX {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    @Parent
+                    @RelateTo(RelatedSM.class)
+                    static interface PCS1R {}
+                }
+            }
+            @End
+            static interface PCS1_C {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface PCS1_X {}
+            static interface PCS1_Y {}
         }
     }
 }
