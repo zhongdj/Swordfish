@@ -54,4 +54,9 @@ public interface Errors {
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet
     public static final String RELATIONSET_MULTIPLE = "002-3500";
+    
+    /**
+     * @param {0} stateMachine class
+     */
+    public static final String RELATION_MULTIPLE_PARENT_RELATION = "002-3501";
 }

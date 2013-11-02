@@ -508,4 +508,42 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             static interface PCR {}
         }
     }
+    
+    
+    @StateMachine
+    static interface NStandaloneParent {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NStandaloneParent.Transitions.PPX.class, value = NStandaloneParent.States.PPB.class)
+            @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NStandaloneParent.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            @ValidWhile(on = { RelatedSM.States.RB.class }, relation = NStandaloneParent.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            static interface PPA {}
+            @End
+            static interface PPB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface PPX {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface PPR {}
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface PPR2 {}
+        }
+    }
 }

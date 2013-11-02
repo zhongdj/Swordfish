@@ -188,4 +188,21 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             throw e;
         }
     }
+    @Test(expected = VerificationException.class)
+    public void test_multiple_parent_relation_standalone () throws VerificationException {
+        @LifecycleRegistry(NStandaloneParent.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+            
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.RELATION_MULTIPLE_PARENT_RELATION,
+                    NStandaloneParent.class);
+            throw e;
+        }
+    }
 }
