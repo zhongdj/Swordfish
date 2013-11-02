@@ -7,11 +7,13 @@ import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.relation.ErrorMessage;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
+import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.syntax.RelationSyntaxMetadata.PStandalone.States.PB;
 
 public class RelationSyntaxMetadata extends BaseMetaDataTest {
 
@@ -363,6 +365,39 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
 
             @RelateTo(RelatedSM.class)
             static interface N5R {}
+        }
+    }
+    @StateMachine
+    static interface PStandaloneParent {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = PStandaloneParent.Transitions.PPX.class, value = PStandaloneParent.States.PPB.class)
+            @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PStandaloneParent.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PStandaloneParent.Relations.PPR.class,
+                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            states = { RelatedSM.States.RA.class }) })
+            static interface PPA {}
+            @End
+            static interface PPB {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface PPX {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface PPR {}
         }
     }
 }

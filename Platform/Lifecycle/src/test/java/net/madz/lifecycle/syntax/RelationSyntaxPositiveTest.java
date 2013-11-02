@@ -33,5 +33,15 @@ public class RelationSyntaxPositiveTest extends RelationSyntaxMetadata {
         new Registry();
     }
     
-    
+    @Test
+    public void test_parent_relation_syntax_positive_standalone() throws VerificationException {
+        @LifecycleRegistry(PStandaloneParent.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        
+        new Registry();
+    }
 }
