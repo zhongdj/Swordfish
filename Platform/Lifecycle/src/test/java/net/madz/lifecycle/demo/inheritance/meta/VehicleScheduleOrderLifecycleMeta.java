@@ -9,7 +9,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.annotations.state.StateOverride;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.demo.inheritance.meta.PlantScheduleOrderLifecycleMeta.Transitions.Finish;
 import net.madz.lifecycle.demo.inheritance.meta.VehicleScheduleOrderLifecycleMeta.States.Ongoing.SubTransitions.DoConstruct;
 import net.madz.lifecycle.demo.inheritance.meta.VehicleScheduleOrderLifecycleMeta.States.Ongoing.SubTransitions.DoTransport;
@@ -20,7 +20,7 @@ public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
     @StateSet
     public static class States extends OrderLifecycleMeta.States {
 
-        @StateOverride
+        @Overrides
         @CompositeStateMachine
         public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {
             
