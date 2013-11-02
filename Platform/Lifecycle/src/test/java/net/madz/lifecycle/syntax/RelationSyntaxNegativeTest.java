@@ -223,7 +223,8 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_illegal_to_override_owning_state_machine_parent_relation() throws VerificationException {
+    public void test_illegal_to_override_owning_state_machine_parent_relation_with_overrides()
+            throws VerificationException {
         @LifecycleRegistry(NOwningStateMachine.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -240,6 +241,28 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
                             + NOwningStateMachine.States.NOwningB.class.getSimpleName(),
                     NOwningStateMachine.States.NOwningB.CRelations.NCR.class, NOwningStateMachine.class,
                     NOwningStateMachine.Relations.NR.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_illegal_to_override_owning_state_machine_parent_relation_without_overrides()
+            throws VerificationException {
+        @LifecycleRegistry(N2OwningStateMachine.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
+                    N2OwningStateMachine.class + ".CompositeStateMachine."
+                            + N2OwningStateMachine.States.N2OwningB.class.getSimpleName(),
+                    N2OwningStateMachine.States.N2OwningB.CRelations.N2CR.class, N2OwningStateMachine.class,
+                    N2OwningStateMachine.Relations.N2R.class);
             throw e;
         }
     }

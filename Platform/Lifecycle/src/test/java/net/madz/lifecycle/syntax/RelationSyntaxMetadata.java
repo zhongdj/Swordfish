@@ -600,7 +600,8 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                 static interface CRelations {
 
                     @Parent
-                    @Overrides // It's illegal whether overrides or not
+                    @Overrides
+                    // It's illegal whether overrides or not
                     @RelateTo(RelatedSM.class)
                     static interface NCR {}
                 }
@@ -614,13 +615,78 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             static interface NOwningX {}
             static interface NOwningY {}
         }
-        
         @RelationSet
         static interface Relations {
 
             @Parent
             @RelateTo(RelatedSM.class)
             static interface NR {}
+        }
+    }
+    @StateMachine
+    static interface N2OwningStateMachine {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = N2OwningStateMachine.Transitions.N2OwningX.class, value = N2OwningB.class)
+            static interface N2OwningA {}
+            @CompositeStateMachine
+            @Function(transition = N2OwningStateMachine.Transitions.N2OwningY.class, value = N2OwningC.class)
+            static interface N2OwningB {
+
+                @StateSet
+                static interface N2CStates {
+
+                    @Initial
+                    @Function(transition = N2OwningB.CTransitions.N2CompositeX.class,
+                            value = N2OwningB.N2CStates.N2CompositeB.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = N2OwningB.CRelations.N2CR.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface N2CompositeA {}
+                    @Function(transition = N2OwningB.CTransitions.N2CompositeX.class,
+                            value = N2OwningB.N2CStates.N2CompositeC.class)
+                    @InboundWhile(on = { RelatedSM.States.RB.class }, relation = N2OwningB.CRelations.N2CR.class,
+                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
+                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                                    states = { RelatedSM.States.RA.class }) })
+                    static interface N2CompositeB {}
+                    @End
+                    @ShortCut(N2OwningC.class)
+                    static interface N2CompositeC {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface N2CompositeX {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    @Parent
+                    // @Overrides // It's illegal whether overrides or not
+                    @RelateTo(RelatedSM.class)
+                    static interface N2CR {}
+                }
+            }
+            @End
+            static interface N2OwningC {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface N2OwningX {}
+            static interface N2OwningY {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @Parent
+            @RelateTo(RelatedSM.class)
+            static interface N2R {}
         }
     }
 }
