@@ -82,16 +82,13 @@ public class StateMachineMetaBuilderImpl extends
     private final ArrayList<RelationMetaBuilder> compositeStateMachineList = new ArrayList<>();
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
-        this(name);
-        this.registry = registry;
-    }
-
-    public StateMachineMetaBuilderImpl(String name) {
         super(null, name);
+        this.registry = registry;
     }
 
     public StateMachineMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, name);
+        this.registry = parent.getRegistry();
     }
 
     @Override
@@ -265,6 +262,8 @@ public class StateMachineMetaBuilderImpl extends
             configureRelationSet(clazz);
             configureStateSetRelations(clazz);
         }
+        
+        addKeys(clazz);
         return this;
     }
 

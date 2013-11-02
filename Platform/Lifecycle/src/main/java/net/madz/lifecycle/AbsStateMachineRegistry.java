@@ -81,7 +81,7 @@ public abstract class AbsStateMachineRegistry {
                 if ( isRegistered(clazz) ) {
                     return;
                 }
-                buildStateMachineMetadata(builderMeta,failureSet,clazz);
+                buildStateMachineMetadata(builderMeta, failureSet, clazz);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
                 if ( isRegistered(stateMachineClass) ) {
@@ -143,8 +143,9 @@ public abstract class AbsStateMachineRegistry {
             throws VerificationException {
         final Class<? extends StateMachineMetaBuilder> builderClass = builderMeta.value();
         try {
-            Constructor<? extends StateMachineMetaBuilder> c = builderClass.getConstructor(String.class);
-            return c.newInstance(metadataClass);
+            Constructor<? extends StateMachineMetaBuilder> c = builderClass.getConstructor(
+                    AbsStateMachineRegistry.class, String.class);
+            return c.newInstance(this, metadataClass);
         } catch (Throwable t) {
             throw new IllegalStateException(t);
         }
