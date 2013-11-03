@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import net.madz.lifecycle.annotations.Null;
 
-@Target({ ElementType.PARAMETER })
+@Target({ ElementType.PARAMETER , ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Relation {
 
