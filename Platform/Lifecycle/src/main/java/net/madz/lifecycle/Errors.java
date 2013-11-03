@@ -21,6 +21,14 @@ public interface Errors {
     public static final String STATESET_WITHOUT_FINAL_STATE = "002-2500";
     // TransitionSet
     public static final String TRANSITIONSET_WITHOUT_TRANSITION = "002-2501";
+    /**
+     * @param {0} method object
+     * @param {1} transitionKey, will be transitionKey class when it's
+     *        available, otherwise it will be transition method name with first
+     *        char upper case.
+     * @param {2} transitionType
+     */
+    public static final String TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER = "002-2502";
     // State's Function
     public static final String FUNCTION_INVALID_TRANSITION_REFERENCE = "002-2610";
     public static final String FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION = "002-2611";

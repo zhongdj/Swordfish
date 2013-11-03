@@ -1,0 +1,44 @@
+package net.madz.lifecycle.syntax.lm.transition;
+
+import java.util.Iterator;
+
+import net.madz.lifecycle.AbsStateMachineRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
+import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
+import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Activate;
+import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Inactivate;
+import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Restart;
+import net.madz.verification.VerificationException;
+import net.madz.verification.VerificationFailure;
+
+import org.junit.Test;
+
+public class TransitionNegativeTests extends TransitionTestMetadata {
+
+    @Test(expected = VerificationException.class)
+    public void test_special_transition_type() throws VerificationException, Throwable {
+        @LifecycleRegistry(NegativeProcess.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            final Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
+            assertFailure(iterator.next(), Errors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+                    NegativeProcess.class.getDeclaredMethod("inactivate", Integer.TYPE),
+                    Inactivate.class.getSimpleName(), TransitionTypeEnum.Corrupt);
+            assertFailure(iterator.next(), Errors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+                    NegativeProcess.class.getDeclaredMethod("activate", Integer.TYPE), Activate.class.getSimpleName(),
+                    TransitionTypeEnum.Recover);
+            assertFailure(iterator.next(), Errors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+                    NegativeProcess.class.getDeclaredMethod("restart", Integer.TYPE), Restart.class.getSimpleName(),
+                    TransitionTypeEnum.Redo);
+            throw e;
+        }
+    }
+}

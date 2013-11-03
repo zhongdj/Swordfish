@@ -356,35 +356,66 @@ public class StateMachineInstBuilderImpl extends
     }
 
     private void verifyTransitionMethod(Method method, VerificationFailureSet failureSet) {
-        Transition transition = method.getAnnotation(Transition.class);
+        final Transition transition = method.getAnnotation(Transition.class);
         if ( transition == null ) {
             return;
+        }
+        TransitionMetadata transitionMetadata = null;
+        if ( Null.class == transition.value() ) {
+            transitionMetadata = verifyTransitionMethodDefaultStyle(method, failureSet, transitionMetadata);
         } else {
-            if ( Null.class == transition.value() ) {
-                if ( !getTemplate().hasTransition(upperFirstChar(method.getName())) ) {
-                    failureSet.add(newVerificationFailure(getMethodDottedPath(method), Errors.LM_METHOD_NAME_INVALID,
-                            getTemplate().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
+            transitionMetadata = verifyTransitionMethodWithTransitionClassKey(method, failureSet, transition,
+                    transitionMetadata);
+        }
+        if ( null != transitionMetadata ) {
+            verifySpecialTransitionMethodHasZeroArgument(method, failureSet, transitionMetadata);
+        }
+    }
+
+    private TransitionMetadata verifyTransitionMethodWithTransitionClassKey(Method method,
+            VerificationFailureSet failureSet, final Transition transition, TransitionMetadata transitionMetadata) {
+        if ( !getTemplate().hasTransition(transition.value()) ) {
+            failureSet.add(newVerificationFailure(getMethodDottedPath(method),
+                    Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(), method
+                            .getDeclaringClass().getName(), getTemplate().getDottedPath()));
+        } else {
+            transitionMetadata = getTemplate().getTransition(transition.value());
+        }
+        return transitionMetadata;
+    }
+
+    private TransitionMetadata verifyTransitionMethodDefaultStyle(Method method, VerificationFailureSet failureSet,
+            TransitionMetadata transitionMetadata) {
+        if ( !getTemplate().hasTransition(upperFirstChar(method.getName())) ) {
+            failureSet.add(newVerificationFailure(getMethodDottedPath(method), Errors.LM_METHOD_NAME_INVALID,
+                    getTemplate().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
+        } else {
+            transitionMetadata = getTemplate().getTransition(upperFirstChar(method.getName()));
+        }
+        return transitionMetadata;
+    }
+
+    private void verifySpecialTransitionMethodHasZeroArgument(Method method, VerificationFailureSet failureSet,
+            TransitionMetadata transitionMetadata) {
+        switch (transitionMetadata.getType()) {
+            case Corrupt:
+                // fall through
+            case Recover:
+                // fall through
+            case Redo:
+                if ( method.getParameterTypes().length > 0 ) {
+                    failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
+                            Errors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER, method,
+                            upperFirstChar(method.getName()), transitionMetadata.getType()));
                 }
-            } else if ( !getTemplate().hasTransition(transition.value()) ) {
-                failureSet.add(newVerificationFailure(getMethodDottedPath(method),
-                        Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(),
-                        method.getDeclaringClass().getName(), getTemplate().getDottedPath()));
-            }
+                break;
+            default:
+                break;
         }
     }
 
     private String getMethodDottedPath(Method method) {
         return method.getDeclaringClass().getName() + "." + method.getName();
-    }
-
-    private Annotation getMethodAnnotation(Class<Transition> class1) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    private String getMethodTransitionName(Method method) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     private String upperFirstChar(String name) {
