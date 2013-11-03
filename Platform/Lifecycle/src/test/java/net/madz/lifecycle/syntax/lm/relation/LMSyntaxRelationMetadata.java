@@ -166,7 +166,7 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         @Relation(S4.Relations.R3.class)
         PLM_R3_S getR3S();
 
-        String getState();
+        public String getState();
     }
     // Positive LM: Concrete all relations in SM that contains
     // CompositeStateMachines
@@ -218,6 +218,8 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
     @LifecycleMeta(S5.class)
     static interface PLM_6 {
 
+        public String getState();
+
         @Transition
         void s5_X();
 
@@ -230,7 +232,6 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
 
-        String getState();
     }
     // Positive LM: Concrete all relations in SM that has super StateMachines.
     @StateMachine
@@ -258,6 +259,8 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
     @LifecycleMeta(S6.class)
     static interface PLM_7 {
 
+        public String getState();
+
         @Transition
         void s5_X();
 
@@ -270,7 +273,6 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
 
-        String getState();
     }
     // Relation Negative Test
     // Relation in InboundWhile or InboundWhiles not binded in LM.

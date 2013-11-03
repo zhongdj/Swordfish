@@ -66,7 +66,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
-                    NNoDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
+                    NDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
     }
@@ -86,7 +86,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD,
-                    NNoDefaultStateIndicatorInterface.class.getDeclaredField("state"));
+                    NPublicStateFieldClass.class.getDeclaredField("state"));
             throw e;
         }
     }
@@ -106,7 +106,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
-                    NNoDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
+                    NPublicStateSetterClass.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
     }
@@ -126,7 +126,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
-                    NNoDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
+                    NPublicStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
     }

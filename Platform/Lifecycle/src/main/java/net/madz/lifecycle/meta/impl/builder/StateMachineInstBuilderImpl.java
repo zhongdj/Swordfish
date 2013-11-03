@@ -1,13 +1,22 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.annotations.Null;
+import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateInst;
@@ -39,6 +48,136 @@ public class StateMachineInstBuilderImpl extends
 
     private void verifySyntax(Class<?> klass) throws VerificationException {
         verifyTransitionMethods(klass);
+        verifyStateIndicator(klass);
+    }
+
+    private void verifyStateIndicator(Class<?> klass) throws VerificationException {
+        if ( !klass.isInterface() ) {
+            Field specifiedStateField = findFieldWith(klass, StateIndicator.class);
+            if ( null != specifiedStateField ) {
+                verifyStateIndicatorElement(klass, specifiedStateField, specifiedStateField.getType());
+                return;
+            }
+        }
+        final Method specifiedGetter = findCustomizedStateIndicatorGetter(klass);
+        if ( null != specifiedGetter ) {
+            verifyStateIndicatorElement(klass, specifiedGetter, specifiedGetter.getReturnType());
+        } else {
+            // verify default
+            final Method defaultGetter = findDefaultStateGetterMethod(klass);
+            if ( null == defaultGetter ) {
+                throw newVerificationException(getDottedPath(),
+                        Errors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
+            } else {
+                verifyStateIndicatorElement(klass, defaultGetter, defaultGetter.getReturnType());
+            }
+        }
+    }
+
+    private Method findCustomizedStateIndicatorGetter(Class<?> klass) {
+        StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner();
+        scanMethodsOnClasses(new Class<?>[] { klass }, null, scanner);
+        final Method specifiedGetter = scanner.getStateGetterMethod();
+        return specifiedGetter;
+    }
+
+    private void verifyStateIndicatorElement(Class<?> klass, AnnotatedElement getter, Class<?> stateType)
+            throws VerificationException {
+        verifyStateIndicatorElementSetterVisibility(klass, getter, stateType);
+        if ( stateType.equals(java.lang.String.class) ) {
+            return;
+        }
+        verifyStateIndicatorConverter(getter, stateType);
+    }
+
+    private void verifyStateIndicatorConverter(AnnotatedElement getter, Class<?> stateType)
+            throws VerificationException {
+        final Class<?> getterDeclaringClass;
+        if ( getter instanceof Method ) {
+            getterDeclaringClass = ( (Method) getter ).getDeclaringClass();
+        } else if ( getter instanceof Field ) {
+            getterDeclaringClass = ( (Field) getter ).getDeclaringClass();
+        } else {
+            throw new IllegalArgumentException();
+        }
+        final Converter converterMeta = getter.getAnnotation(Converter.class);
+        if ( null == converterMeta ) {
+            throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
+                    getterDeclaringClass, stateType);
+        } else {
+            Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
+            for ( Type type : genericInterfaces ) {
+                if ( type instanceof ParameterizedType ) {
+                    ParameterizedType pType = (ParameterizedType) type;
+                    if ( pType.getRawType() instanceof Class
+                            && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
+                        if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
+                            throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_CONVERTER_INVALID,
+                                    getterDeclaringClass, stateType, converterMeta.value(),
+                                    pType.getActualTypeArguments()[0]);
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
+    }
+
+    private void verifyStateIndicatorElementSetterVisibility(final Class<?> klass, AnnotatedElement getter,
+            Class<?> returnType) throws VerificationException {
+        if ( getter instanceof Method ) {
+            final String getterName = ( (Method) getter ).getName();
+            final String setterName = convertSetterName(getterName, returnType);
+            final Method setter = findMethod(klass, setterName, returnType);
+            if ( null == setter && !klass.isInterface() ) {
+                throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_SETTER_NOT_FOUND,
+                        ( (Method) getter ).getDeclaringClass());
+            } else {
+                if ( null != setter && !Modifier.isPrivate(( setter ).getModifiers()) ) {
+                    throw newVerificationException(getDottedPath(),
+                            Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER, setter);
+                }
+            }
+        } else if ( getter instanceof Field ) {
+            if ( !Modifier.isPrivate(( (Field) getter ).getModifiers()) ) {
+                throw newVerificationException(getDottedPath(),
+                        Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private Method findMethod(Class<?> klass, String setterName, Class<?> returnType) {
+        final MethodSignatureScanner scanner = new MethodSignatureScanner(setterName, new Class<?>[] { returnType });
+        scanMethodsOnClasses(new Class<?>[] { klass }, null, scanner);
+        return scanner.getMethod();
+    }
+
+    private String convertSetterName(String getterName, Class<?> type) {
+        if ( type != Boolean.TYPE && type != Boolean.class ) {
+            return "set" + getterName.substring(3);
+        } else {
+            return "set" + getterName.substring(2);
+        }
+    }
+
+    private Method findDefaultStateGetterMethod(Class<?> klass) {
+        final StateIndicatorDefaultMethodScanner scanner = new StateIndicatorDefaultMethodScanner();
+        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        return scanner.getDefaultMethod();
+    }
+
+    private Field findFieldWith(Class<?> klass, Class<StateIndicator> aClass) {
+        for ( Class<?> index = klass; index != Object.class; index = index.getSuperclass() ) {
+            for ( Field field : klass.getDeclaredFields() ) {
+                if ( null != field.getAnnotation(StateIndicator.class) ) {
+                    return field;
+                }
+            }
+        }
+        return null;
     }
 
     private void verifyTransitionMethods(Class<?> klass) throws VerificationException {
@@ -62,8 +201,8 @@ public class StateMachineInstBuilderImpl extends
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(),
-                    Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath()
-                            .getName(), getTemplate().getDottedPath().getAbsoluteName(),klass.getSimpleName()));
+                    Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath().getName(),
+                    getTemplate().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
         }
     }
 
@@ -71,12 +210,77 @@ public class StateMachineInstBuilderImpl extends
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, new MethodScanner() {
 
             @Override
-            public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
                 verifyTransitionMethod(method, failureSet);
+                return false;
             }
         });
     }
 
+    private final class StateIndicatorDefaultMethodScanner implements MethodScanner {
+
+        private Method defaultStateGetterMethod = null;
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            if ( "getState".equals(method.getName()) ) {
+                if ( String.class.equals(method.getReturnType()) && null == defaultStateGetterMethod ) {
+                    defaultStateGetterMethod = method;
+                    return true;
+                } else if ( null != method.getAnnotation(Converter.class) && null == defaultStateGetterMethod ) {
+                    defaultStateGetterMethod = method;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Method getDefaultMethod() {
+            return defaultStateGetterMethod;
+        }
+    }
+    private final class StateIndicatorGetterMethodScanner implements MethodScanner {
+
+        private Method stateGetterMethod = null;
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            if ( null == stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
+                stateGetterMethod = method;
+                return true;
+            }
+            return false;
+        }
+
+        public Method getStateGetterMethod() {
+            return stateGetterMethod;
+        }
+    }
+    private final class MethodSignatureScanner implements MethodScanner {
+
+        private Method targetMethod = null;
+        private String targetMethodName = null;
+        private Class<?>[] parameterTypes = null;
+
+        public MethodSignatureScanner(String setterName, Class<?>[] classes) {
+            this.targetMethodName = setterName;
+            this.parameterTypes = classes;
+        }
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            if ( null == targetMethod && targetMethodName.equals(method.getName())
+                    && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
+                targetMethod = method;
+                return true;
+            }
+            return false;
+        }
+
+        public Method getMethod() {
+            return targetMethod;
+        }
+    }
     private final class CoverageVerifier implements MethodScanner {
 
         private final TransitionMetadata transitionMetadata;
@@ -91,21 +295,22 @@ public class StateMachineInstBuilderImpl extends
         }
 
         @Override
-        public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( !match(transitionMetadata, method) ) {
-                return;
+                return false;
             }
             if ( !declaringClass.contains(method.getDeclaringClass()) ) {
                 declaringClass.add(method.getDeclaringClass());
-                return;
+                return false;
             }
             final TransitionTypeEnum type = transitionMetadata.getType();
             if ( isUniqueTransition(type) ) {
                 failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
                         Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
-                                .getDottedPath().getName(),"@" + type.name(), getTemplate().getDottedPath(), getDottedPath()
-                                .getAbsoluteName()));
+                                .getDottedPath().getName(), "@" + type.name(), getTemplate().getDottedPath(),
+                        getDottedPath().getAbsoluteName()));
             }
+            return false;
         }
 
         private boolean isUniqueTransition(final TransitionTypeEnum type) {
@@ -126,7 +331,7 @@ public class StateMachineInstBuilderImpl extends
     }
     private interface MethodScanner {
 
-        void onMethodFound(Method method, VerificationFailureSet failureSet);
+        boolean onMethodFound(Method method, VerificationFailureSet failureSet);
     }
 
     private void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet,
@@ -136,7 +341,9 @@ public class StateMachineInstBuilderImpl extends
         for ( Class<?> klass : klasses ) {
             if ( klass == Object.class ) continue;
             for ( Method method : klass.getDeclaredMethods() ) {
-                scanner.onMethodFound(method, failureSet);
+                if ( scanner.onMethodFound(method, failureSet) ) {
+                    return;
+                }
             }
             if ( null != klass.getSuperclass() && Object.class != klass ) {
                 superclasses.add(klass.getSuperclass());
