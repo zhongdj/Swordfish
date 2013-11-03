@@ -49,7 +49,16 @@ public interface Errors {
     public static final String LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD = "002-3214";
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
     public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3230";
-    public static final String LM_MUST_HAVE_STATEINDICATOR = "002-3300";
+    /**
+     * @param {0} class annotated with @LifecycleMeta
+     */
+    public static final String STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR = "002-3300";
+    
+    /**
+     * @param {0} setter method object
+     */
+    public static final String STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER = "002-3301";
+    
     // @ConditionSet
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet

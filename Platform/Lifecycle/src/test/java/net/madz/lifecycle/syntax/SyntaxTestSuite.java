@@ -8,5 +8,5 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ RegisterSyntaxNegativeTest.class, RegisterSyntaxPositiveTest.class, StateSetSyntaxPositiveTest.class,
         StateSetAndTransitionSetSyntaxNegativeTest.class, StateSyntaxNegativeTest.class, StateSyntaxPositiveTest.class,
         LMSyntaxTestSuite.class, RelationSyntaxNegativeTest.class, RelationSyntaxPositiveTest.class,
-        ConditionSetTest.class })
+        ConditionSetTest.class, StateIndicatorNegativeTest.class, StateIndicatorPositiveTest.class })
 public class SyntaxTestSuite {}

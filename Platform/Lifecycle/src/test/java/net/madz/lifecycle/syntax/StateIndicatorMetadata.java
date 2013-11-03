@@ -15,43 +15,6 @@ import net.madz.lifecycle.syntax.StateIndicatorMetadata.PS1.Transitions.S1_X;
 
 public class StateIndicatorMetadata extends BaseMetaDataTest {
 
-    @StateMachine
-    static interface PS1 {
-
-        @StateSet
-        static interface States {
-
-            @Initial
-            @Function(transition = Transitions.S1_X.class, value = { S1_B.class })
-            static interface S1_A {}
-            @End
-            static interface S1_B {}
-        }
-        @TransitionSet
-        static interface Transitions {
-
-            static interface S1_X {}
-        }
-    }
-    @LifecycleMeta(PS1.class)
-    static interface PStateIndicatorInterface {
-
-        @Transition(S1_X.class)
-        void doX();
-
-        @StateIndicator
-        String getState();
-    }
-    @LifecycleMeta(PS1.class)
-    static interface PStateIndicatorConverterInterface {
-
-        @Transition(S1_X.class)
-        void doX();
-
-        @StateIndicator
-        @Converter(StateConverterImpl.class)
-        Integer getState();
-    }
     public static class StateConverterImpl implements StateConverter<Integer> {
 
         @Override
@@ -78,31 +41,95 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
             }
         }
     }
+    @StateMachine
+    static interface PS1 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.S1_X.class, value = { S1_B.class })
+            static interface S1_A {}
+            @End
+            static interface S1_B {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface S1_X {}
+        }
+    }
+    // ///////////////////////////////////////////////////////////
+    // Default State Indicator tests
+    // ///////////////////////////////////////////////////////////
     @LifecycleMeta(PS1.class)
-    static interface NStateIndicator {
+    static interface PDefaultStateIndicatorInterface {
 
         @Transition(S1_X.class)
         void doX();
 
-        @StateIndicator
+        // This is the default state getter
+        String getState();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NNoDefaultStateIndicatorInterface {
+        
+        @Transition(S1_X.class)
+        void doX();
+        
+        // This is not the default state getter
+        String getStateX();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NDefaultStateIndicatorInterface {
+
+        @Transition(S1_X.class)
+        void doX();
+
         String getState();
 
         // Should not have public stateSetter
         void setState(String state);
     }
     @LifecycleMeta(PS1.class)
-    static interface NStateIndicatorConverter {
+    static class PDefaultPrivateStateSetterClass {
+
+        private String state;
 
         @Transition(S1_X.class)
-        void doX();
+        public void doX() {}
 
-        @StateIndicator
-        @Converter(StateConverterImpl.class)
-        Integer getState();
+        // Defaulted @StateIndicator
+        public String getState() {
+            return state;
+        }
 
-        // Should not have public stateSetter
-        void setState(Integer state);
+        @SuppressWarnings("unused")
+        private void setState(String state) {
+            this.state = state;
+        }
     }
+    @LifecycleMeta(PS1.class)
+    static class NDefaultPublicStateSetterClass {
+
+        private String state;
+
+        @Transition(S1_X.class)
+        public void doX() {}
+
+        // Defaulted @StateIndicator
+        public String getState() {
+            return state;
+        }
+
+        // Error Modifier
+        public void setState(String state) {
+            this.state = state;
+        }
+    }
+    // ////////////////////////////////////////////////
+    // Field Access State Indicator Tests
+    // ////////////////////////////////////////////////
     @LifecycleMeta(PS1.class)
     static class PrivateStateFieldClass {
 
@@ -141,6 +168,28 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @Transition(S1_X.class)
         public void doX() {}
     }
+    // ////////////////////////////////////////////////////
+    // Property Access State Indicator
+    // ////////////////////////////////////////////////////
+    @LifecycleMeta(PS1.class)
+    static interface PStateIndicatorInterface {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        String getState();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface PStateIndicatorConverterInterface {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        @Converter(StateConverterImpl.class)
+        Integer getState();
+    }
     @LifecycleMeta(PS1.class)
     static class PrivateStateSetterClass {
 
@@ -160,6 +209,32 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(PS1.class)
+    static interface NStateIndicator {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        String getState();
+
+        // Should not have public stateSetter
+        void setState(String state);
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NStateIndicatorConverter {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        @Converter(StateConverterImpl.class)
+        Integer getState();
+
+        // Should not have public stateSetter
+        void setState(Integer state);
+    }
+    
+    @LifecycleMeta(PS1.class)
     static class NPublicStateSetterClass {
 
         private String state;
@@ -172,8 +247,25 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        // Error Modifier
         public void setState(String state) {
             this.state = state;
         }
+    }
+    // //////////////////////////////////////////////////////////////////
+    // Invalid State Converter Tests
+    // //////////////////////////////////////////////////////////////////
+    @LifecycleMeta(PS1.class)
+    static interface NStateIndicatorConverterInvalid {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        @Converter(StateConverterImpl.class)
+        Object getState();
+
+        // Should not have public stateSetter
+        void setState(Object state);
     }
 }
