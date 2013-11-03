@@ -210,8 +210,9 @@ public class StateMachineInstBuilderImpl extends
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, new MethodScanner() {
 
             @Override
-            public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
                 verifyTransitionMethod(method, failureSet);
+                return false;
             }
         });
     }
@@ -221,14 +222,17 @@ public class StateMachineInstBuilderImpl extends
         private Method defaultStateGetterMethod = null;
 
         @Override
-        public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( "getState".equals(method.getName()) ) {
                 if ( String.class.equals(method.getReturnType()) && null == defaultStateGetterMethod ) {
                     defaultStateGetterMethod = method;
+                    return true;
                 } else if ( null != method.getAnnotation(Converter.class) && null == defaultStateGetterMethod ) {
                     defaultStateGetterMethod = method;
+                    return true;
                 }
             }
+            return false;
         }
 
         public Method getDefaultMethod() {
@@ -240,10 +244,12 @@ public class StateMachineInstBuilderImpl extends
         private Method stateGetterMethod = null;
 
         @Override
-        public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( null == stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
                 stateGetterMethod = method;
+                return true;
             }
+            return false;
         }
 
         public Method getStateGetterMethod() {
@@ -262,11 +268,13 @@ public class StateMachineInstBuilderImpl extends
         }
 
         @Override
-        public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( null == targetMethod && targetMethodName.equals(method.getName())
                     && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
                 targetMethod = method;
+                return true;
             }
+            return false;
         }
 
         public Method getMethod() {
@@ -287,13 +295,13 @@ public class StateMachineInstBuilderImpl extends
         }
 
         @Override
-        public void onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( !match(transitionMetadata, method) ) {
-                return;
+                return false;
             }
             if ( !declaringClass.contains(method.getDeclaringClass()) ) {
                 declaringClass.add(method.getDeclaringClass());
-                return;
+                return false;
             }
             final TransitionTypeEnum type = transitionMetadata.getType();
             if ( isUniqueTransition(type) ) {
@@ -302,6 +310,7 @@ public class StateMachineInstBuilderImpl extends
                                 .getDottedPath().getName(), "@" + type.name(), getTemplate().getDottedPath(),
                         getDottedPath().getAbsoluteName()));
             }
+            return false;
         }
 
         private boolean isUniqueTransition(final TransitionTypeEnum type) {
@@ -322,7 +331,7 @@ public class StateMachineInstBuilderImpl extends
     }
     private interface MethodScanner {
 
-        void onMethodFound(Method method, VerificationFailureSet failureSet);
+        boolean onMethodFound(Method method, VerificationFailureSet failureSet);
     }
 
     private void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet,
@@ -332,7 +341,9 @@ public class StateMachineInstBuilderImpl extends
         for ( Class<?> klass : klasses ) {
             if ( klass == Object.class ) continue;
             for ( Method method : klass.getDeclaredMethods() ) {
-                scanner.onMethodFound(method, failureSet);
+                if ( scanner.onMethodFound(method, failureSet) ) {
+                    return;
+                }
             }
             if ( null != klass.getSuperclass() && Object.class != klass ) {
                 superclasses.add(klass.getSuperclass());

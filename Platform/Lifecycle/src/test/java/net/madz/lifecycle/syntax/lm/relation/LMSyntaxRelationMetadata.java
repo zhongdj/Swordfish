@@ -154,6 +154,8 @@ public class LMSyntaxRelationMetadata {
 
         @Relation(S4.Relations.R3.class)
         PLM_R3_S getR3S();
+
+        public String getState();
     }
     // Positive LM: Concrete all relations in SM that contains
     // CompositeStateMachines
@@ -205,6 +207,8 @@ public class LMSyntaxRelationMetadata {
     @LifecycleMeta(S5.class)
     static interface PLM_6 {
 
+        public String getState();
+
         @Transition
         void s5_X();
 
@@ -242,6 +246,8 @@ public class LMSyntaxRelationMetadata {
     }
     @LifecycleMeta(S6.class)
     static interface PLM_7 {
+
+        public String getState();
 
         @Transition
         void s5_X();
