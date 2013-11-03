@@ -74,7 +74,7 @@ public interface Errors {
      * @param {0} class annotated with @LifecycleMeta
      * @param {1} actual state type
      * @param {2} invalid converter
-     * @param {3} raw type that converter converts 
+     * @param {3} raw type that converter converts
      */
     public static final String STATE_INDICATOR_CONVERTER_INVALID = "002-3305";
     // @ConditionSet
@@ -97,4 +97,10 @@ public interface Errors {
      * @param {3} parent relation class of owning stateMachine class
      */
     public static final String RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION = "002-3503";
+    /**
+     * @param {0} @LifecycleMeta Class
+     * @param {1} invalid relation
+     * @param {2} StateMachine
+     */
+    public static final String LM_REFERENCE_INVALID_RELATION = "002-3221";
 }

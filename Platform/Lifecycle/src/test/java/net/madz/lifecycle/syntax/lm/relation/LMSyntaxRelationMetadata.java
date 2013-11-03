@@ -15,6 +15,7 @@ import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R1_S.Transitions.R1_S_X;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R2_S.Transitions.R2_S_X;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R3_S.Transitions.R3_S_X;
@@ -24,8 +25,12 @@ import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.States.
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.Transitions.S5_X;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S6.Relations.S6_R1;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S6.Relations.S6_R2;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S7.Relations.S7_R;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S7.Transitions.S7_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Relations.S8_R;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Transitions.S8_X;
 
-public class LMSyntaxRelationMetadata {
+public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
 
     // Positive LM: Concrete all relations in SM
     @StateMachine
@@ -51,6 +56,8 @@ public class LMSyntaxRelationMetadata {
 
         @Transition(R1_S_X.class)
         void tm();
+
+        String getState();
     }
     @StateMachine
     static interface R2_S {
@@ -75,6 +82,8 @@ public class LMSyntaxRelationMetadata {
 
         @Transition(R2_S_X.class)
         void tm();
+
+        String getState();
     }
     @StateMachine
     static interface R3_S {
@@ -99,6 +108,8 @@ public class LMSyntaxRelationMetadata {
 
         @Transition(R3_S_X.class)
         void tm();
+
+        String getState();
     }
     @StateMachine
     static interface S4 {
@@ -154,6 +165,8 @@ public class LMSyntaxRelationMetadata {
 
         @Relation(S4.Relations.R3.class)
         PLM_R3_S getR3S();
+
+        String getState();
     }
     // Positive LM: Concrete all relations in SM that contains
     // CompositeStateMachines
@@ -216,6 +229,8 @@ public class LMSyntaxRelationMetadata {
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
+
+        String getState();
     }
     // Positive LM: Concrete all relations in SM that has super StateMachines.
     @StateMachine
@@ -247,12 +262,149 @@ public class LMSyntaxRelationMetadata {
         void s5_X();
 
         @Transition
-        void s5_Y(@Relation(R2_S.class) PLM_R2_S rs_S);
+        void s5_Y(@Relation(S6_R2.class) PLM_R2_S rs_S);
 
         @Transition
         void s5_B_X();
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
+
+        String getState();
+    }
+    // Relation Negative Test
+    // Relation in InboundWhile or InboundWhiles not binded in LM.
+    @StateMachine
+    static interface S7 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = S7_X.class, value = { S7_B.class })
+            static interface S7_A {}
+            @End
+            @InboundWhile(on = { R1_S.States.R1_S_A.class }, relation = S7_R.class)
+            static interface S7_B {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface S7_X {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(R1_S.class)
+            static interface S7_R {}
+        }
+    }
+    @LifecycleMeta(S7.class)
+    static interface NLM_1 {
+
+        @Transition
+        void s7_X(PLM_R1_S r1_S);
+
+        String getState();
+    }
+    // Relation Negative Test
+    // Relation in ValidWhile or ValidWhiles not binded in LM.
+    @StateMachine
+    static interface S8 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = S8_X.class, value = { S8_B.class })
+            @ValidWhile(on = { R1_S.States.R1_S_A.class }, relation = S8_R.class)
+            static interface S8_A {}
+            @End
+            static interface S8_B {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface S8_X {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(R1_S.class)
+            static interface S8_R {}
+        }
+    }
+    @LifecycleMeta(S8.class)
+    static interface NLM_2 {
+
+        @Transition
+        void s8_X();
+
+        String getState();
+    }
+    // Relation Negative Test
+    // Relation in Composite StateMachine not binded in LM.
+    @LifecycleMeta(S5.class)
+    static interface NLM_3 {
+
+        @Transition
+        void s5_X();
+
+        @Transition
+        void s5_Y();
+
+        @Transition
+        void s5_B_X();
+
+        String getState();
+    }
+    // Relation Negative Test
+    // Relation in Super StateMachine not binded in LM.
+    @LifecycleMeta(S6.class)
+    static interface NLM_4 {
+
+        @Transition
+        void s5_X();
+
+        @Transition
+        void s5_Y(@Relation(R2_S.class) PLM_R2_S r2_S);
+
+        @Transition
+        void s5_B_X();
+
+        @Relation(S5_B_R1.class)
+        PLM_R1_S r1_S = null;
+
+        String getState();
+    }
+    
+    // Relation Negative Test
+    // Binding an invalid Relation that does not exist in S5.
+    @LifecycleMeta(S5.class)
+    static interface NLM_5 {
+
+        @Transition
+        void s5_X();
+
+        @Transition
+        void s5_Y();
+
+        @Transition
+        void s5_B_X();
+
+        @Relation(S4.Relations.R1.class)
+        PLM_R1_S r1_S = null;
+
+        String getState();
+    }
+    
+    @LifecycleMeta(R1_S.class)
+    static interface NLM_6 {
+
+        @Transition
+        void r1_S_X();
+        
+        @Relation(S4.Relations.R1.class)
+        String getState();
     }
 }
