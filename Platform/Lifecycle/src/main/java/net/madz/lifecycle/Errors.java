@@ -85,6 +85,10 @@ public interface Errors {
      * @param {3} raw type that converter converts
      */
     public static final String STATE_INDICATOR_CONVERTER_INVALID = "002-3305";
+    /**
+     * @param {0} class annotated with @LifecycleMeta
+     */
+    public static final String STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR = "002-3306";
     // @ConditionSet
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet
