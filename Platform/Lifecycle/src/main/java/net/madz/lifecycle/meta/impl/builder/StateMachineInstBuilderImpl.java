@@ -16,6 +16,7 @@ import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
@@ -49,6 +50,82 @@ public class StateMachineInstBuilderImpl extends
     private void verifySyntax(Class<?> klass) throws VerificationException {
         verifyTransitionMethods(klass);
         verifyStateIndicator(klass);
+        verifyRelations(klass);
+    }
+
+    private void verifyRelations(Class<?> klass) throws VerificationException {
+        verifyRelationInstancesDefinedCorrectly(klass);
+        verifyRelationsAllBeCoveraged(klass);
+    }
+
+    private void verifyRelationsAllBeCoveraged(Class<?> klass) {
+        // TODO Auto-generated method stub
+    }
+
+    private void verifyRelationInstancesDefinedCorrectly(Class<?> klass) throws VerificationException {
+        verifyRelationInstanceNotBeyondStateMachine(klass);
+        verifyRelationInstancesUnique(klass);
+    }
+
+    private void verifyRelationInstanceNotBeyondStateMachine(Class<?> klass) throws VerificationException {
+        if ( null == klass ) {
+            return;
+        }
+        verifyRelationInstanceOnFieldNotBeyondStateMachine(klass);
+        verifyRelationInstanceOnMethodNotBeyondStateMachine(klass);
+    }
+
+    private void verifyRelationInstanceOnMethodNotBeyondStateMachine(Class<?> klass) throws VerificationException {
+        if ( Object.class == klass || null == klass ) {
+            return;
+        }
+        RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner();
+        final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class<?>[] { klass },verificationFailureSet, scanner);
+        if (verificationFailureSet.size() > 0) {
+            throw new VerificationException(verificationFailureSet);
+        }
+    }
+
+    private final class RelationIndicatorPropertyMethodScanner implements MethodScanner {
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            Relation relation = method.getAnnotation(Relation.class);
+            if ( null == relation ) {
+                return false;
+            } else {
+                if ( !getTemplate().hasRelation(relation.value()) ) {
+                    failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
+                            Errors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
+                            relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
+                }
+            }
+            return false;
+        }
+    }
+
+    private void verifyRelationInstanceOnFieldNotBeyondStateMachine(Class<?> klass) throws VerificationException {
+        if ( klass.isInterface() || Object.class == klass || null == klass ) {
+            return;
+        }
+        for ( Field field : klass.getDeclaredFields() ) {
+            Relation relation = field.getAnnotation(Relation.class);
+            if ( null == relation ) {
+                continue;
+            }
+            Class<?> relationClass = relation.value();
+            if ( !getTemplate().hasRelation(relationClass) ) {
+                throw new VerificationException(newVerificationFailure(getDottedPath(),
+                        Errors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(), relationClass.getName(),
+                        getTemplate().getDottedPath().getAbsoluteName()));
+            }
+        }
+        verifyRelationInstanceOnFieldNotBeyondStateMachine(klass.getSuperclass());
+    }
+
+    private void verifyRelationInstancesUnique(Class<?> klass) {
+        // TODO Auto-generated method stub
     }
 
     private void verifyStateIndicator(Class<?> klass) throws VerificationException {

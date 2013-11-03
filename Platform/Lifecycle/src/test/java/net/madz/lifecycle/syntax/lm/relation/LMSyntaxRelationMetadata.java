@@ -3,6 +3,7 @@ package net.madz.lifecycle.syntax.lm.relation;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
+import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.Transition;
@@ -30,7 +31,7 @@ import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S7.Transit
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Relations.S8_R;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Transitions.S8_X;
 
-public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
+public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
 
     // Positive LM: Concrete all relations in SM
     @StateMachine
@@ -149,24 +150,25 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         }
     }
     @LifecycleMeta(S4.class)
-    static interface PLM_5 {
+    static class PLM_5 {
+        String state;
 
         @Transition(S4.Transitions.X.class)
-        void tM1(@Relation(R1.class) PLM_R1_S x);
+        void tM1(@Relation(R1.class) PLM_R1_S x) {}
 
         @Transition(S4.Transitions.Y.class)
-        void tM2();
+        void tM2() {}
 
         @Transition(S4.Transitions.Z.class)
-        void tM3();
+        void tM3() {}
 
         @Relation(S4.Relations.R2.class)
         PLM_R2_S r2 = null;
 
         @Relation(S4.Relations.R3.class)
-        PLM_R3_S getR3S();
+        PLM_R3_S getR3S() {return null;}
 
-        public String getState();
+        public String getState() {return state;}
     }
     // Positive LM: Concrete all relations in SM that contains
     // CompositeStateMachines
@@ -216,22 +218,25 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         }
     }
     @LifecycleMeta(S5.class)
-    static interface PLM_6 {
+    static class PLM_6 {
 
-        public String getState();
+        String state;
 
-        @Transition
-        void s5_X();
-
-        @Transition
-        void s5_Y();
+        public String getState() {
+            return state;
+        }
 
         @Transition
-        void s5_B_X();
+        void s5_X() {}
+
+        @Transition
+        void s5_Y() {}
+
+        @Transition
+        void s5_B_X() {}
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
-
     }
     // Positive LM: Concrete all relations in SM that has super StateMachines.
     @StateMachine
@@ -257,22 +262,25 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         }
     }
     @LifecycleMeta(S6.class)
-    static interface PLM_7 {
+    static class PLM_7 {
 
-        public String getState();
+        String state;
 
-        @Transition
-        void s5_X();
-
-        @Transition
-        void s5_Y(@Relation(S6_R2.class) PLM_R2_S rs_S);
+        public String getState() {
+            return state;
+        }
 
         @Transition
-        void s5_B_X();
+        void s5_X() {}
+
+        @Transition
+        void s5_Y(@Relation(S6_R2.class) PLM_R2_S rs_S) {}
+
+        @Transition
+        void s5_B_X() {}
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
-
     }
     // Relation Negative Test
     // Relation in InboundWhile or InboundWhiles not binded in LM.
@@ -337,76 +345,127 @@ public class LMSyntaxRelationMetadata  extends BaseMetaDataTest{
         }
     }
     @LifecycleMeta(S8.class)
-    static interface NLM_2 {
+    static class NLM_2 {
+
+        String state;
 
         @Transition
-        void s8_X();
+        void s8_X() {}
 
-        String getState();
+        String getState() {
+            return state;
+        }
     }
     // Relation Negative Test
     // Relation in Composite StateMachine not binded in LM.
     @LifecycleMeta(S5.class)
-    static interface NLM_3 {
+    static class NLM_3 {
+
+        String state;
 
         @Transition
-        void s5_X();
+        void s5_X() {}
 
         @Transition
-        void s5_Y();
+        void s5_Y() {}
 
         @Transition
-        void s5_B_X();
+        void s5_B_X() {}
 
-        String getState();
+        String getState() {
+            return state;
+        }
     }
     // Relation Negative Test
     // Relation in Super StateMachine not binded in LM.
     @LifecycleMeta(S6.class)
-    static interface NLM_4 {
+    static class NLM_4 {
+
+        String state;
 
         @Transition
-        void s5_X();
+        void s5_X() {}
 
         @Transition
-        void s5_Y(@Relation(R2_S.class) PLM_R2_S r2_S);
+        void s5_Y(@Relation(R2_S.class) PLM_R2_S r2_S) {}
 
         @Transition
-        void s5_B_X();
+        void s5_B_X() {}
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
 
-        String getState();
+        String getState() {
+            return state;
+        }
     }
-    
     // Relation Negative Test
     // Binding an invalid Relation that does not exist in S5.
     @LifecycleMeta(S5.class)
-    static interface NLM_5 {
+    static class NLM_5 {
+
+        String state;
 
         @Transition
-        void s5_X();
+        void s5_X() {}
 
         @Transition
-        void s5_Y();
+        void s5_Y() {}
 
         @Transition
-        void s5_B_X();
+        void s5_B_X() {}
 
         @Relation(S4.Relations.R1.class)
         PLM_R1_S r1_S = null;
 
-        String getState();
+        String getState() {
+            return state;
+        }
+        
+        private void setState(String state) {
+            this.state = state;
+        }
     }
-    
     @LifecycleMeta(R1_S.class)
-    static interface NLM_6 {
+    static class NLM_6 {
+
+        String state;
 
         @Transition
-        void r1_S_X();
-        
+        void r1_S_X() {}
+
         @Relation(S4.Relations.R1.class)
-        String getState();
+        String getState() {
+            return state;
+        }
+        private void setState(String state) {
+            this.state = state;
+        }
+    }
+    @LifecycleMeta(S4.class)
+    static class NLM_7 {
+
+        @Transition(S4.Transitions.X.class)
+        void tM1(@Relation(R1.class) PLM_R1_S x) {}
+
+        @Transition(S4.Transitions.Y.class)
+        void tM2() {}
+
+        @Transition(S4.Transitions.Z.class)
+        void tM3() {}
+
+        @Relation(S4.Relations.R2.class)
+        PLM_R2_S r2 = null;
+        @Relation(S4.Relations.R3.class)
+        PLM_R2_S r3 = null;
+
+        @Relation(S4.Relations.R3.class)
+        PLM_R3_S getR3S() {
+            return null;
+        }
+
+        public String getState() {
+            return null;
+        }
     }
 }

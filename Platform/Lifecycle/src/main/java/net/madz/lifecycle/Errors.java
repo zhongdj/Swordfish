@@ -114,5 +114,6 @@ public interface Errors {
      * @param {1} invalid relation
      * @param {2} StateMachine
      */
-    public static final String LM_REFERENCE_INVALID_RELATION = "002-3221";
+    public static final String LM_REFERENCE_INVALID_RELATION_INSTANCE = "002-3221";
+    public static final String LM_RELATION_INSTANCE_MUST_BE_UNIQUE = "002-3222";
 }
