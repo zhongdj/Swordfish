@@ -274,6 +274,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 functionList.add(function);
             }
         }
+        if ( 0 == functionList.size() &&  null != this.superStateMetadata) {
+            return;
+        }
         if ( 0 == functionList.size()  && ! this.compositeState) {
             throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
                     stateClass.getName());
