@@ -10,7 +10,6 @@ import net.madz.lifecycle.demo.relational.meta.VehicleScheduleOrderLifecycleMeta
 import net.madz.lifecycle.demo.relational.meta.VehicleScheduleOrderLifecycleMeta.Transitions.Start;
 
 @LifecycleMeta(VehicleScheduleOrderLifecycleMeta.class)
-@StateIndicator
 public interface IVehicleScheduleOrder {
 
     @Transition(Schedule.class)
@@ -30,4 +29,7 @@ public interface IVehicleScheduleOrder {
 
     @Transition
     void doConstruct();
+
+    @StateIndicator
+    String getState();
 }

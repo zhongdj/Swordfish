@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @author Barry
  * 
  */
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StateIndicator {
 

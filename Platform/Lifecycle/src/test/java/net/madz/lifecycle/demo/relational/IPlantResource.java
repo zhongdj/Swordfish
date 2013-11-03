@@ -6,8 +6,7 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.demo.relational.meta.PlantResourceLifecycleMeta;
 
 @LifecycleMeta(PlantResourceLifecycleMeta.class)
-@StateIndicator
-//Default with getState
+// Default with getState
 public interface IPlantResource {
 
     @Transition(PlantResourceLifecycleMeta.Transitions.Assign.class)
@@ -21,4 +20,7 @@ public interface IPlantResource {
 
     @Transition(PlantResourceLifecycleMeta.Transitions.ConfirmMaintainOver.class)
     void confirmMaintainOver();
+
+    @StateIndicator
+    String getState();
 }

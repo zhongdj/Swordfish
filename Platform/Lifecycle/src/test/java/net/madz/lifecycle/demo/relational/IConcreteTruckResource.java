@@ -6,8 +6,6 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.demo.relational.meta.ConcreteTruckResourceLifecycleMeta;
 
 @LifecycleMeta(ConcreteTruckResourceLifecycleMeta.class)
-@StateIndicator
-//Default with getState
 public interface IConcreteTruckResource {
 
     @Transition
@@ -20,4 +18,7 @@ public interface IConcreteTruckResource {
     @Transition
     // default to @Transition(Detach.class) use detach -> Detach
     void detach();
+
+    @StateIndicator
+    String getState();
 }
