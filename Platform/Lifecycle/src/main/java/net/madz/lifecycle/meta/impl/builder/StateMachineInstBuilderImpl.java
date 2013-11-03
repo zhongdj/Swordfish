@@ -169,10 +169,10 @@ public class StateMachineInstBuilderImpl extends
         return scanner.getDefaultMethod();
     }
 
-    private Field findFieldWith(Class<?> klass, Class<StateIndicator> aClass) {
+    private Field findFieldWith(Class<?> klass, Class<? extends Annotation> aClass) {
         for ( Class<?> index = klass; index != Object.class; index = index.getSuperclass() ) {
             for ( Field field : klass.getDeclaredFields() ) {
-                if ( null != field.getAnnotation(StateIndicator.class) ) {
+                if ( null != field.getAnnotation(aClass) ) {
                     return field;
                 }
             }
