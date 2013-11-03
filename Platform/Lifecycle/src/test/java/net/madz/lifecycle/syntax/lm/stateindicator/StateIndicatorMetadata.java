@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.lm.stateindicator;
 
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.annotations.Function;
@@ -11,7 +11,8 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.StateIndicatorMetadata.PS1.Transitions.S1_X;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.lm.stateindicator.StateIndicatorMetadata.PS1.Transitions.S1_X;
 
 public class StateIndicatorMetadata extends BaseMetaDataTest {
 
@@ -269,5 +270,4 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @Converter(StateConverterImpl.class)
         Object getState();
     }
-    
 }

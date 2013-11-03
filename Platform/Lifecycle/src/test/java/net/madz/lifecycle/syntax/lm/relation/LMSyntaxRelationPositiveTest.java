@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.lm.relation;
 
 import static org.junit.Assert.fail;
 import net.madz.lifecycle.AbsStateMachineRegistry;

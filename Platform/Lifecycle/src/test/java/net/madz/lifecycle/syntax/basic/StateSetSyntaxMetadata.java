@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.basic;
 
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -6,7 +6,8 @@ import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.StateSetSyntaxMetadata.Positive.Transitions.T;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.basic.StateSetSyntaxMetadata.Positive.Transitions.T;
 
 public class StateSetSyntaxMetadata extends BaseMetaDataTest {
 

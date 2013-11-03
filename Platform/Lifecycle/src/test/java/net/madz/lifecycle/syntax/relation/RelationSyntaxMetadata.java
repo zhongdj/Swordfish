@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.relation;
 
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
@@ -16,8 +16,9 @@ import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.syntax.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningX;
-import net.madz.lifecycle.syntax.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningY;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.relation.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningX;
+import net.madz.lifecycle.syntax.relation.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningY;
 
 public class RelationSyntaxMetadata extends BaseMetaDataTest {
 

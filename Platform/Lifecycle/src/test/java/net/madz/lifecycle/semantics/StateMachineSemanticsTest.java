@@ -28,11 +28,11 @@ public class StateMachineSemanticsTest extends StateMachineSemanticsMetadata {
             final Registry registry = new Registry();
             final StateMetadata[] allStates = registry.getStateMachineMeta(S3.class).getAllStates();
             final HashMap<DottedPath, StateMetadata> statesMap = new HashMap<DottedPath, StateMetadata>();
-            Assert.assertEquals("Expected 5 States in StateMachine", 5, allStates.length);
             for ( StateMetadata state : allStates ) {
                 System.out.println("Testing=====" + state.getDottedPath());
                 statesMap.put(state.getDottedPath(), state);
             }
+            Assert.assertEquals("Expected 7 States in StateMachine", 7, allStates.length);
             Assert.assertNotNull(findStateInStatesMap(
                     "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_A", statesMap));
             Assert.assertNotNull(findStateInStatesMap(

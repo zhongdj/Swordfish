@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.lm.relation;
 
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
@@ -15,15 +15,15 @@ import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.R1_S.Transitions.R1_S_X;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.R2_S.Transitions.R2_S_X;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.R3_S.Transitions.R3_S_X;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S4.Relations.R1;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_Relations.S5_B_R1;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_Transitions.S5_B_X;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S5.Transitions.S5_X;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S6.Relations.S6_R1;
-import net.madz.lifecycle.syntax.LMSyntaxRelationMetadata.S6.Relations.S6_R2;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R1_S.Transitions.R1_S_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R2_S.Transitions.R2_S_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R3_S.Transitions.R3_S_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S4.Relations.R1;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_Relations.S5_B_R1;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_Transitions.S5_B_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.Transitions.S5_X;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S6.Relations.S6_R1;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S6.Relations.S6_R2;
 
 public class LMSyntaxRelationMetadata {
 

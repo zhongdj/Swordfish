@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.register;
 
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -8,9 +8,10 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionTwo;
-import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.CorrectStateMachineSyntax.Transitions.TransitionOne;
-import net.madz.lifecycle.syntax.RegisterSyntaxTestMetaData.IncorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionThree;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.register.RegisterSyntaxTestMetaData.CorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionTwo;
+import net.madz.lifecycle.syntax.register.RegisterSyntaxTestMetaData.CorrectStateMachineSyntax.Transitions.TransitionOne;
+import net.madz.lifecycle.syntax.register.RegisterSyntaxTestMetaData.IncorrectStateMachineInheritanceSuperSyntax.Transitions.TransitionThree;
 
 public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
 

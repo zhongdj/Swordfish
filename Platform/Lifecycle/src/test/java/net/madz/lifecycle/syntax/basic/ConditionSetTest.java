@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.basic;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
@@ -13,11 +13,12 @@ import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.ConditionSetTest.S4.Conditions.CompareWithZero;
-import net.madz.lifecycle.syntax.ConditionSetTest.S4.States.I;
-import net.madz.lifecycle.syntax.ConditionSetTest.S4.States.J;
-import net.madz.lifecycle.syntax.ConditionSetTest.S4.Transitions.Z;
-import net.madz.lifecycle.syntax.ConditionSetTest.S4.Utils.ConcreteCondition;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Conditions.CompareWithZero;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.States.I;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.States.J;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Transitions.Z;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Utils.ConcreteCondition;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;

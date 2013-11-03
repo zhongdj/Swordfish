@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.state;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
@@ -6,18 +6,18 @@ import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.States.NCS2_B.CStates.NCS2_CC;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.States.NCS3_B.CStates.NCS3_CC;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.States.NCS4_B.CStates.NCS4_CC;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_B.CStates.NSC1_CB;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_C;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.States.A;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.C;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.D;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.States.E;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.Transitions.Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S5.states.S5_A;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CStates.NCS2_CC;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.States.NCS3_B.CStates.NCS3_CC;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CStates.NCS4_CC;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CStates.NSC1_CB;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.States.A;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.C;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.D;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.States.E;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.Transitions.Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S5.states.S5_A;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, C.class.getAnnotation(Function.class),
-                    C.class.getName(), net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.Transitions.X.class.getName());
+                    C.class.getName(), net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class.getName());
             throw e;
         }
     }

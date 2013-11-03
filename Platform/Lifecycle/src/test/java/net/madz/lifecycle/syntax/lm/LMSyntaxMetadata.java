@@ -1,9 +1,7 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.lm;
 
-import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
-import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.Transition;
@@ -11,16 +9,16 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.action.Corrupt;
 import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
-import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_X;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Y;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_X;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Y;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Z;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.PS1.Transitions.S1_X;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S2.Transitions.NS1_X;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S2.Transitions.NS1_Y;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S2.Transitions.NS1_Z;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S3.Transitions.S3_X;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S3.Transitions.S3_Y;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S3.Transitions.S3_Z;
 
 public class LMSyntaxMetadata extends BaseMetaDataTest {
 

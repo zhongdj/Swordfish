@@ -1,4 +1,4 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.state;
 
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
@@ -11,33 +11,34 @@ import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.ShortCut;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.States.NCS2_B.CTransitions.NCS2_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.Transitions.NCS2_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS2.Transitions.NCS2_Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.States.NCS3_B.CTransitions.NCS3_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.Transitions.NCS3_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS3.Transitions.NCS3_Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.States.NCS4_B.CTransitions.NCS4_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.Transitions.NCS4_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NCS4.Transitions.NCS4_Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.States.NSC1_C;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S2.States.D;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S3.Transitions.Y;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.Conditions.CompareWithZero;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.States.I;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.States.J;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.Transitions.Z;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S4.Utils.ConcreteCondition;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S5.Transitions.S5_Start;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S5_Super.Transitions.S5_Super_Start;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S6.Transitions.S6_Start;
-import net.madz.lifecycle.syntax.StateSyntaxMetadata.S7.Transitions.S7_X;
+import net.madz.lifecycle.syntax.BaseMetaDataTest;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CTransitions.NCS2_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.Transitions.NCS2_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.Transitions.NCS2_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.States.NCS3_B.CTransitions.NCS3_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.Transitions.NCS3_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.Transitions.NCS3_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CTransitions.NCS4_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.D;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.Transitions.Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S4.Conditions.CompareWithZero;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S4.States.I;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S4.States.J;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S4.Transitions.Z;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S4.Utils.ConcreteCondition;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S5.Transitions.S5_Start;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S5_Super.Transitions.S5_Super_Start;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S6.Transitions.S6_Start;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S7.Transitions.S7_X;
 
 public class StateSyntaxMetadata extends BaseMetaDataTest {
 
@@ -65,7 +66,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
 
             @Initial
-            @Function(transition = net.madz.lifecycle.syntax.StateSyntaxMetadata.S1.Transitions.X.class,
+            @Function(transition = net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class,
                     value = { D.class })
             static interface C {}
             @End

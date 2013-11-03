@@ -1,13 +1,12 @@
-package net.madz.lifecycle.syntax;
+package net.madz.lifecycle.syntax.lm;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.PS1.Transitions.S1_X;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S2.Transitions.NS1_Z;
-import net.madz.lifecycle.syntax.LMSyntaxMetadata.S3.Transitions.S3_Y;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S2.Transitions.NS1_Z;
+import net.madz.lifecycle.syntax.lm.LMSyntaxMetadata.S3.Transitions.S3_Y;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
