@@ -11,6 +11,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.lm.stateindicator.StateIndicatorMetadata.PS1.Transitions.S1_X;
 
@@ -260,7 +261,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @StateIndicator
         Integer getState();
     }
-    
     @LifecycleMeta(PS1.class)
     static interface NStateIndicatorConverterInvalid {
 
@@ -270,5 +270,52 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @StateIndicator
         @Converter(StateConverterImpl.class)
         Object getState();
+    }
+    // //////////////////////////////////////////////////////////////////
+    // Multiple State Indicator Error
+    // //////////////////////////////////////////////////////////////////
+    @LifecycleMeta(PS1.class)
+    static interface PositiveMultipleStateIndicatorSuper {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        String getStateX();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface PositiveMultipleStateIndicatorChild extends PositiveMultipleStateIndicatorSuper {
+
+        @StateIndicator
+        @Overrides
+        String getStateY();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NegativeMultipleStateIndicator {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        @Converter(StateConverterImpl.class)
+        Integer getState();
+
+        @StateIndicator
+        String getStateX();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NegativeMultipleStateIndicatorSuper {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        String getStateX();
+    }
+    @LifecycleMeta(PS1.class)
+    static interface NegativeMultipleStateIndicatorChild extends NegativeMultipleStateIndicatorSuper {
+
+        @StateIndicator
+        String getStateY();
     }
 }

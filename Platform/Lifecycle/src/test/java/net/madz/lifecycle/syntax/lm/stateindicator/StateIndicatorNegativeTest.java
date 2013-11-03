@@ -187,4 +187,42 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
             throw e;
         }
     }
+
+    @Test(expected = VerificationException.class)
+    public void test_multiple_state_indicator_error() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NegativeMultipleStateIndicator.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, NegativeMultipleStateIndicator.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_multiple_state_indicator_through_hierarchy_error() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NegativeMultipleStateIndicatorChild.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, NegativeMultipleStateIndicatorChild.class);
+            throw e;
+        }
+    }
 }

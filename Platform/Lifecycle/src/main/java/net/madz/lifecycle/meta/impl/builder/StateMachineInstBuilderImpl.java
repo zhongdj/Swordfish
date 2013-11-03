@@ -18,6 +18,7 @@ import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateInst;
@@ -151,11 +152,16 @@ public class StateMachineInstBuilderImpl extends
         }
     }
 
-    private Method findCustomizedStateIndicatorGetter(Class<?> klass) {
-        StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner();
-        scanMethodsOnClasses(new Class<?>[] { klass }, null, scanner);
-        final Method specifiedGetter = scanner.getStateGetterMethod();
-        return specifiedGetter;
+    private Method findCustomizedStateIndicatorGetter(Class<?> klass) throws VerificationException {
+        final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(klass);
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, scanner);
+        if ( failureSet.size() > 0 )
+            throw new VerificationException(failureSet);
+        else {
+            final Method specifiedGetter = scanner.getStateGetterMethod();
+            return specifiedGetter;
+        }
     }
 
     private void verifyStateIndicatorElement(Class<?> klass, AnnotatedElement getter, Class<?> stateType)
@@ -319,12 +325,25 @@ public class StateMachineInstBuilderImpl extends
     private final class StateIndicatorGetterMethodScanner implements MethodScanner {
 
         private Method stateGetterMethod = null;
+        private boolean overridingFound = false;
+        private final Class<?> klass;
+
+        public StateIndicatorGetterMethodScanner(Class<?> klass) {
+            this.klass = klass;
+        }
 
         @Override
         public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             if ( null == stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
                 stateGetterMethod = method;
-                return true;
+                overridingFound = null != method.getAnnotation(Overrides.class);
+                return false;
+            } else if ( null != stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
+                if ( !overridingFound ) {
+                    failureSet.add(newVerificationException(getDottedPath(),
+                            Errors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
+                    return true;
+                }
             }
             return false;
         }

@@ -63,4 +63,17 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
         }
         new CorrectRegistry();
     }
+
+    @Test
+    public void test_state_indicator_overrides() throws VerificationException {
+        @LifecycleRegistry({ PositiveMultipleStateIndicatorChild.class })
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class CorrectRegistry extends AbsStateMachineRegistry {
+
+            protected CorrectRegistry() throws VerificationException {
+                super();
+            }
+        }
+        new CorrectRegistry();
+    }
 }
