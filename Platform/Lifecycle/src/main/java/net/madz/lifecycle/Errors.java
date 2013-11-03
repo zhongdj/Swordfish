@@ -53,22 +53,34 @@ public interface Errors {
      * @param {0} class annotated with @LifecycleMeta
      */
     public static final String STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR = "002-3300";
-    
     /**
      * @param {0} setter method object
      */
     public static final String STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER = "002-3301";
-    
     /**
      * @param {0} setter field object
      */
     public static final String STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD = "002-3302";
-    
+    /**
+     * @param {0} class annotated with @LifecycleMeta
+     */
+    public static final String STATE_INDICATOR_SETTER_NOT_FOUND = "002-3303";
+    /**
+     * @param {0} class annotated with @LifecycleMeta
+     * @param {1} state type
+     */
+    public static final String STATE_INDICATOR_CONVERTER_NOT_FOUND = "002-3304";
+    /**
+     * @param {0} class annotated with @LifecycleMeta
+     * @param {1} actual state type
+     * @param {2} invalid converter
+     * @param {3} raw type that converter converts 
+     */
+    public static final String STATE_INDICATOR_CONVERTER_INVALID = "002-3305";
     // @ConditionSet
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet
     public static final String RELATIONSET_MULTIPLE = "002-3500";
-    
     /**
      * @param {0} stateMachine class
      */
@@ -78,7 +90,6 @@ public interface Errors {
      * @param {1} super stateMachine class
      */
     public static final String RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION = "002-3502";
-    
     /**
      * @param {0} composite stateMachine dottedPath
      * @param {1} parent relation class of composite stateMachine class

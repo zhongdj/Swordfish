@@ -130,4 +130,61 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
             throw e;
         }
     }
+
+    @Test(expected = VerificationException.class)
+    public void test_state_indicator_setter_not_found_class_impl() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NStateIndicatorSetterNotFound.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATE_INDICATOR_SETTER_NOT_FOUND,
+                    NStateIndicatorSetterNotFound.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_state_indicator_need_converter_interface_impl() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NNeedConverter.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
+                    NNeedConverter.class, Integer.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_state_indicator_converter_invalid_interface_impl() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NStateIndicatorConverterInvalid.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATE_INDICATOR_CONVERTER_INVALID,
+                    NStateIndicatorConverterInvalid.class, Object.class, StateConverterImpl.class, Integer.class);
+            throw e;
+        }
+    }
 }

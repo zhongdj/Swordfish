@@ -73,10 +73,10 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
     }
     @LifecycleMeta(PS1.class)
     static interface NNoDefaultStateIndicatorInterface {
-        
+
         @Transition(S1_X.class)
         void doX();
-        
+
         // This is not the default state getter
         String getStateX();
     }
@@ -158,7 +158,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @Transition(S1_X.class)
         public void doX() {}
     }
-
     // ////////////////////////////////////////////////////
     // Property Access State Indicator
     // ////////////////////////////////////////////////////
@@ -211,7 +210,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         // Should not have public stateSetter
         void setState(String state);
     }
-    
     @LifecycleMeta(PS1.class)
     static class NPublicStateSetterClass {
 
@@ -230,9 +228,37 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
             this.state = state;
         }
     }
+    @LifecycleMeta(PS1.class)
+    static class NStateIndicatorSetterNotFound {
+
+        private int state;
+
+        @Transition(S1_X.class)
+        public void doX() {}
+
+        @StateIndicator
+        @Converter(StateConverterImpl.class)
+        public Integer getState() {
+            return state;
+        };
+
+        @SuppressWarnings("unused")
+        private void setState(int i) {
+            this.state = i;
+        }
+    }
     // //////////////////////////////////////////////////////////////////
     // Invalid State Converter Tests
     // //////////////////////////////////////////////////////////////////
+    @LifecycleMeta(PS1.class)
+    static interface NNeedConverter {
+
+        @Transition(S1_X.class)
+        void doX();
+
+        @StateIndicator
+        Integer getState();
+    }
     @LifecycleMeta(PS1.class)
     static interface NStateIndicatorConverterInvalid {
 
@@ -242,8 +268,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @StateIndicator
         @Converter(StateConverterImpl.class)
         Object getState();
-
-        // Should not have public stateSetter
-        void setState(Object state);
     }
+    
 }
