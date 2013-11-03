@@ -89,8 +89,9 @@ public class StateMachineMetaBuilderImpl extends
         this.registry = registry;
     }
 
-    public StateMachineMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
+    public StateMachineMetaBuilderImpl(StateMachineMetaBuilderImpl parent, String name) {
         super(parent, name);
+        parent.compositeStateMachineList.add(this);
         this.registry = parent.getRegistry();
     }
 
@@ -676,18 +677,18 @@ public class StateMachineMetaBuilderImpl extends
         return result.toArray(new TransitionMetadata[0]);
     }
 
-    private void loadTransitions(final StateMachineMetaBuilder stateMachineMetaBuilder,
+    private void loadTransitions(final StateMachineMetadata stateMachineMetaBuilder,
             final ArrayList<TransitionMetadata> result) {
         populateTransitions(stateMachineMetaBuilder, result);
-        for ( final StateMachineMetaBuilder compositeStateMachine : stateMachineMetaBuilder.getCompositeStateMachines() ) {
+        for ( final StateMachineMetadata compositeStateMachine : stateMachineMetaBuilder.getCompositeStateMachines() ) {
             populateTransitions(compositeStateMachine, result);
         }
         if ( null != stateMachineMetaBuilder.getSuperStateMachine() ) {
-            loadTransitions(stateMachineMetaBuilder, result);
+            loadTransitions(stateMachineMetaBuilder.getSuperStateMachine(), result);
         }
     }
 
-    private void populateTransitions(StateMachineMetaBuilder stateMachineMetaBuilder,
+    private void populateTransitions(StateMachineMetadata stateMachineMetaBuilder,
             ArrayList<TransitionMetadata> result) {
         for ( TransitionMetadata transition : stateMachineMetaBuilder.getDeclaredTransitionSet() ) {
             result.add(transition);

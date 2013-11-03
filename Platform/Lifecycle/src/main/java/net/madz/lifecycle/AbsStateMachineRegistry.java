@@ -202,7 +202,7 @@ public abstract class AbsStateMachineRegistry {
             StateMachineMetaBuilder owningStateMachine) throws VerificationException {
         Constructor<? extends StateMachineMetaBuilder> c;
         try {
-            c = builderMeta.value().getConstructor(StateMachineMetaBuilder.class, String.class);
+            c = builderMeta.value().getConstructor(builderMeta.value(), String.class);
             final StateMachineMetaBuilder compositeStateMachine = c.newInstance(owningStateMachine,
                     "CompositeStateMachine." + stateMachineClass.getSimpleName());
             return compositeStateMachine;
