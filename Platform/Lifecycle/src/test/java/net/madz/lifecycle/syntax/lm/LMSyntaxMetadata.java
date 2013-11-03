@@ -43,6 +43,8 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
     @LifecycleMeta(PS1.class)
     static interface PLM_1 {
 
+        public String getState();
+
         @Transition(S1_X.class)
         void test();
     }
@@ -82,6 +84,8 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
 
         @Transition(NS1_Z.class)
         void m3();
+
+        public String getState();
     }
     // Positive: all transitions are covered by methods, using default method
     // name
@@ -96,6 +100,8 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
 
         @Transition
         public void nS1_Z();
+
+        public String getState();
     }
     // Transition NS1_Z has no binding method in LM
     @LifecycleMeta(S2.class)
@@ -180,6 +186,8 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
     @LifecycleMeta(S3.class)
     static interface PLM_4 {
 
+        public String getState();
+
         @Transition
         void s3_X();
 
@@ -205,5 +213,4 @@ public class LMSyntaxMetadata extends BaseMetaDataTest {
         @Transition
         void s3_Z();
     }
-
 }

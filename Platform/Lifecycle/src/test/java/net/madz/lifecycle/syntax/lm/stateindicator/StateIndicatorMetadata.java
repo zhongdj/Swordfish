@@ -260,6 +260,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @StateIndicator
         Integer getState();
     }
+    
     @LifecycleMeta(PS1.class)
     static interface NStateIndicatorConverterInvalid {
 
