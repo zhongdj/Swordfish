@@ -140,15 +140,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         public void doX() {}
     }
     @LifecycleMeta(PS1.class)
-    static class NPublicStateFieldClass {
-
-        @StateIndicator
-        public String state;
-
-        @Transition(S1_X.class)
-        public void doX() {}
-    }
-    @LifecycleMeta(PS1.class)
     static class PrivateStateFieldConverterClass {
 
         @StateIndicator
@@ -159,15 +150,15 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         public void doX() {}
     }
     @LifecycleMeta(PS1.class)
-    static class NPublicStateFieldConverterClass {
+    static class NPublicStateFieldClass {
 
         @StateIndicator
-        @Converter(StateConverterImpl.class)
         public String state;
 
         @Transition(S1_X.class)
         public void doX() {}
     }
+
     // ////////////////////////////////////////////////////
     // Property Access State Indicator
     // ////////////////////////////////////////////////////

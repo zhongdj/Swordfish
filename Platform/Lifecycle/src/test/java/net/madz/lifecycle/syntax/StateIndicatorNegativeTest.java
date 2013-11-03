@@ -70,4 +70,25 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
             throw e;
         }
     }
+    @Test(expected = VerificationException.class)
+    public void test_field_access_expose_state_indicator() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NPublicStateFieldClass.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+            
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD,
+                    NNoDefaultStateIndicatorInterface.class.getDeclaredField("state"));
+            throw e;
+        }
+    }
+    
+    
 }

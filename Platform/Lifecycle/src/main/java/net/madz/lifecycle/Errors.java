@@ -59,6 +59,11 @@ public interface Errors {
      */
     public static final String STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER = "002-3301";
     
+    /**
+     * @param {0} setter field object
+     */
+    public static final String STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD = "002-3302";
+    
     // @ConditionSet
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet
