@@ -200,7 +200,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(PS1.class)
-    static interface NStateIndicator {
+    static interface NPublicStateIndicatorInterface {
 
         @Transition(S1_X.class)
         void doX();
@@ -210,19 +210,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
 
         // Should not have public stateSetter
         void setState(String state);
-    }
-    @LifecycleMeta(PS1.class)
-    static interface NStateIndicatorConverter {
-
-        @Transition(S1_X.class)
-        void doX();
-
-        @StateIndicator
-        @Converter(StateConverterImpl.class)
-        Integer getState();
-
-        // Should not have public stateSetter
-        void setState(Integer state);
     }
     
     @LifecycleMeta(PS1.class)

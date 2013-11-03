@@ -70,12 +70,13 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
     public void test_field_access_expose_state_indicator() throws Exception {
         @LifecycleRegistry(StateIndicatorMetadata.NPublicStateFieldClass.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {
                 super();
             }
@@ -89,6 +90,44 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
             throw e;
         }
     }
-    
-    
+
+    @Test(expected = VerificationException.class)
+    public void test_expose_state_indicator_error_interface_impl() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NPublicStateSetterClass.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+                    NNoDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_expose_state_indicator_error_class_impl() throws Exception {
+        @LifecycleRegistry(StateIndicatorMetadata.NPublicStateIndicatorInterface.class)
+        @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+                    NNoDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
+            throw e;
+        }
+    }
 }
