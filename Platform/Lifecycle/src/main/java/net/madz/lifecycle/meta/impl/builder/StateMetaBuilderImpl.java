@@ -2,6 +2,8 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
@@ -19,6 +21,8 @@ import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
+import net.madz.lifecycle.meta.instance.ErrorMessageObject;
+import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
@@ -39,6 +43,10 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private StateMetadata owningState;
     private boolean overriding = false;
     private StateMetadata superStateMetadata;
+    private LinkedList<RelationMetadata> validWhileRelations = new LinkedList<RelationMetadata>();
+    private LinkedList<RelationMetadata> inboundWhileRelations = new LinkedList<RelationMetadata>();
+    private HashMap<TransitionMetadata, FunctionMetadata> functionMetadataMap = new HashMap<>();
+    private final LinkedList<TransitionMetadata> possibleTransitions = new LinkedList<TransitionMetadata>();
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -108,12 +116,6 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     @Override
-    public StateMetadata onTransition(TransitionMetadata transition) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean isInitial() {
         return initial;
     }
@@ -125,8 +127,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public TransitionMetadata[] getPossibleTransitions() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.functionMetadataMap.keySet().toArray(new TransitionMetadata[0]);
+    }
+
+    @Override
+    public FunctionMetadata[] getFunctionMetadata() {
+        return this.functionMetadataMap.values().toArray(new FunctionMetadata[0]);
     }
 
     @Override
@@ -153,26 +159,22 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public boolean hasInboundWhiles() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != this.inboundWhileRelations && this.inboundWhileRelations.size() > 0;
     }
 
     @Override
     public RelationMetadata[] getInboundWhiles() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.inboundWhileRelations.toArray(new RelationMetadata[0]);
     }
 
     @Override
     public boolean hasValidWhiles() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != this.validWhileRelations && this.validWhileRelations.size() > 0;
     }
 
     @Override
     public RelationMetadata[] getValidWhiles() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.validWhileRelations.toArray(new RelationMetadata[0]);
     }
 
     @Override
@@ -274,16 +276,28 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 functionList.add(function);
             }
         }
-        if ( 0 == functionList.size() &&  null != this.superStateMetadata) {
+        if ( 0 == functionList.size() && null != this.superStateMetadata ) {
             return;
         }
-        if ( 0 == functionList.size()  && ! this.compositeState) {
+        if ( 0 == functionList.size() && !this.compositeState ) {
             throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
                     stateClass.getName());
         }
         for ( Function function : functionList ) {
             verifyFunction(stateClass, function);
+            configureFunction(this, function);
         }
+    }
+
+    private void configureFunction(StateMetaBuilderImpl parent, Function function) {
+        final TransitionMetadata transition = parent.getParent().getTransition(function.transition());
+        Class<?>[] value = function.value();
+        final LinkedList<StateMetadata> nextStates = new LinkedList<>();
+        for ( Class<?> item : value ) {
+            nextStates.add(parent.getParent().getState(item));
+        }
+        final FunctionMetadata functionMetadata = new FunctionMetadata(parent, transition, nextStates);
+        this.functionMetadataMap.put(functionMetadata.getTransition(), functionMetadata);
     }
 
     private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
@@ -362,6 +376,49 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         if ( 0 < failureSet.size() ) {
             throw new VerificationException(failureSet);
         }
+        for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
+            RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(inboundWhile.relation()),
+                    inboundWhile.relation(),
+                    getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
+                    configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
+            this.inboundWhileRelations.add(relationMetadata);
+        }
+        for ( ValidWhile validWhile : findValidWhiles(clazz) ) {
+            RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()),
+                    validWhile.relation(),
+                    getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
+                    configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
+            this.validWhileRelations.add(relationMetadata);
+        }
+    }
+
+    private LinkedList<StateMetadata> getOnStates(StateMachineMetadata stateMachineMetadata, Class<?>[] on) {
+        final LinkedList<StateMetadata> onStates = new LinkedList<>();
+        for ( Class<?> clz : on ) {
+            onStates.add(stateMachineMetadata.getState(clz.getSimpleName()));
+        }
+        return onStates;
+    }
+
+    private RelationMetadata configureRelation(StateMachineMetadata relatedStateMachine, Class<?> relationClass,
+            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects)
+            throws VerificationException {
+        return new RelationMetaBuilderImpl(this, relationClass, onStates, errorObjects, relatedStateMachine).build(
+                relationClass, this);
+    }
+
+    private LinkedList<ErrorMessageObject> configureErrorMessageObjects(ErrorMessage[] otherwise, Class clz) {
+        LinkedList<ErrorMessageObject> errorObjects = new LinkedList<ErrorMessageObject>();
+        for ( ErrorMessage item : otherwise ) {
+            LinkedList<StateMetadata> errorStates = new LinkedList<>();
+            Class<?>[] states = item.states();
+            for ( Class<?> stateClz : states ) {
+                errorStates.add(this.getParent().getState(stateClz));
+            }
+            errorObjects.add(new ErrorMessageObject(item.bundle(), clz, item.code(), errorStates
+                    .toArray(new StateMetadata[0])));
+        }
+        return errorObjects;
     }
 
     private void verifyValidWhile(ValidWhile validWhile, Class<?> clazz, VerificationFailureSet failureSet) {

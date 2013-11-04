@@ -3,8 +3,13 @@ package net.madz.lifecycle.syntax.lm.relation;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S4;
 import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_Relations.S5_B_R1;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S5.States.S5_B.S5_B_States.S5_B_A;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S7.Relations.S7_R;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S7.States.S7_B;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Relations.S8_R;
+import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.States.S8_A;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -22,7 +27,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            e.printStackTrace();
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_RELATION_NOT_BE_CONCRETED, "s7_X",
+                    NLM_1.class.getName(), S7_R.class.getSimpleName(), S7.class.getName() + ".StateSet." + S7_B.class.getSimpleName());
             throw e;
         }
     }
@@ -38,7 +44,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            e.printStackTrace();
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_RELATION_NOT_BE_CONCRETED, "s8_X",
+                    NLM_2.class.getName(), S8_R.class.getSimpleName(), S8.class.getName() + ".StateSet."+ S8_A.class.getSimpleName());
             throw e;
         }
     }
@@ -54,7 +61,9 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            e.printStackTrace();
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X",
+                    NLM_3.class.getName(), S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet."+ S5_B_A.class.getSimpleName());
+
             throw e;
         }
     }
@@ -70,7 +79,9 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            e.printStackTrace();
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X",
+                    NLM_4.class.getName(), S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet."+ S5_B_A.class.getSimpleName());
+
             throw e;
         }
     }

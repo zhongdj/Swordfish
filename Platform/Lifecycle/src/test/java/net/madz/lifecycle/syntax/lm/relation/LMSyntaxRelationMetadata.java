@@ -3,7 +3,6 @@ package net.madz.lifecycle.syntax.lm.relation;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
-import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.Transition;
@@ -151,6 +150,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
     }
     @LifecycleMeta(S4.class)
     static class PLM_5 {
+
         String state;
 
         @Transition(S4.Transitions.X.class)
@@ -166,9 +166,17 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         PLM_R2_S r2 = null;
 
         @Relation(S4.Relations.R3.class)
-        PLM_R3_S getR3S() {return null;}
+        PLM_R3_S getR3S() {
+            return null;
+        }
 
-        public String getState() {return state;}
+        public String getState() {
+            return state;
+        }
+
+        private void setState(String state) {
+            this.state = state;
+        }
     }
     // Positive LM: Concrete all relations in SM that contains
     // CompositeStateMachines
@@ -237,6 +245,10 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
+
+        private void setState(String state) {
+            this.state = state;
+        }
     }
     // Positive LM: Concrete all relations in SM that has super StateMachines.
     @StateMachine
@@ -281,6 +293,10 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
 
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
+
+        private void setState(String state) {
+            this.state = state;
+        }
     }
     // Relation Negative Test
     // Relation in InboundWhile or InboundWhiles not binded in LM.
@@ -352,8 +368,12 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         @Transition
         void s8_X() {}
 
-        String getState() {
+        public String getState() {
             return state;
+        }
+
+        private void setState(String state) {
+            this.state = state;
         }
     }
     // Relation Negative Test
@@ -375,6 +395,10 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         String getState() {
             return state;
         }
+
+        private void setState(String state) {
+            this.state = state;
+        }
     }
     // Relation Negative Test
     // Relation in Super StateMachine not binded in LM.
@@ -387,16 +411,20 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         void s5_X() {}
 
         @Transition
-        void s5_Y(@Relation(R2_S.class) PLM_R2_S r2_S) {}
+        void s5_Y(@Relation(S6_R2.class) PLM_R2_S r2_S) {}
 
         @Transition
         void s5_B_X() {}
 
-        @Relation(S5_B_R1.class)
+        @Relation(S6_R1.class)
         PLM_R1_S r1_S = null;
 
         String getState() {
             return state;
+        }
+
+        private void setState(String state) {
+            this.state = state;
         }
     }
     // Relation Negative Test
@@ -421,7 +449,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         String getState() {
             return state;
         }
-        
+
         private void setState(String state) {
             this.state = state;
         }
@@ -438,12 +466,15 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         String getState() {
             return state;
         }
+
         private void setState(String state) {
             this.state = state;
         }
     }
     @LifecycleMeta(S4.class)
     static class NLM_7 {
+
+        String state;
 
         @Transition(S4.Transitions.X.class)
         void tM1(@Relation(R1.class) PLM_R1_S x) {}
@@ -466,6 +497,10 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
 
         public String getState() {
             return null;
+        }
+
+        private void setState(String state) {
+            this.state = state;
         }
     }
 }

@@ -2,6 +2,7 @@ package net.madz.lifecycle.meta.template;
 
 import net.madz.common.Dumpable;
 import net.madz.lifecycle.meta.Recoverable;
+import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.meta.FlavorMetaData;
 import net.madz.meta.MetaData;
 
@@ -14,7 +15,6 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
 
     String getSimpleName();
 
-    StateMetadata onTransition(TransitionMetadata transition);
 
     boolean isInitial();
 
@@ -74,4 +74,7 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
 
     /* For Shortcut State inside a composite state */
     StateMetadata getLinkTo();
+
+    FunctionMetadata[] getFunctionMetadata();
+
 }

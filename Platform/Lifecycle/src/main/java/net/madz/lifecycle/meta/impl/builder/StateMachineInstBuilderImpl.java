@@ -9,7 +9,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.StateConverter;
@@ -21,8 +26,12 @@ import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.builder.TransitionInstBuilder;
+import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.lifecycle.meta.instance.StateInst;
 import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.template.RelationMetadata;
+import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.verification.VerificationException;
@@ -32,6 +41,8 @@ public class StateMachineInstBuilderImpl extends
         AnnotationMetaBuilderBase<StateMachineInstBuilder, StateMachineMetaBuilder> implements StateMachineInstBuilder {
 
     private StateMachineMetaBuilder template;
+    private HashMap<Object, TransitionInst> transitionInsts = new HashMap<>();
+    private HashMap<TransitionMetadata, LinkedList<TransitionInst>> transitionMetadataInstsMap = new HashMap<>();
 
     public StateMachineInstBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
@@ -59,8 +70,142 @@ public class StateMachineInstBuilderImpl extends
         verifyRelationsAllBeCoveraged(klass);
     }
 
-    private void verifyRelationsAllBeCoveraged(Class<?> klass) {
-        // TODO Auto-generated method stub
+    private void verifyRelationsAllBeCoveraged(Class<?> klass) throws VerificationException {
+        StateMetadata[] allStates = getTemplate().getAllStates();
+        for ( StateMetadata state : allStates ) {
+            for ( RelationMetadata relation : state.getValidWhiles() ) {
+                for ( TransitionMetadata transition : state.getPossibleTransitions() ) {
+                    verifyRelationBeCovered(klass, relation, transition);
+                }
+            }
+            for ( RelationMetadata relation : state.getInboundWhiles() ) {
+                for ( TransitionMetadata transition : getTransitionsToState(state) ) {
+                    verifyRelationBeCovered(klass, relation, transition);
+                }
+            }
+        }
+    }
+
+    private TransitionMetadata[] getTransitionsToState(StateMetadata state) {
+        final ArrayList<TransitionMetadata> transitions = new ArrayList<TransitionMetadata>();
+        for ( final StateMetadata stateMetadata : getTemplate().getAllStates() ) {
+            for ( final TransitionMetadata transitionMetadata : stateMetadata.getPossibleTransitions() ) {
+                if ( isTransitionIn(state, transitionMetadata) ) {
+                    transitions.add(transitionMetadata);
+                }
+            }
+        }
+        return transitions.toArray(new TransitionMetadata[0]);
+    }
+
+    private boolean isTransitionIn(StateMetadata state, TransitionMetadata transitionMetadata) {
+        for ( final StateMetadata stateMetadata : getTemplate().getAllStates() ) {
+            for ( FunctionMetadata item : stateMetadata.getFunctionMetadata() ) {
+                if ( item.getTransition().getDottedPath().equals(transitionMetadata.getDottedPath()) ) {
+                    for ( StateMetadata nextState : item.getNextStates() ) {
+                        if ( nextState.getDottedPath() == state.getDottedPath() ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void verifyRelationBeCovered(Class<?> klass, final RelationMetadata relation,
+            final TransitionMetadata transition) throws VerificationException {
+        final TransitionMethodScanner scanner = new TransitionMethodScanner(transition);
+        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        final Method[] transitionMethods = scanner.getTransitionMethods();
+        NEXT_TRANSITION_METHOD: for ( final Method method : transitionMethods ) {
+            if ( hasRelationOnMethodParameters(relation, method) ) continue NEXT_TRANSITION_METHOD;
+            // Continue to check in field and property method
+            if ( !klass.isInterface() && scanFieldsRelation(klass, relation) ) continue NEXT_TRANSITION_METHOD;
+            final RelationGetterScanner relationGetterScanner = new RelationGetterScanner(relation);
+            scanMethodsOnClasses(new Class[] { klass }, null, relationGetterScanner);
+            if ( relationGetterScanner.isCovered() ) continue NEXT_TRANSITION_METHOD;
+            throw new VerificationException(newVerificationFailure(getDottedPath(),
+                    Errors.LM_RELATION_NOT_BE_CONCRETED, method.getName(), klass.getName(), relation.getDottedPath()
+                            .getName(), relation.getParent().getDottedPath()));
+        }
+    }
+
+    private boolean hasRelationOnMethodParameters(final RelationMetadata relation, final Method method)
+            throws VerificationException {
+        for ( Annotation[] annotations : method.getParameterAnnotations() ) {
+            for ( Annotation annotation : annotations ) {
+                if ( annotation instanceof Relation ) {
+                    Relation r = (Relation) annotation;
+                    if ( Null.class == r.value() ) {
+                        throw newVerificationException(getDottedPath(),
+                                Errors.LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE, method);
+                    }
+                    if ( isKeyOfRelationMetadata(relation, r.value()) ) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean scanFieldsRelation(Class<?> klass, final RelationMetadata relation) {
+        for ( Class c = klass; Object.class != c; c = c.getSuperclass() ) {
+            for ( Field field : c.getDeclaredFields() ) {
+                if ( hasRelationOnField(relation, field) ) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasRelationOnField(final RelationMetadata relation, Field field) {
+        Relation r = field.getAnnotation(Relation.class);
+        if ( null == r ) return false;
+        if ( Null.class != r.value() ) {
+            if ( isKeyOfRelationMetadata(relation, r.value()) ) {
+                return true;
+            }
+        } else {
+            if ( isKeyOfRelationMetadata(relation, upperFirstChar(field.getName())) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isKeyOfRelationMetadata(final RelationMetadata relation, Object key) {
+        return relation.getKeySet().contains(key);
+    }
+
+    private final class TransitionMethodScanner implements MethodScanner {
+
+        private final TransitionMetadata transition;
+
+        public TransitionMethodScanner(final TransitionMetadata transition) {
+            this.transition = transition;
+        }
+
+        private ArrayList<Method> transitionMethodList = new ArrayList<Method>();
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            final Transition transitionAnno = method.getAnnotation(Transition.class);
+            if ( null != transitionAnno ) {
+                if ( Null.class != transitionAnno.value() ) {
+                    if ( transitionAnno.value().getSimpleName().equals(transition.getDottedPath().getName()) ) {
+                        transitionMethodList.add(method);
+                    }
+                } else {
+                    if ( upperFirstChar(method.getName()).equals(transition.getDottedPath().getName()) ) {
+                        transitionMethodList.add(method);
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Method[] getTransitionMethods() {
+            return transitionMethodList.toArray(new Method[0]);
+        }
     }
 
     private void verifyRelationInstancesDefinedCorrectly(Class<?> klass) throws VerificationException {
@@ -82,8 +227,8 @@ public class StateMachineInstBuilderImpl extends
         }
         RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner();
         final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class<?>[] { klass },verificationFailureSet, scanner);
-        if (verificationFailureSet.size() > 0) {
+        scanMethodsOnClasses(new Class<?>[] { klass }, verificationFailureSet, scanner);
+        if ( verificationFailureSet.size() > 0 ) {
             throw new VerificationException(verificationFailureSet);
         }
     }
@@ -103,6 +248,41 @@ public class StateMachineInstBuilderImpl extends
                 }
             }
             return false;
+        }
+    }
+    private final class RelationGetterScanner implements MethodScanner {
+
+        private RelationMetadata relationMetadata;
+
+        public RelationGetterScanner(RelationMetadata relation) {
+            this.relationMetadata = relation;
+        }
+
+        public boolean covered = false;
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            if ( method.getName().startsWith("get") ) {
+                Relation relation = method.getAnnotation(Relation.class);
+                if ( null != relation ) {
+                    if ( Null.class == relation.value() ) {
+                        if ( isKeyOfRelationMetadata(relationMetadata, method.getName().substring(3)) ) {
+                            covered = true;
+                            return true;
+                        }
+                    } else {
+                        if ( isKeyOfRelationMetadata(relationMetadata, relation.value()) ) {
+                            covered = true;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public boolean isCovered() {
+            return covered;
         }
     }
 
@@ -125,8 +305,43 @@ public class StateMachineInstBuilderImpl extends
         verifyRelationInstanceOnFieldNotBeyondStateMachine(klass.getSuperclass());
     }
 
-    private void verifyRelationInstancesUnique(Class<?> klass) {
-        // TODO Auto-generated method stub
+    private void verifyRelationInstancesUnique(Class<?> klass) throws VerificationException {
+        final Set<Class<?>> relations = new HashSet<>();
+        for ( Field field : klass.getDeclaredFields() ) {
+            final Relation relation = field.getAnnotation(Relation.class);
+            checkRelationInstanceWhetherExists(klass, relations, relation);
+        }
+        for ( final Method method : klass.getDeclaredMethods() ) {
+            if ( method.getName().startsWith("get") && method.getTypeParameters().length <= 0 ) {
+                if ( method.getAnnotation(Relation.class) != null ) {
+                    checkRelationInstanceWhetherExists(klass, relations, method.getAnnotation(Relation.class));
+                }
+            } else {
+                if ( method.getAnnotation(Relation.class) != null ) {
+                    final Set<Class<?>> methodRelations = new HashSet<>();
+                    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+                    for ( final Annotation[] annotations : parameterAnnotations ) {
+                        for ( final Annotation annotation : annotations ) {
+                            if ( annotation instanceof Relation ) {
+                                final Relation r = (Relation) annotation;
+                                checkRelationInstanceWhetherExists(klass, methodRelations, r);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkRelationInstanceWhetherExists(Class<?> klass, final Set<Class<?>> relations,
+            final Relation relation) throws VerificationException {
+        if ( null != relation ) {
+            if ( relations.contains(relation.value()) ) {
+                throw newVerificationException(getDottedPath(), Errors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE,
+                        klass.getName(), relation.value().getName());
+            }
+            relations.add(relation.value());
+        }
     }
 
     private void verifyStateIndicator(Class<?> klass) throws VerificationException {
@@ -465,6 +680,23 @@ public class StateMachineInstBuilderImpl extends
         }
         if ( null != transitionMetadata ) {
             verifySpecialTransitionMethodHasZeroArgument(method, failureSet, transitionMetadata);
+            configureTransitionInst(method, transitionMetadata);
+        }
+    }
+
+    private void configureTransitionInst(final Method method, final TransitionMetadata transitionMetadata) {
+        final TransitionInstBuilderImpl transitionInstBuilder = new TransitionInstBuilderImpl(this, method,
+                transitionMetadata);
+        final Iterator<Object> iterator = transitionInstBuilder.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            this.transitionInsts.put(iterator.next(), transitionInstBuilder.getMetaData());
+        }
+        if ( null == transitionMetadataInstsMap.get(transitionMetadata) ) {
+            final LinkedList<TransitionInst> insts = new LinkedList<>();
+            insts.add(transitionInstBuilder.getMetaData());
+            transitionMetadataInstsMap.put(transitionMetadata, insts);
+        } else {
+            transitionMetadataInstsMap.get(transitionMetadata).add(transitionInstBuilder.getMetaData());
         }
     }
 
@@ -525,20 +757,21 @@ public class StateMachineInstBuilderImpl extends
 
     @Override
     public TransitionInst[] getTransitionSet() {
-        // TODO Auto-generated method stub
-        return null;
+        if ( null != this.transitionInsts.values() ) {
+            return this.transitionInsts.values().toArray(new TransitionInst[0]);
+        } else {
+            return new TransitionInst[0];
+        }
     }
 
     @Override
     public boolean hasTransition(Object transitionKey) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.transitionInsts.containsKey(transitionKey);
     }
 
     @Override
     public TransitionInst getTransition(Object transitionKey) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.transitionInsts.get(transitionKey);
     }
 
     @Override

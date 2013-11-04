@@ -111,9 +111,25 @@ public interface Errors {
     public static final String RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION = "002-3503";
     /**
      * @param {0} @LifecycleMeta Class
-     * @param {1} invalid relation
+     * @param {1} invalid relation instance
      * @param {2} StateMachine
      */
     public static final String LM_REFERENCE_INVALID_RELATION_INSTANCE = "002-3221";
+    /**
+     * @param {0} @LifecycleMeta Class
+     * @param {1} relation instance
+     */
     public static final String LM_RELATION_INSTANCE_MUST_BE_UNIQUE = "002-3222";
+    /**
+     * @param {0} method
+     * @param {1} @LifecycleMeta Class
+     * @param {2} relation
+     * @param {3} state
+     */
+    public static final String LM_RELATION_NOT_BE_CONCRETED = "002-3223";
+    /**
+     * @param {0} method
+     * 
+     */
+    public static final String LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE = "002-3224";
 }
