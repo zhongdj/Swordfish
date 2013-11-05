@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.madz.common.Dumper;
@@ -28,6 +29,7 @@ import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -803,5 +805,64 @@ public class StateMachineMetaBuilderImpl extends
             }
         }
         return findState(stateMachine.getSuperStateMachine(), stateKey);
+    }
+
+    @Override
+    public ConditionMetadata[] getDeclaredConditions() {
+        return this.conditionList.toArray(new ConditionMetadata[0]);
+    }
+
+    @Override
+    public ConditionMetadata[] getAllCondtions() {
+        final LinkedList<ConditionMetadata> conditions = new LinkedList<ConditionMetadata>();
+        getCondition(this, conditions);
+        return conditions.toArray(new ConditionMetadata[0]);
+    }
+
+    private void getCondition(final StateMachineMetadata stateMachine, final LinkedList<ConditionMetadata> conditions) {
+        if ( null == stateMachine ) {
+            return;
+        }
+        for ( ConditionMetadata conditionMetadata : stateMachine.getDeclaredConditions() ) {
+            conditions.add(conditionMetadata);
+        }
+        for ( StateMachineMetadata item : stateMachine.getCompositeStateMachines() ) {
+            for ( ConditionMetadata conditionMetadata : item.getDeclaredConditions() ) {
+                conditions.add(conditionMetadata);
+            }
+        }
+        getCondition(stateMachine.getSuperStateMachine(), conditions);
+    }
+
+    @Override
+    public ConditionMetadata getCondtion(Object conditionKey) {
+        if ( null != this.conditionMap.get(conditionKey) ) {
+            return this.conditionMap.get(conditionKey);
+        }
+        for ( StateMachineMetaBuilder item : this.compositeStateMachineList ) {
+            if ( null != item.getCondtion(conditionKey) ) {
+                return item.getCondtion(conditionKey);
+            }
+        }
+        if ( hasSuper() ) {
+            return getSuperStateMachine().getCondtion(conditionKey);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean hasCondition(Object conditionKey) {
+        if ( this.conditionMap.containsKey(conditionKey) ) {
+            return true;
+        }
+        for ( StateMachineMetaBuilder stateMachineMetaBuilder : this.getCompositeStateMachines() ) {
+            if ( stateMachineMetaBuilder.hasCondition(conditionKey) ) {
+                return true;
+            }
+        }
+        if ( hasSuper() ) {
+            return getSuperStateMachine().hasCondition(conditionKey);
+        }
+        return false;
     }
 }

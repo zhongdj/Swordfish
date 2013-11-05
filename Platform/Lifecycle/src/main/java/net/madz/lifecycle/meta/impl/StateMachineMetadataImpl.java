@@ -3,6 +3,7 @@ package net.madz.lifecycle.meta.impl;
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -230,5 +231,29 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     public StateMetadata getState(Object stateKey) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public ConditionMetadata[] getDeclaredConditions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ConditionMetadata[] getAllCondtions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ConditionMetadata getCondtion(Object conditionKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean hasCondition(Object conditionKey) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

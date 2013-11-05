@@ -106,4 +106,34 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
     StateMetadata[] getShortcutStateSet();
 
     StateMachineMetadata[] getCompositeStateMachines();
+
+    /* //////////////////////////////////////////////////// */
+    /* //////// Methods For Conditions /////// */
+    /* //////////////////////////////////////////////////// */
+    /**
+     * @return condition metadata defined in current state machine and current
+     *         composite state machines.
+     */
+    ConditionMetadata[] getDeclaredConditions();
+
+    /**
+     * @return all condition metadata defined in current state machine, current
+     *         composite state machines, super state machine, super state
+     *         machine's composite state machines.
+     */
+    ConditionMetadata[] getAllCondtions();
+
+    /**
+     * @param conditionKey
+     * @return condition metadata in the state machine's inheritance hierarchy,
+     *         including composite state machines.
+     */
+    ConditionMetadata getCondtion(Object conditionKey);
+
+    /**
+     * @param conditionKey
+     * @return true if the condition can by found in the state machine's
+     *         inheritance hierarchy and composite state machines.
+     */
+    boolean hasCondition(Object conditionKey);
 }
