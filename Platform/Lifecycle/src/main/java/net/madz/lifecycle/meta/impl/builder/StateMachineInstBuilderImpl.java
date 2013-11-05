@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.madz.lifecycle.Errors;
@@ -21,16 +20,18 @@ import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
-import net.madz.lifecycle.meta.builder.TransitionInstBuilder;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.lifecycle.meta.instance.StateInst;
 import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.RelationMetadata;
+import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
@@ -63,6 +64,96 @@ public class StateMachineInstBuilderImpl extends
         verifyTransitionMethods(klass);
         verifyStateIndicator(klass);
         verifyRelations(klass);
+        verifyConditions(klass);
+    }
+
+    private void verifyConditions(Class<?> klass) throws VerificationException {
+        verifyConditionReferenceValid(klass);
+        verifyAllConditionBeCovered(klass);
+    }
+
+    private void verifyAllConditionBeCovered(Class<?> klass) throws VerificationException {
+        for ( ConditionMetadata conditionMetadata : getTemplate().getAllCondtions() ) {
+            verifyConditionBeCovered(klass, conditionMetadata);
+        }
+    }
+
+    private void verifyConditionBeCovered(Class<?> klass, final ConditionMetadata conditionMetadata)
+            throws VerificationException {
+        final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
+        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        if ( !scanner.isCovered() ) {
+            throw newVerificationException(getDottedPath(), Errors.LM_CONDITION_NOT_COVERED, klass,
+                    getTemplate().getDottedPath(), conditionMetadata.getDottedPath());
+        }
+    }
+
+    private final class ScannerForVerifyConditionCoverage implements MethodScanner {
+
+        private final ConditionMetadata conditionMetadata;
+        private boolean covered = false;
+
+        public ScannerForVerifyConditionCoverage(ConditionMetadata conditionMetadata) {
+            this.conditionMetadata = conditionMetadata;
+        }
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            final Condition condition = method.getAnnotation(Condition.class);
+            if ( null != condition ) {
+                if ( conditionMetadata.getKeySet().contains(condition.value()) ) {
+                    covered = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean isCovered() {
+            return covered;
+        }
+    }
+
+    private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class[] { klass }, failureSet, new ConditionProviderMethodScanner(klass,
+                getTemplate()));
+        if ( failureSet.size() > 0 ) {
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    private final class ConditionProviderMethodScanner implements MethodScanner {
+
+        private HashSet<Class<?>> conditions = new HashSet<>();
+        private StateMachineMetadata template;
+        private Class<?> klass;
+
+        public ConditionProviderMethodScanner(Class<?> klass, StateMachineMetadata template) {
+            this.template = template;
+            this.klass = klass;
+        }
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            final Condition condition = method.getAnnotation(Condition.class);
+            if ( null != condition ) {
+                if ( template.hasCondition(condition.value()) ) {
+                    if ( conditions.contains(condition.value()) ) {
+                        failureSet
+                                .add(newVerificationException(klass.getName(),
+                                        Errors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
+                                        condition.value()));
+                    } else {
+                        conditions.add(condition.value());
+                    }
+                } else {
+                    failureSet.add(newVerificationException(klass.getName(), Errors.LM_CONDITION_REFERENCE_INVALID,
+                            method, condition.value()));
+                }
+            }
+            return false;
+        }
     }
 
     private void verifyRelations(Class<?> klass) throws VerificationException {
