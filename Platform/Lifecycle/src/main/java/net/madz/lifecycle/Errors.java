@@ -56,7 +56,6 @@ public interface Errors {
     public static final String LM_METHOD_NAME_INVALID = "002-3213";
     public static final String LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD = "002-3214";
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
-    public static final String LM_MUST_CONCRETE_ALL_CONDITIONS = "002-3230";
     /**
      * @param {0} class annotated with @LifecycleMeta
      */
@@ -132,4 +131,21 @@ public interface Errors {
      * 
      */
     public static final String LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE = "002-3224";
+    
+    /**
+     * @param {0} @LifecycleMeta class
+     * @param {1} @StateMachine dottedPath
+     * @param {2} Condition Class
+     */
+    public static final String LM_CONDITION_NOT_COVERED = "002-3230";
+    /**
+     * @param {0} Method full qualified name
+     * @param {1} Invalid condition class
+     */
+    public static final String LM_CONDITION_REFERENCE_INVALID = "002-3231";
+    /**
+     * @param {0} @LifecycleMeta class
+     * @param {1} Condition class
+     */
+    public static final String LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION = "002-3232";
 }
