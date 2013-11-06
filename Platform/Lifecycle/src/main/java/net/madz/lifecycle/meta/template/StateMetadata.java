@@ -15,7 +15,6 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
 
     String getSimpleName();
 
-
     boolean isInitial();
 
     boolean isFinal();
@@ -59,7 +58,7 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
      *         valid ONLY in a subset of parent life cycle states, so does the
      *         parent object, the validation will go up along the parent's
      *         parent recursively.
-     *         
+     * 
      */
     RelationMetadata[] getValidWhiles();
 
@@ -75,6 +74,7 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
     /* For Shortcut State inside a composite state */
     StateMetadata getLinkTo();
 
-    FunctionMetadata[] getFunctionMetadata();
+    FunctionMetadata[] getDeclaredFunctionMetadata();
 
+    FunctionMetadata getDeclaredFunctionMetadata(Object functionKey);
 }
