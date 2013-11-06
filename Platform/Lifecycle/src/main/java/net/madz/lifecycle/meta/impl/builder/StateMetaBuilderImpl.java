@@ -3,6 +3,7 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import net.madz.common.DottedPath;
@@ -45,8 +46,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private StateMetadata superStateMetadata;
     private LinkedList<RelationMetadata> validWhileRelations = new LinkedList<RelationMetadata>();
     private LinkedList<RelationMetadata> inboundWhileRelations = new LinkedList<RelationMetadata>();
-    private HashMap<TransitionMetadata, FunctionMetadata> functionMetadataMap = new HashMap<>();
-    private final LinkedList<TransitionMetadata> possibleTransitions = new LinkedList<TransitionMetadata>();
+    private HashMap<Object, FunctionMetadata> functionMetadataMap = new HashMap<>();
+    private ArrayList<TransitionMetadata> possibleTransitionList = new ArrayList<>();
+    private ArrayList<FunctionMetadata> functionMetadataList = new ArrayList<>();
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -127,12 +129,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public TransitionMetadata[] getPossibleTransitions() {
-        return this.functionMetadataMap.keySet().toArray(new TransitionMetadata[0]);
+        return this.possibleTransitionList.toArray(new TransitionMetadata[0]);
     }
 
     @Override
-    public FunctionMetadata[] getFunctionMetadata() {
-        return this.functionMetadataMap.values().toArray(new FunctionMetadata[0]);
+    public FunctionMetadata[] getDeclaredFunctionMetadata() {
+        return this.functionMetadataList.toArray(new FunctionMetadata[0]);
     }
 
     @Override
@@ -201,8 +203,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     @Override
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         verifyBasicSyntax(clazz);
-        addKeys(clazz);
         configureSupperState(clazz);
+        addKeys(clazz);
         return this;
     }
 
@@ -250,8 +252,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     @Override
-    public void configureFunctions(Class<?> clazz) throws VerificationException {
-        verifyFunctions(clazz);
+    public void configureFunctions(Class<?> stateClass) throws VerificationException {
+        for ( Function function : verifyFunctions(stateClass) ) {
+            verifyFunction(stateClass, function);
+            configureFunction(this, function);
+        }
     }
 
     @Override
@@ -264,29 +269,50 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         this.compositeStateMachine = parent.getRegistry().loadStateMachineMetadata(stateClass, parent);
     }
 
-    private void verifyFunctions(Class<?> stateClass) throws VerificationException {
+    private ArrayList<Function> verifyFunctions(Class<?> stateClass) throws VerificationException {
         if ( isFinalState(stateClass) ) {
-            return;
+            return new ArrayList<>();
         }
         final ArrayList<Function> functionList = new ArrayList<>();
+        final HashSet<Class<?>> transitionClassSet = new HashSet<>();
         if ( null != stateClass.getAnnotation(Function.class) ) {
-            functionList.add(stateClass.getAnnotation(Function.class));
+            final Function function = stateClass.getAnnotation(Function.class);
+            addFunction(stateClass, functionList, transitionClassSet, function);
         } else if ( null != stateClass.getAnnotation(Functions.class) ) {
             for ( Function function : stateClass.getAnnotation(Functions.class).value() ) {
-                functionList.add(function);
+                addFunction(stateClass, functionList, transitionClassSet, function);
             }
         }
         if ( 0 == functionList.size() && null != this.superStateMetadata ) {
-            return;
+            return new ArrayList<>();
         }
         if ( 0 == functionList.size() && !this.compositeState ) {
             throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
                     stateClass.getName());
         }
-        for ( Function function : functionList ) {
-            verifyFunction(stateClass, function);
-            configureFunction(this, function);
+        return functionList;
+    }
+
+    private void addFunction(Class<?> stateClass, final ArrayList<Function> functionList,
+            final HashSet<Class<?>> transitionClassSet, Function function) throws VerificationException {
+        if ( transitionClassSet.contains(function.transition()) || !isOverriding()
+                && superStateHasFunction(function.transition()) ) {
+            throw newVerificationException(getDottedPath(),
+                    Errors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION, stateClass, function.transition());
+        } else {
+            functionList.add(function);
+            transitionClassSet.add(function.transition());
         }
+    }
+
+    private boolean superStateHasFunction(Class<?> transitionClass) {
+        for ( StateMetadata metadata = isOverriding() ? null : getSuperStateMetadata(); null != metadata; metadata = metadata
+                .isOverriding() ? null : metadata.getSuperStateMetadata() ) {
+            if ( null != metadata.getDeclaredFunctionMetadata(transitionClass) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void configureFunction(StateMetaBuilderImpl parent, Function function) {
@@ -298,6 +324,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         }
         final FunctionMetadata functionMetadata = new FunctionMetadata(parent, transition, nextStates);
         this.functionMetadataMap.put(functionMetadata.getTransition(), functionMetadata);
+        this.functionMetadataMap.put(function.transition(), functionMetadata);
+        this.functionMetadataList.add(functionMetadata);
+        this.possibleTransitionList.add(transition);
     }
 
     private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
@@ -534,5 +563,10 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             inboundWhileList.add(inboundWhile);
         }
         return inboundWhileList;
+    }
+
+    @Override
+    public FunctionMetadata getDeclaredFunctionMetadata(Object functionKey) {
+        return this.functionMetadataMap.get(functionKey);
     }
 }
