@@ -48,6 +48,7 @@ public class StateMachineSemanticsMetadata {
         @StateSet
         public static interface States extends S1.States {
 
+            @Initial
             @Overrides
             @Function(transition = S2_Z.class, value = { S1_C.class })
             public static interface S2_A extends S1.States.S1_A {}
@@ -67,9 +68,8 @@ public class StateMachineSemanticsMetadata {
                 }
                 @TransitionSet
                 public static interface S2_B_Transitions {
-                    public static interface S2_B_Transitions_X {
-                        
-                    }
+
+                    public static interface S2_B_Transitions_X {}
                 }
             }
         }
@@ -85,14 +85,12 @@ public class StateMachineSemanticsMetadata {
         @StateSet
         public static interface States extends S2.States {
 
+            @Initial
             @Overrides
             @Function(transition = S3_Z.class, value = { S1_D.class })
             public static interface S3_A extends S2_A {}
-            
             @CompositeStateMachine
-            public static interface S3_E extends S2.States.S2_B {
-                
-            }
+            public static interface S3_E extends S2.States.S2_B {}
         }
         @TransitionSet
         public static interface Transitions extends S2.Transitions {
