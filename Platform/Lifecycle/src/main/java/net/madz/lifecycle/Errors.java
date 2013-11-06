@@ -71,6 +71,12 @@ public interface Errors {
      * @param {2} transitionType
      */
     public static final String TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER = "002-2502";
+    /**
+     * @param {0} Transition class
+     * @param {1} condition class
+     * @param {2} juder class
+     */
+    public static final String TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER = "002-2503";
     // State's Function
     public static final String FUNCTION_INVALID_TRANSITION_REFERENCE = "002-2610";
     public static final String FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION = "002-2611";
@@ -203,4 +209,9 @@ public interface Errors {
      * @param {1} Condition class
      */
     public static final String LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION = "002-3232";
+    /**
+     * @param {0} Method class
+     * @param {1} Condition class
+     */
+    public static final String LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE = "002-3233";
 }
