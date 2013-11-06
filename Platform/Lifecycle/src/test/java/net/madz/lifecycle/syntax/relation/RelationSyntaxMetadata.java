@@ -246,7 +246,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = CC.class)
+            @Function(transition = PChild.Transitions.PCX.class, value = CC.class)
             static interface CA extends Super.States.SA {}
             @Function(transition = PChild.Transitions.PCX.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { RelatedSM.States.RB.class })
@@ -266,7 +266,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = NCC.class)
+            @Function(transition = NChild.Transitions.NCX.class, value = NCC.class)
             static interface NCA extends Super.States.SA {}
             @Function(transition = NChild.Transitions.NCX.class, value = SB.class)
             @InboundWhile(relation = PStandalone.Relations.PR.class, on = { InvalidRelationReferenceSM.States.B.class })
@@ -286,7 +286,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = NC2C.class)
+            @Function(transition = NChild2.Transitions.NC2X.class, value = NC2C.class)
             static interface NCA extends Super.States.SA {}
             @Function(transition = NChild2.Transitions.NC2X.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { InvalidRelationReferenceSM.States.B.class })
@@ -306,7 +306,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = NC3C.class)
+            @Function(transition = NChild3.Transitions.NC3X.class, value = NC3C.class)
             static interface NC3A extends Super.States.SA {}
             @Function(transition = NChild3.Transitions.NC3X.class, value = SB.class)
             @InboundWhile(relation = PStandalone.Relations.PR.class, on = { InvalidRelationReferenceSM.States.B.class })
@@ -326,7 +326,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends Super.States {
 
-            @Function(transition = Super.Transitions.SX.class, value = NC4C.class)
+            @Function(transition = NChild4.Transitions.NC4X.class, value = NC4C.class)
             static interface NC4A extends Super.States.SA {}
             @Function(transition = NChild4.Transitions.NC4X.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { InvalidRelationReferenceSM.States.B.class })
