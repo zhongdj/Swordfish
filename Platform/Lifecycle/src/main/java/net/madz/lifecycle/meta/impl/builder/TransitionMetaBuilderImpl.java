@@ -1,7 +1,12 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import net.madz.common.Dumper;
+import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.action.Conditional;
+import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.action.Corrupt;
 import net.madz.lifecycle.annotations.action.Fail;
 import net.madz.lifecycle.annotations.action.Recover;
@@ -13,6 +18,7 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
 import net.madz.meta.MetaDataFilterable;
+import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class TransitionMetaBuilderImpl extends
@@ -31,7 +37,7 @@ public class TransitionMetaBuilderImpl extends
     public void verifyMetaData(VerificationFailureSet verificationSet) {}
 
     @Override
-    public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) {
+    public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         configureCondition(clazz);
         configureType(clazz);
         addKeys(clazz);
@@ -52,14 +58,30 @@ public class TransitionMetaBuilderImpl extends
         }
     }
 
-    private void configureCondition(Class<?> clazz) {
+    private void configureCondition(Class<?> clazz) throws VerificationException {
         Conditional conditionalAnno = clazz.getAnnotation(Conditional.class);
         if ( null != conditionalAnno ) {
             conditional = true;
             conditionClass = conditionalAnno.condition();
             judgerClass = conditionalAnno.judger();
+            verifyJudgerClass(clazz, judgerClass, conditionClass);
         } else {
             conditional = false;
+        }
+    }
+
+    private void verifyJudgerClass(Class<?> clazz, Class<?> judgerClass, Class<?> conditionClass)
+            throws VerificationException {
+        for ( Type type : judgerClass.getGenericInterfaces() ) {
+            if ( type instanceof ParameterizedType ) {
+                final ParameterizedType pType = (ParameterizedType) type;
+                if ( ConditionalTransition.class.isAssignableFrom((Class<?>) pType.getRawType())) {
+                    if (! conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]) ) {
+                        throw newVerificationException(getDottedPath(),
+                                Errors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass, judgerClass);
+                    }
+                }
+            }
         }
     }
 
