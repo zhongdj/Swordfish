@@ -5,21 +5,63 @@ public interface Errors {
     public static final String SYNTAX_ERROR_BUNDLE = "syntax_error";
     public static final String REGISTERED_META_ERROR = "002-1000";
     // StateMachine
+    /**
+     * @param {0} state machine class
+     */
     public static final String STATEMACHINE_SUPER_MUST_BE_STATEMACHINE = "002-2100";
+    /**
+     * @param {0} state machine class
+     */
     public static final String STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE = "002-2101";
+    /**
+     * @param {0} state machine class
+     */
     public static final String STATEMACHINE_CLASS_WITHOUT_ANNOTATION = "002-2102";
-    public static final String STATEMACHINE_WITHOUT_STATESET = "002-2201";
-    public static final String STATEMACHINE_MULTIPLE_STATESET = "002-2202";
-    public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2203";
-    public static final String STATEMACHINE_MULTIPLE_TRANSITIONSET = "002-2204";
-    public static final String STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES = "002-2205";
-    public static final String STATEMACHINE_MULTIPLE_CONDITIONSET = "002-2206";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_WITHOUT_STATESET = "002-2103";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_MULTIPLE_STATESET = "002-2104";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_WITHOUT_TRANSITIONSET = "002-2105";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_MULTIPLE_TRANSITIONSET = "002-2106";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES = "002-2107";
+    /**
+     * @param {0} state machine class
+     */
+    public static final String STATEMACHINE_MULTIPLE_CONDITIONSET = "002-2108";
     // StateSet
-    public static final String STATESET_WITHOUT_STATE = "002-2300";
-    public static final String STATESET_WITHOUT_INITAL_STATE = "002-2400";
+    /**
+     * @param {0} state set class
+     */
+    public static final String STATESET_WITHOUT_INITIAL_STATE = "002-2400";
+    /**
+     * @param {0} state set class
+     */
     public static final String STATESET_MULTIPLE_INITAL_STATES = "002-2401";
-    public static final String STATESET_WITHOUT_FINAL_STATE = "002-2500";
+    /**
+     * @param {0} state set class
+     */
+    public static final String STATESET_WITHOUT_FINAL_STATE = "002-2402";
+    /**
+     * @param {0} state set class
+     */
+    public static final String STATESET_WITHOUT_STATE = "002-2403";
     // TransitionSet
+    /**
+     * @param {0} transition set class
+     */
     public static final String TRANSITIONSET_WITHOUT_TRANSITION = "002-2501";
     /**
      * @param {0} method object
@@ -36,6 +78,20 @@ public interface Errors {
     public static final String FUNCTION_TRANSITION_MUST_BE_NOT_ON_END_STATE = "002-2613";
     public static final String FUNCTION_WITH_EMPTY_STATE_CANDIDATES = "002-2614";
     public static final String STATE_NON_FINAL_WITHOUT_FUNCTIONS = "002-2615";
+    /**
+     * @param {0} stateClass
+     * @param {1} transtionClass
+     */
+    public static final String STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION = "002-2616";
+    /**
+     * @param {0} stateClass
+     */
+    public static final String STATE_OVERRIDES_WITHOUT_SUPER_CLASS = "002-2617";
+    /**
+     * @param {0} stateClass
+     * @param {1} superStateClass
+     */
+    public static final String STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE = "002-2618";
     public static final String FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID = "002-2700";
     // State's Shortcut
     public static final String SHORT_CUT_INVALID = "002-2800";
@@ -131,7 +187,6 @@ public interface Errors {
      * 
      */
     public static final String LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE = "002-3224";
-    
     /**
      * @param {0} @LifecycleMeta class
      * @param {1} @StateMachine dottedPath
