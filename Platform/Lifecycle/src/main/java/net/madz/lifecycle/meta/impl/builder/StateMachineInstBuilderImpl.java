@@ -83,8 +83,8 @@ public class StateMachineInstBuilderImpl extends
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
         if ( !scanner.isCovered() ) {
-            throw newVerificationException(getDottedPath(), Errors.LM_CONDITION_NOT_COVERED, klass,
-                    getTemplate().getDottedPath(), conditionMetadata.getDottedPath());
+            throw newVerificationException(getDottedPath(), Errors.LM_CONDITION_NOT_COVERED, klass, getTemplate()
+                    .getDottedPath(), conditionMetadata.getDottedPath());
         }
     }
 
@@ -116,8 +116,8 @@ public class StateMachineInstBuilderImpl extends
 
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class[] { klass }, failureSet, new ConditionProviderMethodScanner(klass,
-                getTemplate()));
+        scanMethodsOnClasses(new Class[] { klass }, failureSet,
+                new ConditionProviderMethodScanner(klass, getTemplate()));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -145,6 +145,11 @@ public class StateMachineInstBuilderImpl extends
                                         Errors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
                                         condition.value()));
                     } else {
+                        if ( !condition.value().isAssignableFrom(method.getReturnType()) ) {
+                            failureSet.add(newVerificationException(klass.getName(),
+                                    Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE, method,
+                                    condition.value()));
+                        }
                         conditions.add(condition.value());
                     }
                 } else {
