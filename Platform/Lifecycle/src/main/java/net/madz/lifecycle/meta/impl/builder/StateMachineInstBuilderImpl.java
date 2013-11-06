@@ -191,7 +191,7 @@ public class StateMachineInstBuilderImpl extends
 
     private boolean isTransitionIn(StateMetadata state, TransitionMetadata transitionMetadata) {
         for ( final StateMetadata stateMetadata : getTemplate().getAllStates() ) {
-            for ( FunctionMetadata item : stateMetadata.getFunctionMetadata() ) {
+            for ( FunctionMetadata item : stateMetadata.getDeclaredFunctionMetadata() ) {
                 if ( item.getTransition().getDottedPath().equals(transitionMetadata.getDottedPath()) ) {
                     for ( StateMetadata nextState : item.getNextStates() ) {
                         if ( nextState.getDottedPath() == state.getDottedPath() ) {
