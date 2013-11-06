@@ -57,6 +57,7 @@ public class StateMachineMetaBuilderImpl extends
     private TransitionMetaBuilder corruptTransition;
     private TransitionMetaBuilder recoverTransition;
     private TransitionMetaBuilder redoTransition;
+    @SuppressWarnings("unused")
     private TransitionMetaBuilder failTransition;
     /* //////////////////////////////////////////////////// */
     /* ////////////// Fields For Condition /////////////// */
@@ -417,9 +418,24 @@ public class StateMachineMetaBuilderImpl extends
         final Class<?>[] stateClasses = findComponentClasses(clazz, StateSet.class);
         StateMetaBuilder stateBuilder = null;
         for ( Class<?> klass : stateClasses ) {
+            verifyStateClassBasic(klass);
             stateBuilder = new StateMetaBuilderImpl(this, klass.getSimpleName());
             final StateMetaBuilder stateMetaBuilder = stateBuilder.build(klass, this);
             addStateMetadata(klass, stateMetaBuilder);
+        }
+    }
+
+    private void verifyStateClassBasic(Class<?> klass) throws VerificationException {
+        if ( null != klass.getAnnotation(Overrides.class) ) {
+            if ( klass.isInterface() ) {
+                if ( 0 >= klass.getInterfaces().length ) {
+                    throw newVerificationException(getDottedPath() + ".StateSet." + klass.getSimpleName(),
+                            Errors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS, klass);
+                }
+            } else if ( null == klass.getSuperclass() ) {
+                throw newVerificationException(getDottedPath() + ".StateSet." + klass.getSimpleName(),
+                        Errors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS, klass);
+            }
         }
     }
 
@@ -542,31 +558,68 @@ public class StateMachineMetaBuilderImpl extends
         final String stateSetPath = clazz.getName() + ".StateSet";
         final String transitionSetPath = clazz.getName() + ".TransitionSet";
         if ( hasSuperMetadataClass(clazz) ) {
+            verifyStateOverrides(clazz);
+            return;
+        } else {
+            final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
+            if ( 0 == declaredClasses.length ) {
+                throw newVerificationException(clazz.getName(),
+                        Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES, new Object[] { clazz.getName() });
+            }
+            final List<Class<?>> stateClasses = findComponentClass(declaredClasses, StateSet.class);
+            final List<Class<?>> transitionClasses = findComponentClass(declaredClasses, TransitionSet.class);
+            final VerificationFailureSet vs = new VerificationFailureSet();
+            verifyStateSet(clazz, stateSetPath, stateClasses, vs);
+            verifyTransitionSet(clazz, transitionSetPath, transitionClasses, vs);
+            if ( vs.size() > 0 ) {
+                throw new VerificationException(vs);
+            }
+        }
+    }
+
+    private void verifyStateOverrides(Class<?> clazz) throws VerificationException {
+        final List<Class<?>> stateSetClasses = findComponentClass(clazz.getDeclaredClasses(), StateSet.class);
+        if ( 0 >= stateSetClasses.size() ) {
             return;
         }
-        final Class<?>[] declaredClasses = clazz.getDeclaredClasses();
-        if ( 0 == declaredClasses.length ) {
-            throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
-                    new Object[] { clazz.getName() });
+        Class<?> stateSetClass = stateSetClasses.get(0);
+        final Class<?>[] stateClasses = stateSetClass.getDeclaredClasses();
+        if ( 0 == stateClasses.length ) {
+            return;
         }
-        final List<Class<?>> stateClasses = findComponentClass(declaredClasses, StateSet.class);
-        final List<Class<?>> transitionClasses = findComponentClass(declaredClasses, TransitionSet.class);
-        final VerificationFailureSet vs = new VerificationFailureSet();
-        verifyStateSet(clazz, stateSetPath, stateClasses, vs);
-        verifyTransitionSet(clazz, transitionSetPath, transitionClasses, vs);
-        if ( vs.size() > 0 ) {
-            throw new VerificationException(vs);
+        verifyStateOverridesInitial(stateClasses);
+    }
+
+    private void verifyStateOverridesInitial(Class<?>[] stateClasses) throws VerificationException {
+        if ( 0 != findComponentClass(stateClasses, Initial.class).size() ) {
+            return;
         }
+        for ( Class<?> stateClass : stateClasses ) {
+            if ( hasSuperMetadataClass(stateClass) ) {
+                final Class<?> superStateClass = getSuperMetadataClass(stateClass);
+                if ( hasInitial(superStateClass) && hasOverrides(stateClass) ) {
+                    throw newVerificationException(getDottedPath() + ".StateSet",
+                            Errors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE, stateClass,
+                            superStateClass);
+                }
+            }
+        }
+    }
+
+    private boolean hasOverrides(Class<?> stateClass) {
+        return null != stateClass.getAnnotation(Overrides.class);
+    }
+
+    private boolean hasInitial(Class<?> superClass) {
+        return null != superClass.getAnnotation(Initial.class);
     }
 
     private VerificationFailureSet verifyStateSet(Class<?> clazz, final String stateSetPath,
             final List<Class<?>> stateClasses, final VerificationFailureSet vs) {
         if ( stateClasses.size() <= 0 ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_WITHOUT_STATESET, clazz));
         } else if ( stateClasses.size() > 1 ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_MULTIPLE_STATESET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATEMACHINE_MULTIPLE_STATESET, clazz));
         } else {
             verifyStateSetComponent(stateSetPath, stateClasses.get(0), vs);
         }
@@ -576,11 +629,9 @@ public class StateMachineMetaBuilderImpl extends
     private void verifyTransitionSet(Class<?> clazz, final String transitionSetPath,
             final List<Class<?>> transitionClasses, final VerificationFailureSet vs) {
         if ( transitionClasses.size() <= 0 ) {
-            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, clazz));
         } else if ( transitionClasses.size() > 1 ) {
-            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
-                    new Object[] { clazz.getName() }));
+            vs.add(newVerificationException(transitionSetPath, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET, clazz));
         } else {
             verifyTransitionSetComponent(transitionSetPath, transitionClasses.get(0), vs);
         }
@@ -590,8 +641,7 @@ public class StateMachineMetaBuilderImpl extends
             final VerificationFailureSet vs) {
         final Class<?>[] transitionSetClasses = transitionClass.getDeclaredClasses();
         if ( 0 == transitionSetClasses.length ) {
-            vs.add(newVerificationException(dottedPath, Errors.TRANSITIONSET_WITHOUT_TRANSITION,
-                    new Object[] { transitionClass.getName() }));
+            vs.add(newVerificationException(dottedPath, Errors.TRANSITIONSET_WITHOUT_TRANSITION, transitionClass));
         }
     }
 
@@ -599,21 +649,20 @@ public class StateMachineMetaBuilderImpl extends
             final VerificationFailureSet vs) {
         final Class<?>[] stateSetClasses = stateSetClass.getDeclaredClasses();
         if ( 0 == stateSetClasses.length ) {
-            vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE,
-                    new Object[] { stateSetClass.getName() }));
+            vs.add(newVerificationException(stateSetPath, Errors.STATESET_WITHOUT_STATE, stateSetClass));
         } else {
             List<Class<?>> initialClasses = findComponentClass(stateSetClasses, Initial.class);
             if ( initialClasses.size() == 0 ) {
-                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITAL_STATE,
-                        new Object[] { stateSetClass.getName() }));
+                vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_WITHOUT_INITIAL_STATE,
+                        stateSetClass));
             } else if ( initialClasses.size() > 1 ) {
                 vs.add(newVerificationException(stateSetPath + ".Initial", Errors.STATESET_MULTIPLE_INITAL_STATES,
-                        new Object[] { stateSetClass.getName() }));
+                        stateSetClass));
             }
             List<Class<?>> endClasses = findComponentClass(stateSetClasses, End.class);
             if ( endClasses.size() == 0 ) {
                 vs.add(newVerificationException(stateSetPath + ".Final", Errors.STATESET_WITHOUT_FINAL_STATE,
-                        new Object[] { stateSetClass.getName() }));
+                        stateSetClass));
             }
         }
     }
@@ -625,17 +674,16 @@ public class StateMachineMetaBuilderImpl extends
 
     private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
-            Class<?> superclass = clazz.getSuperclass();
+            final Class<?> superclass = clazz.getSuperclass();
             if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
                 throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                        new Object[] { superclass.getName() });
+                        superclass);
             }
         } else if ( clazz.isInterface() && clazz.getInterfaces().length > 0 ) {
             if ( clazz.getInterfaces().length > 1 ) {
-                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
-                        new Object[] { clazz.getName() });
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, clazz);
             }
-            Class<?> clz = clazz.getInterfaces()[0];
+            final Class<?> clz = clazz.getInterfaces()[0];
             if ( isComposite() ) {
                 //
             } else if ( null == clz.getAnnotation(StateMachine.class) ) {
@@ -645,8 +693,7 @@ public class StateMachineMetaBuilderImpl extends
         } else if ( clazz.isInterface() && clazz.getInterfaces().length <= 0 ) {
             if ( null == clazz.getAnnotation(StateMachine.class)
                     && null == clazz.getAnnotation(CompositeStateMachine.class) ) {
-                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
-                        clazz.getName());
+                throw newVerificationException(clazz.getName(), Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION, clazz);
             }
         }
     }
@@ -664,8 +711,11 @@ public class StateMachineMetaBuilderImpl extends
             Class<? extends Annotation> annotationClass) {
         ArrayList<Class<?>> stateClasses = new ArrayList<>();
         for ( Class<?> klass : declaredClasses ) {
-            if ( null != klass.getAnnotation(annotationClass) ) {
-                stateClasses.add(klass);
+            for ( Annotation annotation : klass.getDeclaredAnnotations() ) {
+                if ( annotation.annotationType().equals(annotationClass) ) {
+                    stateClasses.add(klass);
+                    break;
+                }
             }
         }
         return stateClasses;
