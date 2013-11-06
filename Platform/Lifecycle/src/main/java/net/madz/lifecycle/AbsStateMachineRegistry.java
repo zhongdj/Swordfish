@@ -91,7 +91,7 @@ public abstract class AbsStateMachineRegistry {
                     return;
                 }
                 final StateMachineMetadata metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
-                if (null == metaData) {
+                if ( null == metaData ) {
                     continue;
                 }
                 StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
@@ -99,7 +99,7 @@ public abstract class AbsStateMachineRegistry {
                 addInstance(clazz, stateMachineInstance);
             } else {
                 final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
-                        Errors.REGISTERED_META_ERROR, new String[] { clazz.getName() });
+                        Errors.REGISTERED_META_ERROR, clazz);
                 failureSet.add(new VerificationFailure(this, getClass().getName(), Errors.REGISTERED_META_ERROR,
                         errorMessage));
             }

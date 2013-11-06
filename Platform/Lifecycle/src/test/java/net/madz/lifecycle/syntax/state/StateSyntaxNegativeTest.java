@@ -9,8 +9,8 @@ import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CStates.NCS2_CC;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.States.NCS3_B.CStates.NCS3_CC;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CStates.NCS4_CC;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CStates.NSC1_CB;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.States.A;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.C;
@@ -54,7 +54,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
                     Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, C.class.getAnnotation(Function.class),
-                    C.class.getName(), net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class.getName());
+                    C.class.getName(),
+                    net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class.getName());
             throw e;
         }
     }
@@ -113,54 +114,128 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
     public void test_shortcut_referencing_state_beyond_scope() throws VerificationException {
         @LifecycleRegistry(NCS2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID,
-                    NCS2_CC.class.getAnnotation(ShortCut.class), NCS2_CC.class, NSC1_C.class);
+                    Errors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID, NCS2_CC.class.getAnnotation(ShortCut.class),
+                    NCS2_CC.class, NSC1_C.class);
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
     public void test_composite_final_without_shortcut() throws VerificationException {
         @LifecycleRegistry(NCS3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT,
-                    NCS3_CC.class);
+                    Errors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, NCS3_CC.class);
             throw e;
         }
     }
+
     @Test(expected = VerificationException.class)
     public void test_shortcut_without_end_annotation() throws VerificationException {
         @LifecycleRegistry(NCS4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END,
-                    NCS4_CC.class);
+                    Errors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, NCS4_CC.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_multiple_functions_referring_same_transition() throws VerificationException {
+        @LifecycleRegistry(Multiple_Function_Referring_Same_Transition.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
+                    Multiple_Function_Referring_Same_Transition.States.Created.class,
+                    Multiple_Function_Referring_Same_Transition.Transitions.X.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_inheritance_multiple_functions_referring_same_transition() throws VerificationException {
+        @LifecycleRegistry(Multiple_Function_Referring_Same_Transition_Child.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
+                    Multiple_Function_Referring_Same_Transition_Child.States.Created.class,
+                    Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_state_overrides_without_super_class() throws VerificationException {
+        @LifecycleRegistry(NegativeOverridesWithoutSuperClass.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS,
+                    NegativeOverridesWithoutSuperClass.States.A.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_intial_state_overrides_missing_initial_state() throws VerificationException {
+        @LifecycleRegistry(NegativeOverridesMissingInitial.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE,
+                    NegativeOverridesMissingInitial.States.A.class, CorrectBase.States.A.class);
             throw e;
         }
     }

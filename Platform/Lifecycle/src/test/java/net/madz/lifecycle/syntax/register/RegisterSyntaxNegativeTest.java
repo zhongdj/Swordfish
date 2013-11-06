@@ -34,7 +34,8 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR, new String[] { WithoutMetadataAnnotationErrorSyntax.class.getName() });
+            final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR,
+                    WithoutMetadataAnnotationErrorSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(Errors.REGISTERED_META_ERROR, failure.getErrorCode());
@@ -60,7 +61,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
             final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
-                    new String[] { IncorrectStateMachineInheritanceSuperSyntax.class.getName() });
+                    IncorrectStateMachineInheritanceSuperSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());
@@ -86,7 +87,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = actualFailureSet.iterator();
             VerificationFailure failure = iterator.next();
             final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
-                    new String[] { IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class.getName() });
+                    IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, failure.getErrorCode());
@@ -95,19 +96,20 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation() throws VerificationException {
+    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation()
+            throws VerificationException {
         @LifecycleRegistry(value = { WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation.class })
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-            }
+            protected Registry() throws VerificationException {}
         }
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
-                    WrongStateMachineSyntaxWithoutAnnotation.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
+                    WrongStateMachineSyntaxWithoutAnnotation.class);
             throw e;
         }
     }

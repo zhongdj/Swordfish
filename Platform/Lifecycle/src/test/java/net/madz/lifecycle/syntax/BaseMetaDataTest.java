@@ -13,7 +13,7 @@ public class BaseMetaDataTest {
         super();
     }
 
-    protected String getMessage(String errorCode, Object[] args) {
+    protected String getMessage(String errorCode, Object... args) {
         return BundleUtils
                 .getBundledMessage(StateMachineMetaBuilder.class, Errors.SYNTAX_ERROR_BUNDLE, errorCode, args);
     }
