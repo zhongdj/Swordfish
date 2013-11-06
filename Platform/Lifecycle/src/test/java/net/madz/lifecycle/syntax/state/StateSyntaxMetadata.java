@@ -1,7 +1,9 @@
 package net.madz.lifecycle.syntax.state;
 
+import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
@@ -10,6 +12,7 @@ import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CTransitions.NCS2_CX;
@@ -21,8 +24,8 @@ import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.Transitions.NCS3
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CTransitions.NCS4_CX;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_Y;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
@@ -328,7 +331,6 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             static interface NCS2_Y {}
         }
     }
-    
     @StateMachine
     static interface NCS3 {
 
@@ -369,7 +371,6 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             static interface NCS3_Y {}
         }
     }
-    
     @StateMachine
     static interface NCS4 {
 
@@ -410,6 +411,119 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
 
             static interface NCS4_X {}
             static interface NCS4_Y {}
+        }
+    }
+    @StateMachine
+    static interface Multiple_Function_Referring_Same_Transition {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Functions({
+                    @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class,
+                            value = Ended.class),
+                    @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class,
+                            value = Ended.class) })
+            static interface Created {}
+            @End
+            static interface Ended {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface X {}
+        }
+    }
+    @StateMachine
+    static interface Multiple_Function_Referring_Same_Transition_Super {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
+                    value = Ended.class) })
+            static interface Created {}
+            @End
+            static interface Ended {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface X {}
+        }
+    }
+    @StateMachine
+    static interface Multiple_Function_Referring_Same_Transition_Child extends
+            Multiple_Function_Referring_Same_Transition_Super {
+
+        @StateSet
+        static interface States extends Multiple_Function_Referring_Same_Transition_Super.States {
+
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
+                    value = Ended.class) })
+            static interface Created extends Multiple_Function_Referring_Same_Transition_Super.States.Created {}
+        }
+    }
+    @StateMachine
+    static interface State_Overriding_Function_Referring_Same_Transition_With_Super_State extends
+            Multiple_Function_Referring_Same_Transition_Super {
+
+        @StateSet
+        static interface States extends Multiple_Function_Referring_Same_Transition_Super.States {
+
+            @Initial
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
+                    value = Ended.class) })
+            @Overrides
+            static interface Created extends Multiple_Function_Referring_Same_Transition_Super.States.Created {}
+        }
+    }
+    @StateMachine
+    static interface CorrectBase {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = CorrectBase.Transitions.X.class, value = CorrectBase.States.B.class)
+            static interface A {}
+            @End
+            static interface B {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface X {}
+        }
+    }
+    @StateMachine
+    static interface NegativeOverridesWithoutSuperClass extends CorrectBase {
+
+        public static final String errorCode = Errors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS;
+
+        @StateSet
+        static interface States extends CorrectBase.States {
+
+            @Initial
+            @Overrides
+            @Function(transition = CorrectBase.Transitions.X.class, value = CorrectBase.States.B.class)
+            static interface A {}
+        }
+    }
+    @StateMachine
+    static interface NegativeOverridesMissingInitial extends CorrectBase {
+
+        public static final String errorCode = Errors.STATESET_MULTIPLE_INITAL_STATES;
+
+        @StateSet
+        static interface States extends CorrectBase.States {
+
+            @Overrides
+            // Should define another @Initial state or add @Initial to this
+            // @Initial State
+            static interface A extends CorrectBase.States.A {}
         }
     }
 }

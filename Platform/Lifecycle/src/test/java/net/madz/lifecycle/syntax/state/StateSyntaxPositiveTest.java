@@ -41,4 +41,15 @@ public class StateSyntaxPositiveTest extends StateSyntaxMetadata {
         }
         new Registry();
     }
+    
+    @Test
+    public void test_state_overriding_function_referring_same_transition_with_super_state () throws VerificationException{
+        @LifecycleRegistry(State_Overriding_Function_Referring_Same_Transition_With_Super_State.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        new Registry();
+    }
 }
