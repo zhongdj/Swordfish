@@ -274,4 +274,27 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
             this.state = state;
         }
     }
+    
+    @LifecycleMeta(S1.class)
+    static class ConditionObjectDoesNotImplementConditionClass {
+        static final String errorCode = Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE;
+        private String state;
+
+        @Transition
+        public void s1_Transition_X() {}
+
+        public String getState() {
+            return state;
+        }
+        
+        @Condition(S1.Conditions.S1_Condition_A.class)
+        public String getConditionA() {
+            return null;
+        }
+
+        @SuppressWarnings("unused")
+        private void setState(String state) {
+            this.state = state;
+        }
+    }
 }

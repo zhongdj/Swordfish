@@ -12,7 +12,8 @@ import org.junit.Test;
 public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
 
     @Test(expected = VerificationException.class)
-    public final void test_condition_reference_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
+    public final void test_condition_reference_invalid() throws VerificationException, NoSuchMethodException,
+            SecurityException {
         @LifecycleRegistry(NLM_1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -23,8 +24,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_CONDITION_REFERENCE_INVALID,
-                    NLM_1.class.getMethod("getConditionA", null),
-                    S1.Transitions.S1_Transition_X.class);
+                    NLM_1.class.getMethod("getConditionA", null), S1.Transitions.S1_Transition_X.class);
             throw e;
         }
     }
@@ -59,7 +59,28 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_CONDITION_NOT_COVERED,
-                    NLM_3.class, S1.class.getName(), S1.class.getName() + ".ConditionSet." + S1_Condition_A.class.getSimpleName());
+                    NLM_3.class, S1.class.getName(),
+                    S1.class.getName() + ".ConditionSet." + S1_Condition_A.class.getSimpleName());
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public final void test_condition_object_does_not_implement_condition_class() throws NoSuchMethodException,
+            SecurityException, VerificationException {
+        @LifecycleRegistry(ConditionObjectDoesNotImplementConditionClass.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(),
+                    Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
+                    ConditionObjectDoesNotImplementConditionClass.class.getMethod("getConditionA", null),
+                    S1_Condition_A.class);
             throw e;
         }
     }
