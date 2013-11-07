@@ -772,6 +772,7 @@ public class StateMachineMetaBuilderImpl extends
 
     private TransitionMetadata findTransition(StateMachineMetadata stateMachineMetaBuilder, Object transitionKey) {
         if ( null == stateMachineMetaBuilder ) return null;
+        
         TransitionMetadata transitionMetadata = stateMachineMetaBuilder.getDeclaredTransition(transitionKey);
         if ( null != transitionMetadata ) {
             return transitionMetadata;

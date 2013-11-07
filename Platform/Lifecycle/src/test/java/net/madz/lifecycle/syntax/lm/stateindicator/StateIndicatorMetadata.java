@@ -318,4 +318,9 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         @StateIndicator
         String getStateY();
     }
+
+    public static void main(String[] args) throws Throwable {
+        System.out.println("Testing Main");
+        new PDefaultPrivateStateSetterClass().doX();
+    }
 }
