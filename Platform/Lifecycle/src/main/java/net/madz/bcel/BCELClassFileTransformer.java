@@ -1,18 +1,18 @@
 package net.madz.bcel;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.Transition;
 
 import org.apache.bcel.classfile.AnnotationEntry;
 import org.apache.bcel.classfile.Attribute;
-import org.apache.bcel.classfile.ClassFormatException;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.InnerClasses;
 import org.apache.bcel.classfile.JavaClass;
@@ -23,68 +23,78 @@ import org.apache.bcel.generic.Type;
 
 public class BCELClassFileTransformer implements ClassFileTransformer {
 
+    private static final Logger log = Logger.getLogger(BCELClassFileTransformer.class.getName());
     public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/")
             + ";";
     public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L"
             + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
+    private String[] ignoredPackages = new String[] { "java.", "javax.", "sun." };
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
             ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        // TODO Auto-generated method stub
-        final String fileName = className;
-        final String location = protectionDomain.getCodeSource().getLocation().getPath();
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(classfileBuffer);) {
-            final JavaClass jclas = new ClassParser(bais, fileName).parse();
-            final AnnotationEntry[] annotationEntries = jclas.getAnnotationEntries();
-            boolean foundLifecycleMeta = false;
-            for ( AnnotationEntry annotationEntry : annotationEntries ) {
-                if ( LIFECYLEMETA_ANNOTATION_TYPE.equals(annotationEntry.getAnnotationType()) ) {
-                    foundLifecycleMeta = true;
-                }
-            }
-            if ( !foundLifecycleMeta ) return classfileBuffer;
-            final ClassGen cgen = new ClassGen(jclas);
-            final Method[] methods = jclas.getMethods();
-            int index;
-            for ( index = 0; index < methods.length; index++ ) {
-                if ( methods[index].getAnnotationEntries() != null ) {
-                    boolean found = false;
-                    for ( AnnotationEntry entry : methods[index].getAnnotationEntries() ) {
-                        if ( TRANSITION_ANNOTATION_TYPE.equals(entry.getAnnotationType()) ) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if ( found ) break;
-                }
-            }
-            if ( index < methods.length ) {
-                int innerClassSeq = 1;
-                Attribute[] attributes = cgen.getAttributes();
-                for ( Attribute attribute : attributes ) {
-                    if ( attribute instanceof InnerClasses ) {
-                        InnerClasses icAttr = (InnerClasses) attribute;
-                        innerClassSeq += icAttr.getInnerClasses().length;
-                    }
-                }
-                Method interceptingMethod = methods[index];
-                doGenerateAll(cgen, innerClassSeq, interceptingMethod, location);
-                return cgen.getJavaClass().getBytes();
-            } else {
-                System.err.println("Method with annotation" + TRANSITION_ANNOTATION_TYPE + " not found in " + fileName);
-            }
-        } catch (ClassFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        if ( shouldIgnore(className) ) {
+            return classfileBuffer;
         }
-        System.out.println("className: " + fileName);
-        System.out.println("classBeingRedefined: " + classBeingRedefined);
-        System.out.println("protectionDomain: " + protectionDomain);
-        return classfileBuffer;
+        final String location = protectionDomain.getCodeSource().getLocation().getPath();
+        try (final ByteArrayInputStream bais = new ByteArrayInputStream(classfileBuffer)) {
+            final JavaClass jclas = new ClassParser(bais, className).parse();
+            if ( !isTransformNeeded(jclas) ) {
+                return classfileBuffer;
+            }
+            final ClassGen classGen = new ClassGen(jclas);
+            int innerClassSeq = nextInnerClassSeqOf(classGen);
+            for ( final Method method : jclas.getMethods() ) {
+                if ( null == method.getAnnotationEntries() ) {
+                    continue;
+                }
+                for ( final AnnotationEntry entry : method.getAnnotationEntries() ) {
+                    if ( isTransformNeeded(entry) ) {
+                        doTransform(classGen, innerClassSeq++, method, location);
+                        break;
+                    }
+                }
+            }
+            return classGen.getJavaClass().getBytes();
+        } catch (Throwable e) {
+            log.log(Level.SEVERE, "Failed to transform class " + className, e);
+            throw new IllegalClassFormatException();
+        }
+    }
+
+    private boolean shouldIgnore(String className) {
+        for ( int i = 0; i < ignoredPackages.length; i++ ) {
+            if ( className.startsWith(ignoredPackages[i]) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isTransformNeeded(AnnotationEntry entry) {
+        return TRANSITION_ANNOTATION_TYPE.equals(entry.getAnnotationType());
+    }
+
+    private int nextInnerClassSeqOf(final ClassGen cgen) {
+        int innerClassSeq = 1;
+        for ( final Attribute attribute : cgen.getAttributes() ) {
+            if ( attribute instanceof InnerClasses ) {
+                InnerClasses icAttr = (InnerClasses) attribute;
+                innerClassSeq += icAttr.getInnerClasses().length;
+            }
+        }
+        return innerClassSeq;
+    }
+
+    private boolean isTransformNeeded(final JavaClass jclas) {
+        final AnnotationEntry[] annotationEntries = jclas.getAnnotationEntries();
+        boolean foundLifecycleMeta = false;
+        for ( final AnnotationEntry annotationEntry : annotationEntries ) {
+            if ( LIFECYLEMETA_ANNOTATION_TYPE.equals(annotationEntry.getAnnotationType()) ) {
+                foundLifecycleMeta = true;
+            }
+        }
+        return foundLifecycleMeta;
     }
 
     /**
@@ -105,7 +115,7 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
         inst.addTransformer(new BCELClassFileTransformer());
     }
 
-    private static void doGenerateAll(ClassGen cgen, int innerClassSeq, Method interceptingMethod, String location)
+    private static void doTransform(ClassGen cgen, int innerClassSeq, Method interceptingMethod, String location)
             throws Throwable {
         JavaAnonymousInnerClass c = new JavaAnonymousInnerClass(cgen.getClassName(), interceptingMethod.getName(),
                 interceptingMethod.getArgumentTypes(), innerClassSeq, Object.class.getName(), new Type[0],

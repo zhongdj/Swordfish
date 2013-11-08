@@ -31,69 +31,88 @@ import org.apache.bcel.generic.Type;
 
 public class MethodInterceptor {
 
-    public static void addWrapper(ClassGen cgen, Method method, int anonymousInnerClassSeq) {
-        final String interceptingClass = cgen.getClassName();
-        final String interceptingMethod = method.getName();
-        // set up the construction tools
-        InstructionFactory ifact = new InstructionFactory(cgen);
-        InstructionList ilist = new InstructionList();
-        ConstantPoolGen constantPoolGen = cgen.getConstantPool();
-        String cname = cgen.getClassName();
-        MethodGen wrapgen = new MethodGen(method, cname, constantPoolGen);
-        // int interceptingMethodIndex = constantPoolGen.addMethodref(wrapgen);
-        wrapgen.setInstructionList(ilist);
-        // rename a copy of the original method
+    public static void addWrapper(ClassGen classGen, Method method, int anonymousInnerClassSeq) {
+        renameOriginalMethod(classGen, method, classGen.getConstantPool(), classGen.getClassName());
+        createWrapperMethodWithCreateNewInnerClass(classGen, method, anonymousInnerClassSeq, classGen.getClassName(),
+                method.getName(), classGen.getConstantPool());
+    }
+
+    private static void renameOriginalMethod(ClassGen classGen, Method method, final ConstantPoolGen constantPoolGen,
+            String cname) {
         MethodGen methgen = new MethodGen(method, cname, constantPoolGen);
-        cgen.removeMethod(method);
+        classGen.removeMethod(method);
         String iname = methgen.getName() + "$Impl";
         methgen.setName(iname);
         methgen.removeAnnotationEntries();
-        cgen.addMethod(methgen.getMethod());
-        // constantPoolGen.addMethodref(methgen);
-        Type result = methgen.getReturnType();
-        // compute the size of the calling parameters
-        Type[] types = methgen.getArgumentTypes();
-        int slot = methgen.isStatic() ? 0 : 1;
-        for ( int i = 0; i < types.length; i++ ) {
-            slot += types[i].getSize();
+        classGen.addMethod(methgen.getMethod());
+    }
+
+    private static void createWrapperMethodWithCreateNewInnerClass(ClassGen classGen, Method method,
+            int anonymousInnerClassSeq, final String interceptingClass, final String interceptingMethod,
+            final ConstantPoolGen constantPoolGen) {
+        final InstructionFactory ifact = new InstructionFactory(classGen);
+        final InstructionList ilist = new InstructionList();
+        try {
+            final MethodGen wrapMethodGen = new MethodGen(method, interceptingClass, constantPoolGen);
+            wrapMethodGen.setInstructionList(ilist);
+            final String innerClassName = createInterceptMethodCode(classGen, anonymousInnerClassSeq,
+                    interceptingClass, interceptingMethod, ifact, ilist, constantPoolGen, method);
+            // finalize the constructed method
+            wrapMethodGen.stripAttributes(true);
+            wrapMethodGen.setMaxStack();
+            wrapMethodGen.setMaxLocals();
+            classGen.addMethod(wrapMethodGen.getMethod());
+            //
+            processInnerClassesAttributes(classGen, classGen.getConstantPool(), innerClassName);
+        } finally {
+            ilist.dispose();
         }
+    }
+
+    private static String createInterceptMethodCode(ClassGen classGen, int anonymousInnerClassSeq,
+            final String interceptingClass, final String interceptingMethod, final InstructionFactory ifact,
+            final InstructionList ilist, final ConstantPoolGen constantPoolGen, Method originalMethod) {
+        final Type[] argumentTypes = originalMethod.getArgumentTypes(); 
+        int localVariableSlotCursor = nextLocalVariableSlotCursor(originalMethod);
         // Step 1. InterceptorController controller = new
         // InterceptorController();
         ilist.append(ifact.createNew(InterceptorController.class.getName()));
         ilist.append(InstructionFactory.DUP);
         ilist.append(ifact.createInvoke(InterceptorController.class.getName(), "<init>", Type.VOID, Type.NO_ARGS,
                 Constants.INVOKESPECIAL));
-        final int controllerIndex = slot;
+        final int controllerIndex = localVariableSlotCursor;
         final ObjectType controllerType = new ObjectType(InterceptorController.class.getName());
-        slot += controllerType.getSize();
+        localVariableSlotCursor += controllerType.getSize();
         ilist.append(InstructionFactory.createStore(controllerType, controllerIndex));
         // Step 2. final InterceptContext<Void> context = new
-        // InterceptContext<Void>(getClass(), this, "allocateResources",
-        // new Class[] { Long.class, Long.class, Long.class });
+        // InterceptContext<Void>(getClass(), this, methodName,
+        // new Class[] { Long.class, Long.class, Long.class },
+        // Object[] arguments);
         // 2.1 getClass()
         ilist.append(ifact.createNew(InterceptContext.class.getName()));
         ilist.append(InstructionFactory.DUP);
-        ilist.append(new LDC(cgen.getConstantPool().lookupClass(interceptingClass)));
+        ilist.append(new LDC(constantPoolGen.lookupClass(interceptingClass)));
         // 2.2 load this
         ilist.append(InstructionFactory.createLoad(new ObjectType(interceptingClass), 0));// this
         // 2.3 load intercepting method
-        int methodNameIndex = cgen.getConstantPool().lookupString(interceptingMethod);
+        int methodNameIndex = constantPoolGen.lookupString(interceptingMethod);
         if ( -1 >= methodNameIndex ) {
-            methodNameIndex = cgen.getConstantPool().addString(interceptingMethod);
+            methodNameIndex = constantPoolGen.addString(interceptingMethod);
         }
         ilist.append(new LDC(methodNameIndex));// methodName
         // 2.4 calculate argument size and allocate an array with same size
-        ilist.append(new ICONST(types.length));
+        ilist.append(new ICONST(argumentTypes.length));
         ilist.append(ifact.createNewArray(new ObjectType("java.lang.Class"), (short) 1));
         // 2.5 assign value for each element in array
-        for ( int i = 0; i < types.length; i++ ) {
+        for ( int i = 0; i < argumentTypes.length; i++ ) {
             ilist.append(InstructionFactory.DUP);
             ilist.append(new ICONST(i));
-            Type type = types[i];
+            Type type = argumentTypes[i];
             if ( type instanceof BasicType ) {
-                ilist.append(ifact.createGetStatic(convertType2ClassName(type), "TYPE", new ObjectType("java.lang.Class")));
+                ilist.append(ifact.createGetStatic(convertType2ClassName(type), "TYPE", new ObjectType(
+                        "java.lang.Class")));
             } else {
-                int argumentClassIndex = convertType2ClassIndex(cgen, type);
+                int argumentClassIndex = convertType2ClassIndex(classGen, type);
                 if ( type.getSize() > 4 ) {
                     ilist.append(new LDC_W(argumentClassIndex));
                 } else {
@@ -118,9 +137,9 @@ public class MethodInterceptor {
          * ObjectType("java.lang.Object"), new
          * ObjectType("java.lang.reflect.Method")}, Constants.INVOKESPECIAL));
          */
-        final int contextIndex = slot;
+        final int contextIndex = localVariableSlotCursor;
         final ObjectType contextType = new ObjectType(InterceptContext.class.getName());
-        slot += contextType.getSize();
+        localVariableSlotCursor += contextType.getSize();
         ilist.append(InstructionFactory.createStore(contextType, contextIndex));
         ilist.append(InstructionFactory.createLoad(controllerType, controllerIndex));
         ilist.append(InstructionFactory.createLoad(contextType, contextIndex));
@@ -133,15 +152,15 @@ public class MethodInterceptor {
         // 3.1 load constructor arguments variables
         ilist.append(InstructionFactory.createThis());
         int localIndex = 1;
-        for ( int i = 0; i < types.length; i++ ) {
-            ilist.append(InstructionFactory.createLoad(types[i], localIndex));
-            localIndex += types[i].getSize();
+        for ( int i = 0; i < argumentTypes.length; i++ ) {
+            ilist.append(InstructionFactory.createLoad(argumentTypes[i], localIndex));
+            localIndex += argumentTypes[i].getSize();
         }
         // 3.2 calculating constructor argument types
-        Type[] inner_constructor_arg_types = new Type[types.length + 1];
+        Type[] inner_constructor_arg_types = new Type[argumentTypes.length + 1];
         inner_constructor_arg_types[0] = new ObjectType(interceptingClass);
-        for ( int i = 1; i <= types.length; i++ ) {
-            inner_constructor_arg_types[i] = types[i - 1];
+        for ( int i = 1; i <= argumentTypes.length; i++ ) {
+            inner_constructor_arg_types[i] = argumentTypes[i - 1];
         }
         // 3.3 invoke constructor method
         ilist.append(ifact.createInvoke(innerClassName, "<init>", Type.VOID, inner_constructor_arg_types,
@@ -153,16 +172,24 @@ public class MethodInterceptor {
         // Step 5.
         ilist.append(InstructionConstants.POP);
         ilist.append(InstructionConstants.RETURN);
-        // finalize the constructed method
-        wrapgen.stripAttributes(true);
-        wrapgen.setMaxStack();
-        wrapgen.setMaxLocals();
-        cgen.addMethod(wrapgen.getMethod());
-        ConstantPoolGen constantPool = cgen.getConstantPool();
-        int innerClasses_index = constantPool.lookupUtf8("InnerClasses");
-        Attribute[] attributes = cgen.getAttributes();
+        return innerClassName;
+    }
+
+    private static int nextLocalVariableSlotCursor(Method originalMethod) {
+        int localVariableSlotCursor = originalMethod.isStatic() ? 0 : 1;
+        for ( Type type : originalMethod.getArgumentTypes() )
+        // compute the size of the calling parameters
+        {
+            localVariableSlotCursor += type.getSize();
+        }
+        return localVariableSlotCursor;
+    }
+
+    private static void processInnerClassesAttributes(ClassGen classGen, final ConstantPoolGen constantPoolGen,
+            final String innerClassName) {
+        int innerClasses_index = constantPoolGen.lookupUtf8("InnerClasses");
         boolean innerClassFound = false;
-        for ( Attribute attribute : attributes ) {
+        for ( Attribute attribute : classGen.getAttributes() ) {
             if ( attribute instanceof InnerClasses ) {
                 InnerClasses ics = (InnerClasses) attribute;
                 ArrayList<InnerClass> iclist = new ArrayList<InnerClass>();
@@ -170,8 +197,8 @@ public class MethodInterceptor {
                 for ( InnerClass innerClass : innerClasses ) {
                     iclist.add(innerClass);
                 }
-                iclist.add(new InnerClass(constantPool.lookupClass(innerClassName), constantPool.lookupClass(cgen
-                        .getClassName()),
+                iclist.add(new InnerClass(constantPoolGen.lookupClass(innerClassName), constantPoolGen
+                        .lookupClass(classGen.getClassName()),
                 // If C is anonymous (JLS 15.9.5), the value of the
                 // inner_name_index item must be zero.
                         0,
@@ -186,20 +213,19 @@ public class MethodInterceptor {
                 break;
             }
         }
-        if ( innerClassFound ) {} else {
-            innerClasses_index = constantPool.addUtf8("InnerClasses");
+        if ( !innerClassFound ) {
+            innerClasses_index = constantPoolGen.addUtf8("InnerClasses");
             final InnerClasses inner = new InnerClasses(innerClasses_index, 10, new InnerClass[] { new InnerClass(
-                    constantPool.lookupClass(innerClassName), constantPool.lookupClass(cgen.getClassName()),
+                    constantPoolGen.lookupClass(innerClassName), constantPoolGen.lookupClass(classGen.getClassName()),
                     // If C is anonymous (JLS 15.9.5), the value of the
                     // inner_name_index item must be zero.
                     0,
                     // They should be set to zero in generated class files and
                     // should be ignored by Java Virtual Machine
                     // implementations.
-                    0) }, constantPool.getConstantPool());
-            cgen.addAttribute(inner);
+                    0) }, constantPoolGen.getConstantPool());
+            classGen.addAttribute(inner);
         }
-        ilist.dispose();
     }
 
     private static int convertType2ClassIndex(ClassGen cgen, Type type) {
@@ -283,13 +309,13 @@ public class MethodInterceptor {
         } else {
             System.out.println("Usage: BCELMethodInterceptor class-file method-name");
         }
-        
     }
 
     private static void doGenerateAll(ClassGen cgen, int innerClassSeq, Method interceptingMethod) throws Throwable {
         JavaAnonymousInnerClass c = new JavaAnonymousInnerClass(cgen.getClassName(), interceptingMethod.getName(),
                 interceptingMethod.getArgumentTypes(), innerClassSeq, Object.class.getName(), new Type[0],
-                java.util.concurrent.Callable.class.getName(), new Type[] { new ObjectType(Void.class.getName()) }, null);
+                java.util.concurrent.Callable.class.getName(), new Type[] { new ObjectType(Void.class.getName()) },
+                null);
         c.doGenerate();
         MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);
     }

@@ -9,21 +9,24 @@ public class InterceptContext<V> {
     private final Class<?> klass;
     private final Method method;
     private final Object target;
+    private final Object[] arguments;
 
-    public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType) {
+    public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType, Object[] arguments) {
         super();
         this.klass = klass;
         this.method = findMethod(klass, methodName, argsType);
         this.annotation = method.getAnnotations();
         this.target = target;
-        System.out.println("Intercepting....instatiating InterceptContext ...");
-    }
-    public InterceptContext(Class<?> klass, Object target, Method interceptMethod) {
-        super();
-        this.klass = klass;
-        this.method = interceptMethod;
-        this.annotation = method.getAnnotations();
-        this.target = target;
+        if ( null == arguments ) {
+            this.arguments = new Object[0];
+        } else {
+            this.arguments = arguments;
+        }
+        StringBuilder sb = new StringBuilder(" ");
+        for ( Object o : this.arguments ) {
+            sb.append(String.valueOf(o)).append(" ");
+        }
+        System.out.println("Found Intercept Point: " + methodName + "( " + sb.toString() + " )");
         System.out.println("Intercepting....instatiating InterceptContext ...");
     }
 
