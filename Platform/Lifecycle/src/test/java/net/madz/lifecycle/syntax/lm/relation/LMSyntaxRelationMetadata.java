@@ -32,6 +32,23 @@ import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.S8.Transit
 
 public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
 
+    private static final class TestLifecycleInterceptor implements PLM_R1_S {
+
+        private String state = R1_S.States.R1_S_A.class.getSimpleName();
+
+        @Override
+        public void tm() {}
+
+        @Override
+        public String getState() {
+            return state;
+        }
+
+        @Override
+        public String toString() {
+            return "TestLifecycleInterceptor [state=" + state + "]";
+        }
+    }
     // Positive LM: Concrete all relations in SM
     @StateMachine
     static interface R1_S {
@@ -502,5 +519,12 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         private void setState(String state) {
             this.state = state;
         }
+    }
+
+    public static void main(String[] args) throws Throwable {
+        System.out.println("Testing Main");
+        PLM_5 plm_5 = new PLM_5();
+        PLM_R1_S x = new TestLifecycleInterceptor();
+        plm_5.tM1(x);
     }
 }

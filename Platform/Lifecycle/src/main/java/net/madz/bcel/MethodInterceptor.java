@@ -18,6 +18,7 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BasicType;
 import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.ClassGenException;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.ICONST;
 import org.apache.bcel.generic.InstructionConstants;
@@ -27,9 +28,12 @@ import org.apache.bcel.generic.LDC;
 import org.apache.bcel.generic.LDC_W;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.PUSH;
 import org.apache.bcel.generic.Type;
 
 public class MethodInterceptor {
+
+    private static final String POST_FIX = "$Impl";
 
     public static void addWrapper(ClassGen classGen, Method method, int anonymousInnerClassSeq) {
         renameOriginalMethod(classGen, method, classGen.getConstantPool(), classGen.getClassName());
@@ -41,7 +45,7 @@ public class MethodInterceptor {
             String cname) {
         MethodGen methgen = new MethodGen(method, cname, constantPoolGen);
         classGen.removeMethod(method);
-        String iname = methgen.getName() + "$Impl";
+        String iname = methgen.getName() + POST_FIX;
         methgen.setName(iname);
         methgen.removeAnnotationEntries();
         classGen.addMethod(methgen.getMethod());
@@ -72,8 +76,29 @@ public class MethodInterceptor {
     private static String createInterceptMethodCode(ClassGen classGen, int anonymousInnerClassSeq,
             final String interceptingClass, final String interceptingMethod, final InstructionFactory ifact,
             final InstructionList ilist, final ConstantPoolGen constantPoolGen, Method originalMethod) {
-        final Type[] argumentTypes = originalMethod.getArgumentTypes(); 
+        final Type[] argumentTypes = originalMethod.getArgumentTypes();
         int localVariableSlotCursor = nextLocalVariableSlotCursor(originalMethod);
+        // Step 0. Create Object[] arguments array.
+        ilist.append(new PUSH(constantPoolGen, argumentTypes.length));
+        ilist.append(ifact.createNewArray(Type.OBJECT, (short) 1));
+        int localVariableIndex = 1;
+        int argumentArrayIndex = 0;
+        for ( final Type type : originalMethod.getArgumentTypes() ) {
+            ilist.append(InstructionConstants.DUP);
+            ilist.append(new PUSH(constantPoolGen, argumentArrayIndex++));
+            if ( type instanceof BasicType ) {
+                ilist.append(InstructionFactory.createLoad(type, localVariableIndex));
+                final String wrapperType = getWrapperType((BasicType) type);
+                ilist.append(ifact.createInvoke(wrapperType, "valueOf", new ObjectType(wrapperType),
+                        new Type[] { type }, Constants.INVOKESTATIC));
+            } else {
+                ilist.append(InstructionFactory.createLoad(type, localVariableIndex));
+            }
+            ilist.append(InstructionConstants.AASTORE);
+            localVariableIndex += type.getSize();
+        }
+        final int argumentsArrayLocalVariableIndex = localVariableSlotCursor++;
+        ilist.append(InstructionFactory.createStore(Type.OBJECT, argumentsArrayLocalVariableIndex));
         // Step 1. InterceptorController controller = new
         // InterceptorController();
         ilist.append(ifact.createNew(InterceptorController.class.getName()));
@@ -122,11 +147,14 @@ public class MethodInterceptor {
             ilist.append(InstructionConstants.AASTORE);
         }
         // 2.6 new InterceptContext<Void>(...
-        final Type[] interceptor_method_arg_types = new Type[4];
+        ilist.append(InstructionFactory.createLoad(new ArrayType("java.lang.Object", 1),
+                argumentsArrayLocalVariableIndex));
+        final Type[] interceptor_method_arg_types = new Type[5];
         interceptor_method_arg_types[0] = new ObjectType("java.lang.Class");
         interceptor_method_arg_types[1] = new ObjectType("java.lang.Object");
         interceptor_method_arg_types[2] = new ObjectType("java.lang.String");
         interceptor_method_arg_types[3] = new ArrayType("java.lang.Class", 1);
+        interceptor_method_arg_types[4] = new ArrayType("java.lang.Object", 1);
         ilist.append(ifact.createInvoke(InterceptContext.class.getName(), "<init>", Type.VOID,
                 interceptor_method_arg_types, Constants.INVOKESPECIAL));
         /*
@@ -173,6 +201,29 @@ public class MethodInterceptor {
         ilist.append(InstructionConstants.POP);
         ilist.append(InstructionConstants.RETURN);
         return innerClassName;
+    }
+
+    private static String getWrapperType(BasicType type) {
+        switch (type.getType()) {
+            case Constants.T_BOOLEAN:
+                return "java.lang.Boolean";
+            case Constants.T_BYTE:
+                return "java.lang.Byte";
+            case Constants.T_SHORT:
+                return "java.lang.Short";
+            case Constants.T_CHAR:
+                return "java.lang.Character";
+            case Constants.T_INT:
+                return "java.lang.Integer";
+            case Constants.T_LONG:
+                return "java.lang.Long";
+            case Constants.T_DOUBLE:
+                return "java.lang.Double";
+            case Constants.T_FLOAT:
+                return "java.lang.Float";
+            default:
+                throw new ClassGenException("Invalid type: " + type);
+        }
     }
 
     private static int nextLocalVariableSlotCursor(Method originalMethod) {

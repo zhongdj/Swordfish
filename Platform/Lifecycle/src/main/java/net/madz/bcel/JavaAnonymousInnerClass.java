@@ -30,6 +30,7 @@ import org.apache.bcel.verifier.statics.StringRepresentation;
 
 public class JavaAnonymousInnerClass {
 
+    private static final String POSTFIX = "$Impl";
     private final String outerClassName;
     private final String enclosingMethodName;
     private final Type[] enclosingMethodArguments;
@@ -193,7 +194,7 @@ public class JavaAnonymousInnerClass {
         }
         final Type returnType = lookupEnclosingMethodReturnType();
         final Type[] argTypes = lookupEnclosingMethodArgType();
-        iList.append(ifact.createInvoke(outerClassName, enclosingMethodName + "$Impl", returnType, argTypes,
+        iList.append(ifact.createInvoke(outerClassName, enclosingMethodName + POSTFIX, returnType, argTypes,
                 Constants.INVOKEVIRTUAL));
         iList.append(InstructionConstants.ACONST_NULL);
         iList.append(InstructionConstants.ARETURN);

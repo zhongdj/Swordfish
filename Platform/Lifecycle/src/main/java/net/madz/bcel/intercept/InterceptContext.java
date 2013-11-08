@@ -30,6 +30,10 @@ public class InterceptContext<V> {
         System.out.println("Intercepting....instatiating InterceptContext ...");
     }
 
+    public Object[] getArguments() {
+        return this.arguments;
+    }
+
     public Annotation[] getAnnotation() {
         return annotation;
     }

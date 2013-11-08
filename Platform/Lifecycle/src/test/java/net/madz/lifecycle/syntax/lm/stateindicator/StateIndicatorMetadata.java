@@ -99,7 +99,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
         private String state;
 
         @Transition(S1_X.class)
-        public void doX() {}
+        public void doX(String x, int y, int z) {}
 
         // Defaulted @StateIndicator
         public String getState() {
@@ -321,6 +321,6 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
 
     public static void main(String[] args) throws Throwable {
         System.out.println("Testing Main");
-        new PDefaultPrivateStateSetterClass().doX();
+        new PDefaultPrivateStateSetterClass().doX("Tracy" ,4545,3343);
     }
 }
