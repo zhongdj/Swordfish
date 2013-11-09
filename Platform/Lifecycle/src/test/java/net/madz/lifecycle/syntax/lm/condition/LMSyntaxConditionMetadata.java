@@ -1,6 +1,6 @@
 package net.madz.lifecycle.syntax.lm.condition;
 
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -208,7 +208,7 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
     @LifecycleMeta(S1.class)
     static class NLM_1 {
 
-        static final String errorCode = Errors.LM_CONDITION_REFERENCE_INVALID;
+        static final String errorCode = SyntaxErrors.LM_CONDITION_REFERENCE_INVALID;
         private String state;
 
         @Transition
@@ -231,7 +231,7 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
     @LifecycleMeta(S1.class)
     static class NLM_2 {
 
-        static final String errorCode = Errors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION;
+        static final String errorCode = SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION;
         private String state;
 
         @Transition
@@ -259,7 +259,7 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
     @LifecycleMeta(S1.class)
     static class NLM_3 {
 
-        static final String errorCode = Errors.LM_CONDITION_NOT_COVERED;
+        static final String errorCode = SyntaxErrors.LM_CONDITION_NOT_COVERED;
         private String state;
 
         @Transition
@@ -277,7 +277,7 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
     
     @LifecycleMeta(S1.class)
     static class ConditionObjectDoesNotImplementConditionClass {
-        static final String errorCode = Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE;
+        static final String errorCode = SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE;
         private String state;
 
         @Transition

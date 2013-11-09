@@ -15,37 +15,46 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
-import net.madz.lifecycle.Errors;
 import net.madz.lifecycle.StateConverter;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
+import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.Overrides;
-import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
+import net.madz.lifecycle.meta.builder.ConditionObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
+import net.madz.lifecycle.meta.instance.ConditionObject;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
-import net.madz.lifecycle.meta.instance.StateInst;
-import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.instance.StateObject;
+import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineInstBuilderImpl extends
-        AnnotationMetaBuilderBase<StateMachineInstBuilder, StateMachineMetaBuilder> implements StateMachineInstBuilder {
+public class StateMachineObjectBuilderImpl extends
+        ObjectBuilderBase<StateMachineObjectBuilder, StateMachineMetaBuilder> implements StateMachineObjectBuilder {
 
-    private StateMachineMetaBuilder template;
-    private HashMap<Object, TransitionInst> transitionInsts = new HashMap<>();
-    private HashMap<TransitionMetadata, LinkedList<TransitionInst>> transitionMetadataInstsMap = new HashMap<>();
+    private final StateMachineMetaBuilder template;
+    private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
+    private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
+    private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
+    private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
+    private StateAccessor<String> stateAccessor;
+    private final HashMap<Object, StateObject> stateMap = new HashMap<>();
+    private final ArrayList<StateObject> stateList = new ArrayList<>();
 
-    public StateMachineInstBuilderImpl(StateMachineMetaBuilder template, String name) {
+    public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
         this.template = template;
     }
@@ -55,9 +64,74 @@ public class StateMachineInstBuilderImpl extends
         // TODO Auto-generated method stub
     }
 
-    public StateMachineInstBuilder build(Class<?> klass) throws VerificationException {
+    public StateMachineObjectBuilder build(Class<?> klass) throws VerificationException {
         verifySyntax(klass);
+        configureStateIndicatorAccessor(klass);
+        configureConditions(klass);
+        configureTransitionObjects(klass);
+        configureStateObjects(klass);
         return this;
+    }
+
+    private void configureStateObjects(Class<?> klass) throws VerificationException {
+        final StateMetadata[] allStates = getTemplate().getAllStates();
+        for ( StateMetadata stateMetadata : allStates ) {
+            StateObjectBuilderImpl stateObject = new StateObjectBuilderImpl(this, stateMetadata);
+            stateObject.build(klass, this);
+            Iterator<Object> iterator = stateObject.getKeySet().iterator();
+            while ( iterator.hasNext() ) {
+                this.stateMap.put(iterator.next(), stateObject.getMetaData());
+            }
+            this.stateList.add(stateObject);
+        }
+    }
+
+    private void configureStateIndicatorAccessor(Class<?> klass) throws VerificationException {
+        if ( !klass.isInterface() ) {
+            Field specifiedStateField = findFieldWith(klass, StateIndicator.class);
+            if ( null != specifiedStateField ) {
+                configureFieldStateAccessor(specifiedStateField);
+                return;
+            }
+        }
+        final Method specifiedGetter = findCustomizedStateIndicatorGetter(klass);
+        if ( null != specifiedGetter ) {
+            configurePropertyAccessor(klass, specifiedGetter);
+        } else {
+            final Method defaultGetter = findDefaultStateGetterMethod(klass);
+            configurePropertyAccessor(klass, defaultGetter);
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void configurePropertyAccessor(Class<?> klass, Method getter) {
+        final String setterName = convertSetterName(getter.getName(), getter.getReturnType());
+        final Method setter = findMethod(klass, setterName, getter.getReturnType());
+        if ( String.class.equals(getter.getReturnType()) ) {
+            this.stateAccessor = new PropertyAccessor<String>(getter, setter);
+        } else {
+            try {
+                final StateConverter<?> stateConverter = getter.getAnnotation(Converter.class).value().newInstance();
+                this.stateAccessor = new ConverterAccessor(stateConverter, new PropertyAccessor(getter, setter));
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void configureFieldStateAccessor(Field stateField) {
+        if ( String.class.equals(stateField.getType()) ) {
+            this.stateAccessor = new FieldStateAccessor<String>(stateField);
+        } else {
+            try {
+                final StateConverter<?> stateConverter = stateField.getAnnotation(Converter.class).value()
+                        .newInstance();
+                this.stateAccessor = new ConverterAccessor(stateConverter, new FieldStateAccessor(stateField));
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     private void verifySyntax(Class<?> klass) throws VerificationException {
@@ -83,7 +157,7 @@ public class StateMachineInstBuilderImpl extends
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
         if ( !scanner.isCovered() ) {
-            throw newVerificationException(getDottedPath(), Errors.LM_CONDITION_NOT_COVERED, klass, getTemplate()
+            throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getTemplate()
                     .getDottedPath(), conditionMetadata.getDottedPath());
         }
     }
@@ -140,21 +214,20 @@ public class StateMachineInstBuilderImpl extends
             if ( null != condition ) {
                 if ( template.hasCondition(condition.value()) ) {
                     if ( conditions.contains(condition.value()) ) {
-                        failureSet
-                                .add(newVerificationException(klass.getName(),
-                                        Errors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
-                                        condition.value()));
+                        failureSet.add(newVerificationException(klass.getName(),
+                                SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
+                                condition.value()));
                     } else {
                         if ( !condition.value().isAssignableFrom(method.getReturnType()) ) {
                             failureSet.add(newVerificationException(klass.getName(),
-                                    Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE, method,
+                                    SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE, method,
                                     condition.value()));
                         }
                         conditions.add(condition.value());
                     }
                 } else {
-                    failureSet.add(newVerificationException(klass.getName(), Errors.LM_CONDITION_REFERENCE_INVALID,
-                            method, condition.value()));
+                    failureSet.add(newVerificationException(klass.getName(),
+                            SyntaxErrors.LM_CONDITION_REFERENCE_INVALID, method, condition.value()));
                 }
             }
             return false;
@@ -222,8 +295,8 @@ public class StateMachineInstBuilderImpl extends
             scanMethodsOnClasses(new Class[] { klass }, null, relationGetterScanner);
             if ( relationGetterScanner.isCovered() ) continue NEXT_TRANSITION_METHOD;
             throw new VerificationException(newVerificationFailure(getDottedPath(),
-                    Errors.LM_RELATION_NOT_BE_CONCRETED, method.getName(), klass.getName(), relation.getDottedPath()
-                            .getName(), relation.getParent().getDottedPath()));
+                    SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, method.getName(), klass.getName(), relation
+                            .getDottedPath().getName(), relation.getParent().getDottedPath()));
         }
     }
 
@@ -235,7 +308,7 @@ public class StateMachineInstBuilderImpl extends
                     Relation r = (Relation) annotation;
                     if ( Null.class == r.value() ) {
                         throw newVerificationException(getDottedPath(),
-                                Errors.LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE, method);
+                                SyntaxErrors.LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE, method);
                     }
                     if ( isKeyOfRelationMetadata(relation, r.value()) ) return true;
                 }
@@ -261,7 +334,7 @@ public class StateMachineInstBuilderImpl extends
                 return true;
             }
         } else {
-            if ( isKeyOfRelationMetadata(relation, upperFirstChar(field.getName())) ) {
+            if ( isKeyOfRelationMetadata(relation, StringUtil.toUppercaseFirstCharacter(field.getName())) ) {
                 return true;
             }
         }
@@ -291,7 +364,8 @@ public class StateMachineInstBuilderImpl extends
                         transitionMethodList.add(method);
                     }
                 } else {
-                    if ( upperFirstChar(method.getName()).equals(transition.getDottedPath().getName()) ) {
+                    if ( StringUtil.toUppercaseFirstCharacter(method.getName()).equals(
+                            transition.getDottedPath().getName()) ) {
                         transitionMethodList.add(method);
                     }
                 }
@@ -339,7 +413,7 @@ public class StateMachineInstBuilderImpl extends
             } else {
                 if ( !getTemplate().hasRelation(relation.value()) ) {
                     failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
-                            Errors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
+                            SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
                             relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
                 }
             }
@@ -394,7 +468,7 @@ public class StateMachineInstBuilderImpl extends
             Class<?> relationClass = relation.value();
             if ( !getTemplate().hasRelation(relationClass) ) {
                 throw new VerificationException(newVerificationFailure(getDottedPath(),
-                        Errors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(), relationClass.getName(),
+                        SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(), relationClass.getName(),
                         getTemplate().getDottedPath().getAbsoluteName()));
             }
         }
@@ -433,7 +507,7 @@ public class StateMachineInstBuilderImpl extends
             final Relation relation) throws VerificationException {
         if ( null != relation ) {
             if ( relations.contains(relation.value()) ) {
-                throw newVerificationException(getDottedPath(), Errors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE,
+                throw newVerificationException(getDottedPath(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE,
                         klass.getName(), relation.value().getName());
             }
             relations.add(relation.value());
@@ -456,7 +530,7 @@ public class StateMachineInstBuilderImpl extends
             final Method defaultGetter = findDefaultStateGetterMethod(klass);
             if ( null == defaultGetter ) {
                 throw newVerificationException(getDottedPath(),
-                        Errors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
+                        SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
             } else {
                 verifyStateIndicatorElement(klass, defaultGetter, defaultGetter.getReturnType());
             }
@@ -496,7 +570,7 @@ public class StateMachineInstBuilderImpl extends
         }
         final Converter converterMeta = getter.getAnnotation(Converter.class);
         if ( null == converterMeta ) {
-            throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
+            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
                     getterDeclaringClass, stateType);
         } else {
             Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
@@ -506,9 +580,9 @@ public class StateMachineInstBuilderImpl extends
                     if ( pType.getRawType() instanceof Class
                             && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
                         if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
-                            throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_CONVERTER_INVALID,
-                                    getterDeclaringClass, stateType, converterMeta.value(),
-                                    pType.getActualTypeArguments()[0]);
+                            throw newVerificationException(getDottedPath(),
+                                    SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
+                                    converterMeta.value(), pType.getActualTypeArguments()[0]);
                         }
                     }
                 } else {
@@ -525,18 +599,18 @@ public class StateMachineInstBuilderImpl extends
             final String setterName = convertSetterName(getterName, returnType);
             final Method setter = findMethod(klass, setterName, returnType);
             if ( null == setter && !klass.isInterface() ) {
-                throw newVerificationException(getDottedPath(), Errors.STATE_INDICATOR_SETTER_NOT_FOUND,
+                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_SETTER_NOT_FOUND,
                         ( (Method) getter ).getDeclaringClass());
             } else {
                 if ( null != setter && !Modifier.isPrivate(( setter ).getModifiers()) ) {
                     throw newVerificationException(getDottedPath(),
-                            Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER, setter);
+                            SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER, setter);
                 }
             }
         } else if ( getter instanceof Field ) {
             if ( !Modifier.isPrivate(( (Field) getter ).getModifiers()) ) {
                 throw newVerificationException(getDottedPath(),
-                        Errors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
+                        SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
             }
         } else {
             throw new IllegalArgumentException();
@@ -595,7 +669,7 @@ public class StateMachineInstBuilderImpl extends
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(),
-                    Errors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath().getName(),
+                    SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath().getName(),
                     getTemplate().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
         }
     }
@@ -606,6 +680,63 @@ public class StateMachineInstBuilderImpl extends
             @Override
             public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
                 verifyTransitionMethod(method, failureSet);
+                return false;
+            }
+        });
+    }
+
+    private void configureConditions(final Class<?> klass) {
+        scanMethodsOnClasses(new Class<?>[] { klass }, null, new MethodScanner() {
+
+            @Override
+            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+                final Condition conditionMeta = method.getAnnotation(Condition.class);
+                if ( null == conditionMeta ) {
+                    return false;
+                }
+                final ConditionMetadata conditionMetadata = getTemplate().getCondtion(conditionMeta.value());
+                try {
+                    configureCondition(klass, method, conditionMetadata);
+                } catch (VerificationException e) {
+                    throw new IllegalStateException(e);
+                }
+                return false;
+            }
+        });
+    }
+
+    protected void configureCondition(Class<?> klass, Method method, ConditionMetadata conditionMetadata)
+            throws VerificationException {
+        ConditionObjectBuilder builder = new ConditionObjectBuilderImpl(this, method, conditionMetadata);
+        builder.build(klass, this);
+        final Iterator<Object> iterator = builder.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            this.conditionObjectMap.put(iterator.next(), builder.getMetaData());
+        }
+        this.conditionObjectList.add(builder);
+    }
+
+    private void configureTransitionObjects(final Class<?> klass) {
+        scanMethodsOnClasses(new Class<?>[] { klass }, null, new MethodScanner() {
+
+            @Override
+            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+                final Transition transitionAnno = method.getAnnotation(Transition.class);
+                if ( null == transitionAnno ) {
+                    return false;
+                }
+                final TransitionMetadata transitionMetadata;
+                if ( Null.class == transitionAnno.value() ) {
+                    transitionMetadata = getTemplate().getTransition(
+                            StringUtil.toUppercaseFirstCharacter(method.getName()));
+                } else {
+                    transitionMetadata = getTemplate().getTransition(transitionAnno.value());
+                }
+                try {
+                    configureTransitionObject(klass, method, transitionMetadata);
+                } catch (VerificationException e) {
+                    throw new IllegalStateException(e);
+                }
                 return false;
             }
         });
@@ -652,7 +783,7 @@ public class StateMachineInstBuilderImpl extends
             } else if ( null != stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
                 if ( !overridingFound ) {
                     failureSet.add(newVerificationException(getDottedPath(),
-                            Errors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
+                            SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
                     return true;
                 }
             }
@@ -713,7 +844,7 @@ public class StateMachineInstBuilderImpl extends
             final TransitionTypeEnum type = transitionMetadata.getType();
             if ( isUniqueTransition(type) ) {
                 failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
-                        Errors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
+                        SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
                                 .getDottedPath().getName(), "@" + type.name(), getTemplate().getDottedPath(),
                         getDottedPath().getAbsoluteName()));
             }
@@ -730,36 +861,11 @@ public class StateMachineInstBuilderImpl extends
             if ( null == transition ) return false;
             final String transitionName = transitionMetadata.getDottedPath().getName();
             if ( Null.class == transition.value() ) {
-                return transitionName.equals(upperFirstChar(transitionMethod.getName()));
+                return transitionName.equals(StringUtil.toUppercaseFirstCharacter(transitionMethod.getName()));
             } else {
                 return transitionName.equals(transition.value().getSimpleName());
             }
         }
-    }
-    private interface MethodScanner {
-
-        boolean onMethodFound(Method method, VerificationFailureSet failureSet);
-    }
-
-    private void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet,
-            final MethodScanner scanner) {
-        if ( 0 == klasses.length ) return;
-        final ArrayList<Class<?>> superclasses = new ArrayList<Class<?>>();
-        for ( Class<?> klass : klasses ) {
-            if ( klass == Object.class ) continue;
-            for ( Method method : klass.getDeclaredMethods() ) {
-                if ( scanner.onMethodFound(method, failureSet) ) {
-                    return;
-                }
-            }
-            if ( null != klass.getSuperclass() && Object.class != klass ) {
-                superclasses.add(klass.getSuperclass());
-            }
-            for ( Class<?> interfaze : klass.getInterfaces() ) {
-                superclasses.add(interfaze);
-            }
-        }
-        scanMethodsOnClasses(superclasses.toArray(new Class<?>[superclasses.size()]), failureSet, scanner);
     }
 
     private void verifyTransitionMethod(Method method, VerificationFailureSet failureSet) {
@@ -776,23 +882,24 @@ public class StateMachineInstBuilderImpl extends
         }
         if ( null != transitionMetadata ) {
             verifySpecialTransitionMethodHasZeroArgument(method, failureSet, transitionMetadata);
-            configureTransitionInst(method, transitionMetadata);
         }
     }
 
-    private void configureTransitionInst(final Method method, final TransitionMetadata transitionMetadata) {
-        final TransitionInstBuilderImpl transitionInstBuilder = new TransitionInstBuilderImpl(this, method,
+    private void configureTransitionObject(final Class<?> klass, final Method method,
+            final TransitionMetadata transitionMetadata) throws VerificationException {
+        final TransitionObjectBuilderImpl transitionObjectBuilder = new TransitionObjectBuilderImpl(this, method,
                 transitionMetadata);
-        final Iterator<Object> iterator = transitionInstBuilder.getKeySet().iterator();
+        transitionObjectBuilder.build(klass, this);
+        final Iterator<Object> iterator = transitionObjectBuilder.getKeySet().iterator();
         while ( iterator.hasNext() ) {
-            this.transitionInsts.put(iterator.next(), transitionInstBuilder.getMetaData());
+            this.transitionObjectMap.put(iterator.next(), transitionObjectBuilder.getMetaData());
         }
-        if ( null == transitionMetadataInstsMap.get(transitionMetadata) ) {
-            final LinkedList<TransitionInst> insts = new LinkedList<>();
-            insts.add(transitionInstBuilder.getMetaData());
-            transitionMetadataInstsMap.put(transitionMetadata, insts);
+        if ( null == transitionMetadataMap.get(transitionMetadata) ) {
+            final LinkedList<TransitionObject> transitionObjects = new LinkedList<>();
+            transitionObjects.add(transitionObjectBuilder.getMetaData());
+            transitionMetadataMap.put(transitionMetadata, transitionObjects);
         } else {
-            transitionMetadataInstsMap.get(transitionMetadata).add(transitionInstBuilder.getMetaData());
+            transitionMetadataMap.get(transitionMetadata).add(transitionObjectBuilder.getMetaData());
         }
     }
 
@@ -800,8 +907,8 @@ public class StateMachineInstBuilderImpl extends
             VerificationFailureSet failureSet, final Transition transition, TransitionMetadata transitionMetadata) {
         if ( !getTemplate().hasTransition(transition.value()) ) {
             failureSet.add(newVerificationFailure(getMethodDottedPath(method),
-                    Errors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(), method
-                            .getDeclaringClass().getName(), getTemplate().getDottedPath()));
+                    SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(),
+                    method.getDeclaringClass().getName(), getTemplate().getDottedPath()));
         } else {
             transitionMetadata = getTemplate().getTransition(transition.value());
         }
@@ -810,11 +917,11 @@ public class StateMachineInstBuilderImpl extends
 
     private TransitionMetadata verifyTransitionMethodDefaultStyle(Method method, VerificationFailureSet failureSet,
             TransitionMetadata transitionMetadata) {
-        if ( !getTemplate().hasTransition(upperFirstChar(method.getName())) ) {
-            failureSet.add(newVerificationFailure(getMethodDottedPath(method), Errors.LM_METHOD_NAME_INVALID,
+        if ( !getTemplate().hasTransition(StringUtil.toUppercaseFirstCharacter(method.getName())) ) {
+            failureSet.add(newVerificationFailure(getMethodDottedPath(method), SyntaxErrors.LM_METHOD_NAME_INVALID,
                     getTemplate().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
         } else {
-            transitionMetadata = getTemplate().getTransition(upperFirstChar(method.getName()));
+            transitionMetadata = getTemplate().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
         }
         return transitionMetadata;
     }
@@ -829,8 +936,8 @@ public class StateMachineInstBuilderImpl extends
             case Redo:
                 if ( method.getParameterTypes().length > 0 ) {
                     failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
-                            Errors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER, method,
-                            upperFirstChar(method.getName()), transitionMetadata.getType()));
+                            SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER, method,
+                            StringUtil.toUppercaseFirstCharacter(method.getName()), transitionMetadata.getType()));
                 }
                 break;
             default:
@@ -842,56 +949,33 @@ public class StateMachineInstBuilderImpl extends
         return method.getDeclaringClass().getName() + "." + method.getName();
     }
 
-    private String upperFirstChar(String name) {
-        if ( name.length() > 1 ) {
-            return name.substring(0, 1).toUpperCase().concat(name.substring(1));
-        } else if ( name.length() == 1 ) {
-            return name.toUpperCase();
-        }
-        return name;
-    }
-
     @Override
-    public TransitionInst[] getTransitionSet() {
-        if ( null != this.transitionInsts.values() ) {
-            return this.transitionInsts.values().toArray(new TransitionInst[0]);
+    public TransitionObject[] getTransitionSet() {
+        if ( null != this.transitionObjectMap.values() ) {
+            return this.transitionObjectMap.values().toArray(new TransitionObject[0]);
         } else {
-            return new TransitionInst[0];
+            return new TransitionObject[0];
         }
     }
 
     @Override
     public boolean hasTransition(Object transitionKey) {
-        return this.transitionInsts.containsKey(transitionKey);
+        return this.transitionObjectMap.containsKey(transitionKey);
     }
 
     @Override
-    public TransitionInst getTransition(Object transitionKey) {
-        return this.transitionInsts.get(transitionKey);
+    public TransitionObject getTransition(Object transitionKey) {
+        return this.transitionObjectMap.get(transitionKey);
     }
 
     @Override
-    public StateInst[] getStateSet() {
-        // TODO Auto-generated method stub
-        return null;
+    public StateObject[] getStateSet() {
+        return this.stateList.toArray(new StateObject[0]);
     }
 
     @Override
-    public StateInst getState(Object stateKey) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Method stateGetter() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Method stateSetter() {
-        // TODO Auto-generated method stub
-        return null;
+    public StateObject getState(Object stateKey) {
+        return stateMap.get(stateKey);
     }
 
     @Override
@@ -900,7 +984,58 @@ public class StateMachineInstBuilderImpl extends
     }
 
     @Override
-    public StateMachineInstBuilder build(Class<?> klass, StateMachineMetaBuilder parent) throws VerificationException {
+    public StateMachineObjectBuilder build(Class<?> klass, StateMachineMetaBuilder parent) throws VerificationException {
+        addKeys(klass);
         return this;
+    }
+
+    @Override
+    public StateAccessor<String> getStateAccessor() {
+        return stateAccessor;
+    }
+
+    public void setStateAccessor(StateAccessor<String> accessor) {
+        this.stateAccessor = accessor;
+    }
+
+    @Override
+    public String evaluateState(Object target) {
+        return this.stateAccessor.read(target);
+    }
+
+    @Override
+    public void setTargetState(Object target, String state) {
+        this.stateAccessor.write(target, state);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public String getNextState(Object target, Object transitionKey) {
+        final String stateName = evaluateState(target);
+        final StateObject state = getState(stateName);
+        final FunctionMetadata functionMetadata = state.getTemplate().getFunctionMetadata(transitionKey);
+        if ( 1 < functionMetadata.getNextStates().size() ) {
+            final TransitionMetadata transitionMetadata = functionMetadata.getTransition();
+            Class<? extends ConditionalTransition<?>> judgerClass = transitionMetadata.getJudgerClass();
+            try {
+                ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass
+                        .newInstance();
+                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(getCondition(transitionMetadata
+                        .getConditionClass()));
+                return nextStateClass.getSimpleName();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass
+                        + ". Please provide no-arg constructor.");
+            }
+        } else if ( 1 == functionMetadata.getNextStates().size() ) {
+            final StateMetadata nextState = functionMetadata.getNextStates().get(0);
+            return nextState.getSimpleName();
+        } else {
+            throw new IllegalArgumentException("No next states found with fuction: " + functionMetadata);
+        }
+    }
+
+    private Object getCondition(Class<?> conditionClass) {
+        return this.conditionObjectMap.get(conditionClass);
     }
 }

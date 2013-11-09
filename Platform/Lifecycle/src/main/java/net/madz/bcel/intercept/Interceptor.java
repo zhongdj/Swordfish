@@ -6,8 +6,7 @@ public abstract class Interceptor<V> {
 
     private Interceptor<V> next;
 
-    public Interceptor() {
-    }
+    public Interceptor() {}
 
     public Interceptor(Interceptor<V> next) {
         super();

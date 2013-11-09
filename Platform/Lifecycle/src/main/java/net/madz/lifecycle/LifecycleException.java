@@ -1,12 +1,15 @@
 package net.madz.lifecycle;
 
-import net.madz.utils.MadzException;
+import net.madz.utils.MadzRuntimeException;
 
-public class LifecycleException extends MadzException {
+public class LifecycleException extends MadzRuntimeException {
 
     private static final long serialVersionUID = 7069144333982097517L;
-
     private static final String LIFECYCLE = "Lifecycle";
+
+    public LifecycleException(Class<?> cls, String bundle, String errorCode, Object... messageVars) {
+        super(cls, bundle, errorCode, messageVars);
+    }
 
     public LifecycleException(Class<?> cls, String bundle, String errorCode, String[] messageVars, Throwable cause) {
         super(cls, bundle, errorCode, messageVars, cause);

@@ -3,7 +3,7 @@ package net.madz.lifecycle.syntax.lm.condition;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.syntax.lm.condition.LMSyntaxConditionMetadata.S1.Conditions.S1_Condition_A;
 import net.madz.verification.VerificationException;
 
@@ -23,7 +23,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_CONDITION_REFERENCE_INVALID,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_CONDITION_REFERENCE_INVALID,
                     NLM_1.class.getMethod("getConditionA", null), S1.Transitions.S1_Transition_X.class);
             throw e;
         }
@@ -41,7 +41,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, NLM_2.class,
+                    SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, NLM_2.class,
                     S1.Conditions.S1_Condition_A.class);
             throw e;
         }
@@ -58,7 +58,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.LM_CONDITION_NOT_COVERED,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_CONDITION_NOT_COVERED,
                     NLM_3.class, S1.class.getName(),
                     S1.class.getName() + ".ConditionSet." + S1_Condition_A.class.getSimpleName());
             throw e;
@@ -78,7 +78,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
+                    SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
                     ConditionObjectDoesNotImplementConditionClass.class.getMethod("getConditionA", null),
                     S1_Condition_A.class);
             throw e;

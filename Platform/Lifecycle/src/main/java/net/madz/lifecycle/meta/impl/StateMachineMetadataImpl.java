@@ -2,7 +2,7 @@ package net.madz.lifecycle.meta.impl;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
@@ -186,7 +186,7 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     }
 
     @Override
-    public StateMachineInst newInstance(Class<?> clazz) {
+    public StateMachineObject newInstance(Class<?> clazz) {
         // TODO Auto-generated method stub
         return null;
     }

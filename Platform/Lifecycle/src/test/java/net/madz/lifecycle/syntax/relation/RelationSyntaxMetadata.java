@@ -1,6 +1,6 @@
 package net.madz.lifecycle.syntax.relation;
 
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -67,12 +67,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = PStandalone.Transitions.PX.class, value = PB.class)
             @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PStandalone.Relations.PR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PStandalone.Relations.PR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             static interface PA {}
             @End
@@ -93,7 +93,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NStandalone {
 
-        static String error = Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+        static String error = SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
 
         @StateSet
         static interface States {
@@ -121,7 +121,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NStandalone2 {
 
-        static String error = Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION;
+        static String error = SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION;
 
         @StateSet
         static interface States {
@@ -149,7 +149,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NStandalone3 {
 
-        static String error = Errors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE;
+        static String error = SyntaxErrors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE;
 
         @StateSet
         static interface States {
@@ -177,7 +177,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NStandalone4 {
 
-        static String error = Errors.RELATIONSET_MULTIPLE;
+        static String error = SyntaxErrors.RELATIONSET_MULTIPLE;
 
         @StateSet
         static interface States {
@@ -217,12 +217,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = Super.Transitions.SX.class, value = SB.class)
             @InboundWhile(relation = Super.Relations.SR.class, on = { RelatedSM.States.RB.class },
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             @ValidWhile(relation = Super.Relations.SR.class, on = { RelatedSM.States.RB.class },
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             static interface SA {}
             @End
@@ -261,7 +261,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NChild extends Super {
 
-        static String error = Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+        static String error = SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
 
         @StateSet
         static interface States extends Super.States {
@@ -281,7 +281,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NChild2 extends Super {
 
-        static String error = Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION;
+        static String error = SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION;
 
         @StateSet
         static interface States extends Super.States {
@@ -301,7 +301,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NChild3 extends Super {
 
-        static String error = Errors.RELATION_VALIDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+        static String error = SyntaxErrors.RELATION_VALIDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
 
         @StateSet
         static interface States extends Super.States {
@@ -321,7 +321,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NChild4 extends Super {
 
-        static String error = Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION;
+        static String error = SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION;
 
         @StateSet
         static interface States extends Super.States {
@@ -341,7 +341,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NStandalone5 {
 
-        static String error = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID;
+        static String error = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID;
 
         @StateSet
         static interface States {
@@ -349,12 +349,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NStandalone5.Transitions.N5X.class, value = N5B.class)
             @InboundWhile(relation = NStandalone5.Relations.N5R.class, on = { RelatedSM.States.RB.class },
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { InvalidRelationReferenceSM.States.A.class }) })
             @ValidWhile(relation = NStandalone5.Relations.N5R.class, on = { RelatedSM.States.RB.class },
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
                             states = { InvalidRelationReferenceSM.States.A.class }) })
             static interface N5A {}
             @End
@@ -381,12 +381,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = PStandaloneParent.Transitions.PPX.class, value = PStandaloneParent.States.PPB.class)
             @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PStandaloneParent.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PStandaloneParent.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             static interface PPA {}
             @End
@@ -425,15 +425,15 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                     @Function(transition = OwningB.CTransitions.CompositeX.class,
                             value = OwningB.CStates.CompositeB.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = OwningB.CRelations.PCS1R.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface CompositeA {}
                     @Function(transition = OwningB.CTransitions.CompositeX.class,
                             value = OwningB.CStates.CompositeC.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = OwningB.CRelations.PCS1R.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface CompositeB {}
                     @End
@@ -473,12 +473,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Function(transition = PParentRelationSuper.Transitions.PPX.class,
                     value = PParentRelationSuper.States.PPB.class)
             @InboundWhile(on = { RelatedSM.States.RB.class }, relation = PParentRelationSuper.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             @ValidWhile(on = { RelatedSM.States.RB.class }, relation = PParentRelationSuper.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             static interface PPA {}
             @End
@@ -518,12 +518,12 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NStandaloneParent.Transitions.PPX.class, value = NStandaloneParent.States.PPB.class)
             @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NStandaloneParent.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             @ValidWhile(on = { RelatedSM.States.RB.class }, relation = NStandaloneParent.Relations.PPR.class,
-                    otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                            code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                    otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                            code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                             states = { RelatedSM.States.RA.class }) })
             static interface PPA {}
             @End
@@ -577,15 +577,15 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                     @Function(transition = NOwningB.CTransitions.NCompositeX.class,
                             value = NOwningB.NCStates.NCompositeB.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NOwningB.CRelations.NCR.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface NCompositeA {}
                     @Function(transition = NOwningB.CTransitions.NCompositeX.class,
                             value = NOwningB.NCStates.NCompositeC.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = NOwningB.CRelations.NCR.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface NCompositeB {}
                     @End
@@ -644,15 +644,15 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                     @Function(transition = N2OwningB.CTransitions.N2CompositeX.class,
                             value = N2OwningB.N2CStates.N2CompositeB.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = N2OwningB.CRelations.N2CR.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface N2CompositeA {}
                     @Function(transition = N2OwningB.CTransitions.N2CompositeX.class,
                             value = N2OwningB.N2CStates.N2CompositeC.class)
                     @InboundWhile(on = { RelatedSM.States.RB.class }, relation = N2OwningB.CRelations.N2CR.class,
-                            otherwise = { @ErrorMessage(bundle = Errors.SYNTAX_ERROR_BUNDLE,
-                                    code = Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+                            otherwise = { @ErrorMessage(bundle = SyntaxErrors.SYNTAX_ERROR_BUNDLE,
+                                    code = SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                                     states = { RelatedSM.States.RA.class }) })
                     static interface N2CompositeB {}
                     @End

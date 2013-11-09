@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
-import net.madz.lifecycle.meta.instance.RelationInst;
+import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.meta.MetaData;
@@ -39,7 +39,7 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
     }
 
     @Override
-    public RelationInst newInstance(Class<?> clazz) {
+    public RelationObject newInstance(Class<?> clazz) {
         return null;
     }
 

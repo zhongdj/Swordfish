@@ -1,6 +1,6 @@
 package net.madz.lifecycle;
 
-public interface Errors {
+public interface SyntaxErrors {
 
     public static final String SYNTAX_ERROR_BUNDLE = "syntax_error";
     public static final String REGISTERED_META_ERROR = "002-1000";

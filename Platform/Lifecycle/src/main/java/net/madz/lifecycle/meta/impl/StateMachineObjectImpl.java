@@ -3,15 +3,14 @@ package net.madz.lifecycle.meta.impl;
 import java.lang.reflect.Method;
 
 import net.madz.common.DottedPath;
-import net.madz.lifecycle.meta.instance.StateInst;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
-import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.instance.StateObject;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationFailureSet;
 
-
-public class StateMachineInstImpl implements StateMachineInst {
+public class StateMachineObjectImpl implements StateMachineObject {
 
     @Override
     public StateMachineMetadata getTemplate() {
@@ -36,7 +35,7 @@ public class StateMachineInstImpl implements StateMachineInst {
     }
 
     @Override
-    public TransitionInst[] getTransitionSet() {
+    public TransitionObject[] getTransitionSet() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -48,31 +47,41 @@ public class StateMachineInstImpl implements StateMachineInst {
     }
 
     @Override
-    public TransitionInst getTransition(Object transitionKey) {
+    public TransitionObject getTransition(Object transitionKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public StateInst[] getStateSet() {
+    public StateObject[] getStateSet() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public StateInst getState(Object stateKey) {
+    public StateObject getState(Object stateKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Method stateGetter() {
+    public StateAccessor<String> getStateAccessor() {
+        return null;
+    }
+
+    @Override
+    public String evaluateState(Object target) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Method stateSetter() {
+    public void setTargetState(Object target, String state) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String getNextState(Object target, Object transtionKey) {
         // TODO Auto-generated method stub
         return null;
     }

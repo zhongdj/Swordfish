@@ -4,11 +4,12 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
@@ -49,6 +50,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private HashMap<Object, FunctionMetadata> functionMetadataMap = new HashMap<>();
     private ArrayList<TransitionMetadata> possibleTransitionList = new ArrayList<>();
     private ArrayList<FunctionMetadata> functionMetadataList = new ArrayList<>();
+    private HashMap<Object, TransitionMetadata> possibleTransitionMap = new HashMap<>();
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -113,8 +115,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public String getSimpleName() {
-        // TODO Auto-generated method stub
-        return null;
+        return getDottedPath().getName();
     }
 
     @Override
@@ -139,8 +140,26 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public TransitionMetadata getTransition(Object transitionKey) {
-        // TODO Auto-generated method stub
-        return null;
+        if ( isOverriding() || !hasSuper() ) {
+            final TransitionMetadata transitionMetadata = getDeclaredPossibleTransition(transitionKey);
+            if ( null == transitionMetadata ) {
+                throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
+                        + " while searching transition metadata.");
+            } else {
+                return transitionMetadata;
+            }
+        } else {// if ( hasSuper() && !isOverriding() ) {
+            final TransitionMetadata transitionMetadata = getDeclaredPossibleTransition(transitionKey);
+            if ( null != transitionMetadata ) {
+                return transitionMetadata;
+            } else {
+                return this.getSuperStateMetadata().getTransition(transitionKey);
+            }
+        }
+    }
+
+    private TransitionMetadata getDeclaredPossibleTransition(Object transitionKey) {
+        return possibleTransitionMap.get(transitionKey);
     }
 
     @Override
@@ -232,17 +251,18 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             return;
         }
         if ( isFinalState(clazz) && !isShortCut(clazz) ) {
-            throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT,
-                    clazz);
+            throw newVerificationException(getDottedPath(),
+                    SyntaxErrors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, clazz);
         } else if ( isShortCut(clazz) && !isFinalState(clazz) ) {
-            throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, clazz);
+            throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END,
+                    clazz);
         } else if ( isShortCut(clazz) ) {
             final ShortCut shortCut = clazz.getAnnotation(ShortCut.class);
             final Class<?> targetStateClass = shortCut.value();
             StateMetadata found = findStateMetadata(targetStateClass, parent.getOwningStateMachine());
             if ( null == found ) {
-                throw newVerificationException(getDottedPath(), Errors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID,
-                        shortCut, clazz, targetStateClass);
+                throw newVerificationException(getDottedPath(),
+                        SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID, shortCut, clazz, targetStateClass);
             }
         }
     }
@@ -287,8 +307,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             return new ArrayList<>();
         }
         if ( 0 == functionList.size() && !this.compositeState ) {
-            throw newVerificationException(getDottedPath().getAbsoluteName(), Errors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
-                    stateClass.getName());
+            throw newVerificationException(getDottedPath().getAbsoluteName(),
+                    SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
         }
         return functionList;
     }
@@ -298,7 +318,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         if ( transitionClassSet.contains(function.transition()) || !isOverriding()
                 && superStateHasFunction(function.transition()) ) {
             throw newVerificationException(getDottedPath(),
-                    Errors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION, stateClass, function.transition());
+                    SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION, stateClass,
+                    function.transition());
         } else {
             functionList.add(function);
             transitionClassSet.add(function.transition());
@@ -323,10 +344,14 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             nextStates.add(parent.getParent().getState(item));
         }
         final FunctionMetadata functionMetadata = new FunctionMetadata(parent, transition, nextStates);
-        this.functionMetadataMap.put(functionMetadata.getTransition(), functionMetadata);
-        this.functionMetadataMap.put(function.transition(), functionMetadata);
         this.functionMetadataList.add(functionMetadata);
         this.possibleTransitionList.add(transition);
+        final Iterator<Object> iterator = transition.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            final Object next = iterator.next();
+            this.functionMetadataMap.put(next, functionMetadata);
+            this.possibleTransitionMap.put(next, transition);
+        }
     }
 
     private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
@@ -338,27 +363,27 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             if ( this.parent.isComposite() ) {
                 if ( null != this.parent.getOwningStateMachine().getTransition(transitionClz) ) {
                     failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                            Errors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function,
+                            SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function,
                             stateClass.getName(), transitionClz.getName()));
                 } else {
                     failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                            Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
+                            SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
                             transitionClz.getName()));
                 }
             } else {
                 failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                        Errors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
+                        SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
                         transitionClz.getName()));
             }
         }
         if ( 0 == stateCandidates.length ) {
             failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                    Errors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function, stateClass.getName(),
+                    SyntaxErrors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function, stateClass.getName(),
                     transitionClz.getName()));
         } else if ( 1 < stateCandidates.length ) {
             if ( !transition.isConditional() ) {
                 failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
-                        Errors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(),
+                        SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(),
                         transitionClz.getName()));
             }
         }
@@ -367,7 +392,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             StateMetadata stateMetadata = findStateMetadata(stateCandidateClass);
             if ( null == stateMetadata ) {
                 failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                        Errors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, function, stateClass.getName(), parent
+                        SyntaxErrors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, function, stateClass.getName(), parent
                                 .getDottedPath().getAbsoluteName(), stateCandidateClass.getName()));
             }
         }
@@ -468,7 +493,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet) {
         if ( !hasRelation(relationClass) ) {
             failureSet.add(newVerificationFailure(getDottedPath(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass,
+                    SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass,
                     parent.getDottedPath()));
             return;
         }
@@ -483,11 +508,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                 if ( a instanceof InboundWhile ) {
                     failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
-                            Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass,
+                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass,
                             relatedStateMachine.getDottedPath()));
                 } else {
                     failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
-                            Errors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
+                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
                             relatedStateMachine.getDottedPath()));
                 }
             }
@@ -509,11 +534,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                     if ( a instanceof InboundWhile ) {
                         failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
-                                Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass,
+                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass,
                                 relatedStateMachine.getDottedPath()));
                     } else {
                         failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
-                                Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass,
+                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass,
                                 relatedStateMachine.getDottedPath()));
                     }
                 }
@@ -568,5 +593,50 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     @Override
     public FunctionMetadata getDeclaredFunctionMetadata(Object functionKey) {
         return this.functionMetadataMap.get(functionKey);
+    }
+
+    @Override
+    public boolean hasMultipleStateCandidatesOn(Object transitionKey) {
+        if ( isOverriding() || !hasSuper() ) {
+            final FunctionMetadata functionMetadata = getDeclaredFunctionMetadata(transitionKey);
+            if ( null == functionMetadata ) {
+                throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey);
+            }
+            if ( 1 < functionMetadata.getNextStates().size() ) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {// if ( hasSuper() && !isOverriding() ) {
+            final FunctionMetadata functionMetadata = this.getDeclaredFunctionMetadata(transitionKey);
+            if ( null != functionMetadata ) {
+                return true;
+            } else {
+                return this.getSuperStateMetadata().hasMultipleStateCandidatesOn(transitionKey);
+            }
+        }
+    }
+
+    public FunctionMetadata getFunctionMetadata(Object functionKey) {
+        if ( isOverriding() || !hasSuper() ) {
+            final FunctionMetadata functionMetadata = getDeclaredFunctionMetadata(functionKey);
+            if ( null == functionMetadata ) {
+                throw new IllegalArgumentException("Invalid Key or Key not registered: " + functionKey
+                        + " while searching function metadata.");
+            } else {
+                return functionMetadata;
+            }
+        } else {// if ( hasSuper() && !isOverriding() ) {
+            final FunctionMetadata functionMetadata = this.getDeclaredFunctionMetadata(functionKey);
+            if ( null != functionMetadata ) {
+                return functionMetadata;
+            } else {
+                return this.getSuperStateMetadata().getFunctionMetadata(functionKey);
+            }
+        }
+    }
+
+    private boolean hasSuper() {
+        return null != getSuperStateMetadata();
     }
 }

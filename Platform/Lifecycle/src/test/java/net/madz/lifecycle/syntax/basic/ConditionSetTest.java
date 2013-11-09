@@ -3,7 +3,7 @@ package net.madz.lifecycle.syntax.basic;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -36,7 +36,7 @@ public class ConditionSetTest extends BaseMetaDataTest {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.CONDITIONSET_MULTIPLE, S4.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.CONDITIONSET_MULTIPLE, S4.class);
             throw e;
         }
     }

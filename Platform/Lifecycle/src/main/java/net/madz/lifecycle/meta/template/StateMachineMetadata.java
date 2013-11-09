@@ -3,13 +3,13 @@ package net.madz.lifecycle.meta.template;
 import net.madz.common.Dumpable;
 import net.madz.lifecycle.meta.Recoverable;
 import net.madz.lifecycle.meta.Template;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.meta.FlavorMetaData;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationException;
 
 public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>, Dumpable, Recoverable,
-        Template<StateMachineInst> {
+        Template<StateMachineObject> {
 
     /* ///////////////////////////////////////////////////////////// */
     /* // State Machine Relation with other State Machine Methods // */
@@ -88,7 +88,7 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      * @throws VerificationException
      */
     @Override
-    StateMachineInst newInstance(Class<?> clazz) throws VerificationException;
+    StateMachineObject newInstance(Class<?> clazz) throws VerificationException;
 
     /* //////////////////////////////////////////////////// */
     /* //////// Methods For Composite State Machine /////// */

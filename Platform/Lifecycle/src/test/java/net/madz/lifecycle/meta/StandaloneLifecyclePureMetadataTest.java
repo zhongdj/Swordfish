@@ -19,9 +19,9 @@ import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.F
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Schedule;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Start;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
-import net.madz.lifecycle.meta.instance.StateInst;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
-import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.instance.StateObject;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -30,6 +30,8 @@ import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,7 +43,7 @@ public class StandaloneLifecyclePureMetadataTest {
 
     private static StateMachineMetadata machineMetadata;
 
-    private static StateMachineInst stateMachineInst;
+    private static StateMachineObject stateMachineInst;
 
     private static StateMachineRegistry registry;
 
@@ -66,7 +68,7 @@ public class StandaloneLifecyclePureMetadataTest {
     @Test
     public void testRegistry() {
         final Map<Object, StateMachineMetadata> types = registry.getStateMachineTypes();
-        final Map<Object, StateMachineInst> instances = registry.getStateMachineInstances();
+        final Map<Object, StateMachineObject> instances = registry.getStateMachineInstances();
         // Check Sizes
         {
             assertTrue(types.size() > 0);
@@ -161,7 +163,7 @@ public class StandaloneLifecyclePureMetadataTest {
     @Test
     public void testTransitionInstances() throws NoSuchMethodException {
         // Check 3 transition instances
-        final TransitionInst[] transitionSet = stateMachineInst.getTransitionSet();
+        final TransitionObject[] transitionSet = stateMachineInst.getTransitionSet();
         assertEquals(3, transitionSet.length);
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Schedule.class, "allocateResources");
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Start.class, "confirmStart");
@@ -313,8 +315,8 @@ public class StandaloneLifecyclePureMetadataTest {
     // //////////////////////////////////////////////////////////////////
     @Test
     public void testStateInstancesSummary() throws Exception {
-        final StateMachineInst i = stateMachineInst;
-        final StateInst[] stateSet = i.getStateSet();
+        final StateMachineObject i = stateMachineInst;
+        final StateObject[] stateSet = i.getStateSet();
         assertEquals(5, stateSet.length);
         // Class Key Valdiation
         assertNotNull(i.getState(Created.class));
@@ -344,19 +346,14 @@ public class StandaloneLifecyclePureMetadataTest {
 
     @Test
     public void testStateMachineInst() throws Throwable {
-        final StateMachineInst i = stateMachineInst;
-        final Method getter = i.stateGetter();
-        final Method setter = i.stateSetter();
-        final Method methodG = IServiceOrder.class.getMethod("getServiceOrderState");
-        assertEquals(methodG, getter);
-        assertNull(setter);
+        fail("Not implement Yet.");
     }
 
     private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass,
-            final StateMachineInst stateMachineInst, final Class<?> transitionContainerClass,
+            final StateMachineObject stateMachineInst, final Class<?> transitionContainerClass,
             final String expectMethodName) throws NoSuchMethodException {
         assertTrue(stateMachineInst.hasTransition(transitionContainerClass));
-        final TransitionInst transition = stateMachineInst.getTransition(transitionContainerClass);
+        final TransitionObject transition = stateMachineInst.getTransition(transitionContainerClass);
         final Method actualTransitionMethod = transition.getTransitionMethod();
         final Method expectedTransitionMethod = lifecycleContainerClass.getMethod(expectMethodName);
         assertEquals(expectedTransitionMethod, actualTransitionMethod);

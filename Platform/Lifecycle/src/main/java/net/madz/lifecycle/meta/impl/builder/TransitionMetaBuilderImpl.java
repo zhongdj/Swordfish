@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import net.madz.common.Dumper;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.action.Corrupt;
@@ -13,7 +13,7 @@ import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
-import net.madz.lifecycle.meta.instance.TransitionInst;
+import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
@@ -27,7 +27,7 @@ public class TransitionMetaBuilderImpl extends
     private TransitionTypeEnum type = TransitionTypeEnum.Common;
     private boolean conditional;
     private Class<?> conditionClass;
-    private Class<?> judgerClass;
+    private Class<? extends ConditionalTransition<?>> judgerClass;
 
     protected TransitionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "TransitionSet." + name);
@@ -75,10 +75,11 @@ public class TransitionMetaBuilderImpl extends
         for ( Type type : judgerClass.getGenericInterfaces() ) {
             if ( type instanceof ParameterizedType ) {
                 final ParameterizedType pType = (ParameterizedType) type;
-                if ( ConditionalTransition.class.isAssignableFrom((Class<?>) pType.getRawType())) {
-                    if (! conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]) ) {
+                if ( ConditionalTransition.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
+                    if ( !conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]) ) {
                         throw newVerificationException(getDottedPath(),
-                                Errors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass, judgerClass);
+                                SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass,
+                                judgerClass);
                     }
                 }
             }
@@ -107,7 +108,7 @@ public class TransitionMetaBuilderImpl extends
     }
 
     @Override
-    public TransitionInst newInstance(Class<?> clazz) {
+    public TransitionObject newInstance(Class<?> clazz) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -121,5 +122,15 @@ public class TransitionMetaBuilderImpl extends
     @Override
     public boolean isConditional() {
         return conditional;
+    }
+
+    @Override
+    public Class<?> getConditionClass() {
+        return conditionClass;
+    }
+
+    @Override
+    public Class<? extends ConditionalTransition<?>> getJudgerClass() {
+        return judgerClass;
     }
 }

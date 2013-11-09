@@ -2,29 +2,31 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.reflect.Method;
 
-import net.madz.lifecycle.meta.builder.StateMachineInstBuilder;
-import net.madz.lifecycle.meta.builder.TransitionInstBuilder;
+import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
+import net.madz.lifecycle.meta.builder.TransitionObjectBuilder;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class TransitionInstBuilderImpl extends
-        AnnotationMetaBuilderBase<TransitionInstBuilder, StateMachineInstBuilder> implements TransitionInstBuilder {
+public class TransitionObjectBuilderImpl extends
+        AnnotationMetaBuilderBase<TransitionObjectBuilder, StateMachineObjectBuilder> implements
+        TransitionObjectBuilder {
 
     private Method transitionMethod;
     private TransitionMetadata template;
 
-    public TransitionInstBuilderImpl(StateMachineInstBuilder parent, Method transitionMethod,
+    public TransitionObjectBuilderImpl(StateMachineObjectBuilder parent, Method transitionMethod,
             TransitionMetadata template) {
-        super(parent, "TransitionSet" + template.getDottedPath().getName() + transitionMethod.getName());
+        super(parent, "TransitionSet." + template.getDottedPath().getName() + "." + transitionMethod.getName());
         this.transitionMethod = transitionMethod;
         this.template = template;
     }
 
     @Override
-    public TransitionInstBuilder build(Class<?> klass, StateMachineInstBuilder parent) throws VerificationException {
+    public TransitionObjectBuilder build(Class<?> klass, StateMachineObjectBuilder parent) throws VerificationException {
+        addKeys(template.getKeySet());
         return this;
     }
 
@@ -44,7 +46,7 @@ public class TransitionInstBuilderImpl extends
     }
 
     @Override
-    public TransitionInstBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
+    public TransitionObjectBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         return this;
     }
 }

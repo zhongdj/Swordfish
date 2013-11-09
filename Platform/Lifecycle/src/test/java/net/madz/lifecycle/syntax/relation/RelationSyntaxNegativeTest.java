@@ -5,7 +5,7 @@ import java.util.Iterator;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
@@ -28,7 +28,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE,
+                    SyntaxErrors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE,
                     NStandalone3.Relations.NR.class.getAnnotation(RelateTo.class));
             throw e;
         }
@@ -45,7 +45,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.RELATIONSET_MULTIPLE,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.RELATIONSET_MULTIPLE,
                     NStandalone4.class);
             throw e;
         }
@@ -63,10 +63,10 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             final Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(iterator.next(), Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
+            assertFailure(iterator.next(), SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(InboundWhile.class), NStandalone5.States.N5A.class,
                     RelatedSM.class.getName());
-            assertFailure(iterator.next(), Errors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
+            assertFailure(iterator.next(), SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID,
                     NStandalone5.States.N5A.class.getAnnotation(ValidWhile.class), NStandalone5.States.N5A.class,
                     RelatedSM.class.getName());
             throw e;
@@ -85,7 +85,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NStandalone.States.NA.class
+                    SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NStandalone.States.NA.class
                             .getAnnotation(InboundWhile.class).relation(), NStandalone.States.NA.class,
                     NStandalone.class.getName());
             throw e;
@@ -104,7 +104,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
+                    SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
                     NStandalone2.States.NA.class.getAnnotation(InboundWhile.class), NStandalone2.States.NA.class,
                     RelatedSM.class.getName());
             throw e;
@@ -123,7 +123,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild.States.NCC.class
+                    SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild.States.NCC.class
                             .getAnnotation(InboundWhile.class).relation(), NChild.States.NCC.class,
                     NChild.class.getName());
             throw e;
@@ -142,7 +142,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
+                    SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
                     NChild2.States.NC2C.class.getAnnotation(InboundWhile.class), NChild2.States.NC2C.class,
                     RelatedSM.class.getName());
             throw e;
@@ -161,7 +161,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild3.States.NC3C.class
+                    SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, NChild3.States.NC3C.class
                             .getAnnotation(InboundWhile.class).relation(), NChild3.States.NC3C.class,
                     NChild3.class.getName());
             throw e;
@@ -180,7 +180,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
+                    SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION,
                     NChild4.States.NC4C.class.getAnnotation(InboundWhile.class), NChild4.States.NC4C.class,
                     RelatedSM.class.getName());
             throw e;
@@ -198,7 +198,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.RELATION_MULTIPLE_PARENT_RELATION,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.RELATION_MULTIPLE_PARENT_RELATION,
                     NStandaloneParent.class);
             throw e;
         }
@@ -216,7 +216,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
+                    SyntaxErrors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
                     NParentRelationChild.class, PParentRelationSuper.class);
             throw e;
         }
@@ -235,7 +235,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
+                    SyntaxErrors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
                     NOwningStateMachine.class.getName() + ".CompositeStateMachine."
                             + NOwningStateMachine.States.NOwningB.class.getSimpleName(),
                     NOwningStateMachine.States.NOwningB.CRelations.NCR.class, NOwningStateMachine.class,
@@ -257,7 +257,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
+                    SyntaxErrors.RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION,
                     N2OwningStateMachine.class.getName() + ".CompositeStateMachine."
                             + N2OwningStateMachine.States.N2OwningB.class.getSimpleName(),
                     N2OwningStateMachine.States.N2OwningB.CRelations.N2CR.class, N2OwningStateMachine.class,

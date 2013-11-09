@@ -5,7 +5,7 @@ import java.util.Iterator;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
@@ -30,8 +30,8 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
         } catch (VerificationException e) {
             assertEquals(1, e.getVerificationFailureSet().size());
             final VerificationFailure failure = e.getVerificationFailureSet().iterator().next();
-            assertEquals(Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES, failure.getErrorCode());
-            final String expectedMessage = getMessage(Errors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
+            assertEquals(SyntaxErrors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES, failure.getErrorCode());
+            final String expectedMessage = getMessage(SyntaxErrors.STATEMACHINE_WITHOUT_INNER_CLASSES_OR_INTERFACES,
                     new Object[] { Negative_No_InnerClasses.class.getName() });
             assertEquals(expectedMessage, failure.getErrorMessage(null));
             throw e;
@@ -54,16 +54,16 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             final VerificationFailure failureOne = iterator.next();
             final VerificationFailure failureTwo = iterator.next();
             {
-                assertEquals(Errors.STATEMACHINE_WITHOUT_STATESET, failureOne.getErrorCode());
-                assertEquals(Errors.STATEMACHINE_WITHOUT_TRANSITIONSET, failureTwo.getErrorCode());
+                assertEquals(SyntaxErrors.STATEMACHINE_WITHOUT_STATESET, failureOne.getErrorCode());
+                assertEquals(SyntaxErrors.STATEMACHINE_WITHOUT_TRANSITIONSET, failureTwo.getErrorCode());
             }
             {
-                final String expectedMessage = getMessage(Errors.STATEMACHINE_WITHOUT_STATESET,
+                final String expectedMessage = getMessage(SyntaxErrors.STATEMACHINE_WITHOUT_STATESET,
                         Negative_No_StateSet_and_TransitionSet.class);
                 assertEquals(expectedMessage, failureOne.getErrorMessage(null));
             }
             {
-                final String expectedMessage = getMessage(Errors.STATEMACHINE_WITHOUT_TRANSITIONSET,
+                final String expectedMessage = getMessage(SyntaxErrors.STATEMACHINE_WITHOUT_TRANSITIONSET,
                         Negative_No_StateSet_and_TransitionSet.class);
                 assertEquals(expectedMessage, failureTwo.getErrorMessage(null));
             }
@@ -86,9 +86,9 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             Iterator<VerificationFailure> iterator = ex.getVerificationFailureSet().iterator();
             final VerificationFailure failureOne = iterator.next();
             final VerificationFailure failureTwo = iterator.next();
-            assertFailure(failureOne, Errors.STATEMACHINE_MULTIPLE_STATESET,
+            assertFailure(failureOne, SyntaxErrors.STATEMACHINE_MULTIPLE_STATESET,
                     Negative_Multi_StateSet_Multi_TransitionSet.class);
-            assertFailure(failureTwo, Errors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
+            assertFailure(failureTwo, SyntaxErrors.STATEMACHINE_MULTIPLE_TRANSITIONSET,
                     Negative_Multi_StateSet_Multi_TransitionSet.class);
             throw ex;
         }
@@ -106,8 +106,8 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             new Registry();
         } catch (VerificationException e) {
             Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(iterator.next(), Errors.STATESET_WITHOUT_STATE, Negative_No_State_No_Transition.States.class);
-            assertFailure(iterator.next(), Errors.TRANSITIONSET_WITHOUT_TRANSITION,
+            assertFailure(iterator.next(), SyntaxErrors.STATESET_WITHOUT_STATE, Negative_No_State_No_Transition.States.class);
+            assertFailure(iterator.next(), SyntaxErrors.TRANSITIONSET_WITHOUT_TRANSITION,
                     Negative_No_State_No_Transition.Transitions.class);
             throw e;
         }
@@ -129,9 +129,9 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             VerificationFailure failureOne = iterator.next();
             VerificationFailure failureTwo = iterator.next();
-            assertFailure(failureOne, Errors.STATESET_WITHOUT_INITIAL_STATE,
+            assertFailure(failureOne, SyntaxErrors.STATESET_WITHOUT_INITIAL_STATE,
                     Negative_StateSet_Without_InitalState_And_EndState.States.class);
-            assertFailure(failureTwo, Errors.STATESET_WITHOUT_FINAL_STATE,
+            assertFailure(failureTwo, SyntaxErrors.STATESET_WITHOUT_FINAL_STATE,
                     Negative_StateSet_Without_InitalState_And_EndState.States.class);
             throw e;
         }
@@ -148,7 +148,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), Errors.STATESET_MULTIPLE_INITAL_STATES,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATESET_MULTIPLE_INITAL_STATES,
                     Negative_StateSet_With_Multi_InitalState.States.class);
             throw e;
         }

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
@@ -34,11 +34,11 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(Errors.REGISTERED_META_ERROR,
+            final String expectedErrorMessage = getMessage(SyntaxErrors.REGISTERED_META_ERROR,
                     WithoutMetadataAnnotationErrorSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
-            assertEquals(Errors.REGISTERED_META_ERROR, failure.getErrorCode());
+            assertEquals(SyntaxErrors.REGISTERED_META_ERROR, failure.getErrorCode());
             throw ex;
         }
     }
@@ -60,11 +60,11 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
+            final String expectedErrorMessage = getMessage(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
                     IncorrectStateMachineInheritanceSuperSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
-            assertEquals(Errors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());
+            assertEquals(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());
             throw ex;
         }
     }
@@ -86,11 +86,11 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             assertEquals(1, actualFailureSet.size());
             Iterator<VerificationFailure> iterator = actualFailureSet.iterator();
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
+            final String expectedErrorMessage = getMessage(SyntaxErrors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE,
                     IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
-            assertEquals(Errors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, failure.getErrorCode());
+            assertEquals(SyntaxErrors.STATEMACHINE_HAS_ONLY_ONE_SUPER_INTERFACE, failure.getErrorCode());
             throw ex;
         }
     }
@@ -108,7 +108,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    Errors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
+                    SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
                     WrongStateMachineSyntaxWithoutAnnotation.class);
             throw e;
         }

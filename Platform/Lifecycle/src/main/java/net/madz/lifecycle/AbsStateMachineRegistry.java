@@ -16,7 +16,7 @@ import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
-import net.madz.lifecycle.meta.instance.StateMachineInst;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
@@ -58,7 +58,7 @@ public abstract class AbsStateMachineRegistry {
      * or simple name, or class full name
      */
     protected final HashMap<Object, StateMachineMetadata> typeMap = new HashMap<>();
-    protected final HashMap<Object, StateMachineInst> instanceMap = new HashMap<>();
+    protected final HashMap<Object, StateMachineObject> instanceMap = new HashMap<>();
     private final LifecycleRegistry lifecycleRegistry;
     private final StateMachineBuilder builderMeta;
 
@@ -79,7 +79,26 @@ public abstract class AbsStateMachineRegistry {
         }
         final Class<?>[] toRegister = lifecycleRegistry.value();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        for ( Class<?> clazz : toRegister ) {
+        for ( Class<?> clazz : toRegister )
+            registerLifecycleMeta(failureSet, clazz);
+        if ( failureSet.size() > 0 ) {
+            failureSet.dump(new Dumper(System.out));
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    public void registerLifecycleMeta(final Class<?> clazz) throws VerificationException {
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        registerLifecycleMeta(failureSet, clazz);
+        if ( failureSet.size() > 0 ) {
+            failureSet.dump(new Dumper(System.out));
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    private void registerLifecycleMeta(final VerificationFailureSet failureSet, Class<?> clazz)
+            throws VerificationException {
+        {
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
                 if ( isRegistered(clazz) ) {
                     return;
@@ -92,21 +111,17 @@ public abstract class AbsStateMachineRegistry {
                 }
                 final StateMachineMetadata metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
                 if ( null == metaData ) {
-                    continue;
+                    return;
                 }
-                StateMachineInst stateMachineInstance = metaData.newInstance(clazz);
+                StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
             } else {
                 final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
-                        Errors.REGISTERED_META_ERROR, clazz);
-                failureSet.add(new VerificationFailure(this, getClass().getName(), Errors.REGISTERED_META_ERROR,
+                        SyntaxErrors.REGISTERED_META_ERROR, clazz);
+                failureSet.add(new VerificationFailure(this, getClass().getName(), SyntaxErrors.REGISTERED_META_ERROR,
                         errorMessage));
             }
-        }
-        if ( failureSet.size() > 0 ) {
-            failureSet.dump(new Dumper(System.out));
-            throw new VerificationException(failureSet);
         }
     }
 
@@ -114,7 +129,7 @@ public abstract class AbsStateMachineRegistry {
         return null != this.typeMap.get(clazz.getName());
     }
 
-    public synchronized void addInstance(Class<?> clazz, StateMachineInst stateMachine) {
+    public synchronized void addInstance(Class<?> clazz, StateMachineObject stateMachine) {
         instanceMap.put(clazz, stateMachine);
         instanceMap.put(clazz.getName(), stateMachine);
     }
@@ -148,7 +163,7 @@ public abstract class AbsStateMachineRegistry {
         return Collections.unmodifiableMap(this.typeMap);
     }
 
-    public synchronized Map<Object, StateMachineInst> getStateMachineInstances() {
+    public synchronized Map<Object, StateMachineObject> getStateMachineInstances() {
         return Collections.unmodifiableMap(this.instanceMap);
     }
 
@@ -156,7 +171,7 @@ public abstract class AbsStateMachineRegistry {
         return this.typeMap.get(key);
     }
 
-    public synchronized StateMachineInst getStateMachineInst(Object key) {
+    public synchronized StateMachineObject getStateMachineInst(Object key) {
         return this.instanceMap.get(key);
     }
 
@@ -189,6 +204,10 @@ public abstract class AbsStateMachineRegistry {
             }
         }
         return null;
+    }
+
+    public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException {
+        return loadStateMachineMetadata(stateMachineClass, null);
     }
 
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass,

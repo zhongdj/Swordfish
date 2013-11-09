@@ -1,6 +1,6 @@
 package net.madz.lifecycle.syntax.state;
 
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
@@ -501,7 +501,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NegativeOverridesWithoutSuperClass extends CorrectBase {
 
-        public static final String errorCode = Errors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS;
+        public static final String errorCode = SyntaxErrors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS;
 
         @StateSet
         static interface States extends CorrectBase.States {
@@ -515,7 +515,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
     @StateMachine
     static interface NegativeOverridesMissingInitial extends CorrectBase {
 
-        public static final String errorCode = Errors.STATESET_MULTIPLE_INITAL_STATES;
+        public static final String errorCode = SyntaxErrors.STATESET_MULTIPLE_INITAL_STATES;
 
         @StateSet
         static interface States extends CorrectBase.States {

@@ -2,7 +2,7 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.common.DottedPath;
 import net.madz.lifecycle.AbsStateMachineRegistry;
-import net.madz.lifecycle.Errors;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
 import net.madz.meta.MetaData;
 import net.madz.meta.impl.MetaDataBuilderBase;
@@ -37,7 +37,7 @@ public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT ex
 
     protected VerificationFailure newVerificationFailure(String dottedPathName, String errorCode, Object... args) {
         return new VerificationFailure(this, dottedPathName, errorCode, BundleUtils.getBundledMessage(getClass(),
-                Errors.SYNTAX_ERROR_BUNDLE, errorCode, args));
+                SyntaxErrors.SYNTAX_ERROR_BUNDLE, errorCode, args));
     }
 
     protected void addKeys(Class<?> clazz) {
