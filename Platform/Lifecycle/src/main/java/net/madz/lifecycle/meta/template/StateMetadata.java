@@ -51,7 +51,7 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
     /**
      * @return related state dependencies, expected to be used pre-state-change
      *         validation, which will validate the validity of the state. Once
-     *         the state is not invalid, transitions will fail until the state
+     *         the state is not valid, transitions will fail until the state
      *         has been fixed by synchronizationTransition.
      * 
      *         And if parent object life cycle exists, then this state should be
