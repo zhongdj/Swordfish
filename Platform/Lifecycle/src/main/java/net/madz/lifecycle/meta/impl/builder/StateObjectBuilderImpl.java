@@ -21,7 +21,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
     private StateMetadata template;
 
     protected StateObjectBuilderImpl(StateMachineObjectBuilder parent, StateMetadata stateMetadata) {
-        super(parent, stateMetadata.getDottedPath().getName());
+        super(parent, "StateSet." + stateMetadata.getDottedPath().getName());
         this.template = stateMetadata;
     }
 

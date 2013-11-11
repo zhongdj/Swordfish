@@ -455,6 +455,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         }
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
             RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(inboundWhile.relation()),
+                    "InboundWhiles." + inboundWhile.relation().getSimpleName(), 
                     inboundWhile.relation(),
                     getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
                     configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
@@ -462,6 +463,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         }
         for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
             RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()),
+                    "ValidWhiles." + validWhile.relation().getSimpleName(),
                     validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
                     configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
@@ -477,10 +479,10 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         return onStates;
     }
 
-    private RelationMetadata configureRelation(StateMachineMetadata relatedStateMachine, Class<?> relationClass,
+    private RelationMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
             LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects)
             throws VerificationException {
-        return new RelationMetaBuilderImpl(this, relationClass, onStates, errorObjects, relatedStateMachine).build(
+        return new RelationMetaBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(
                 relationClass, this);
     }
 
@@ -515,8 +517,13 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private void verifyRelation(Annotation a, final Class<?>[] relatedStateClasses, final Class<?> relationClass,
             final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet) {
         if ( !hasRelation(relationClass) ) {
-            failureSet.add(newVerificationFailure(getDottedPath(),
-                    SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET, relationClass, stateClass,
+            final String errorCode;
+            if ( a instanceof InboundWhile ) {
+                errorCode = SyntaxErrors.RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+            } else {
+                errorCode = SyntaxErrors.RELATION_VALIDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
+            }
+            failureSet.add(newVerificationFailure(getDottedPath(), errorCode, relationClass, stateClass,
                     parent.getDottedPath()));
             return;
         }
@@ -573,6 +580,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         boolean result = false;
         for ( StateMachineMetadata smd = parent; !result && smd != null; smd = smd.getSuperStateMachine() ) {
             result = smd.hasRelation(relationClass);
+            if ( !result && smd.isComposite() ) {
+                result = smd.getOwningStateMachine().hasRelation(relationClass);
+            }
+            if ( result ) {
+                return result;
+            }
         }
         return result;
     }
@@ -581,6 +594,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         StateMachineMetadata relatedSm = null;
         for ( StateMachineMetadata smd = parent; relatedSm == null && smd != null; smd = smd.getSuperStateMachine() ) {
             relatedSm = smd.getRelatedStateMachine(relationClass);
+            if (null == relatedSm && getParent().isComposite()) {
+                relatedSm = getParent().getOwningStateMachine().getRelatedStateMachine(relationClass);
+            }
         }
         return relatedSm;
     }

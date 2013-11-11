@@ -1,6 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
@@ -17,19 +18,19 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
         RelationMetaBuilder {
 
     private StateMachineMetadata relatedStateMachine;
-    private final LinkedList<StateMetadata> onStates;
-    private final LinkedList<ErrorMessageObject> errorMessageObjects;
+    private final LinkedList<StateMetadata> onStates = new LinkedList<>();
+    private final LinkedList<ErrorMessageObject> errorMessageObjects = new LinkedList<>();
 
     @Override
     public StateMachineMetadata getRelatedStateMachine() {
         return relatedStateMachine;
     }
 
-    public RelationMetaBuilderImpl(StateMetaBuilder parent, Class<?> relationKey,
-            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
-        super(parent, "RelationSet." + relationKey.getSimpleName());
-        this.onStates = onStates;
-        this.errorMessageObjects = errorMessageObjects;
+    public RelationMetaBuilderImpl(StateMetaBuilder parent, String name,
+            List<StateMetadata> onStates, List<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
+        super(parent, name);
+        this.onStates.addAll(onStates);
+        this.errorMessageObjects.addAll(errorMessageObjects);
         this.relatedStateMachine = stateMachineMetadata;
     }
 

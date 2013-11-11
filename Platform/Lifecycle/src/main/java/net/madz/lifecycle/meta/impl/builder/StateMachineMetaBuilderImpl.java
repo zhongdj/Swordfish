@@ -264,10 +264,10 @@ public class StateMachineMetaBuilderImpl extends
             configureConditionSet(clazz);
             configureTransitionSet(clazz);
             configureStateSetBasic(clazz);
-            configureCompositeStateMachine(clazz);
-            configureFunctions(clazz);
             configureRelationSet(clazz);
             configureStateSetRelations(clazz);
+            configureCompositeStateMachine(clazz);
+            configureFunctions(clazz);
         }
         addKeys(clazz);
         return this;
