@@ -38,6 +38,7 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.meta.KeySet;
 import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
@@ -53,6 +54,7 @@ public class StateMachineObjectBuilderImpl extends
     private StateAccessor<String> stateAccessor;
     private final HashMap<Object, StateObject> stateMap = new HashMap<>();
     private final ArrayList<StateObject> stateList = new ArrayList<>();
+    private final HashMap<Object, ReadAccessor<?>> relationObjectsMap = new HashMap<>();
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
@@ -70,13 +72,49 @@ public class StateMachineObjectBuilderImpl extends
         configureConditions(klass);
         configureTransitionObjects(klass);
         configureStateObjects(klass);
+        configureRelationObject(klass);
         return this;
+    }
+
+    private void configureRelationObject(Class<?> klass) throws VerificationException {
+        configureRelationObjectsOnField(klass);
+        configureRelationObjectsOnProperties(klass);
+    }
+
+    private void configureRelationObjectsOnProperties(Class<?> klass) throws VerificationException {
+        if ( Object.class == klass || null == klass ) {
+            return;
+        }
+        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner();
+        final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class<?>[] { klass }, verificationFailureSet, scanner);
+        if ( 0 < verificationFailureSet.size() ) throw new VerificationException(verificationFailureSet);
+    }
+
+    @SuppressWarnings({ "rawtypes" })
+    private void configureRelationObjectsOnField(Class<?> klass) throws VerificationException {
+        if ( klass.isInterface() || Object.class == klass || null == klass ) {
+            return;
+        }
+        for ( Field field : klass.getDeclaredFields() ) {
+            Relation relation = field.getAnnotation(Relation.class);
+            if ( null == relation ) {
+                continue;
+            }
+            Class<?> relationClass = relation.value();
+            // getTemplate().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
+            getTemplate().getRegistry().loadStateMachineObject(field.getType());
+            final FieldEvaluator evaluator = new FieldEvaluator(field);
+            this.relationObjectsMap.put(relationClass, evaluator);
+            this.relationObjectsMap.put(relationClass.getSimpleName(), evaluator);
+        }
     }
 
     private void configureStateObjects(Class<?> klass) throws VerificationException {
         final StateMetadata[] allStates = getTemplate().getAllStates();
         for ( StateMetadata stateMetadata : allStates ) {
             StateObjectBuilderImpl stateObject = new StateObjectBuilderImpl(this, stateMetadata);
+            stateObject.setRegistry(getRegistry());
             stateObject.build(klass, this);
             Iterator<Object> iterator = stateObject.getKeySet().iterator();
             while ( iterator.hasNext() ) {
@@ -318,7 +356,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private boolean scanFieldsRelation(Class<?> klass, final RelationMetadata relation) {
-        for ( Class c = klass; Object.class != c; c = c.getSuperclass() ) {
+        for ( Class<?> c = klass; Object.class != c; c = c.getSuperclass() ) {
             for ( Field field : c.getDeclaredFields() ) {
                 if ( hasRelationOnField(relation, field) ) return true;
             }
@@ -415,6 +453,31 @@ public class StateMachineObjectBuilderImpl extends
                     failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
                             SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
                             relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
+                }
+            }
+            return false;
+        }
+    }
+    private final class RelationGetterConfigureScanner implements MethodScanner {
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            Relation relation = method.getAnnotation(Relation.class);
+            if ( null != relation ) {
+                final PropertyEvaluator evaluator = new PropertyEvaluator(method);
+                if ( Null.class == relation.value() ) {
+                    if ( method.getName().startsWith("get") ) {
+                        relationObjectsMap.put(method.getName().substring(3), evaluator);
+                    }
+                    relationObjectsMap.put(method.getName(), evaluator);
+                } else {
+                    relationObjectsMap.put(relation.value(), evaluator);
+                }
+                try {
+                    getTemplate().getRegistry().loadStateMachineObject(method.getReturnType());
+                } catch (VerificationException e) {
+                    failureSet.add(e);
                 }
             }
             return false;
@@ -608,7 +671,7 @@ public class StateMachineObjectBuilderImpl extends
                 }
             }
         } else if ( getter instanceof Field ) {
-            if ( !Modifier.isPrivate(( (Field) getter ).getModifiers())) {
+            if ( !Modifier.isPrivate(( (Field) getter ).getModifiers()) ) {
                 throw newVerificationException(getDottedPath(),
                         SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
             }
@@ -1037,5 +1100,45 @@ public class StateMachineObjectBuilderImpl extends
 
     private Object getCondition(Class<?> conditionClass) {
         return this.conditionObjectMap.get(conditionClass);
+    }
+
+    @Override
+    public void validValidWhiles(Object target) {
+        final StateMetadata state = getTemplate().getState(evaluateState(target));
+        final RelationMetadata[] validWhiles = state.getValidWhiles();
+        for ( final RelationMetadata relationMetadata : validWhiles ) {
+            ReadAccessor<?> evaluator = getEvaluator(relationMetadata.getKeySet());
+            getState(state.getDottedPath()).verifyValidWhile(target, relationMetadata, evaluator);
+            // StateMachineObject relatedStateMachineObject = null;
+            // Object relationObject =
+            // evaluateRelationObject(relationMetadata.getKeySet().iterator());
+            // if ( null == relationObject ) {
+            // throw new
+            // IllegalStateException("There is no relation object for relation "
+            // + relationMetadata.getDottedPath());
+            // }
+            // relatedStateMachineObject =
+            // this.registry.getStateMachineInst(relationObject);
+            // if ( null == relatedStateMachineObject ) {
+            // throw new
+            // IllegalStateException("There is no state machine object found in registry for relation "
+            // + relationMetadata.getDottedPath());
+            // }
+            // String evaluateState =
+            // relatedStateMachineObject.evaluateState(relationObject);
+            // verifyRelationObjectInValidStates(relationMetadata.getOnStates(),
+            // evaluateState);
+        }
+    }
+
+    private ReadAccessor<?> getEvaluator(KeySet keySet) {
+        final Iterator<Object> iterator = keySet.iterator();
+        while ( iterator.hasNext() ) {
+            final Object relationKey = iterator.next();
+            if ( relationObjectsMap.containsKey(relationKey) ) {
+                return relationObjectsMap.get(relationKey);
+            }
+        }
+        return null;
     }
 }

@@ -81,4 +81,6 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
     boolean hasMultipleStateCandidatesOn(Object transtionKey);
 
     FunctionMetadata getFunctionMetadata(Object functionKey);
+
+    RelationMetadata[] getDeclaredValidWhiles();
 }

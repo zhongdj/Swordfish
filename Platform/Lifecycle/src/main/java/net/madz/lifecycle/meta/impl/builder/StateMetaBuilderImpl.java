@@ -2,6 +2,7 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -195,6 +196,27 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public RelationMetadata[] getValidWhiles() {
+        final ArrayList<RelationMetadata> result = new ArrayList<>();
+        getRelationMetadataRecursively(this, result);
+        return result.toArray(new RelationMetadata[0]);
+    }
+
+    private void getRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
+        final RelationMetadata[] declaredValidWhiles = stateMetadata.getDeclaredValidWhiles();
+        for ( final RelationMetadata relationMetadata : declaredValidWhiles ) {
+            result.add(relationMetadata);
+        }
+        if ( isOverriding() ) {
+            return;
+        } else {
+            if ( null != stateMetadata.getSuperStateMetadata() ) {
+                getRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
+            }
+        }
+    }
+
+    @Override
+    public RelationMetadata[] getDeclaredValidWhiles() {
         return this.validWhileRelations.toArray(new RelationMetadata[0]);
     }
 
@@ -229,6 +251,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     private void configureSupperState(Class<?> clazz) {
         final Class<?>[] interfaces = clazz.getInterfaces();
+        
         if ( interfaces.length > 0 ) {
             if ( null != clazz.getAnnotation(Overrides.class) ) {
                 this.overriding = true;
@@ -424,7 +447,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
             verifyInboundWhile(inboundWhile, clazz, failureSet);
         }
-        for ( ValidWhile validWhile : findValidWhiles(clazz) ) {
+        for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
             verifyValidWhile(validWhile, clazz, failureSet);
         }
         if ( 0 < failureSet.size() ) {
@@ -437,7 +460,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                     configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
             this.inboundWhileRelations.add(relationMetadata);
         }
-        for ( ValidWhile validWhile : findValidWhiles(clazz) ) {
+        for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
             RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()),
                     validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
@@ -562,10 +585,19 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         return relatedSm;
     }
 
-    private ArrayList<ValidWhile> findValidWhiles(Class<?> clazz) {
+    private ArrayList<ValidWhile> findDeclaredValidWhiles(Class<?> clazz) {
         final ArrayList<ValidWhile> validWhileList = new ArrayList<>();
-        final ValidWhiles validWhiles = clazz.getAnnotation(ValidWhiles.class);
-        final ValidWhile validWhile = clazz.getAnnotation(ValidWhile.class);
+        Annotation[] declaredAnnotations = clazz.getDeclaredAnnotations();
+        ValidWhiles validWhiles = null;
+        ValidWhile validWhile = null;
+        for ( Annotation annotation : declaredAnnotations ) {
+            if ( ValidWhiles.class == annotation.annotationType() ) {
+                validWhiles = (ValidWhiles) annotation;
+            }
+            if ( ValidWhile.class == annotation.annotationType() ) {
+                validWhile = (ValidWhile) annotation;
+            }
+        }
         if ( null != validWhiles ) {
             for ( ValidWhile valid : validWhiles.value() ) {
                 validWhileList.add(valid);
