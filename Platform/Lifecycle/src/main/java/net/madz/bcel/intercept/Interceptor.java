@@ -28,6 +28,9 @@ public abstract class Interceptor<V> {
     }
 
     protected void handleException(Exception e) {
+        if ( e instanceof RuntimeException ) {
+            throw (RuntimeException) e;
+        }
         System.out.println("intercepting with :" + getClass().getName() + " @handleException");
     }
 
