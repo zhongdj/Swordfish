@@ -15,7 +15,6 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycl
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycle;
 import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
-
 import static org.junit.Assert.assertEquals;
 
 public class EngineTestBase {
@@ -106,5 +105,9 @@ public class EngineTestBase {
 
     public EngineTestBase() {
         super();
+    }
+
+    protected void assertState(final Class<?> stateClass, final ReactiveObject product) {
+        assertEquals(stateClass.getSimpleName(), product.getState());
     }
 }
