@@ -48,6 +48,11 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
         public String getState() {
             return state;
         }
+        
+        @SuppressWarnings("unused")
+        private void setState(String stateName) {
+            this.state = stateName;
+        }
     }
 
     protected static class WithoutMetadataAnnotationErrorSyntax {}
