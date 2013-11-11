@@ -608,7 +608,7 @@ public class StateMachineObjectBuilderImpl extends
                 }
             }
         } else if ( getter instanceof Field ) {
-            if ( !Modifier.isPrivate(( (Field) getter ).getModifiers()) ) {
+            if ( !Modifier.isPrivate(( (Field) getter ).getModifiers())) {
                 throw newVerificationException(getDottedPath(),
                         SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
             }
@@ -639,7 +639,7 @@ public class StateMachineObjectBuilderImpl extends
 
     private Field findFieldWith(Class<?> klass, Class<? extends Annotation> aClass) {
         for ( Class<?> index = klass; index != Object.class; index = index.getSuperclass() ) {
-            for ( Field field : klass.getDeclaredFields() ) {
+            for ( Field field : index.getDeclaredFields() ) {
                 if ( null != field.getAnnotation(aClass) ) {
                     return field;
                 }
