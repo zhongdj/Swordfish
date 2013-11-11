@@ -16,7 +16,7 @@ public class LifecycleCommonErrors {
      * @param {4} relation definition
      */
     public static final String STATE_INVALID = "002-9001";
-    public static final String BUNDLE = "lifecyle_common";
+    public static final String BUNDLE = "lifecycle_common";
 
     private LifecycleCommonErrors() {}
 }
