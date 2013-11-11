@@ -1,15 +1,15 @@
 package net.madz.lifecycle.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
-import net.madz.lifecycle.annotations.relation.ValidWhile;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta.Relations.CustomerRelation;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.VOIPServiceLifecycleMeta.Relations.VoipProvider;
 
-import org.apache.bcel.generic.NEW;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
 
@@ -24,8 +24,14 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             order.start();
         } catch (LifecycleException e) {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), customer,
-                    customer.getState(), InternetServiceLifecycleMeta.States.New.class.getAnnotation(ValidWhile.class));
+                    customer.getState(),
+                    validWhileDottedPath(InternetServiceLifecycleMeta.States.New.class, CustomerRelation.class));
         }
+    }
+
+    private String validWhileDottedPath(Class<?> stateClass, Class<?> relationKeyClss) {
+        return stateClass.getDeclaringClass().getDeclaringClass().getName() + ".StateSet." + stateClass.getSimpleName()
+                + ".ValidWhiles." + relationKeyClss.getSimpleName();
     }
 
     @Test(expected = LifecycleException.class)
@@ -44,7 +50,8 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             service.start();
         } catch (LifecycleException e) {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, service, service.getState(), customer,
-                    customer.getState(), InternetServiceLifecycleMeta.States.New.class.getAnnotation(ValidWhile.class));
+                    customer.getState(),
+                    validWhileDottedPath(InternetServiceLifecycleMeta.States.New.class, CustomerRelation.class));
         }
     }
 
@@ -63,8 +70,15 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, service, service.getState(), provider,
-                    provider.getState(), InternetServiceLifecycleMeta.States.New.class.getAnnotation(ValidWhile.class));
+            assertLifecycleError(
+                    e,
+                    LifecycleCommonErrors.STATE_INVALID,
+                    service,
+                    service.getState(),
+                    provider,
+                    provider.getState(),
+                    validWhileDottedPath(InternetTVServiceLifecycle.States.New.class,
+                            InternetTVServiceLifecycle.Relations.TVProvider.class));
         }
     }
 
@@ -83,7 +97,8 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             service.start();
         } catch (LifecycleException e) {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, service, service.getState(), provider,
-                    provider.getState(), VOIPServiceLifecycleMeta.States.New.class.getAnnotation(ValidWhile.class));
+                    provider.getState(),
+                    validWhileDottedPath(VOIPServiceLifecycleMeta.States.New.class, VoipProvider.class));
         }
     }
 }
