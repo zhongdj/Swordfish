@@ -85,4 +85,10 @@ public class StateMachineObjectImpl implements StateMachineObject {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public void validValidWhiles(Object target) {
+        // TODO Auto-generated method stub
+        
+    }
 }
