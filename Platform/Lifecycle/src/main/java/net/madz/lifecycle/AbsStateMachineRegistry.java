@@ -88,6 +88,7 @@ public abstract class AbsStateMachineRegistry {
     }
 
     public void registerLifecycleMeta(final Class<?> clazz) throws VerificationException {
+        System.out.println("registering .. " + clazz);
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         registerLifecycleMeta(failureSet, clazz);
         if ( failureSet.size() > 0 ) {
@@ -106,16 +107,21 @@ public abstract class AbsStateMachineRegistry {
                 createStateMachineMetaBuilder(clazz, null, failureSet);
             } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
                 final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
-                if ( isRegistered(stateMachineClass) ) {
+                final StateMachineMetadata metaData;
+                if ( !isRegistered(stateMachineClass) ) {
+                    metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
+                } else {
+                    metaData = loadStateMachineMetadata(stateMachineClass);
+                }
+                if (null == metaData) {
+                    //Failed to create State machine Meta Builder will return null.
                     return;
                 }
-                final StateMachineMetadata metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
-                if ( null == metaData ) {
-                    return;
+                if ( null == getStateMachineInst(clazz) ) {
+                    StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
+                    stateMachineInstance.verifyMetaData(failureSet);
+                    addInstance(clazz, stateMachineInstance);
                 }
-                StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
-                stateMachineInstance.verifyMetaData(failureSet);
-                addInstance(clazz, stateMachineInstance);
             } else {
                 final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
                         SyntaxErrors.REGISTERED_META_ERROR, clazz);
