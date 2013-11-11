@@ -131,7 +131,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     @Override
     protected void preExec(InterceptContext<V> context) {
         super.preExec(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context.getKlass());
+        final StateMachineObject stateMachine = lookupStateMachine(context.getTarget().getClass());
         if ( isLockEnabled() ) {
             lock(stateMachine, context);
         }
@@ -163,7 +163,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void validateStateValidWhiles(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        stateMachine.validValidWhiles(context.getTarget());
     }
 
     private void lock(StateMachineObject stateMachine, InterceptContext<V> context) {
