@@ -1,5 +1,7 @@
 package net.madz.lifecycle.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.annotation.Annotation;
 import java.util.Date;
 
@@ -30,8 +32,6 @@ import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * <ol>
@@ -373,6 +373,8 @@ public class CoreFuntionTestMetadata {
             @Overrides
             @ValidWhile(relation = VOIPServiceLifecycleMeta.Relations.VoipProvider.class,
                     on = VOIPProviderLifecycleMeta.States.ServiceAvailable.class)
+            @Function(transition = VOIPServiceLifecycleMeta.Transitions.Start.class,
+                    value = { VOIPServiceLifecycleMeta.States.InService.class })
             static interface New extends InternetServiceLifecycleMeta.States.New {}
         }
         @RelationSet
@@ -468,9 +470,15 @@ public class CoreFuntionTestMetadata {
 
     protected static void assertLifecycleError(LifecycleException e, final String expectedErrorCode,
             final Object... messageVars) {
+        System.out.println("expected error code: " + expectedErrorCode);
+        System.out.println("  actual error code: " + e.getErrorCode());
         assertEquals(expectedErrorCode, e.getErrorCode());
-        assertEquals(BundleUtils.getBundledMessage(LifecycleInterceptor.class, LifecycleCommonErrors.BUNDLE,
-                expectedErrorCode, messageVars), e.getMessage());
+        final String expectedMessage = BundleUtils.getBundledMessage(LifecycleInterceptor.class, LifecycleCommonErrors.BUNDLE,
+                expectedErrorCode, messageVars);
+        System.out.println("expected error message: " + expectedMessage);
+        System.out.println("  actual error message: " + e.getMessage());
+        
+        assertEquals(expectedMessage, e.getMessage());
         throw e;
     }
 

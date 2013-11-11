@@ -24,7 +24,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             order.start();
         } catch (LifecycleException e) {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), customer,
-                    customer.getState(), NEW.class.getAnnotation(ValidWhile.class));
+                    customer.getState(), InternetServiceLifecycleMeta.States.New.class.getAnnotation(ValidWhile.class));
         }
     }
 
