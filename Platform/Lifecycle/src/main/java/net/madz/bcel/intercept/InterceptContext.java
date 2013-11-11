@@ -36,7 +36,7 @@ public class InterceptContext<V> {
         for ( Object o : this.arguments ) {
             sb.append(String.valueOf(o)).append(" ");
         }
-        System.out.println("Found Intercept Point: " + methodName + "( " + sb.toString() + " )");
+        System.out.println("Found Intercept Point: " + klass + "."+ methodName + "( " + sb.toString() + " )");
         System.out.println("Intercepting....instatiating InterceptContext ...");
     }
 
