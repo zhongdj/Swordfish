@@ -113,8 +113,9 @@ public abstract class AbsStateMachineRegistry {
                 } else {
                     metaData = loadStateMachineMetadata(stateMachineClass);
                 }
-                if (null == metaData) {
-                    //Failed to create State machine Meta Builder will return null.
+                if ( null == metaData ) {
+                    // Failed to create State machine Meta Builder will return
+                    // null.
                     return;
                 }
                 if ( null == getStateMachineInst(clazz) ) {
@@ -214,6 +215,16 @@ public abstract class AbsStateMachineRegistry {
 
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException {
         return loadStateMachineMetadata(stateMachineClass, null);
+    }
+
+    public StateMachineObject loadStateMachineObject(Class<?> stateMachineObjectClass) throws VerificationException {
+        final StateMachineObject stateMachineObject = getStateMachineInst(stateMachineObjectClass);
+        if ( null != stateMachineObject ) {
+            return stateMachineObject;
+        } else {
+            registerLifecycleMeta(stateMachineObjectClass);
+            return getStateMachineInst(stateMachineObjectClass);
+        }
     }
 
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass,
