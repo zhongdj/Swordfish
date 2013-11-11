@@ -101,7 +101,7 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      */
     StateMachineMetadata getOwningStateMachine();
 
-    StateMetadata getCompositeState();
+    StateMetadata getOwningState();
 
     StateMetadata[] getShortcutStateSet();
 

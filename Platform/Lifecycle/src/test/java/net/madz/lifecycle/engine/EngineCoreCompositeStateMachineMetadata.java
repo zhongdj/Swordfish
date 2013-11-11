@@ -80,6 +80,13 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
         }
     }
     public abstract static class ProductBase extends ReactiveObject {
+    }
+    @LifecycleMeta(OrderLifecycle.class)
+    public static class ProductOrder extends ProductBase {
+
+        public ProductOrder() {
+            initialState(OrderLifecycle.States.Created.class.getSimpleName());
+        }
 
         @Transition
         public void start() {}
@@ -95,13 +102,6 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
 
         @Transition
         public void confirmComplete() {}
-    }
-    @LifecycleMeta(OrderLifecycle.class)
-    public static class ProductOrder extends ProductBase {
-
-        public ProductOrder() {
-            initialState(OrderLifecycle.States.Created.class.getSimpleName());
-        }
     }
     // ///////////////////////////////////////////////////////////////////////////////
     // Relational
@@ -234,6 +234,21 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
         public Contract getContract() {
             return this.contract;
         }
+
+        @Transition
+        public void start() {}
+
+        @Transition
+        public void cancel() {}
+
+        @Transition
+        public void doProduce() {}
+
+        @Transition
+        public void doDeliver() {}
+
+        @Transition
+        public void confirmComplete() {}
     }
     // ///////////////////////////////////////////////////////////////////////////////
     // Relational Case 2.
@@ -313,6 +328,21 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
         public Contract getContract() {
             return this.contract;
         }
+
+        @Transition
+        public void start() {}
+
+        @Transition
+        public void cancel() {}
+
+        @Transition
+        public void doProduce() {}
+
+        @Transition
+        public void doDeliver() {}
+
+        @Transition
+        public void confirmComplete() {}
     }
     @StateMachine
     static interface RelationalOrderLifecycleReferencingInnerValidWhile {
@@ -390,5 +420,20 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
         public Contract getContract() {
             return contract;
         }
+
+        @Transition
+        public void start() {}
+
+        @Transition
+        public void cancel() {}
+
+        @Transition
+        public void doProduce() {}
+
+        @Transition
+        public void doDeliver() {}
+
+        @Transition
+        public void confirmComplete() {}
     }
 }

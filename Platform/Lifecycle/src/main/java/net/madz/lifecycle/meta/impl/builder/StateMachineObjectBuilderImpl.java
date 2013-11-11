@@ -1077,6 +1077,10 @@ public class StateMachineObjectBuilderImpl extends
         final String stateName = evaluateState(target);
         final StateObject state = getState(stateName);
         final FunctionMetadata functionMetadata = state.getTemplate().getFunctionMetadata(transitionKey);
+        if ( null == functionMetadata ) {
+            throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
+                    + " while searching function metadata.");
+        }
         if ( 1 < functionMetadata.getNextStates().size() ) {
             final TransitionMetadata transitionMetadata = functionMetadata.getTransition();
             Class<? extends ConditionalTransition<?>> judgerClass = transitionMetadata.getJudgerClass();
@@ -1085,17 +1089,29 @@ public class StateMachineObjectBuilderImpl extends
                         .newInstance();
                 final Class<?> nextStateClass = conditionalTransition.doConditionJudge(getCondition(transitionMetadata
                         .getConditionClass()));
-                return nextStateClass.getSimpleName();
+                final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass)
+                        .getTemplate());
+                return nextState.getSimpleName();
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass
                         + ". Please provide no-arg constructor.");
             }
         } else if ( 1 == functionMetadata.getNextStates().size() ) {
-            final StateMetadata nextState = functionMetadata.getNextStates().get(0);
+            StateMetadata nextState = functionMetadata.getNextStates().get(0);
+            nextState = handleCompositeStateMachineLinkage(nextState);
             return nextState.getSimpleName();
         } else {
             throw new IllegalArgumentException("No next states found with fuction: " + functionMetadata);
         }
+    }
+
+    private StateMetadata handleCompositeStateMachineLinkage(StateMetadata nextState) {
+        if ( nextState.isCompositeState() ) {
+            nextState = nextState.getCompositeStateMachine().getInitialState();
+        } else if ( nextState.getStateMachine().isComposite() && nextState.isFinal() ) {
+            nextState = nextState.getLinkTo();
+        }
+        return nextState;
     }
 
     private Object getCondition(Class<?> conditionClass) {

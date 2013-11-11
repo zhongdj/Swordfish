@@ -234,7 +234,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public StateMetadata getCompositeState() {
+    public StateMetadata getOwningState() {
         return owningState;
     }
 

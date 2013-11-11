@@ -2,7 +2,6 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,9 +18,12 @@ import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.InboundWhiles;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.relation.ValidWhiles;
+import net.madz.lifecycle.annotations.state.Corrupted;
 import net.madz.lifecycle.annotations.state.End;
+import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.annotations.state.Waiting;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
@@ -52,6 +54,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     private ArrayList<TransitionMetadata> possibleTransitionList = new ArrayList<>();
     private ArrayList<FunctionMetadata> functionMetadataList = new ArrayList<>();
     private HashMap<Object, TransitionMetadata> possibleTransitionMap = new HashMap<>();
+    private StateMetadata shortcutState;
+    private boolean corrupted;
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
@@ -141,16 +145,23 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public TransitionMetadata getTransition(Object transitionKey) {
+        TransitionMetadata transitionMetadata = null;
+        if ( this.parent.isComposite() ) {
+            transitionMetadata = this.parent.getOwningState().getTransition(transitionKey);
+        }
         if ( isOverriding() || !hasSuper() ) {
-            final TransitionMetadata transitionMetadata = getDeclaredPossibleTransition(transitionKey);
             if ( null == transitionMetadata ) {
-                throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
-                        + " while searching transition metadata.");
+                transitionMetadata = getDeclaredPossibleTransition(transitionKey);
+            }
+            if ( null == transitionMetadata ) {
+                return null;
             } else {
                 return transitionMetadata;
             }
         } else {// if ( hasSuper() && !isOverriding() ) {
-            final TransitionMetadata transitionMetadata = getDeclaredPossibleTransition(transitionKey);
+            if ( null == transitionMetadata ) {
+                transitionMetadata = getDeclaredPossibleTransition(transitionKey);
+            }
             if ( null != transitionMetadata ) {
                 return transitionMetadata;
             } else {
@@ -237,21 +248,46 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public StateMetadata getLinkTo() {
-        // TODO Auto-generated method stub
-        return null;
+        return shortcutState;
     }
 
     @Override
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
         verifyBasicSyntax(clazz);
         configureSupperState(clazz);
+        configureStateType(clazz);
+        configureShortcutState(clazz, parent);
         addKeys(clazz);
         return this;
     }
 
+    private void configureStateType(Class<?> clazz) {
+        if ( isOverriding() ) {
+            for ( Annotation anno : clazz.getDeclaredAnnotations() ) {
+                if ( Initial.class == anno.annotationType() ) {
+                    this.initial = true;
+                } else if ( End.class == anno.annotationType() ) {
+                    this.end = true;
+                }
+            }
+        } else {
+            if ( null != clazz.getAnnotation(Initial.class) ) {
+                this.initial = true;
+            } else if ( null != clazz.getAnnotation(End.class) ) {
+                this.end = true;
+            }
+        }
+    }
+
+    private void configureShortcutState(Class<?> clazz, StateMachineMetaBuilder parent) {
+        if ( !parent.isComposite() ) return;
+        if ( !isFinal() ) return;
+        final ShortCut shortCut = clazz.getAnnotation(ShortCut.class);
+        this.shortcutState = parent.getOwningStateMachine().getState(shortCut.value());
+    }
+
     private void configureSupperState(Class<?> clazz) {
         final Class<?>[] interfaces = clazz.getInterfaces();
-        
         if ( interfaces.length > 0 ) {
             if ( null != clazz.getAnnotation(Overrides.class) ) {
                 this.overriding = true;
@@ -455,16 +491,14 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         }
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
             RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(inboundWhile.relation()),
-                    "InboundWhiles." + inboundWhile.relation().getSimpleName(), 
-                    inboundWhile.relation(),
+                    "InboundWhiles." + inboundWhile.relation().getSimpleName(), inboundWhile.relation(),
                     getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
                     configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
             this.inboundWhileRelations.add(relationMetadata);
         }
         for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
             RelationMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()),
-                    "ValidWhiles." + validWhile.relation().getSimpleName(),
-                    validWhile.relation(),
+                    "ValidWhiles." + validWhile.relation().getSimpleName(), validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
                     configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
             this.validWhileRelations.add(relationMetadata);
@@ -479,8 +513,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         return onStates;
     }
 
-    private RelationMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
-            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects)
+    private RelationMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name,
+            Class<?> relationClass, LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects)
             throws VerificationException {
         return new RelationMetaBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(
                 relationClass, this);
@@ -594,7 +628,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         StateMachineMetadata relatedSm = null;
         for ( StateMachineMetadata smd = parent; relatedSm == null && smd != null; smd = smd.getSuperStateMachine() ) {
             relatedSm = smd.getRelatedStateMachine(relationClass);
-            if (null == relatedSm && getParent().isComposite()) {
+            if ( null == relatedSm && getParent().isComposite() ) {
                 relatedSm = getParent().getOwningStateMachine().getRelatedStateMachine(relationClass);
             }
         }
@@ -645,8 +679,14 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
 
     @Override
     public boolean hasMultipleStateCandidatesOn(Object transitionKey) {
+        FunctionMetadata functionMetadata = null;
+        if ( parent.isComposite() ) {
+            functionMetadata = parent.getOwningState().getDeclaredFunctionMetadata(transitionKey);
+        }
         if ( isOverriding() || !hasSuper() ) {
-            final FunctionMetadata functionMetadata = getDeclaredFunctionMetadata(transitionKey);
+            if ( null == functionMetadata ) {
+                functionMetadata = getDeclaredFunctionMetadata(transitionKey);
+            }
             if ( null == functionMetadata ) {
                 throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey);
             }
@@ -656,7 +696,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 return false;
             }
         } else {// if ( hasSuper() && !isOverriding() ) {
-            final FunctionMetadata functionMetadata = this.getDeclaredFunctionMetadata(transitionKey);
+            if ( null == functionMetadata ) {
+                functionMetadata = this.getDeclaredFunctionMetadata(transitionKey);
+            }
             if ( null != functionMetadata ) {
                 return true;
             } else {
@@ -666,16 +708,17 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     public FunctionMetadata getFunctionMetadata(Object functionKey) {
+        FunctionMetadata functionMetadata = null;
+        if ( parent.isComposite() ) {
+            functionMetadata = parent.getOwningState().getDeclaredFunctionMetadata(functionKey);
+        }
         if ( isOverriding() || !hasSuper() ) {
-            final FunctionMetadata functionMetadata = getDeclaredFunctionMetadata(functionKey);
             if ( null == functionMetadata ) {
-                throw new IllegalArgumentException("Invalid Key or Key not registered: " + functionKey
-                        + " while searching function metadata.");
-            } else {
-                return functionMetadata;
+                functionMetadata = getDeclaredFunctionMetadata(functionKey);
             }
+            return functionMetadata;
         } else {// if ( hasSuper() && !isOverriding() ) {
-            final FunctionMetadata functionMetadata = this.getDeclaredFunctionMetadata(functionKey);
+            functionMetadata = this.getDeclaredFunctionMetadata(functionKey);
             if ( null != functionMetadata ) {
                 return functionMetadata;
             } else {

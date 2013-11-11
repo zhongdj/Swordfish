@@ -174,7 +174,7 @@ public class StateMachineMetadataImpl implements StateMachineMetadata {
     }
 
     @Override
-    public StateMetadata getCompositeState() {
+    public StateMetadata getOwningState() {
         // TODO Auto-generated method stub
         return null;
     }
