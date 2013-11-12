@@ -98,6 +98,11 @@ public interface SyntaxErrors {
      * @param {1} superStateClass
      */
     public static final String STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE = "002-2618";
+    /**
+     * @param {0} stateClass
+     * @param {1} superClass
+     */
+    public static final String STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS = "002-2619";
     public static final String FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID = "002-2700";
     // State's Shortcut
     public static final String SHORT_CUT_INVALID = "002-2800";
@@ -174,7 +179,6 @@ public interface SyntaxErrors {
      * @param {0} Relation Class
      */
     public static final String RELATION_NO_RELATED_TO_DEFINED = "002-3504";
-
     /**
      * @param {0} @LifecycleMeta Class
      * @param {1} invalid relation instance
