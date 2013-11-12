@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.madz.lifecycle.StateConverter;
@@ -450,9 +452,7 @@ public class StateMachineObjectBuilderImpl extends
             if ( null == relation ) {
                 return false;
             } else {
-                if ( Null.class == relation.value() ) {
-                    
-                } else if ( !getTemplate().hasRelation(relation.value()) ) {
+                if ( Null.class == relation.value() ) {} else if ( !getTemplate().hasRelation(relation.value()) ) {
                     failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
                             SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
                             relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
@@ -1122,6 +1122,9 @@ public class StateMachineObjectBuilderImpl extends
         } else if ( nextState.getStateMachine().isComposite() && nextState.isFinal() ) {
             nextState = nextState.getLinkTo();
         }
+        if ( nextState.isCompositeState() || nextState.getStateMachine().isComposite() && nextState.isFinal()) {
+            nextState = handleCompositeStateMachineLinkage(nextState);
+        }
         return nextState;
     }
 
@@ -1133,9 +1136,22 @@ public class StateMachineObjectBuilderImpl extends
     public void validValidWhiles(Object target) {
         final StateMetadata state = getTemplate().getState(evaluateState(target));
         final RelationMetadata[] validWhiles = state.getValidWhiles();
+        final HashMap<String, List<RelationMetadata>> mergedRelations = new HashMap<>();
         for ( final RelationMetadata relationMetadata : validWhiles ) {
-            ReadAccessor<?> evaluator = getEvaluator(relationMetadata.getKeySet());
-            getState(state.getDottedPath()).verifyValidWhile(target, relationMetadata, evaluator);
+            final String relationKey = relationMetadata.getRelatedStateMachine().getDottedPath().getAbsoluteName();
+            if ( mergedRelations.containsKey(relationKey) ) {
+                final List<RelationMetadata> list = mergedRelations.get(relationKey);
+                list.add(relationMetadata);
+            } else {
+                final ArrayList<RelationMetadata> list = new ArrayList<>();
+                list.add(relationMetadata);
+                mergedRelations.put(relationKey, list);
+            }
+        }
+        for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
+            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
+            getState(state.getDottedPath()).verifyValidWhile(target,
+                    relationMetadataEntry.getValue().toArray(new RelationMetadata[0]), evaluator);
         }
     }
 
