@@ -4,6 +4,10 @@ import org.junit.Test;
 
 public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreCompositeStateMachineMetadata {
 
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Part I: Stand alone composite state machine (composite state machine
+    // without inheritance)
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
     @Test
     public void test_non_relational_composite_state_machine_complete_process() {
         final ProductOrder product = new ProductOrder();
@@ -154,4 +158,8 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
             assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Finished.class, product);
         }
     }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Part II: composite state machine with inheritance)
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 }

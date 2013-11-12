@@ -9,6 +9,10 @@ import static org.junit.Assert.fail;
 
 public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreCompositeStateMachineMetadata {
 
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Part I: Stand alone composite state machine (composite state machine
+    // without inheritance)
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
     @Test(expected = LifecycleException.class)
     public void test_non_relational_standalone_composite_invalid_transition() {
         final ProductOrder order = new ProductOrder();
@@ -113,4 +117,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
             throw e;
         }
     }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Part II: composite state machine with inheritance)
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
 }

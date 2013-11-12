@@ -4,14 +4,8 @@ import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Relations.PowerRelation;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPostValidateCondition;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardObjectPostValidateCondition;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardObjectPreValidateCondition;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerObject;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta.Relations.CustomerRelation;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Relations.PowerRelation;
 
 import org.junit.Test;
 
