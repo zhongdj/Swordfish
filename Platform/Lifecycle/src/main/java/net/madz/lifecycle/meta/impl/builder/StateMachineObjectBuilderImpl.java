@@ -450,7 +450,9 @@ public class StateMachineObjectBuilderImpl extends
             if ( null == relation ) {
                 return false;
             } else {
-                if ( !getTemplate().hasRelation(relation.value()) ) {
+                if ( Null.class == relation.value() ) {
+                    
+                } else if ( !getTemplate().hasRelation(relation.value()) ) {
                     failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
                             SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
                             relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
@@ -1088,7 +1090,8 @@ public class StateMachineObjectBuilderImpl extends
             try {
                 ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass
                         .newInstance();
-                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target, transitionMetadata));
+                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target,
+                        transitionMetadata));
                 final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass)
                         .getTemplate());
                 return nextState.getSimpleName();
