@@ -1,5 +1,7 @@
 package net.madz.lifecycle.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
@@ -8,8 +10,6 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycl
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Relations.PowerRelation;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
 
@@ -98,28 +98,32 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     public void test_inbound_while_with_non_conditional_transition() {
         final Customer customer = new Customer();
         customer.activate();
-        InternetServiceOrder service = new InternetServiceOrder(new Date(), null, customer, "3 years");
+        InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null,
+                customer, "3 years");
         customer.cancel();
         assertEquals(CustomerLifecycleMeta.States.Canceled.class.getSimpleName(), customer.getState());
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
-                    InternetServiceLifecycleMeta.Transitions.Start.class,
-                    InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), service, customer,
+            assertLifecycleError(
+                    e,
+                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+                    InternetServiceLifecycleMetaWithInboundWhile.Transitions.Start.class,
+                    InternetServiceLifecycleMetaWithInboundWhile.States.InService.class.getSimpleName(),
+                    service,
+                    customer,
                     customer.getState(),
-                    inboundWhileDottedPath(InternetServiceLifecycleMeta.States.InService.class, CustomerRelation.class));
+                    inboundWhileDottedPath(InternetServiceLifecycleMetaWithInboundWhile.States.InService.class,
+                            CustomerRelation.class));
         }
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inbound_while_with_contional_transition_prevalidate_inbound_while_negative() {
+    public void test_inbound_while_with_conditional_transition_prevalidate_inbound_while_negative() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPreValidateCondition keyboard = new KeyBoardObjectPreValidateCondition(power);
-        keyboard.pressAnyKey();
-        assertEquals(KeyBoardLifecycleMetadataPreValidateCondition.States.Default.class, keyboard.getState());
-        assertEquals(PowerLifecycleMetadata.States.InService.class, power.getState());
-        power.reducePower();
+        power.shutDown();
+        assertState(PowerLifecycleMetadata.States.PowerOff.class, power);
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {
@@ -135,12 +139,13 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
                             PowerRelation.class));
         }
     }
+
     @Test(expected = LifecycleException.class)
-    public void test_inbound_while_with_contional_transition_postvalidate_inbound_while_negative() {
+    public void test_inbound_while_with_conditional_transition_postvalidate_inbound_while_negative() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
-        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.Default.class, keyboard);
+        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class, keyboard);
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {

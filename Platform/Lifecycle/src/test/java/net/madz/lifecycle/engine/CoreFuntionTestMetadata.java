@@ -388,17 +388,108 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
     }
 
     @StateMachine
+    protected static interface InternetServiceLifecycleMetaWithInboundWhile {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = InternetServiceLifecycleMetaWithInboundWhile.Transitions.Start.class,
+                    value = { InternetServiceLifecycleMetaWithInboundWhile.States.InService.class })
+            static interface New {}
+            @Function(transition = InternetServiceLifecycleMetaWithInboundWhile.Transitions.End.class,
+                    value = { InternetServiceLifecycleMetaWithInboundWhile.States.Ended.class })
+            @InboundWhile(on = { CustomerLifecycleMeta.States.Active.class },
+                    relation = InternetServiceLifecycleMetaWithInboundWhile.Relations.CustomerRelation.class)
+            static interface InService {}
+            @End
+            static interface Ended {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Start {}
+            static interface End {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(value = CustomerLifecycleMeta.class)
+            static interface CustomerRelation {}
+        }
+    }
+    @LifecycleMeta(InternetServiceLifecycleMetaWithInboundWhile.class)
+    public class InternetServiceOrderWithInboundWhile extends ReactiveObject {
+
+        private Date startDate;
+        private Date endDate;
+        @Relation(InternetServiceLifecycleMetaWithInboundWhile.Relations.CustomerRelation.class)
+        private Customer customer;
+        private String type;
+
+        public InternetServiceOrderWithInboundWhile() {
+            initialState(InternetServiceLifecycleMetaWithInboundWhile.States.New.class.getSimpleName());
+        }
+
+        public InternetServiceOrderWithInboundWhile(Date startDate, Date endDate, Customer customer, String type) {
+            super();
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.customer = customer;
+            this.type = type;
+            initialState(InternetServiceLifecycleMeta.States.New.class.getSimpleName());
+        }
+
+        @Transition
+        public void start() {}
+
+        @Transition
+        public void end() {}
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
+        }
+
+        public void setCustomer(Customer customer) {
+            this.customer = customer;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public Customer getCustomer() {
+            return customer;
+        }
+
+        public String getType() {
+            return type;
+        }
+    }
+    @StateMachine
     static interface PowerLifecycleMetadata {
 
         @StateSet
         static interface States {
 
             @Initial
-            @Functions(value = { @Function(transition = ShutDown.class, value = { Ended.class }),
-                    @Function(transition = ReducePower.class, value = { InService.class, Ended.class }) })
-            static interface InService {}
+            @Functions(value = { @Function(transition = ShutDown.class, value = { PowerOff.class }),
+                    @Function(transition = ReducePower.class, value = { PowerOn.class, PowerOff.class }) })
+            static interface PowerOn {}
             @End
-            static interface Ended {}
+            static interface PowerOff {}
         }
         @TransitionSet
         static interface Transitions {
@@ -420,9 +511,9 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             @Override
             public Class<?> doConditionJudge(PowerLeftCondition t) {
                 if ( t.powerLeft() ) {
-                    return PowerLifecycleMetadata.States.InService.class;
+                    return PowerLifecycleMetadata.States.PowerOn.class;
                 } else {
-                    return PowerLifecycleMetadata.States.Ended.class;
+                    return PowerLifecycleMetadata.States.PowerOff.class;
                 }
             }
         }
@@ -434,10 +525,14 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = PressAnyKey.class, value = { Default.class, Broken.class })
-            @InboundWhile(on = { PowerLifecycleMetadata.States.InService.class }, relation = PowerRelation.class)
-            static interface Default {}
-            @InboundWhile(on = { PowerLifecycleMetadata.States.InService.class }, relation = PowerRelation.class)
+            @Function(transition = PressAnyKey.class, value = { ReadingInput.class, Broken.class, NotReading.class })
+            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
+            static interface ReadingInput {}
+            @Function(transition = PressAnyKey.class, value = { ReadingInput.class })
+            @ValidWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
+            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOff.class }, relation = PowerRelation.class)
+            static interface NotReading {}
+            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
             @End
             static interface Broken {}
         }
@@ -459,14 +554,18 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             static interface TimesLeft {
 
                 boolean timesLeft();
+
+                boolean isPowerOff();
             }
         }
         public static class ConditionJudgerImpl implements ConditionalTransition<TimesLeft> {
 
             @Override
             public Class<?> doConditionJudge(TimesLeft t) {
-                if ( t.timesLeft() ) {
-                    return KeyBoardLifecycleMetadataPreValidateCondition.States.Default.class;
+                if ( t.isPowerOff() ) {
+                    return KeyBoardLifecycleMetadataPreValidateCondition.States.NotReading.class;
+                } else if ( t.timesLeft() ) {
+                    return KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class;
                 } else {
                     return KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class;
                 }
@@ -500,7 +599,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         }
 
         public PowerObject() {
-            initialState(PowerLifecycleMetadata.States.InService.class.getSimpleName());
+            initialState(PowerLifecycleMetadata.States.PowerOn.class.getSimpleName());
         }
 
         @Condition(PowerLifecycleMetadata.Conditions.PowerLeftCondition.class)
@@ -522,7 +621,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
         public KeyBoardObjectPreValidateCondition(PowerObject powerObject) {
             this.powerObject = powerObject;
-            initialState(KeyBoardObjectPreValidateCondition.class.getSimpleName());
+            initialState(KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class.getSimpleName());
         }
 
         @Condition(KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class)
@@ -539,6 +638,11 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         public boolean timesLeft() {
             return times > 0;
         }
+
+        @Override
+        public boolean isPowerOff() {
+            return !powerObject.powerLeft();
+        }
     }
     @LifecycleMeta(KeyBoardLifecycleMetadataPostValidateCondition.class)
     public static class KeyBoardObjectPostValidateCondition extends ReactiveObject implements TimesLeft {
@@ -550,7 +654,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         public KeyBoardObjectPostValidateCondition(PowerObject powerObject) {
             super();
             this.powerObject = powerObject;
-            initialState(KeyBoardLifecycleMetadataPostValidateCondition.States.Default.class.getSimpleName());
+            initialState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class.getSimpleName());
         }
 
         @Condition(KeyBoardLifecycleMetadataPostValidateCondition.Conditions.TimesLeft.class)
@@ -567,6 +671,11 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @Override
         public boolean timesLeft() {
             return times > 0;
+        }
+
+        @Override
+        public boolean isPowerOff() {
+            return !powerObject.powerLeft();
         }
     }
 }

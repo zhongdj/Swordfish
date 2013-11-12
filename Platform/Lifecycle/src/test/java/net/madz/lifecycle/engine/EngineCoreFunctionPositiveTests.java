@@ -1,13 +1,12 @@
 package net.madz.lifecycle.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPostValidateCondition;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
 
@@ -62,9 +61,9 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     public void test_inbound_while_with_non_conditional_transition() {
         final Customer customer = new Customer();
         customer.activate();
-        InternetServiceOrder service = new InternetServiceOrder(new Date(), null, customer, "3 years");
+        InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null, customer, "3 years");
         service.start();
-        assertEquals(InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), service.getState());
+        assertState(InternetServiceLifecycleMetaWithInboundWhile.States.InService.class, service);
     }
 
     @Test
@@ -72,11 +71,11 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPreValidateCondition keyboard = new KeyBoardObjectPreValidateCondition(power);
         keyboard.pressAnyKey();
-        assertEquals(KeyBoardLifecycleMetadataPreValidateCondition.States.Default.class, keyboard.getState());
-        assertEquals(PowerLifecycleMetadata.States.InService.class, power.getState());
+        assertState(KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class, keyboard);
+        assertState(PowerLifecycleMetadata.States.PowerOn.class, power);
         keyboard.pressAnyKey();
-        assertEquals(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class, keyboard.getState());
-        assertEquals(PowerLifecycleMetadata.States.Ended.class, power.getState());
+        assertState(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class, keyboard);
+        assertState(PowerLifecycleMetadata.States.PowerOn.class, power);
     }
 
     @Test
@@ -84,6 +83,8 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
-        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.Default.class, keyboard);
+        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class, keyboard);
+        keyboard.pressAnyKey();
+        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.NotReading.class, keyboard);
     }
 }
