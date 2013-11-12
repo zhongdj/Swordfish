@@ -341,9 +341,45 @@ public class StateMachineMetaBuilderImpl extends
     private void configureRelationSet(Class<?> clazz) throws VerificationException {
         verifyParentRelationSyntax(clazz);
         for ( Class<?> relationClass : findComponentClasses(clazz, RelationSet.class) ) {
+            verifyRelateTo(relationClass);
             addRelationMetadata(relationClass);
             addRelatedStateMachine(relationClass);
         }
+    }
+
+    private void verifyRelateTo(Class<?> clazz) throws VerificationException {
+        if ( !hasSuperMetadataClass(clazz) ) {
+            if ( null == clazz.getAnnotation(RelateTo.class) ) {
+                throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
+            }
+        } else if ( isOverriding(clazz) ) {
+            if ( !hasRelateToDeclared(clazz) ) {
+                throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
+            }
+        } else {
+            if ( null != clazz.getAnnotation(RelateTo.class) ) {
+                verifyRelateTo(getSuperMetadataClass(clazz));
+            }
+        }
+    }
+
+    private boolean hasRelateToDeclared(Class<?> clazz) {
+        for ( Annotation anno : clazz.getDeclaredAnnotations() ) {
+            if ( RelateTo.class == anno.annotationType() ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isOverriding(Class<?> clazz) {
+        boolean overriding = false;
+        for ( Annotation anno : clazz.getDeclaredAnnotations() ) {
+            if ( Overrides.class == anno.annotationType() ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Class<?> getDeclaredParentRelation(Class<?> clazz) {

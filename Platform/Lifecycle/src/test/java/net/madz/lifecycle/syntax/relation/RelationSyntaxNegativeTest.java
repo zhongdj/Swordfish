@@ -265,4 +265,21 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
             throw e;
         }
     }
+
+    @Test(expected = VerificationException.class)
+    public void test_relation_without_relate_to() throws VerificationException {
+        @LifecycleRegistry(NoRelateTo.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED,
+                    NoRelateTo.Relations.Relative.class);
+            throw e;
+        }
+    }
 }

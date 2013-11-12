@@ -171,6 +171,11 @@ public interface SyntaxErrors {
      */
     public static final String RELATION_COMPOSITE_STATE_MACHINE_CANNOT_OVERRIDE_OWNING_PARENT_RELATION = "002-3503";
     /**
+     * @param {0} Relation Class
+     */
+    public static final String RELATION_NO_RELATED_TO_DEFINED = "002-3504";
+
+    /**
      * @param {0} @LifecycleMeta Class
      * @param {1} invalid relation instance
      * @param {2} StateMachine

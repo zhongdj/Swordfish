@@ -690,4 +690,28 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             static interface N2R {}
         }
     }
+    @StateMachine
+    static interface NoRelateTo {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = NoRelateTo.Transitions.Action.class, value = Finished.class)
+            @ValidWhile(relation = NoRelateTo.Relations.Relative.class, on = RelatedSM.States.RA.class)
+            static interface Created {}
+            @End
+            static interface Finished {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Action {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            static interface Relative {}
+        }
+    }
 }
