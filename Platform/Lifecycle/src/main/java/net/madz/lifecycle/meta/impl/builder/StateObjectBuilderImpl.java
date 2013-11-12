@@ -1,7 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
@@ -39,22 +39,26 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
     }
 
     @Override
-    public void verifyValidWhile(Object target, RelationMetadata relationMetadata, ReadAccessor<?> evaluator) {
+    public void verifyValidWhile(Object target, RelationMetadata[] relationMetadataArray, ReadAccessor<?> evaluator) {
         final Object relatedTarget = evaluator.read(target);
         final StateMachineObject relatedStateMachineInst = this.getRegistry().getStateMachineInst(
                 relatedTarget.getClass().getName());
         final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
         boolean find = false;
-        for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
-            if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
-                find = true;
-                break;
+        for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+            for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
+                if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
+                    find = true;
+                    break;
+                }
             }
         }
         if ( false == find ) {
-            final ArrayList<String> validRelationStates = new ArrayList<>();
-            for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
-                validRelationStates.add(metadata.getSimpleName());
+            final HashSet<String> validRelationStates = new HashSet<>();
+            for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+                for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
+                    validRelationStates.add(metadata.getSimpleName());
+                }
             }
             throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.STATE_INVALID,
                     target, this.template.getSimpleName(), relatedTarget, relatedEvaluateState,
