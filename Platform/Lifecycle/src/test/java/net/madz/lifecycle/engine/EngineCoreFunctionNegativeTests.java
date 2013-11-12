@@ -6,9 +6,6 @@ import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.Customer;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta;
-import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceOrder;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta.Relations.CustomerRelation;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.VOIPServiceLifecycleMeta.Relations.VoipProvider;
 
