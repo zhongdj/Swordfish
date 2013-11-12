@@ -174,11 +174,11 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CustomerLifecycleMeta.class)
-    public static class Customer {
+    public static class Customer extends ReactiveObject {
 
-        private String state = Draft.class.getSimpleName();
-
-        protected Customer() {}
+        protected Customer() {
+            initialState(Draft.class.getSimpleName());
+        }
 
         @Transition
         public void activate() {}
@@ -191,16 +191,6 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
         @Transition
         public void cancel() {}
-
-        // Default @StateIndicator
-        public String getState() {
-            return state;
-        }
-
-        @SuppressWarnings("unused")
-        private void setState(String state) {
-            this.state = state;
-        }
     }
     @StateMachine
     protected static interface InternetServiceLifecycleMeta {
@@ -323,16 +313,17 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
     @LifecycleMeta(VOIPProviderLifecycleMeta.class)
     public static class VOIPProvider extends BaseServiceProvider {}
     @LifecycleMeta(InternetServiceLifecycleMeta.class)
-    public class InternetServiceOrder {
+    public class InternetServiceOrder extends ReactiveObject {
 
         private Date startDate;
         private Date endDate;
         @Relation(InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
         private Customer customer;
         private String type;
-        private String state = InternetServiceLifecycleMeta.States.New.class.getSimpleName();;
 
-        public InternetServiceOrder() {}
+        public InternetServiceOrder() {
+            initialState(InternetServiceLifecycleMeta.States.New.class.getSimpleName());
+        }
 
         public InternetServiceOrder(Date startDate, Date endDate, Customer customer, String type) {
             super();
@@ -340,6 +331,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             this.endDate = endDate;
             this.customer = customer;
             this.type = type;
+            initialState(InternetServiceLifecycleMeta.States.New.class.getSimpleName());
         }
 
         @Transition
@@ -347,15 +339,6 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
         @Transition
         public void end() {}
-
-        public String getState() {
-            return state;
-        }
-
-        @SuppressWarnings("unused")
-        private void setState(String state) {
-            this.state = state;
-        }
 
         public void setStartDate(Date startDate) {
             this.startDate = startDate;

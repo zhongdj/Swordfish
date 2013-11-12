@@ -1,6 +1,8 @@
 package net.madz.lifecycle.engine;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.madz.bcel.intercept.DefaultStateMachineRegistry;
 import net.madz.bcel.intercept.LifecycleInterceptor;
@@ -114,5 +116,16 @@ public class EngineTestBase {
 
     protected void assertState(final Class<?> stateClass, final ReactiveObject product) {
         assertEquals(stateClass.getSimpleName(), product.getState());
+    }
+
+    protected void assertInvalidStateErrorByValidWhile(final LifecycleException e, final ReactiveObject relationObject, final ReactiveObject itself, final Class<?>... validStates) {
+        final ArrayList<String> validNames = new ArrayList<>();
+        for ( Class<?> validstate : validStates ) {
+            validNames.add(validstate.getSimpleName());
+        }
+        try {
+            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, itself, itself.getState(), relationObject,
+                    relationObject.getState(), Arrays.toString(validNames.toArray()));
+        } catch (LifecycleException ex) {}
     }
 }

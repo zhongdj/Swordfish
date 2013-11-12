@@ -2,7 +2,6 @@ package net.madz.lifecycle.engine;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
-import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.RelationalOrderLifecycleSharingValidWhile;
 
 import org.junit.Test;
 
@@ -45,10 +44,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             order.start();
         } catch (LifecycleException e) {
-            try {
-                assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                        contract.getState());
-            } catch (LifecycleException ex) {}
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
         }
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
@@ -59,8 +55,8 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             order.doProduce();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                    contract.getState());
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
+            throw e;
         }
     }
 
@@ -71,9 +67,9 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         final ProductOrderOuterValidWhile order = new ProductOrderOuterValidWhile(contract);
         try {
             order.start();
+            fail("Should throw LifecycleException");
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                    contract.getState());
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
         }
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
@@ -84,9 +80,10 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         assertState(ContractLifecycle.States.Canceled.class, contract);
         try {
             order.doProduce();
+            fail("Should throw LifecycleException");
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                    contract.getState());
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
+            throw e;
         }
     }
 
@@ -97,9 +94,9 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         final ProductOrderSharingValidWhile order = new ProductOrderSharingValidWhile(contract);
         try {
             order.start();
+            fail("Should throw LifecycleException");
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                    contract.getState());
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
         }
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
@@ -110,9 +107,10 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         assertState(ContractLifecycle.States.Canceled.class, contract);
         try {
             order.doProduce();
+            fail("Should throw LifecycleException");
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, order, order.getState(), contract,
-                    contract.getState());
+            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
+            throw e;
         }
     }
 }

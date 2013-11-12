@@ -1,5 +1,8 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
@@ -38,7 +41,8 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
     @Override
     public void verifyValidWhile(Object target, RelationMetadata relationMetadata, ReadAccessor<?> evaluator) {
         final Object relatedTarget = evaluator.read(target);
-        final StateMachineObject relatedStateMachineInst = this.getRegistry().getStateMachineInst(relatedTarget.getClass().getName());
+        final StateMachineObject relatedStateMachineInst = this.getRegistry().getStateMachineInst(
+                relatedTarget.getClass().getName());
         final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
         boolean find = false;
         for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
@@ -48,9 +52,13 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
             }
         }
         if ( false == find ) {
-            throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE,
-                    LifecycleCommonErrors.STATE_INVALID, target, this.template.getSimpleName(), relatedTarget,
-                    relatedEvaluateState, relationMetadata.getDottedPath().getAbsoluteName());
+            final ArrayList<String> validRelationStates = new ArrayList<>();
+            for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
+                validRelationStates.add(metadata.getSimpleName());
+            }
+            throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.STATE_INVALID,
+                    target, this.template.getSimpleName(), relatedTarget, relatedEvaluateState,
+                    Arrays.toString(validRelationStates.toArray(new String[0])));
         }
     }
 }

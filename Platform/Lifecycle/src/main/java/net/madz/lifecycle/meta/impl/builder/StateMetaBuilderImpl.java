@@ -217,6 +217,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         for ( final RelationMetadata relationMetadata : declaredValidWhiles ) {
             result.add(relationMetadata);
         }
+        if ( parent.isComposite() ) {
+            for ( final RelationMetadata relationMetadata : parent.getOwningState().getValidWhiles() ) {
+                result.add(relationMetadata);
+            }
+        }
         if ( isOverriding() ) {
             return;
         } else {
