@@ -306,9 +306,10 @@ public class StateMachineMetaBuilderImpl extends
         if ( !hasSuperMetadataClass(clazz) ) {
             return;
         }
-        if ( isComposite() && isState(getSuperMetadataClass(clazz)) ) {
-            this.superStateMachineMetadata = null;
-        } else if ( isComposite() ) {
+        // if ( isComposite() && isState(getSuperMetadataClass(clazz)) ) {
+        // this.superStateMachineMetadata = null;
+        // } else
+        if ( isComposite() ) {
             this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
         } else if ( hasSuperMetadataClass(clazz) ) {
             this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
@@ -856,7 +857,8 @@ public class StateMachineMetaBuilderImpl extends
         for ( StateMetadata stateMetadata : stateMachineMeta.getDeclaredStateSet() ) {
             if ( !overridedStates.contains(stateMetadata) ) {
                 results.add(stateMetadata);
-                if ( stateMetadata.isOverriding() ) {
+                if ( null != stateMetadata.getSuperStateMetadata() ) { // stateMetadata.isOverriding()
+                                                                       // ) {
                     addOverridedStates(overridedStates, stateMetadata.getSuperStateMetadata());
                 }
             }
@@ -868,7 +870,8 @@ public class StateMachineMetaBuilderImpl extends
             return;
         }
         overridedStates.add(superStateMetadata);
-        if ( superStateMetadata.isOverriding() ) {
+        if ( null != superStateMetadata.getSuperStateMetadata() ) {// .isOverriding()
+                                                                   // ) {
             addOverridedStates(overridedStates, superStateMetadata.getSuperStateMetadata());
         }
     }
