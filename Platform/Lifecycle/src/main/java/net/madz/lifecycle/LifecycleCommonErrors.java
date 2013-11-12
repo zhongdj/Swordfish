@@ -16,6 +16,15 @@ public class LifecycleCommonErrors {
      * @param {4} relation definition
      */
     public static final String STATE_INVALID = "002-9001";
+    /**
+     * @param {0} transition
+     * @param {1} target object next state
+     * @param {2} target object
+     * @param {3} relation object
+     * @param {4} relation object's state
+     * @param {5} inbound constraint definition
+     */
+    public static final String VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT = "002-9002";
     public static final String BUNDLE = "lifecycle_common";
 
     private LifecycleCommonErrors() {}
