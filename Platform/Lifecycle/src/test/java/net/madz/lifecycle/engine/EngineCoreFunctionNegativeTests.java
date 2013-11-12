@@ -4,6 +4,13 @@ import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Relations.PowerRelation;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPostValidateCondition;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardObjectPostValidateCondition;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardObjectPreValidateCondition;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerObject;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta.Relations.CustomerRelation;
 
 import org.junit.Test;
@@ -108,6 +115,51 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
                     InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), service, customer,
                     customer.getState(),
                     inboundWhileDottedPath(InternetServiceLifecycleMeta.States.InService.class, CustomerRelation.class));
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_inbound_while_with_contional_transition_prevalidate_inbound_while_negative() {
+        final PowerObject power = new PowerObject();
+        final KeyBoardObjectPreValidateCondition keyboard = new KeyBoardObjectPreValidateCondition(power);
+        keyboard.pressAnyKey();
+        assertEquals(KeyBoardLifecycleMetadataPreValidateCondition.States.Default.class, keyboard.getState());
+        assertEquals(PowerLifecycleMetadata.States.InService.class, power.getState());
+        power.reducePower();
+        try {
+            keyboard.pressAnyKey();
+        } catch (LifecycleException e) {
+            assertLifecycleError(
+                    e,
+                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+                    KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
+                    KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class.getSimpleName(),
+                    keyboard,
+                    power,
+                    power.getState(),
+                    inboundWhileDottedPath(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class,
+                            PowerRelation.class));
+        }
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_inbound_while_with_contional_transition_postvalidate_inbound_while_negative() {
+        final PowerObject power = new PowerObject();
+        final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
+        keyboard.pressAnyKey();
+        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.Default.class, keyboard);
+        try {
+            keyboard.pressAnyKey();
+        } catch (LifecycleException e) {
+            assertLifecycleError(
+                    e,
+                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+                    KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
+                    KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class.getSimpleName(),
+                    keyboard,
+                    power,
+                    power.getState(),
+                    inboundWhileDottedPath(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class,
+                            PowerRelation.class));
         }
     }
 }

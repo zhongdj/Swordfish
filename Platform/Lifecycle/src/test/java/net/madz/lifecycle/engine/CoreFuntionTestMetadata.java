@@ -9,6 +9,10 @@ import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.TransitionSet;
+import net.madz.lifecycle.annotations.action.Condition;
+import net.madz.lifecycle.annotations.action.ConditionSet;
+import net.madz.lifecycle.annotations.action.Conditional;
+import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.Relation;
@@ -19,6 +23,12 @@ import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.CustomerLifecycleMeta.States.Draft;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetTVServiceLifecycle.Relations.TVProvider;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Relations.PowerRelation;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Conditions.PowerLeftCondition;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ReducePower;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ShutDown;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycle.States.ServiceAvailable;
 import net.madz.verification.VerificationException;
 
@@ -375,5 +385,188 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
     public CoreFuntionTestMetadata() {
         super();
+    }
+
+    @StateMachine
+    static interface PowerLifecycleMetadata {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Functions(value = { @Function(transition = ShutDown.class, value = { Ended.class }),
+                    @Function(transition = ReducePower.class, value = { InService.class, Ended.class }) })
+            static interface InService {}
+            @End
+            static interface Ended {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface ShutDown {}
+            @Conditional(condition = PowerLeftCondition.class, judger = PowerLeftConditionImpl.class)
+            static interface ReducePower {}
+        }
+        @ConditionSet
+        static interface Conditions {
+
+            static interface PowerLeftCondition {
+
+                boolean powerLeft();
+            }
+        }
+        static class PowerLeftConditionImpl implements ConditionalTransition<PowerLeftCondition> {
+
+            @Override
+            public Class<?> doConditionJudge(PowerLeftCondition t) {
+                if ( t.powerLeft() ) {
+                    return PowerLifecycleMetadata.States.InService.class;
+                } else {
+                    return PowerLifecycleMetadata.States.Ended.class;
+                }
+            }
+        }
+    }
+    @StateMachine
+    static interface KeyBoardLifecycleMetadataPreValidateCondition {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = PressAnyKey.class, value = { Default.class, Broken.class })
+            @InboundWhile(on = { PowerLifecycleMetadata.States.InService.class }, relation = PowerRelation.class)
+            static interface Default {}
+            @InboundWhile(on = { PowerLifecycleMetadata.States.InService.class }, relation = PowerRelation.class)
+            @End
+            static interface Broken {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            @Conditional(condition = TimesLeft.class, judger = ConditionJudgerImpl.class, postValidate = false)
+            static interface PressAnyKey {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(PowerLifecycleMetadata.class)
+            static interface PowerRelation {}
+        }
+        @ConditionSet
+        static interface Conditions {
+
+            static interface TimesLeft {
+
+                boolean timesLeft();
+            }
+        }
+        public static class ConditionJudgerImpl implements ConditionalTransition<TimesLeft> {
+
+            @Override
+            public Class<?> doConditionJudge(TimesLeft t) {
+                if ( t.timesLeft() ) {
+                    return KeyBoardLifecycleMetadataPreValidateCondition.States.Default.class;
+                } else {
+                    return KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class;
+                }
+            }
+        }
+    }
+    @StateMachine
+    static interface KeyBoardLifecycleMetadataPostValidateCondition extends
+            KeyBoardLifecycleMetadataPreValidateCondition {
+
+        @TransitionSet
+        static interface Transitions extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions {
+
+            @Overrides
+            @Conditional(condition = KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class,
+                    judger = ConditionJudgerImpl.class, postValidate = true)
+            static interface PressAnyKey extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey {}
+        }
+    }
+    @LifecycleMeta(PowerLifecycleMetadata.class)
+    public static class PowerObject extends ReactiveObject implements PowerLeftCondition {
+
+        private int powerLeft = 2;
+
+        @Transition
+        public void shutDown() {}
+
+        @Transition
+        public void reducePower() {
+            powerLeft--;
+        }
+
+        public PowerObject() {
+            initialState(PowerLifecycleMetadata.States.InService.class.getSimpleName());
+        }
+
+        @Condition(PowerLifecycleMetadata.Conditions.PowerLeftCondition.class)
+        public PowerLeftCondition getPowerLeftCondition() {
+            return this;
+        }
+
+        @Override
+        public boolean powerLeft() {
+            return powerLeft > 0;
+        }
+    }
+    @LifecycleMeta(KeyBoardLifecycleMetadataPreValidateCondition.class)
+    public static class KeyBoardObjectPreValidateCondition extends ReactiveObject implements TimesLeft {
+
+        private int times = 2;
+        @Relation(PowerRelation.class)
+        private PowerObject powerObject;
+
+        public KeyBoardObjectPreValidateCondition(PowerObject powerObject) {
+            this.powerObject = powerObject;
+            initialState(KeyBoardObjectPreValidateCondition.class.getSimpleName());
+        }
+
+        @Condition(KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class)
+        public TimesLeft getTimeLeft() {
+            return this;
+        }
+
+        @Transition
+        public void pressAnyKey() {
+            times = times - 1;
+        }
+
+        @Override
+        public boolean timesLeft() {
+            return times > 0;
+        }
+    }
+    @LifecycleMeta(KeyBoardLifecycleMetadataPostValidateCondition.class)
+    public static class KeyBoardObjectPostValidateCondition extends ReactiveObject implements TimesLeft {
+
+        private int times = 2;
+        @Relation(PowerRelation.class)
+        private PowerObject powerObject;
+
+        public KeyBoardObjectPostValidateCondition(PowerObject powerObject) {
+            super();
+            this.powerObject = powerObject;
+            initialState(KeyBoardLifecycleMetadataPostValidateCondition.States.Default.class.getSimpleName());
+        }
+
+        @Condition(KeyBoardLifecycleMetadataPostValidateCondition.Conditions.TimesLeft.class)
+        public TimesLeft getTimeLeft() {
+            return this;
+        }
+
+        @Transition
+        public void pressAnyKey() {
+            times = times - 1;
+            powerObject.reducePower();
+        }
+
+        @Override
+        public boolean timesLeft() {
+            return times > 0;
+        }
     }
 }
