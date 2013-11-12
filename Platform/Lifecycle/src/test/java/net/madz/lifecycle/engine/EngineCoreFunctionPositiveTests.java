@@ -56,4 +56,15 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         service.start();
         assertEquals(VOIPServiceLifecycleMeta.States.InService.class.getSimpleName(), service.getState());
     }
+
+    @Test
+    public void test_inbound_while_with_non_conditional_transition() {
+        final Customer customer = new Customer();
+        customer.activate();
+        InternetServiceOrder service = new InternetServiceOrder(new Date(), null, customer, "3 years");
+        service.start();
+        assertEquals(InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), service.getState());
+    }
+    
+    
 }

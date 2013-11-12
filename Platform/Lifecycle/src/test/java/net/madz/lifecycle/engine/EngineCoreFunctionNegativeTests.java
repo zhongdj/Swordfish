@@ -6,6 +6,9 @@ import java.util.Date;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.Customer;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceOrder;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetServiceLifecycleMeta.Relations.CustomerRelation;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.VOIPServiceLifecycleMeta.Relations.VoipProvider;
 
@@ -32,6 +35,11 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     private String validWhileDottedPath(Class<?> stateClass, Class<?> relationKeyClss) {
         return stateClass.getDeclaringClass().getDeclaringClass().getName() + ".StateSet." + stateClass.getSimpleName()
                 + ".ValidWhiles." + relationKeyClss.getSimpleName();
+    }
+
+    private String inboundWhileDottedPath(Class<?> stateClass, Class<?> relationKeyClss) {
+        return stateClass.getDeclaringClass().getDeclaringClass().getName() + ".StateSet." + stateClass.getSimpleName()
+                + ".InboundWhiles." + relationKeyClss.getSimpleName();
     }
 
     @Test(expected = LifecycleException.class)
@@ -99,6 +107,24 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, service, service.getState(), provider,
                     provider.getState(),
                     validWhileDottedPath(VOIPServiceLifecycleMeta.States.New.class, VoipProvider.class));
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_inbound_while_with_non_conditional_transition() {
+        final Customer customer = new Customer();
+        customer.activate();
+        InternetServiceOrder service = new InternetServiceOrder(new Date(), null, customer, "3 years");
+        customer.cancel();
+        assertEquals(CustomerLifecycleMeta.States.Canceled.class.getSimpleName(), customer.getState());
+        try {
+            service.start();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+                    InternetServiceLifecycleMeta.Transitions.Start.class,
+                    InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), service, customer,
+                    customer.getState(),
+                    inboundWhileDottedPath(InternetServiceLifecycleMeta.States.InService.class, CustomerRelation.class));
         }
     }
 }
