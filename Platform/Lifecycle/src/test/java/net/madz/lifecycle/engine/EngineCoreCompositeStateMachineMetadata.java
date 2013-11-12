@@ -501,6 +501,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                 @RelationSet
                 static interface CRelations {
 
+                    @RelateTo(ContractLifecycle.class)
                     static interface R5 {}
                 }
             }
@@ -582,6 +583,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                 @RelationSet
                 static interface CRelations {
 
+                    @RelateTo(ContractLifecycle.class)
                     static interface R3 {}
                 }
             }
@@ -664,6 +666,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                 @RelationSet
                 static interface CRelations {
 
+                    @RelateTo(ContractLifecycle.class)
                     static interface R3 {}
                 }
             }
@@ -680,6 +683,102 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
 
             @RelateTo(ContractLifecycle.class)
             static interface R2 {}
+        }
+    }
+    @LifecycleMeta(SM2.class)
+    public static class Base extends ReactiveObject {
+
+        private final Contract contract;
+
+        public Base(Contract contract) {
+            initialState(SM2.States.S0.class.getSimpleName());
+            this.contract = contract;
+        }
+
+        @Relation(SM2.Relations.R6.class)
+        public Contract getContract() {
+            return contract;
+        }
+
+        @Relation(SM2.States.S1.CRelations.R4.class)
+        public Contract getContract2() {
+            return contract;
+        }
+
+        @Relation(SM2.States.S2.CRelations.R5.class)
+        public Contract getContract3() {
+            return contract;
+        }
+
+        @Transition(SM2.Transitions.T6.class)
+        public void doOwningSMAction() {}
+
+        @Transition(SM2.States.S1.CTransitions.T4.class)
+        public void doCompositeActionT4() {}
+
+        @Transition(SM2.States.S2.CTransitions.T5.class)
+        public void doCompositeActionT5() {}
+    }
+    @LifecycleMeta(SM1_No_Overrides.class)
+    public static class NoOverrideComposite extends Base {
+
+        public NoOverrideComposite(Contract contract) {
+            super(contract);
+        }
+
+        @Transition(SM1_No_Overrides.Transitions.T2.class)
+        public void doActionT2() {}
+
+        @Transition(SM1_No_Overrides.States.S1.CTransitions.T1.class)
+        public void doActionT1() {}
+
+        @Transition(SM1_No_Overrides.States.S2.CTransitions.T3.class)
+        public void doActionT3() {}
+
+        @Relation(SM1_No_Overrides.Relations.R2.class)
+        public Contract getContractR2() {
+            return getContract();
+        }
+
+        @Relation(SM1_No_Overrides.States.S1.CRelations.R1.class)
+        public Contract getContractR1() {
+            return getContract();
+        }
+
+        @Relation(SM1_No_Overrides.States.S2.CRelations.R3.class)
+        public Contract getContractR3() {
+            return getContract();
+        }
+    }
+    @LifecycleMeta(SM1_Overrides.class)
+    public static class OverridesComposite extends Base {
+
+        public OverridesComposite(Contract contract) {
+            super(contract);
+        }
+
+        @Transition(SM1_Overrides.Transitions.T2.class)
+        public void doActionT2() {}
+
+        @Transition(SM1_Overrides.States.S1.CTransitions.T1.class)
+        public void doActionT1() {}
+
+        @Transition(SM1_Overrides.States.S2.CTransitions.T3.class)
+        public void doActionT3() {}
+
+        @Relation(SM1_Overrides.Relations.R2.class)
+        public Contract getContractR2() {
+            return getContract();
+        }
+
+        @Relation(SM1_Overrides.States.S1.CRelations.R1.class)
+        public Contract getContractR1() {
+            return getContract();
+        }
+
+        @Relation(SM1_Overrides.States.S2.CRelations.R3.class)
+        public Contract getContractR3() {
+            return getContract();
         }
     }
 }
