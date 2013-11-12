@@ -3,6 +3,7 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -1087,12 +1088,12 @@ public class StateMachineObjectBuilderImpl extends
             try {
                 ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass
                         .newInstance();
-                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(getCondition(transitionMetadata
-                        .getConditionClass()));
+                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target, transitionMetadata));
                 final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass)
                         .getTemplate());
                 return nextState.getSimpleName();
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass
                         + ". Please provide no-arg constructor.");
             }
@@ -1105,6 +1106,13 @@ public class StateMachineObjectBuilderImpl extends
         }
     }
 
+    private Object evaluateJudgeable(Object target, final TransitionMetadata transitionMetadata)
+            throws IllegalAccessException, InvocationTargetException {
+        final ConditionObject conditionObject = getConditionObject(transitionMetadata.getConditionClass());
+        Object getJudgeable = conditionObject.conditionGetter().invoke(target);
+        return getJudgeable;
+    }
+
     private StateMetadata handleCompositeStateMachineLinkage(StateMetadata nextState) {
         if ( nextState.isCompositeState() ) {
             nextState = nextState.getCompositeStateMachine().getInitialState();
@@ -1114,7 +1122,7 @@ public class StateMachineObjectBuilderImpl extends
         return nextState;
     }
 
-    private Object getCondition(Class<?> conditionClass) {
+    private ConditionObject getConditionObject(Class<?> conditionClass) {
         return this.conditionObjectMap.get(conditionClass);
     }
 
