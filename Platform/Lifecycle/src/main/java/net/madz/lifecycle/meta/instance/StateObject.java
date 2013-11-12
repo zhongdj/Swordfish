@@ -7,5 +7,5 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 
 public interface StateObject extends Concrete<StateMetadata> {
 
-    void verifyValidWhile(Object target, RelationMetadata relation, ReadAccessor<?> evaluator);
+    void verifyValidWhile(Object target, RelationMetadata[] relation, ReadAccessor<?> evaluator);
 }
