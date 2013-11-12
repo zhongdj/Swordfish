@@ -289,18 +289,40 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         this.shortcutState = parent.getOwningStateMachine().getState(shortCut.value());
     }
 
-    private void configureSupperState(Class<?> clazz) {
-        final Class<?>[] interfaces = clazz.getInterfaces();
-        if ( interfaces.length > 0 ) {
+    private void configureSupperState(Class<?> clazz) throws VerificationException {
+        if ( clazz.isInterface() ) {
+            final Class<?>[] interfaces = clazz.getInterfaces();
+            if ( interfaces.length > 0 ) {
+                this.superStateMetadata = findStateMetadata(interfaces[0]);
+                if ( null == this.superStateMetadata ) {
+                    throw newVerificationException(getDottedPath(),
+                            SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS, clazz, interfaces[0]);
+                }
+                if ( null != this.superStateMetadata && null != clazz.getAnnotation(Overrides.class) ) {
+                    this.overriding = true;
+                } else {
+                    this.overriding = false;
+                }
+            } else {
+                this.overriding = false;
+                this.superStateMetadata = null;
+            }
+        } else {
+            final Class<?> superStateClass = clazz.getSuperclass();
+            if ( null != superStateClass ) {
+                this.superStateMetadata = findStateMetadata(superStateClass);
+                if ( null == this.superStateMetadata ) {
+                    throw newVerificationException(getDottedPath(),
+                            SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS, clazz, superStateClass);
+                }
+            } else {
+                this.superStateMetadata = null;
+            }
             if ( null != clazz.getAnnotation(Overrides.class) ) {
                 this.overriding = true;
             } else {
                 this.overriding = false;
             }
-            this.superStateMetadata = findStateMetadata(interfaces[0]);
-        } else {
-            this.overriding = false;
-            this.superStateMetadata = null;
         }
     }
 
@@ -523,7 +545,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 relationClass, this);
     }
 
-    private LinkedList<ErrorMessageObject> configureErrorMessageObjects(ErrorMessage[] otherwise, Class clz) {
+    private LinkedList<ErrorMessageObject> configureErrorMessageObjects(ErrorMessage[] otherwise, Class<?> clz) {
         LinkedList<ErrorMessageObject> errorObjects = new LinkedList<ErrorMessageObject>();
         for ( ErrorMessage item : otherwise ) {
             LinkedList<StateMetadata> errorStates = new LinkedList<>();
