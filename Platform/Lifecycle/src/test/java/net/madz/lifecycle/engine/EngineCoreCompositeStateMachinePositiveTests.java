@@ -159,7 +159,9 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
         }
     }
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Part II: composite state machine with inheritance)
+    // Part II: composite state machine with inheritance) According to Image File: 
+    // Composite State Machine Visibility Scope.png
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
     
+   
 }

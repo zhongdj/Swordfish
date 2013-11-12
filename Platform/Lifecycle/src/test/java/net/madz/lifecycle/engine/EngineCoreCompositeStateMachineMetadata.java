@@ -14,6 +14,7 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.verification.VerificationException;
 
@@ -27,7 +28,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
     }
 
     // ///////////////////////////////////////////////////////////////////////////////
-    // Non Relational
+    // Non Relational (Composite State Machine without inheritance)
     // ///////////////////////////////////////////////////////////////////////////////
     @StateMachine
     static interface OrderLifecycle {
@@ -79,8 +80,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             static interface Cancel {}
         }
     }
-    public abstract static class ProductBase extends ReactiveObject {
-    }
+    public abstract static class ProductBase extends ReactiveObject {}
     @LifecycleMeta(OrderLifecycle.class)
     public static class ProductOrder extends ProductBase {
 
@@ -435,5 +435,251 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
 
         @Transition
         public void confirmComplete() {}
+    }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Part II: composite state machine with inheritance) According to Image
+    // File:
+    // Composite State Machine Visibility Scope.png
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    @StateMachine
+    public static interface SM2 {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S1.class)
+            static interface S0 {}
+            @CompositeStateMachine
+            @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S2.class)
+            @ValidWhile(relation = SM2.Relations.R6.class, on = { ContractLifecycle.States.Active.class })
+            static interface S1 {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = SM2.States.S1.CTransitions.T4.class, value = SM2.States.S1.CStates.CS1.class)
+                    @ValidWhile(relation = SM2.States.S1.CRelations.R4.class,
+                            on = { ContractLifecycle.States.Expired.class })
+                    static interface CS0 {}
+                    @End
+                    @ShortCut(SM2.States.S2.class)
+                    static interface CS1 {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface T4 {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    @RelateTo(ContractLifecycle.class)
+                    static interface R4 {}
+                }
+            }
+            @CompositeStateMachine
+            @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S3.class)
+            static interface S2 {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = SM2.States.S2.CTransitions.T5.class, value = SM2.States.S2.CStates.CS3.class)
+                    static interface CS2 {}
+                    @End
+                    @ShortCut(SM2.States.S3.class)
+                    static interface CS3 {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface T5 {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    static interface R5 {}
+                }
+            }
+            @End
+            static interface S3 {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface T6 {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(ContractLifecycle.class)
+            static interface R6 {}
+        }
+    }
+    @StateMachine
+    public static interface SM1_No_Overrides extends SM2 {
+
+        @StateSet
+        static interface States extends SM2.States {
+
+            @Initial
+            @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S1.class)
+            @Overrides
+            static interface S0 extends SM2.States.S0 {}
+            @CompositeStateMachine
+            @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S2.class)
+            @ValidWhile(relation = SM1_No_Overrides.Relations.R2.class, on = { ContractLifecycle.States.Draft.class })
+            static interface S1 extends SM2.States.S1 {
+
+                @StateSet
+                static interface CStates extends SM2.States.S1.CStates {
+
+                    @Initial
+                    @Function(transition = SM1_No_Overrides.States.S1.CTransitions.T1.class,
+                            value = SM1_No_Overrides.States.S1.CStates.CS1.class)
+                    @ValidWhile(relation = SM1_No_Overrides.States.S1.CRelations.R1.class,
+                            on = { ContractLifecycle.States.Expired.class })
+                    static interface CS0 extends SM2.States.S1.CStates.CS0 {}
+                    @End
+                    @ShortCut(SM1_No_Overrides.States.S2.class)
+                    static interface CS1 {}
+                }
+                @TransitionSet
+                static interface CTransitions extends SM2.States.S1.CTransitions {
+
+                    static interface T1 {}
+                }
+                @RelationSet
+                static interface CRelations extends SM2.States.S1.CRelations {
+
+                    @RelateTo(ContractLifecycle.class)
+                    static interface R1 {}
+                }
+            }
+            @CompositeStateMachine
+            @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S3.class)
+            static interface S2 {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = SM1_No_Overrides.States.S2.CTransitions.T3.class,
+                            value = SM1_No_Overrides.States.S2.CStates.CS3.class)
+                    static interface CS2 {}
+                    @End
+                    @ShortCut(SM1_No_Overrides.States.S3.class)
+                    static interface CS3 {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface T3 {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    static interface R3 {}
+                }
+            }
+            @End
+            static interface S3 extends SM2.States.S3 {}
+        }
+        @TransitionSet
+        static interface Transitions extends SM2.Transitions {
+
+            static interface T2 {}
+        }
+        @RelationSet
+        static interface Relations extends SM2.Relations {
+
+            @RelateTo(ContractLifecycle.class)
+            static interface R2 {}
+        }
+    }
+    @StateMachine
+    public static interface SM1_Overrides extends SM2 {
+
+        @StateSet
+        static interface States extends SM2.States {
+
+            @Initial
+            @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S1.class)
+            @Overrides
+            static interface S0 extends SM2.States.S0 {}
+            @CompositeStateMachine
+            @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S2.class)
+            @ValidWhile(relation = SM1_Overrides.Relations.R2.class, on = { ContractLifecycle.States.Draft.class })
+            @Overrides
+            static interface S1 extends SM2.States.S1 {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = SM1_Overrides.States.S1.CTransitions.T1.class,
+                            value = SM1_Overrides.States.S1.CStates.CS1.class)
+                    @ValidWhile(relation = SM1_Overrides.States.S1.CRelations.R1.class,
+                            on = { ContractLifecycle.States.Expired.class })
+                    static interface CS0 {}
+                    @End
+                    @ShortCut(SM1_Overrides.States.S2.class)
+                    static interface CS1 {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface T1 {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    @RelateTo(ContractLifecycle.class)
+                    static interface R1 {}
+                }
+            }
+            @CompositeStateMachine
+            @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S3.class)
+            static interface S2 {
+
+                @StateSet
+                static interface CStates {
+
+                    @Initial
+                    @Function(transition = SM1_Overrides.States.S2.CTransitions.T3.class,
+                            value = SM1_Overrides.States.S2.CStates.CS3.class)
+                    static interface CS2 {}
+                    @End
+                    @ShortCut(SM1_Overrides.States.S3.class)
+                    static interface CS3 {}
+                }
+                @TransitionSet
+                static interface CTransitions {
+
+                    static interface T3 {}
+                }
+                @RelationSet
+                static interface CRelations {
+
+                    static interface R3 {}
+                }
+            }
+            @End
+            static interface S3 extends SM2.States.S3 {}
+        }
+        @TransitionSet
+        static interface Transitions extends SM2.Transitions {
+
+            static interface T2 {}
+        }
+        @RelationSet
+        static interface Relations extends SM2.Relations {
+
+            @RelateTo(ContractLifecycle.class)
+            static interface R2 {}
+        }
     }
 }
