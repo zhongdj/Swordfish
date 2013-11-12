@@ -306,17 +306,19 @@ public class StateMachineMetaBuilderImpl extends
         if ( !hasSuperMetadataClass(clazz) ) {
             return;
         }
-        // if ( isComposite() && isState(getSuperMetadataClass(clazz)) ) {
-        // this.superStateMachineMetadata = null;
-        // } else
-        if ( isComposite() ) {
+        if ( isComposite() && isNotCompositeState(getSuperMetadataClass(clazz)) ) {
+            this.superStateMachineMetadata = null;
+        } else if ( isComposite() ) {
             this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
         } else if ( hasSuperMetadataClass(clazz) ) {
             this.superStateMachineMetadata = registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this);
         }
     }
 
-    private boolean isState(Class<?> superMetadataClass) {
+    private boolean isNotCompositeState(Class<?> superMetadataClass) {
+        if (isCompositeStateMachine(superMetadataClass)) {
+            return false;
+        }
         if ( null != superMetadataClass.getAnnotation(End.class) ) {
             return true;
         } else if ( null != superMetadataClass.getAnnotation(Function.class) ) {

@@ -32,11 +32,9 @@ public class StateMachineSemanticsTest extends StateMachineSemanticsMetadata {
                 System.out.println("Testing=====" + state.getDottedPath());
                 statesMap.put(state.getDottedPath(), state);
             }
-            Assert.assertEquals("Expected 7 States in StateMachine", 7, allStates.length);
+            Assert.assertEquals("Expected 6 States in StateMachine", 6, allStates.length);
             Assert.assertNotNull(findStateInStatesMap(
                     "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_A", statesMap));
-            Assert.assertNotNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S2.StateSet.S2_B", statesMap));
             Assert.assertNotNull(findStateInStatesMap(
                     "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_C", statesMap));
             Assert.assertNotNull(findStateInStatesMap(
