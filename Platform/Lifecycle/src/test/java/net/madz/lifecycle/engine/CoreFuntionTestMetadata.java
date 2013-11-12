@@ -1,8 +1,5 @@
 package net.madz.lifecycle.engine;
 
-import static org.junit.Assert.assertEquals;
-
-import java.lang.annotation.Annotation;
 import java.util.Date;
 
 import net.madz.lifecycle.annotations.Function;
