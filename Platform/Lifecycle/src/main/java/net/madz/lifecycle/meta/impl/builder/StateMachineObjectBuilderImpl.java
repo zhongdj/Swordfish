@@ -1125,25 +1125,6 @@ public class StateMachineObjectBuilderImpl extends
         for ( final RelationMetadata relationMetadata : validWhiles ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadata.getKeySet());
             getState(state.getDottedPath()).verifyValidWhile(target, relationMetadata, evaluator);
-            // StateMachineObject relatedStateMachineObject = null;
-            // Object relationObject =
-            // evaluateRelationObject(relationMetadata.getKeySet().iterator());
-            // if ( null == relationObject ) {
-            // throw new
-            // IllegalStateException("There is no relation object for relation "
-            // + relationMetadata.getDottedPath());
-            // }
-            // relatedStateMachineObject =
-            // this.registry.getStateMachineInst(relationObject);
-            // if ( null == relatedStateMachineObject ) {
-            // throw new
-            // IllegalStateException("There is no state machine object found in registry for relation "
-            // + relationMetadata.getDottedPath());
-            // }
-            // String evaluateState =
-            // relatedStateMachineObject.evaluateState(relationObject);
-            // verifyRelationObjectInValidStates(relationMetadata.getOnStates(),
-            // evaluateState);
         }
     }
 

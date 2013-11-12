@@ -11,9 +11,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.annotations.relation.Relation;
-import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
-import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
 public class LifecycleInterceptor<V> extends Interceptor<V> {
