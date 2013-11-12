@@ -700,7 +700,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
                 functionMetadata = this.getDeclaredFunctionMetadata(transitionKey);
             }
             if ( null != functionMetadata ) {
-                return true;
+                if ( functionMetadata.getNextStates().size() > 1 ) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return this.getSuperStateMetadata().hasMultipleStateCandidatesOn(transitionKey);
             }
