@@ -562,7 +562,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             }
             @CompositeStateMachine
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S3.class)
-            static interface S2 {
+            static interface S2 extends SM2.States.S2 {
 
                 @StateSet
                 static interface CStates {
@@ -570,10 +570,10 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     @Initial
                     @Function(transition = SM1_No_Overrides.States.S2.CTransitions.T3.class,
                             value = SM1_No_Overrides.States.S2.CStates.CS3.class)
-                    static interface CS2 {}
+                    static interface CS2 extends SM2.States.S2.CStates.CS2 {}
                     @End
                     @ShortCut(SM1_No_Overrides.States.S3.class)
-                    static interface CS3 {}
+                    static interface CS3 extends SM2.States.S2.CStates.CS3 {}
                 }
                 @TransitionSet
                 static interface CTransitions {
@@ -711,13 +711,13 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
         }
 
         @Transition(SM2.Transitions.T6.class)
-        public void doOwningSMAction() {}
+        public void doActionT6() {}
 
         @Transition(SM2.States.S1.CTransitions.T4.class)
-        public void doCompositeActionT4() {}
+        public void doActionT4() {}
 
         @Transition(SM2.States.S2.CTransitions.T5.class)
-        public void doCompositeActionT5() {}
+        public void doActionT5() {}
     }
     @LifecycleMeta(SM1_No_Overrides.class)
     public static class NoOverrideComposite extends Base {

@@ -158,10 +158,25 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
             assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Finished.class, product);
         }
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Part II: composite state machine with inheritance) According to Image File: 
+    // Part II: composite state machine with inheritance) According to Image
+    // File:
     // Composite State Machine Visibility Scope.png
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-   
+    @Test
+    public void test_no_overrides_relational_composite_state_machine() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        contract.activate(); //Draft, Expire, Active
+        assertState(ContractLifecycle.States.Active.class, contract);
+        final NoOverrideComposite noOverride = new NoOverrideComposite(contract);
+        assertState(SM1_No_Overrides.States.S0.class, noOverride);
+        noOverride.doActionT2();
+        assertState(SM1_No_Overrides.States.S1.CStates.CS0.class, noOverride);
+        noOverride.doActionT1();//noOverride.doActionT4();
+        assertState(SM1_No_Overrides.States.S2.CStates.CS2.class, noOverride);
+        noOverride.doActionT3();//noOverride.doActionT5();
+        assertState(SM1_No_Overrides.States.S3.class, noOverride);
+    }
 }
