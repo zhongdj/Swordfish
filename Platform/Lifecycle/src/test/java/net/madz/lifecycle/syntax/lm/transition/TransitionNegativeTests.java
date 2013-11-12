@@ -1,5 +1,6 @@
 package net.madz.lifecycle.syntax.lm.transition;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
@@ -29,13 +30,20 @@ public class TransitionNegativeTests extends TransitionTestMetadata {
             new Registry();
         } catch (VerificationException e) {
             final Iterator<VerificationFailure> iterator = e.getVerificationFailureSet().iterator();
-            assertFailure(iterator.next(), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+            final HashMap<String, VerificationFailure> errors = new HashMap<>();
+            VerificationFailure next = iterator.next();
+            errors.put(next.getErrorKey().getName(), next);
+            next = iterator.next();
+            errors.put(next.getErrorKey().getName(), next);
+            next = iterator.next();
+            errors.put(next.getErrorKey().getName(), next);
+            assertFailure(errors.get("Inactivate"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
                     NegativeProcess.class.getDeclaredMethod("inactivate", Integer.TYPE),
                     Inactivate.class.getSimpleName(), TransitionTypeEnum.Corrupt);
-            assertFailure(iterator.next(), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+            assertFailure(errors.get("Activate"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
                     NegativeProcess.class.getDeclaredMethod("activate", Integer.TYPE), Activate.class.getSimpleName(),
                     TransitionTypeEnum.Recover);
-            assertFailure(iterator.next(), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
+            assertFailure(errors.get("Restart"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
                     NegativeProcess.class.getDeclaredMethod("restart", Integer.TYPE), Restart.class.getSimpleName(),
                     TransitionTypeEnum.Redo);
             throw e;

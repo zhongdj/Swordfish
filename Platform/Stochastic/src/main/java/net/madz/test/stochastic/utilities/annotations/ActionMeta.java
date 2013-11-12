@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public @interface ActionMeta {
 
     // Types
-    Class<?> zuoraType();
+    Class<?> rawType();
 
     String sfdcType() default "";
 

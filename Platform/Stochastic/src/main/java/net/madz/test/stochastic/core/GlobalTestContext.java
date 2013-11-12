@@ -73,8 +73,6 @@ public class GlobalTestContext {
         // if (null == actionMeta) {
         // continue;
         // }
-        // if (!actionMeta.zuoraType().equals(StandardObject.class)) {
-        // key = actionMeta.zuoraType().getName() + "." +
         // actionMeta.operation().name();
         // } else if (0 < actionMeta.sfdcType().trim().length()) {
         // key = SDFC_CUSTOM_OBJECT_PREFIX + "." +

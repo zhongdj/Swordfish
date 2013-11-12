@@ -1,6 +1,8 @@
 package net.madz.verification;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumpable;
@@ -53,7 +55,11 @@ public class VerificationFailure implements Dumpable, Cloneable {
             Object... details) {
         this.cause = cause;
         this.source = source;
-        this.errorKey = source instanceof MetaData ? ( (MetaData) source ).getDottedPath().append(errorKey)
+        List<String> segements = new ArrayList<>();
+        for (String segement : errorKey.split("\\.")) {
+            segements.add(segement);
+        }
+        this.errorKey = source instanceof MetaData ? ( (MetaData) source ).getDottedPath().append(segements)
                 : DottedPath.parse(errorKey);
         this.defaultErrorMessage = defaultErrorMessage;
         this.details = details;

@@ -20,7 +20,6 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
     @SuppressWarnings("unchecked")
     public final static VerificationFailureSet NULL_SET = new VerificationFailureSet(
             (Set<VerificationFailure>) Collections.EMPTY_SET);
-
     // private final static long serialVersionUID = 1L;
     private final Set<VerificationFailure> failureSet;
 
@@ -53,7 +52,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @param metaData
      *            Schema, entity, field, or action with error
      * @param errorKey
-     *            Zuora error message key
+     *            error message key
      * @param defaultErrorMessage
      *            Message to display if message key is not found
      * @param details
@@ -70,7 +69,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @param metaData
      *            Schema, entity, field, or action with error
      * @param errorKey
-     *            Zuora error message key
+     *            error message key
      * @param defaultErrorMessage
      *            Message to display if message key is not found
      * @param details
