@@ -84,7 +84,5 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
         assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class, keyboard);
-        keyboard.pressAnyKey();
-        assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.NotReading.class, keyboard);
     }
 }

@@ -295,7 +295,7 @@ public class StandaloneLifecyclePureMetadataTest {
         // Simple State Validation
         assertNull(created.getCompositeStateMachine());
         assertNull(created.getCorruptTransition());
-        assertEquals(0, created.getInboundWhiles().length);
+        assertEquals(0, created.getDeclaredInboundWhiles().length);
         assertNull(created.getLinkTo());
         assertNull(created.getOwningState());
         assertEquals(m, created.getParent());

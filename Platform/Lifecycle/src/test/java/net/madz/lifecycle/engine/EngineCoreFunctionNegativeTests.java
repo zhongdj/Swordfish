@@ -105,16 +105,10 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertLifecycleError(
-                    e,
-                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+            assertViolateInboundWhileRelationConstraint(e,
                     InternetServiceLifecycleMetaWithInboundWhile.Transitions.Start.class,
-                    InternetServiceLifecycleMetaWithInboundWhile.States.InService.class.getSimpleName(),
-                    service,
-                    customer,
-                    customer.getState(),
-                    inboundWhileDottedPath(InternetServiceLifecycleMetaWithInboundWhile.States.InService.class,
-                            CustomerRelation.class));
+                    InternetServiceLifecycleMetaWithInboundWhile.States.InService.class, service, customer,
+                    CustomerLifecycleMeta.States.Active.class);
         }
     }
 
@@ -127,16 +121,10 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {
-            assertLifecycleError(
-                    e,
-                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+            assertViolateInboundWhileRelationConstraint(e,
                     KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
-                    KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class.getSimpleName(),
-                    keyboard,
-                    power,
-                    power.getState(),
-                    inboundWhileDottedPath(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class,
-                            PowerRelation.class));
+                    KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class, keyboard, power,
+                    PowerLifecycleMetadata.States.PowerOn.class);
         }
     }
 
@@ -149,16 +137,10 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {
-            assertLifecycleError(
-                    e,
-                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
-                    KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
-                    KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class.getSimpleName(),
-                    keyboard,
-                    power,
-                    power.getState(),
-                    inboundWhileDottedPath(KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class,
-                            PowerRelation.class));
+            assertViolateInboundWhileRelationConstraint(e,
+                    KeyBoardLifecycleMetadataPostValidateCondition.Transitions.PressAnyKey.class,
+                    KeyBoardLifecycleMetadataPostValidateCondition.States.Broken.class, keyboard, power,
+                    PowerLifecycleMetadata.States.PowerOn.class);
         }
     }
 }

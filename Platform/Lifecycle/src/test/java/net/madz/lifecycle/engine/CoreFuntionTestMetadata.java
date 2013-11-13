@@ -216,8 +216,9 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             static interface New {}
             @Function(transition = InternetServiceLifecycleMeta.Transitions.End.class,
                     value = { InternetServiceLifecycleMeta.States.Ended.class })
-            @InboundWhile(on = { CustomerLifecycleMeta.States.Active.class },
-                    relation = InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
+            // @InboundWhile(on = { CustomerLifecycleMeta.States.Active.class },
+            // relation =
+            // InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
             static interface InService {}
             @End
             static interface Ended {}
@@ -504,12 +505,17 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             static interface PowerLeftCondition {
 
                 boolean powerLeft();
+
+                boolean isShutDown();
             }
         }
         static class PowerLeftConditionImpl implements ConditionalTransition<PowerLeftCondition> {
 
             @Override
             public Class<?> doConditionJudge(PowerLeftCondition t) {
+                if ( t.isShutDown() ) {
+                    return PowerLifecycleMetadata.States.PowerOff.class;
+                }
                 if ( t.powerLeft() ) {
                     return PowerLifecycleMetadata.States.PowerOn.class;
                 } else {
@@ -525,13 +531,13 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = PressAnyKey.class, value = { ReadingInput.class, Broken.class, NotReading.class })
+            @Function(transition = PressAnyKey.class, value = { ReadingInput.class, Broken.class/*, NotReading.class */})
             @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
             static interface ReadingInput {}
-            @Function(transition = PressAnyKey.class, value = { ReadingInput.class })
-            @ValidWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
-            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOff.class }, relation = PowerRelation.class)
-            static interface NotReading {}
+//            @Function(transition = PressAnyKey.class, value = { ReadingInput.class })
+//            @ValidWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
+//            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOff.class }, relation = PowerRelation.class)
+//            static interface NotReading {}
             @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
             @End
             static interface Broken {}
@@ -562,9 +568,10 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
             @Override
             public Class<?> doConditionJudge(TimesLeft t) {
-                if ( t.isPowerOff() ) {
-                    return KeyBoardLifecycleMetadataPreValidateCondition.States.NotReading.class;
-                } else if ( t.timesLeft() ) {
+//                if ( t.isPowerOff() ) {
+//                    return KeyBoardLifecycleMetadataPreValidateCondition.States.NotReading.class;
+//                } else 
+                if ( t.timesLeft() ) {
                     return KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class;
                 } else {
                     return KeyBoardLifecycleMetadataPreValidateCondition.States.Broken.class;
@@ -589,9 +596,12 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
     public static class PowerObject extends ReactiveObject implements PowerLeftCondition {
 
         private int powerLeft = 2;
+        private boolean shutdown = false;
 
         @Transition
-        public void shutDown() {}
+        public void shutDown() {
+            shutdown = true;
+        }
 
         @Transition
         public void reducePower() {
@@ -610,6 +620,11 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @Override
         public boolean powerLeft() {
             return powerLeft > 0;
+        }
+
+        @Override
+        public boolean isShutDown() {
+            return shutdown;
         }
     }
     @LifecycleMeta(KeyBoardLifecycleMetadataPreValidateCondition.class)
@@ -641,7 +656,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
         @Override
         public boolean isPowerOff() {
-            return !powerObject.powerLeft();
+            return !powerObject.powerLeft() || powerObject.shutdown;
         }
     }
     @LifecycleMeta(KeyBoardLifecycleMetadataPostValidateCondition.class)
