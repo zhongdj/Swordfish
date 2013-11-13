@@ -1,7 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
@@ -54,7 +54,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
             }
         }
         if ( false == find ) {
-            final HashSet<String> validRelationStates = new HashSet<>();
+            final LinkedHashSet<String> validRelationStates = new LinkedHashSet<>();
             for ( RelationMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
                     validRelationStates.add(metadata.getSimpleName());
