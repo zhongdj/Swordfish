@@ -1082,7 +1082,7 @@ public class StateMachineObjectBuilderImpl extends
         final FunctionMetadata functionMetadata = state.getTemplate().getFunctionMetadata(transitionKey);
         if ( null == functionMetadata ) {
             throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
-                    + " while searching function metadata.");
+                    + " while searching function metadata from state: " + state);
         }
         if ( 1 < functionMetadata.getNextStates().size() ) {
             final TransitionMetadata transitionMetadata = functionMetadata.getTransition();
