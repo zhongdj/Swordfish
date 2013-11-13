@@ -197,13 +197,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     public RelationMetadata[] getDeclaredInboundWhiles() {
         return this.inboundWhileRelations.toArray(new RelationMetadata[0]);
     }
-    
+
     @Override
     public RelationMetadata[] getInboundWhiles() {
         final ArrayList<RelationMetadata> result = new ArrayList<>();
         getInboundWhileRelationMetadataRecursively(this, result);
         return result.toArray(new RelationMetadata[0]);
-        
     }
 
     @Override
@@ -218,7 +217,8 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         return result.toArray(new RelationMetadata[0]);
     }
 
-    private void getValidWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
+    private void getValidWhileRelationMetadataRecursively(StateMetadata stateMetadata,
+            ArrayList<RelationMetadata> result) {
         final RelationMetadata[] declaredValidWhiles = stateMetadata.getDeclaredValidWhiles();
         for ( final RelationMetadata relationMetadata : declaredValidWhiles ) {
             result.add(relationMetadata);
@@ -236,8 +236,9 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             }
         }
     }
-    
-    private void getInboundWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
+
+    private void getInboundWhileRelationMetadataRecursively(StateMetadata stateMetadata,
+            ArrayList<RelationMetadata> result) {
         final RelationMetadata[] declaredInboundWhiles = stateMetadata.getDeclaredInboundWhiles();
         for ( final RelationMetadata relationMetadata : declaredInboundWhiles ) {
             result.add(relationMetadata);
@@ -336,7 +337,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             }
         } else {
             final Class<?> superStateClass = clazz.getSuperclass();
-            if ( null != superStateClass ) {
+            if ( null != superStateClass && !Object.class.equals(superStateClass) ) {
                 this.superStateMetadata = findStateMetadata(superStateClass);
                 if ( null == this.superStateMetadata ) {
                     throw newVerificationException(getDottedPath(),
@@ -767,12 +768,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         FunctionMetadata functionMetadata = null;
         if ( parent.isComposite() ) {
             functionMetadata = parent.getOwningState().getDeclaredFunctionMetadata(functionKey);
-            if (null != functionMetadata) {
+            if ( null != functionMetadata ) {
                 return functionMetadata;
             }
         }
         if ( isOverriding() || !hasSuper() ) {
-                return getDeclaredFunctionMetadata(functionKey);
+            return getDeclaredFunctionMetadata(functionKey);
         } else {// if ( hasSuper() && !isOverriding() ) {
             functionMetadata = this.getDeclaredFunctionMetadata(functionKey);
             if ( null != functionMetadata ) {

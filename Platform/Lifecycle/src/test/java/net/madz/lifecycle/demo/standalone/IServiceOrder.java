@@ -3,6 +3,7 @@ package net.madz.lifecycle.demo.standalone;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Cancel;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Finish;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Schedule;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Start;
@@ -37,6 +38,9 @@ public interface IServiceOrder {
 
     @Transition(Finish.class)
     void confirmFinish();
+
+    @Transition(Cancel.class)
+    void cancel();
 
     @StateIndicator
     String getServiceOrderState();
