@@ -117,7 +117,78 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
             throw e;
         }
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
     // Part II: composite state machine with inheritance)
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Test
+    public void test_no_overrides_relational_composite_state_machine_with_canceled_contract() {
+        final Contract contract = new Contract();
+        {
+            assertState(ContractLifecycle.States.Draft.class, contract);
+            contract.activate(); // Draft from Owning State, Active From Owning
+            assertState(ContractLifecycle.States.Active.class, contract);
+        }
+        final NoOverrideComposite noOverride = new NoOverrideComposite(contract);
+        {
+            assertState(SM1_No_Overrides.States.S0.class, noOverride);
+            noOverride.doActionT2();
+            assertState(SM1_No_Overrides.States.S1.CStates.CS0.class, noOverride);
+        }
+        {
+            contract.cancel();
+            assertState(ContractLifecycle.States.Canceled.class, contract);
+        }
+        try {
+            noOverride.doActionT1();
+        } catch (LifecycleException e) {
+            assertInvalidStateErrorByValidWhile(e, contract, noOverride, ContractLifecycle.States.Draft.class,
+                    ContractLifecycle.States.Active.class, ContractLifecycle.States.Expired.class);
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_no_overrides_relational_composite_state_machine_with_T3() {
+        final Contract contract = new Contract();
+        {
+            assertState(ContractLifecycle.States.Draft.class, contract);
+            contract.activate(); // Draft from Owning State, Active From Owning
+            assertState(ContractLifecycle.States.Active.class, contract);
+        }
+        final NoOverrideComposite noOverride = new NoOverrideComposite(contract);
+        {
+            assertState(SM1_No_Overrides.States.S0.class, noOverride);
+            noOverride.doActionT2();
+            assertState(SM1_No_Overrides.States.S1.CStates.CS0.class, noOverride);
+        }
+        try {
+            noOverride.doActionT3();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
+                    SM1_No_Overrides.States.S2.CTransitions.T3.class,
+                    SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
+        }
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_no_overrides_relational_composite_state_machine_with_T5() {
+        final Contract contract = new Contract();
+        {
+            assertState(ContractLifecycle.States.Draft.class, contract);
+            contract.activate(); // Draft from Owning State, Active From Owning
+            assertState(ContractLifecycle.States.Active.class, contract);
+        }
+        final NoOverrideComposite noOverride = new NoOverrideComposite(contract);
+        {
+            assertState(SM1_No_Overrides.States.S0.class, noOverride);
+            noOverride.doActionT2();
+            assertState(SM1_No_Overrides.States.S1.CStates.CS0.class, noOverride);
+        }
+        try {
+            noOverride.doActionT5();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
+                    SM2.States.S2.CTransitions.T5.class,
+                    SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
+        }
+    }
 }
