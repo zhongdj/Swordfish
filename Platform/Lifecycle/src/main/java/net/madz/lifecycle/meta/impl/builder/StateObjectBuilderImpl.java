@@ -83,7 +83,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
             }
         }
         if ( false == find ) {
-            final HashSet<String> validRelationStates = new HashSet<>();
+            final LinkedHashSet<String> validRelationStates = new LinkedHashSet<>();
             for ( RelationMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
                     validRelationStates.add(metadata.getSimpleName());
