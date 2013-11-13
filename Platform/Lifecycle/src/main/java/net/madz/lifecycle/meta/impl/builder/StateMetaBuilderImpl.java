@@ -740,12 +740,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         FunctionMetadata functionMetadata = null;
         if ( parent.isComposite() ) {
             functionMetadata = parent.getOwningState().getDeclaredFunctionMetadata(functionKey);
+            if (null != functionMetadata) {
+                return functionMetadata;
+            }
         }
         if ( isOverriding() || !hasSuper() ) {
-            if ( null == functionMetadata ) {
-                functionMetadata = getDeclaredFunctionMetadata(functionKey);
-            }
-            return functionMetadata;
+                return getDeclaredFunctionMetadata(functionKey);
         } else {// if ( hasSuper() && !isOverriding() ) {
             functionMetadata = this.getDeclaredFunctionMetadata(functionKey);
             if ( null != functionMetadata ) {
