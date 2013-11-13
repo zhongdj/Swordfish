@@ -2,6 +2,10 @@ package net.madz.lifecycle.engine;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.Contract;
+import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.ContractLifecycle;
+import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.OverridesComposite;
+import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.SM1_Overrides;
 
 import org.junit.Test;
 
@@ -169,6 +173,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
                     SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
         }
     }
+
     @Test(expected = LifecycleException.class)
     public void test_no_overrides_relational_composite_state_machine_with_T5() {
         final Contract contract = new Contract();
@@ -187,27 +192,124 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
             noOverride.doActionT5();
         } catch (LifecycleException e) {
             assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
-                    SM2.States.S2.CTransitions.T5.class,
-                    SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
+                    SM2.States.S2.CTransitions.T5.class, SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
+                    noOverride);
         }
     }
-    
+
     @Test(expected = LifecycleException.class)
     public void test_overrides_relational_composite_state_machine_with_T1_Active_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        contract.activate();
+        assertState(ContractLifecycle.States.Active.class, contract);
+        try {
+            object.doActionT1();
+        } catch (LifecycleException e) {
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
+                    ContractLifecycle.States.Draft.class);
+            throw e;
+        }
     }
-    @Test(expected = LifecycleException.class)
-    public void test_overrides_relational_composite_state_machine_with_T2_Canceled_contract() {
-    }
-    @Test(expected = LifecycleException.class)
-    public void test_overrides_relational_composite_state_machine_with_T6_Active_contract() {
-    }
-    @Test(expected = LifecycleException.class)
-    public void test_overrides_relational_composite_state_machine_with_T1_Canceled_contract() {
-    }
+
     @Test(expected = LifecycleException.class)
     public void test_overrides_relational_composite_state_machine_with_T2_Active_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        contract.activate();
+        assertState(ContractLifecycle.States.Active.class, contract);
+        try {
+            object.doActionT2();
+        } catch (LifecycleException e) {
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
+                    ContractLifecycle.States.Draft.class);
+            throw e;
+        }
     }
+
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T6_Active_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        contract.activate();
+        assertState(ContractLifecycle.States.Active.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        try {
+            object.doActionT6();
+        } catch (LifecycleException e) {
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
+                    ContractLifecycle.States.Draft.class);
+            throw e;
+        }
+    }
+
     @Test(expected = LifecycleException.class)
     public void test_overrides_relational_composite_state_machine_with_T6_Canceled_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        contract.activate();
+        assertState(ContractLifecycle.States.Active.class, contract);
+        contract.cancel();
+        assertState(ContractLifecycle.States.Canceled.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        try {
+            object.doActionT6();
+        } catch (LifecycleException e) {
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
+                    ContractLifecycle.States.Draft.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T6_Expired_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        contract.activate();
+        assertState(ContractLifecycle.States.Active.class, contract);
+        contract.expire();
+        assertState(ContractLifecycle.States.Expired.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        try {
+            object.doActionT6();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
+                    SM1_Overrides.Transitions.T6.class, SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
+                    object);
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T6_Draft_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        try {
+            object.doActionT6();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
+                    SM1_Overrides.Transitions.T6.class, SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
+                    object);
+        }
     }
 }
