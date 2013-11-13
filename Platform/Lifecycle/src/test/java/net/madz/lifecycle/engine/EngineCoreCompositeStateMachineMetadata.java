@@ -541,8 +541,6 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     @Initial
                     @Function(transition = SM1_No_Overrides.States.S1.CTransitions.T1.class,
                             value = SM1_No_Overrides.States.S1.CStates.CS1.class)
-                    @ValidWhile(relation = SM1_No_Overrides.States.S1.CRelations.R1.class,
-                            on = { ContractLifecycle.States.Expired.class })
                     static interface CS0 extends SM2.States.S1.CStates.CS0 {}
                     @End
                     @ShortCut(SM1_No_Overrides.States.S2.class)
