@@ -3,7 +3,9 @@ package net.madz.lifecycle;
 public class LifecycleCommonErrors {
 
     /**
-     * @param {0} transition simple name
+     * @param {0} transition simple name or transitionKey Class,
+     *        When @Transition(value=T.class) then transitionKeyClass will be
+     *        the value other than simple Name
      * @param {1} state name
      * @param {2} target object
      */
