@@ -191,4 +191,23 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
                     SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
         }
     }
+    
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T1_Active_contract() {
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T2_Canceled_contract() {
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T6_Active_contract() {
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T1_Canceled_contract() {
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T2_Active_contract() {
+    }
+    @Test(expected = LifecycleException.class)
+    public void test_overrides_relational_composite_state_machine_with_T6_Canceled_contract() {
+    }
 }

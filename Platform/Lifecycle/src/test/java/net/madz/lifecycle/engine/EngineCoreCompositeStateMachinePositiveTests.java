@@ -197,6 +197,7 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
         noOverride.doActionT6();// noOverride.doActionT5();
         assertState(SM1_No_Overrides.States.S3.class, noOverride);
     }
+
     @Test
     public void test_no_overrides_relational_composite_state_machine_with_Active_contract_and_owning_T2() {
         final Contract contract = new Contract();
@@ -248,4 +249,33 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
         noOverride.doActionT3();// noOverride.doActionT5();
         assertState(SM1_No_Overrides.States.S3.class, noOverride);
     }
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T1_Draft_contract() {
+        final Contract contract = new Contract();
+        assertState(ContractLifecycle.States.Draft.class, contract);
+        final OverridesComposite object = new OverridesComposite(contract);
+        assertState(SM1_Overrides.States.S0.class, object);
+        object.doActionT2();
+        assertState(SM1_Overrides.States.S1.CStates.CS0.class, object);
+        object.doActionT1();
+        assertState(SM1_Overrides.States.S2.CStates.CS2.class, object);
+        object.doActionT3();
+        assertState(SM1_Overrides.States.S3.class, object);
+    }
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T2_Draft_contract() {}
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T6_Draft_contract() {}
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T1_Expired_contract() {}
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T2_Expired_contract() {}
+
+    @Test
+    public void test_overrides_relational_composite_state_machine_with_T6_Expired_contract() {}
 }
