@@ -316,7 +316,7 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private boolean isNotCompositeState(Class<?> superMetadataClass) {
-        if (isCompositeStateMachine(superMetadataClass)) {
+        if ( isCompositeStateMachine(superMetadataClass) ) {
             return false;
         }
         if ( null != superMetadataClass.getAnnotation(End.class) ) {
@@ -849,9 +849,13 @@ public class StateMachineMetaBuilderImpl extends
         }
         populateStates(results, stateMachine, overridedStates);
         for ( final StateMachineMetadata stateMachineMeta : stateMachine.getCompositeStateMachines() ) {
-            populateStates(results, stateMachineMeta, overridedStates);
+            if ( !overridedStates.contains(stateMachineMeta.getOwningState()) ) {
+                populateStates(results, stateMachineMeta, overridedStates);
+            }
         }
-        populateStateMetadatas(stateMachine.getSuperStateMachine(), results, overridedStates);
+        if ( !stateMachine.isComposite() || stateMachine.isComposite() && !stateMachine.getOwningState().isOverriding() ) {
+            populateStateMetadatas(stateMachine.getSuperStateMachine(), results, overridedStates);
+        }
     }
 
     private void populateStates(final ArrayList<StateMetadata> results, final StateMachineMetadata stateMachineMeta,
