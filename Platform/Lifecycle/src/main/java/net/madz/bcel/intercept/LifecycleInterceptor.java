@@ -42,8 +42,8 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
-    private static synchronized StateMachineObject lookupStateMachine(Class<?> klass) {
-        return registry.getStateMachineInst(klass);
+    private static synchronized StateMachineObject lookupStateMachine(InterceptContext<?> context) {
+        return registry.getStateMachineInst(context.getTarget().getClass());
     }
 
     public LifecycleInterceptor(Interceptor<V> next) {
@@ -60,7 +60,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     @Override
     protected void postExec(InterceptContext<V> context) {
         super.postExec(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context.getKlass());
+        final StateMachineObject stateMachine = lookupStateMachine(context);
         try {
             if ( !nextStateCanBeEvaluatedBeforeTranstion(stateMachine, context) ) {
                 validateNextStateInboundWhileAfterTransitionMethod(stateMachine, context);
@@ -129,7 +129,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     @Override
     protected void preExec(InterceptContext<V> context) {
         super.preExec(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context.getTarget().getClass());
+        final StateMachineObject stateMachine = lookupStateMachine(context);
         if ( isLockEnabled() ) {
             lock(stateMachine, context);
         }
