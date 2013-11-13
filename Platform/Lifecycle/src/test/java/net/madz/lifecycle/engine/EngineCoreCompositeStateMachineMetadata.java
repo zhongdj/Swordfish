@@ -643,7 +643,8 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             }
             @CompositeStateMachine
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S3.class)
-            static interface S2 {
+            @Overrides
+            static interface S2 extends SM2.States.S2{
 
                 @StateSet
                 static interface CStates {
