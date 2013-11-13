@@ -65,4 +65,33 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObjectBuilder
                     Arrays.toString(validRelationStates.toArray(new String[0])));
         }
     }
+
+    @Override
+    public void verifyInboundWhile(Object transitionKey, Object target, String nextState,
+            RelationMetadata[] relationMetadataArray, ReadAccessor<?> evaluator) {
+        final Object relatedTarget = evaluator.read(target);
+        final StateMachineObject relatedStateMachineInst = this.getRegistry().getStateMachineInst(
+                relatedTarget.getClass().getName());
+        final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
+        boolean find = false;
+        for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+            for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
+                if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
+                    find = true;
+                    break;
+                }
+            }
+        }
+        if ( false == find ) {
+            final HashSet<String> validRelationStates = new HashSet<>();
+            for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+                for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
+                    validRelationStates.add(metadata.getSimpleName());
+                }
+            }
+            throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE,
+                    LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT, transitionKey, nextState, target,
+                    relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
+        }
+    }
 }

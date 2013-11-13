@@ -1,10 +1,8 @@
 package net.madz.lifecycle.meta.impl;
 
-import java.lang.reflect.Method;
-
 import net.madz.common.DottedPath;
-import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.meta.MetaData;
@@ -87,8 +85,20 @@ public class StateMachineObjectImpl implements StateMachineObject {
     }
 
     @Override
-    public void validValidWhiles(Object target) {
+    public void validateValidWhiles(Object target) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public void validateInboundWhiles(Object target, Object transtionKey) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean evaluateConditionBeforeTransition(Object transtionKey) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

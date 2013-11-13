@@ -288,7 +288,7 @@ public class StateMachineObjectBuilderImpl extends
                     verifyRelationBeCovered(klass, relation, transition);
                 }
             }
-            for ( RelationMetadata relation : state.getInboundWhiles() ) {
+            for ( RelationMetadata relation : state.getDeclaredInboundWhiles() ) {
                 for ( TransitionMetadata transition : getTransitionsToState(state) ) {
                     verifyRelationBeCovered(klass, relation, transition);
                 }
@@ -1122,7 +1122,7 @@ public class StateMachineObjectBuilderImpl extends
         } else if ( nextState.getStateMachine().isComposite() && nextState.isFinal() ) {
             nextState = nextState.getLinkTo();
         }
-        if ( nextState.isCompositeState() || nextState.getStateMachine().isComposite() && nextState.isFinal()) {
+        if ( nextState.isCompositeState() || nextState.getStateMachine().isComposite() && nextState.isFinal() ) {
             nextState = handleCompositeStateMachineLinkage(nextState);
         }
         return nextState;
@@ -1133,21 +1133,10 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     @Override
-    public void validValidWhiles(Object target) {
+    public void validateValidWhiles(Object target) {
         final StateMetadata state = getTemplate().getState(evaluateState(target));
         final RelationMetadata[] validWhiles = state.getValidWhiles();
-        final HashMap<String, List<RelationMetadata>> mergedRelations = new HashMap<>();
-        for ( final RelationMetadata relationMetadata : validWhiles ) {
-            final String relationKey = relationMetadata.getRelatedStateMachine().getDottedPath().getAbsoluteName();
-            if ( mergedRelations.containsKey(relationKey) ) {
-                final List<RelationMetadata> list = mergedRelations.get(relationKey);
-                list.add(relationMetadata);
-            } else {
-                final ArrayList<RelationMetadata> list = new ArrayList<>();
-                list.add(relationMetadata);
-                mergedRelations.put(relationKey, list);
-            }
-        }
+        final HashMap<String, List<RelationMetadata>> mergedRelations = mergeRelations(validWhiles);
         for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
             getState(state.getDottedPath()).verifyValidWhile(target,
@@ -1164,5 +1153,40 @@ public class StateMachineObjectBuilderImpl extends
             }
         }
         return null;
+    }
+
+    @Override
+    public void validateInboundWhiles(Object target, Object transitionKey) {
+        final StateMetadata state = getTemplate().getState(evaluateState(target));
+        final String nextState = getNextState(target, transitionKey);
+        final StateMetadata nextStateMetadata = getTemplate().getState(nextState);
+        for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergeRelations(
+                nextStateMetadata.getInboundWhiles()).entrySet() ) {
+            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
+            getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
+                    relationMetadataEntry.getValue().toArray(new RelationMetadata[0]), evaluator);
+        }
+    }
+
+    private HashMap<String, List<RelationMetadata>> mergeRelations(RelationMetadata[] relations) {
+        final HashMap<String, List<RelationMetadata>> mergedRelations = new HashMap<>();
+        for ( final RelationMetadata relationMetadata : relations ) {
+            final String relationKey = relationMetadata.getRelatedStateMachine().getDottedPath().getAbsoluteName();
+            if ( mergedRelations.containsKey(relationKey) ) {
+                final List<RelationMetadata> list = mergedRelations.get(relationKey);
+                list.add(relationMetadata);
+            } else {
+                final ArrayList<RelationMetadata> list = new ArrayList<>();
+                list.add(relationMetadata);
+                mergedRelations.put(relationKey, list);
+            }
+        }
+        return mergedRelations;
+    }
+
+    @Override
+    public boolean evaluateConditionBeforeTransition(Object transitionKey) {
+        TransitionMetadata transition = getTemplate().getTransition(transitionKey);
+        return !transition.postValidate();
     }
 }

@@ -28,6 +28,7 @@ public class TransitionMetaBuilderImpl extends
     private boolean conditional;
     private Class<?> conditionClass;
     private Class<? extends ConditionalTransition<?>> judgerClass;
+    private boolean postValidate;
 
     protected TransitionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "TransitionSet." + name);
@@ -64,6 +65,7 @@ public class TransitionMetaBuilderImpl extends
             conditional = true;
             conditionClass = conditionalAnno.condition();
             judgerClass = conditionalAnno.judger();
+            postValidate = conditionalAnno.postValidate();
             verifyJudgerClass(clazz, judgerClass, conditionClass);
         } else {
             conditional = false;
@@ -132,5 +134,10 @@ public class TransitionMetaBuilderImpl extends
     @Override
     public Class<? extends ConditionalTransition<?>> getJudgerClass() {
         return judgerClass;
+    }
+
+    @Override
+    public boolean postValidate() {
+        return postValidate;
     }
 }

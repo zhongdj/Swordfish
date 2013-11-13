@@ -63,7 +63,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         final StateMachineObject stateMachine = lookupStateMachine(context);
         try {
             if ( !nextStateCanBeEvaluatedBeforeTranstion(stateMachine, context) ) {
-                validateNextStateInboundWhileAfterTransitionMethod(stateMachine, context);
+                validateNextStateInboundWhile(stateMachine, context);
             }
             setNextState(stateMachine, context);
             performCallbacksAfterStateChange(stateMachine, context);
@@ -98,9 +98,9 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         stateMachine.setTargetState(context.getTarget(), stateName);
     }
 
-    private void validateNextStateInboundWhileAfterTransitionMethod(StateMachineObject stateMachine,
+    private void validateNextStateInboundWhile(StateMachineObject stateMachine,
             InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        stateMachine.validateInboundWhiles(context.getTarget(), context.getTranstionKey());
     }
 
     private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject stateMachine, InterceptContext<V> context) {
@@ -113,7 +113,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private boolean canEvaluateConditionBeforeTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
-        return false;
+        return stateMachine.evaluateConditionBeforeTransition(context.getTranstionKey());
     }
 
     private boolean hasOnlyOneStateCandidate(StateMachineObject stateMachine, InterceptContext<V> context) {
@@ -136,17 +136,12 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         validateStateValidWhiles(stateMachine, context);
         validateTransition(stateMachine, context);
         if ( nextStateCanBeEvaluatedBeforeTranstion(stateMachine, context) ) {
-            validateStateInboundWhilesBeforeTransitionMethod(stateMachine, context);
+            validateNextStateInboundWhile(stateMachine, context);
         }
         performCallbacksBeforeStateChange(stateMachine, context);
     }
 
     private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
-    }
-
-    private void validateStateInboundWhilesBeforeTransitionMethod(StateMachineObject stateMachine,
-            InterceptContext<V> context) {
         // TODO Auto-generated method stub
     }
 
@@ -161,7 +156,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void validateStateValidWhiles(StateMachineObject stateMachine, InterceptContext<V> context) {
-        stateMachine.validValidWhiles(context.getTarget());
+        stateMachine.validateValidWhiles(context.getTarget());
     }
 
     private void lock(StateMachineObject stateMachine, InterceptContext<V> context) {

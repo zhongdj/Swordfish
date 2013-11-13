@@ -194,8 +194,16 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     @Override
-    public RelationMetadata[] getInboundWhiles() {
+    public RelationMetadata[] getDeclaredInboundWhiles() {
         return this.inboundWhileRelations.toArray(new RelationMetadata[0]);
+    }
+    
+    @Override
+    public RelationMetadata[] getInboundWhiles() {
+        final ArrayList<RelationMetadata> result = new ArrayList<>();
+        getInboundWhileRelationMetadataRecursively(this, result);
+        return result.toArray(new RelationMetadata[0]);
+        
     }
 
     @Override
@@ -206,11 +214,11 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     @Override
     public RelationMetadata[] getValidWhiles() {
         final ArrayList<RelationMetadata> result = new ArrayList<>();
-        getRelationMetadataRecursively(this, result);
+        getValidWhileRelationMetadataRecursively(this, result);
         return result.toArray(new RelationMetadata[0]);
     }
 
-    private void getRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
+    private void getValidWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
         final RelationMetadata[] declaredValidWhiles = stateMetadata.getDeclaredValidWhiles();
         for ( final RelationMetadata relationMetadata : declaredValidWhiles ) {
             result.add(relationMetadata);
@@ -224,7 +232,26 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
             return;
         } else {
             if ( null != stateMetadata.getSuperStateMetadata() ) {
-                getRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
+                getValidWhileRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
+            }
+        }
+    }
+    
+    private void getInboundWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationMetadata> result) {
+        final RelationMetadata[] declaredInboundWhiles = stateMetadata.getDeclaredInboundWhiles();
+        for ( final RelationMetadata relationMetadata : declaredInboundWhiles ) {
+            result.add(relationMetadata);
+        }
+        if ( parent.isComposite() ) {
+            for ( final RelationMetadata relationMetadata : parent.getOwningState().getInboundWhiles() ) {
+                result.add(relationMetadata);
+            }
+        }
+        if ( isOverriding() ) {
+            return;
+        } else {
+            if ( null != stateMetadata.getSuperStateMetadata() ) {
+                getValidWhileRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
             }
         }
     }

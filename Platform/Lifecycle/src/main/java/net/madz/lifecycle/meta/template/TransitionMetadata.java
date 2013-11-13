@@ -29,4 +29,6 @@ public interface TransitionMetadata extends MetaData, Dumpable, Template<Transit
     Class<?> getConditionClass();
 
     Class<? extends ConditionalTransition<?>> getJudgerClass();
+    
+    boolean postValidate();
 }

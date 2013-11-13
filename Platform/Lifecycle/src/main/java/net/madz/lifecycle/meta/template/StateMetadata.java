@@ -44,7 +44,7 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
      * @return related state dependencies, expected to be used post-state-change
      *         validation
      */
-    RelationMetadata[] getInboundWhiles();
+    RelationMetadata[] getDeclaredInboundWhiles();
 
     boolean hasValidWhiles();
 
@@ -83,4 +83,6 @@ public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<Met
     FunctionMetadata getFunctionMetadata(Object functionKey);
 
     RelationMetadata[] getDeclaredValidWhiles();
+
+    RelationMetadata[] getInboundWhiles();
 }

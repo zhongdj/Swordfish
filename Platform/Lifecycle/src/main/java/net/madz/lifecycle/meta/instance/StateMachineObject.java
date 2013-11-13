@@ -185,5 +185,9 @@ public interface StateMachineObject extends Concrete<StateMachineMetadata> {
 
     String getNextState(Object target, Object transtionKey);
 
-    void validValidWhiles(Object target);
+    void validateValidWhiles(Object target);
+
+    void validateInboundWhiles(Object target, Object transtionKey);
+
+    boolean evaluateConditionBeforeTransition(Object transtionKey);
 }
