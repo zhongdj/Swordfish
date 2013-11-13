@@ -51,6 +51,7 @@ public class StateMachineObjectBuilderImpl extends
 
     private final StateMachineMetaBuilder template;
     private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
+    private final ArrayList<TransitionObject> transitionObjectList = new ArrayList<>();
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
     private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
     private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
@@ -956,6 +957,7 @@ public class StateMachineObjectBuilderImpl extends
         final TransitionObjectBuilderImpl transitionObjectBuilder = new TransitionObjectBuilderImpl(this, method,
                 transitionMetadata);
         transitionObjectBuilder.build(klass, this);
+        transitionObjectList.add(transitionObjectBuilder.getMetaData());
         final Iterator<Object> iterator = transitionObjectBuilder.getKeySet().iterator();
         while ( iterator.hasNext() ) {
             this.transitionObjectMap.put(iterator.next(), transitionObjectBuilder.getMetaData());
@@ -1017,11 +1019,7 @@ public class StateMachineObjectBuilderImpl extends
 
     @Override
     public TransitionObject[] getTransitionSet() {
-        if ( null != this.transitionObjectMap.values() ) {
-            return this.transitionObjectMap.values().toArray(new TransitionObject[0]);
-        } else {
-            return new TransitionObject[0];
-        }
+        return transitionObjectList.toArray(new TransitionObject[0]);
     }
 
     @Override
