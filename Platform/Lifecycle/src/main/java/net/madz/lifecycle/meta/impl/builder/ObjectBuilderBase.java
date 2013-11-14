@@ -7,7 +7,7 @@ import net.madz.meta.MetaData;
 import net.madz.verification.VerificationFailureSet;
 
 public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends
-        AnnotationMetaBuilderBase<SELF, PARENT> {
+        InheritableAnnotationMetaBuilderBase<SELF, PARENT> {
 
     protected interface MethodScanner {
 

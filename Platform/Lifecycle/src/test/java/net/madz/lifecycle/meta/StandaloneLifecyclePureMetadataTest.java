@@ -19,8 +19,8 @@ import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.F
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Schedule;
 import net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.Transitions.Start;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
-import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
@@ -31,13 +31,12 @@ import net.madz.verification.VerificationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class StandaloneLifecyclePureMetadataTest {
 
@@ -89,7 +88,7 @@ public class StandaloneLifecyclePureMetadataTest {
     @Test
     public void testTransitionMetadatas() throws SecurityException {
         StateMachineMetadata m = machineMetadata;
-        assertEquals(m, stateMachineInst.getTemplate());
+        assertEquals(m, stateMachineInst.getMetaType());
         {
             // Class Key Validation
             assertNotNull(m.getDeclaredTransition(Schedule.class));
@@ -337,11 +336,11 @@ public class StandaloneLifecyclePureMetadataTest {
         assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Finished.class.getSimpleName()));
         assertNotNull(i.getState(IServiceOrder.class.getName() + ".StateSet." + Cancelled.class.getSimpleName()));
         final StateMachineMetadata m = machineMetadata;
-        assertEquals(m.getDeclaredState(Created.class), i.getState(Created.class).getTemplate());
-        assertEquals(m.getDeclaredState(Queued.class), i.getState(Queued.class).getTemplate());
-        assertEquals(m.getDeclaredState(Ongoing.class), i.getState(Ongoing.class).getTemplate());
-        assertEquals(m.getDeclaredState(Finished.class), i.getState(Finished.class).getTemplate());
-        assertEquals(m.getDeclaredState(Cancelled.class), i.getState(Cancelled.class).getTemplate());
+        assertEquals(m.getDeclaredState(Created.class), i.getState(Created.class).getMetaType());
+        assertEquals(m.getDeclaredState(Queued.class), i.getState(Queued.class).getMetaType());
+        assertEquals(m.getDeclaredState(Ongoing.class), i.getState(Ongoing.class).getMetaType());
+        assertEquals(m.getDeclaredState(Finished.class), i.getState(Finished.class).getMetaType());
+        assertEquals(m.getDeclaredState(Cancelled.class), i.getState(Cancelled.class).getMetaType());
     }
 
     @Test

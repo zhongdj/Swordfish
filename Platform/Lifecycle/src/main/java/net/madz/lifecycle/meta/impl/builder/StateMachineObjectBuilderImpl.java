@@ -33,6 +33,7 @@ import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.instance.ConditionObject;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
@@ -47,7 +48,7 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class StateMachineObjectBuilderImpl extends
-        ObjectBuilderBase<StateMachineObjectBuilder, StateMachineMetaBuilder> implements StateMachineObjectBuilder {
+        ObjectBuilderBase<StateMachineObject, StateMachineObject> implements StateMachineObjectBuilder {
 
     private final StateMachineMetaBuilder template;
     private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
@@ -106,8 +107,8 @@ public class StateMachineObjectBuilderImpl extends
                 continue;
             }
             Class<?> relationClass = relation.value();
-            // getTemplate().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
-            getTemplate().getRegistry().loadStateMachineObject(field.getType());
+            // getMetaType().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
+            getMetaType().getRegistry().loadStateMachineObject(field.getType());
             final FieldEvaluator evaluator = new FieldEvaluator(field);
             this.relationObjectsMap.put(relationClass, evaluator);
             this.relationObjectsMap.put(relationClass.getSimpleName(), evaluator);
@@ -115,7 +116,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private void configureStateObjects(Class<?> klass) throws VerificationException {
-        final StateMetadata[] allStates = getTemplate().getAllStates();
+        final StateMetadata[] allStates = getMetaType().getAllStates();
         for ( StateMetadata stateMetadata : allStates ) {
             StateObjectBuilderImpl stateObject = new StateObjectBuilderImpl(this, stateMetadata);
             stateObject.setRegistry(getRegistry());
@@ -189,7 +190,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private void verifyAllConditionBeCovered(Class<?> klass) throws VerificationException {
-        for ( ConditionMetadata conditionMetadata : getTemplate().getAllCondtions() ) {
+        for ( ConditionMetadata conditionMetadata : getMetaType().getAllCondtions() ) {
             verifyConditionBeCovered(klass, conditionMetadata);
         }
     }
@@ -199,7 +200,7 @@ public class StateMachineObjectBuilderImpl extends
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
         if ( !scanner.isCovered() ) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getTemplate()
+            throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getMetaType()
                     .getDottedPath(), conditionMetadata.getDottedPath());
         }
     }
@@ -233,7 +234,7 @@ public class StateMachineObjectBuilderImpl extends
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         scanMethodsOnClasses(new Class[] { klass }, failureSet,
-                new ConditionProviderMethodScanner(klass, getTemplate()));
+                new ConditionProviderMethodScanner(klass, getMetaType()));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -282,7 +283,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private void verifyRelationsAllBeCoveraged(Class<?> klass) throws VerificationException {
-        StateMetadata[] allStates = getTemplate().getAllStates();
+        StateMetadata[] allStates = getMetaType().getAllStates();
         for ( StateMetadata state : allStates ) {
             for ( RelationMetadata relation : state.getValidWhiles() ) {
                 for ( TransitionMetadata transition : state.getPossibleTransitions() ) {
@@ -299,7 +300,7 @@ public class StateMachineObjectBuilderImpl extends
 
     private TransitionMetadata[] getTransitionsToState(StateMetadata state) {
         final ArrayList<TransitionMetadata> transitions = new ArrayList<TransitionMetadata>();
-        for ( final StateMetadata stateMetadata : getTemplate().getAllStates() ) {
+        for ( final StateMetadata stateMetadata : getMetaType().getAllStates() ) {
             for ( final TransitionMetadata transitionMetadata : stateMetadata.getPossibleTransitions() ) {
                 if ( isTransitionIn(state, transitionMetadata) ) {
                     transitions.add(transitionMetadata);
@@ -310,7 +311,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private boolean isTransitionIn(StateMetadata state, TransitionMetadata transitionMetadata) {
-        for ( final StateMetadata stateMetadata : getTemplate().getAllStates() ) {
+        for ( final StateMetadata stateMetadata : getMetaType().getAllStates() ) {
             for ( FunctionMetadata item : stateMetadata.getDeclaredFunctionMetadata() ) {
                 if ( item.getTransition().getDottedPath().equals(transitionMetadata.getDottedPath()) ) {
                     for ( StateMetadata nextState : item.getNextStates() ) {
@@ -453,10 +454,10 @@ public class StateMachineObjectBuilderImpl extends
             if ( null == relation ) {
                 return false;
             } else {
-                if ( Null.class == relation.value() ) {} else if ( !getTemplate().hasRelation(relation.value()) ) {
+                if ( Null.class == relation.value() ) {} else if ( !getMetaType().hasRelation(relation.value()) ) {
                     failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
                             SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
-                            relation.value().getName(), getTemplate().getDottedPath().getAbsoluteName()));
+                            relation.value().getName(), getMetaType().getDottedPath().getAbsoluteName()));
                 }
             }
             return false;
@@ -479,7 +480,7 @@ public class StateMachineObjectBuilderImpl extends
                     relationObjectsMap.put(relation.value(), evaluator);
                 }
                 try {
-                    getTemplate().getRegistry().loadStateMachineObject(method.getReturnType());
+                    getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
                 } catch (VerificationException e) {
                     failureSet.add(e);
                 }
@@ -533,10 +534,10 @@ public class StateMachineObjectBuilderImpl extends
                 continue;
             }
             Class<?> relationClass = relation.value();
-            if ( !getTemplate().hasRelation(relationClass) ) {
+            if ( !getMetaType().hasRelation(relationClass) ) {
                 throw new VerificationException(newVerificationFailure(getDottedPath(),
                         SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(), relationClass.getName(),
-                        getTemplate().getDottedPath().getAbsoluteName()));
+                        getMetaType().getDottedPath().getAbsoluteName()));
             }
         }
         verifyRelationInstanceOnFieldNotBeyondStateMachine(klass.getSuperclass());
@@ -725,7 +726,7 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     private void verifyAllTransitionsCoverage(Class<?> klass, VerificationFailureSet failureSet) {
-        for ( TransitionMetadata transitionMetadata : getTemplate().getAllTransitions() ) {
+        for ( TransitionMetadata transitionMetadata : getMetaType().getAllTransitions() ) {
             verifyTransitionBeCovered(klass, transitionMetadata, failureSet);
         }
     }
@@ -737,7 +738,7 @@ public class StateMachineObjectBuilderImpl extends
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(),
                     SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath().getName(),
-                    getTemplate().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
+                    getMetaType().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
         }
     }
 
@@ -761,7 +762,7 @@ public class StateMachineObjectBuilderImpl extends
                 if ( null == conditionMeta ) {
                     return false;
                 }
-                final ConditionMetadata conditionMetadata = getTemplate().getCondtion(conditionMeta.value());
+                final ConditionMetadata conditionMetadata = getMetaType().getCondtion(conditionMeta.value());
                 try {
                     configureCondition(klass, method, conditionMetadata);
                 } catch (VerificationException e) {
@@ -794,10 +795,10 @@ public class StateMachineObjectBuilderImpl extends
                 }
                 final TransitionMetadata transitionMetadata;
                 if ( Null.class == transitionAnno.value() ) {
-                    transitionMetadata = getTemplate().getTransition(
+                    transitionMetadata = getMetaType().getTransition(
                             StringUtil.toUppercaseFirstCharacter(method.getName()));
                 } else {
-                    transitionMetadata = getTemplate().getTransition(transitionAnno.value());
+                    transitionMetadata = getMetaType().getTransition(transitionAnno.value());
                 }
                 try {
                     configureTransitionObject(klass, method, transitionMetadata);
@@ -912,7 +913,7 @@ public class StateMachineObjectBuilderImpl extends
             if ( isUniqueTransition(type) ) {
                 failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
                         SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
-                                .getDottedPath().getName(), "@" + type.name(), getTemplate().getDottedPath(),
+                                .getDottedPath().getName(), "@" + type.name(), getMetaType().getDottedPath(),
                         getDottedPath().getAbsoluteName()));
             }
             return false;
@@ -973,23 +974,23 @@ public class StateMachineObjectBuilderImpl extends
 
     private TransitionMetadata verifyTransitionMethodWithTransitionClassKey(Method method,
             VerificationFailureSet failureSet, final Transition transition, TransitionMetadata transitionMetadata) {
-        if ( !getTemplate().hasTransition(transition.value()) ) {
+        if ( !getMetaType().hasTransition(transition.value()) ) {
             failureSet.add(newVerificationFailure(getMethodDottedPath(method),
                     SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(),
-                    method.getDeclaringClass().getName(), getTemplate().getDottedPath()));
+                    method.getDeclaringClass().getName(), getMetaType().getDottedPath()));
         } else {
-            transitionMetadata = getTemplate().getTransition(transition.value());
+            transitionMetadata = getMetaType().getTransition(transition.value());
         }
         return transitionMetadata;
     }
 
     private TransitionMetadata verifyTransitionMethodDefaultStyle(Method method, VerificationFailureSet failureSet,
             TransitionMetadata transitionMetadata) {
-        if ( !getTemplate().hasTransition(StringUtil.toUppercaseFirstCharacter(method.getName())) ) {
+        if ( !getMetaType().hasTransition(StringUtil.toUppercaseFirstCharacter(method.getName())) ) {
             failureSet.add(newVerificationFailure(getMethodDottedPath(method), SyntaxErrors.LM_METHOD_NAME_INVALID,
-                    getTemplate().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
+                    getMetaType().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
         } else {
-            transitionMetadata = getTemplate().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
+            transitionMetadata = getMetaType().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
         }
         return transitionMetadata;
     }
@@ -1043,12 +1044,12 @@ public class StateMachineObjectBuilderImpl extends
     }
 
     @Override
-    public StateMachineMetaBuilder getTemplate() {
+    public StateMachineMetaBuilder getMetaType() {
         return template;
     }
 
     @Override
-    public StateMachineObjectBuilder build(Class<?> klass, StateMachineMetaBuilder parent) throws VerificationException {
+    public StateMachineObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
         addKeys(klass);
         return this;
     }
@@ -1077,7 +1078,7 @@ public class StateMachineObjectBuilderImpl extends
     public String getNextState(Object target, Object transitionKey) {
         final String stateName = evaluateState(target);
         final StateObject state = getState(stateName);
-        final FunctionMetadata functionMetadata = state.getTemplate().getFunctionMetadata(transitionKey);
+        final FunctionMetadata functionMetadata = state.getMetaType().getFunctionMetadata(transitionKey);
         if ( null == functionMetadata ) {
             throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
                     + " while searching function metadata from state: " + state);
@@ -1091,7 +1092,7 @@ public class StateMachineObjectBuilderImpl extends
                 final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target,
                         transitionMetadata));
                 final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass)
-                        .getTemplate());
+                        .getMetaType());
                 return nextState.getSimpleName();
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
@@ -1132,7 +1133,7 @@ public class StateMachineObjectBuilderImpl extends
 
     @Override
     public void validateValidWhiles(Object target) {
-        final StateMetadata state = getTemplate().getState(evaluateState(target));
+        final StateMetadata state = getMetaType().getState(evaluateState(target));
         final RelationMetadata[] validWhiles = state.getValidWhiles();
         final HashMap<String, List<RelationMetadata>> mergedRelations = mergeRelations(validWhiles);
         for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
@@ -1155,9 +1156,9 @@ public class StateMachineObjectBuilderImpl extends
 
     @Override
     public void validateInboundWhiles(Object target, Object transitionKey) {
-        final StateMetadata state = getTemplate().getState(evaluateState(target));
+        final StateMetadata state = getMetaType().getState(evaluateState(target));
         final String nextState = getNextState(target, transitionKey);
-        final StateMetadata nextStateMetadata = getTemplate().getState(nextState);
+        final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
         for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergeRelations(
                 nextStateMetadata.getInboundWhiles()).entrySet() ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
@@ -1184,7 +1185,8 @@ public class StateMachineObjectBuilderImpl extends
 
     @Override
     public boolean evaluateConditionBeforeTransition(Object transitionKey) {
-        TransitionMetadata transition = getTemplate().getTransition(transitionKey);
+        TransitionMetadata transition = getMetaType().getTransition(transitionKey);
         return !transition.postValidate();
     }
+
 }

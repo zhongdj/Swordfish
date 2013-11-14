@@ -1,9 +1,8 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.common.DottedPath;
-import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
+import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 import net.madz.meta.MetaData;
 import net.madz.meta.impl.MetaDataBuilderBase;
 import net.madz.utils.BundleUtils;
@@ -11,15 +10,19 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 
 public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends
-        MetaDataBuilderBase<SELF, PARENT> implements AnnotationMetaBuilder<SELF, PARENT> {
+        MetaDataBuilderBase<SELF, PARENT> {
 
-    protected AbsStateMachineRegistry registry;
+    protected LifecycleMetaRegistry registry;
 
-    public AbsStateMachineRegistry getRegistry() {
+    public AnnotationMetaBuilderBase(PARENT parent, String name) {
+        super(parent, name);
+    }
+
+    public LifecycleMetaRegistry getRegistry() {
         return registry;
     }
 
-    public void setRegistry(AbsStateMachineRegistry registry) {
+    public void setRegistry(LifecycleMetaRegistry registry) {
         this.registry = registry;
     }
 
@@ -46,10 +49,5 @@ public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT ex
         addKey(clazz);
         addKey(clazz.getName());
         addKey(clazz.getSimpleName());
-    }
-
-    protected AnnotationMetaBuilderBase(PARENT parent, String name) {
-        super(parent, name);
-        System.out.println(getDottedPath().getAbsoluteName());
     }
 }

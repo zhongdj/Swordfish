@@ -1,11 +1,10 @@
 package net.madz.lifecycle.meta.builder;
 
-import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
-import net.madz.meta.MetaDataBuilder;
+import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 
+public interface StateMachineObjectBuilder extends AnnotationMetaBuilder<StateMachineObject, StateMachineObject>,
+        StateMachineObject {
 
-public interface StateMachineObjectBuilder extends MetaDataBuilder<StateMachineObjectBuilder, StateMachineMetaBuilder>, StateMachineObject  {
-    
-    void setRegistry(AbsStateMachineRegistry registry);
+    void setRegistry(LifecycleMetaRegistry registry);
 }

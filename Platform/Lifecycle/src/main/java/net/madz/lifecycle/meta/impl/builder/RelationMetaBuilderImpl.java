@@ -3,19 +3,18 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.madz.common.Dumper;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
-import net.madz.lifecycle.meta.instance.RelationObject;
+import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationMetaBuilder, StateMetaBuilder> implements
-        RelationMetaBuilder {
+public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationMetadata, StateMetadata>
+        implements RelationMetaBuilder {
 
     private StateMachineMetadata relatedStateMachine;
     private final LinkedList<StateMetadata> onStates = new LinkedList<>();
@@ -26,8 +25,8 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
         return relatedStateMachine;
     }
 
-    public RelationMetaBuilderImpl(StateMetaBuilder parent, String name,
-            List<StateMetadata> onStates, List<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
+    public RelationMetaBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates,
+            List<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
         super(parent, name);
         this.onStates.addAll(onStates);
         this.errorMessageObjects.addAll(errorMessageObjects);
@@ -40,18 +39,8 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
     }
 
     @Override
-    public RelationObject newInstance(Class<?> clazz) {
-        return null;
-    }
-
-    @Override
-    public RelationMetaBuilder build(Class<?> klass, StateMetaBuilder parent) throws VerificationException {
+    public RelationMetaBuilder build(Class<?> klass, StateMetadata parent) throws VerificationException {
         addKeys(klass);
-        return this;
-    }
-
-    @Override
-    public RelationMetaBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         return this;
     }
 
@@ -63,5 +52,10 @@ public class RelationMetaBuilderImpl extends AnnotationMetaBuilderBase<RelationM
     @Override
     public ErrorMessageObject[] getErrorMessageObjects() {
         return this.errorMessageObjects.toArray(new ErrorMessageObject[0]);
+    }
+
+    @Override
+    public void dump(Dumper dumper) {
+        // TODO Auto-generated method stub
     }
 }

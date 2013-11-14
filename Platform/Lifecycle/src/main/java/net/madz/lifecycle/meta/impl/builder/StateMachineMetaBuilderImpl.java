@@ -33,13 +33,12 @@ import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class StateMachineMetaBuilderImpl extends
-        AnnotationMetaBuilderBase<StateMachineMetaBuilder, StateMachineMetaBuilder> implements StateMachineMetaBuilder {
+        InheritableAnnotationMetaBuilderBase<StateMachineMetadata, StateMachineMetadata> implements
+        StateMachineMetaBuilder {
 
     private StateMachineMetadata superStateMachineMetadata;
     private StateMachineMetadata parentStateMachineMetadata;
@@ -176,11 +175,6 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public StateMachineMetaBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        return this;
-    }
-
-    @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
     }
@@ -252,7 +246,7 @@ public class StateMachineMetaBuilderImpl extends
     /* ////////////// Methods For Builder ///////////////// */
     /* //////////////////////////////////////////////////// */
     @Override
-    public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
+    public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
         preConfigureStateMachineType(clazz);
         // Step 1. Syntax Validation
         {

@@ -1,14 +1,14 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import net.madz.common.Dumper;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
-import net.madz.meta.MetaDataFilterable;
+import net.madz.lifecycle.meta.template.ConditionMetadata;
+import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.verification.VerificationFailureSet;
 
-public class ConditionMetaBuilderImpl extends AnnotationMetaBuilderBase<ConditionMetaBuilder, StateMachineMetaBuilder>
-        implements ConditionMetaBuilder {
+public class ConditionMetaBuilderImpl extends
+        InheritableAnnotationMetaBuilderBase<ConditionMetadata, StateMachineMetadata> implements ConditionMetaBuilder {
 
     protected ConditionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "ConditionSet." + name);
@@ -18,14 +18,13 @@ public class ConditionMetaBuilderImpl extends AnnotationMetaBuilderBase<Conditio
     public void verifyMetaData(VerificationFailureSet verificationSet) {}
 
     @Override
-    public ConditionMetaBuilder build(Class<?> klass, StateMachineMetaBuilder builder) {
+    public ConditionMetaBuilder build(Class<?> klass, StateMachineMetadata builder) {
         addKeys(klass);
         return this;
     }
 
     @Override
-    public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
+    public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
-        return null;
     }
 }

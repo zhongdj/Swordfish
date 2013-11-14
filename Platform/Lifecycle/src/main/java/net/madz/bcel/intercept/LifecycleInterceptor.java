@@ -118,7 +118,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
 
     private boolean hasOnlyOneStateCandidate(StateMachineObject stateMachine, InterceptContext<V> context) {
         final String stateName = stateMachine.evaluateState(context.getTarget());
-        final StateMetadata state = stateMachine.getTemplate().getState(stateName);
+        final StateMetadata state = stateMachine.getMetaType().getState(stateName);
         if ( state.hasMultipleStateCandidatesOn(context.getTranstionKey()) ) {
             return false;
         } else {
@@ -147,7 +147,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
 
     private void validateTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
         String stateName = stateMachine.evaluateState(context.getTarget());
-        StateMetadata stateMetadata = stateMachine.getTemplate().getState(stateName);
+        StateMetadata stateMetadata = stateMachine.getMetaType().getState(stateName);
         if ( null == stateMetadata.getTransition(context.getTranstionKey()) ) {
             throw new LifecycleException(getClass(), "lifecycle_common",
                     LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTranstionKey(), stateName,

@@ -1,12 +1,10 @@
 package net.madz.lifecycle.meta.template;
 
-import net.madz.common.Dumpable;
+import net.madz.lifecycle.meta.MetaType;
 import net.madz.lifecycle.meta.Recoverable;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
-import net.madz.meta.FlavorMetaData;
-import net.madz.meta.MetaData;
 
-public interface StateMetadata extends MetaData, Recoverable, FlavorMetaData<MetaData>, Dumpable {
+public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
 
     /* ////////////////////////////////////////////////////////////////// */
     /* //////////////////////////Basic Properties /////////////////////// */

@@ -36,7 +36,7 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBuilder, StateMachineMetaBuilder>
+public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<StateMetadata, StateMachineMetadata>
         implements StateMetaBuilder {
 
     private boolean end;
@@ -101,18 +101,12 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     @Override
-    public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public StateMachineMetaBuilder getStateMachine() {
+    public StateMachineMetadata getStateMachine() {
         return parent;
     }
 
@@ -283,7 +277,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
     }
 
     @Override
-    public StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
+    public StateMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
         verifyBasicSyntax(clazz);
         configureSupperState(clazz);
         configureStateType(clazz);
@@ -310,7 +304,7 @@ public class StateMetaBuilderImpl extends AnnotationMetaBuilderBase<StateMetaBui
         }
     }
 
-    private void configureShortcutState(Class<?> clazz, StateMachineMetaBuilder parent) {
+    private void configureShortcutState(Class<?> clazz, StateMachineMetadata parent) {
         if ( !parent.isComposite() ) return;
         if ( !isFinal() ) return;
         final ShortCut shortCut = clazz.getAnnotation(ShortCut.class);

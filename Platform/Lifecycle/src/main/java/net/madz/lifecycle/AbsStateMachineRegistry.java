@@ -17,13 +17,14 @@ import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
 
-public abstract class AbsStateMachineRegistry {
+public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -183,7 +184,7 @@ public abstract class AbsStateMachineRegistry {
     }
 
     private StateMachineMetadata createStateMachineMetaBuilder(Class<?> stateMachineClass,
-            StateMachineMetaBuilder owningStateMachine, VerificationFailureSet failureSet) throws VerificationException {
+            StateMachineMetadata owningStateMachine, VerificationFailureSet failureSet) throws VerificationException {
         StateMachineMetaBuilder metaBuilder = null;
         try {
             if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
@@ -217,6 +218,7 @@ public abstract class AbsStateMachineRegistry {
         return loadStateMachineMetadata(stateMachineClass, null);
     }
 
+    @Override
     public StateMachineObject loadStateMachineObject(Class<?> stateMachineObjectClass) throws VerificationException {
         final StateMachineObject stateMachineObject = getStateMachineInst(stateMachineObjectClass);
         if ( null != stateMachineObject ) {
@@ -227,15 +229,16 @@ public abstract class AbsStateMachineRegistry {
         }
     }
 
+    @Override
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass,
-            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
+            StateMachineMetadata owningStateMachine) throws VerificationException {
         StateMachineMetadata stateMachineMeta = getStateMachineMeta(stateMachineClass);
         if ( null != stateMachineMeta ) return stateMachineMeta;
         return createStateMachineMetaBuilder(stateMachineClass, owningStateMachine, null);
     }
 
     private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass,
-            StateMachineMetaBuilder owningStateMachine) throws VerificationException {
+            StateMachineMetadata owningStateMachine) throws VerificationException {
         Constructor<? extends StateMachineMetaBuilder> c;
         try {
             c = builderMeta.value().getConstructor(builderMeta.value(), String.class);

@@ -1,15 +1,11 @@
 package net.madz.lifecycle.meta.template;
 
-import net.madz.common.Dumpable;
+import net.madz.lifecycle.meta.MetaType;
 import net.madz.lifecycle.meta.Recoverable;
-import net.madz.lifecycle.meta.Template;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
-import net.madz.meta.FlavorMetaData;
-import net.madz.meta.MetaData;
 import net.madz.verification.VerificationException;
 
-public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>, Dumpable, Recoverable,
-        Template<StateMachineObject> {
+public interface StateMachineMetadata extends Recoverable, MetaType<StateMachineMetadata> {
 
     /* ///////////////////////////////////////////////////////////// */
     /* // State Machine Relation with other State Machine Methods // */
@@ -87,7 +83,6 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      *         part is concreted by the clazz param.
      * @throws VerificationException
      */
-    @Override
     StateMachineObject newInstance(Class<?> clazz) throws VerificationException;
 
     /* //////////////////////////////////////////////////// */
@@ -136,4 +131,6 @@ public interface StateMachineMetadata extends MetaData, FlavorMetaData<MetaData>
      *         inheritance hierarchy and composite state machines.
      */
     boolean hasCondition(Object conditionKey);
+
+    LifecycleMetaRegistry getRegistry();
 }

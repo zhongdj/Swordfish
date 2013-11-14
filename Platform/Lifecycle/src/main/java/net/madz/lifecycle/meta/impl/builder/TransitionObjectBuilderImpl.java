@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.TransitionObjectBuilder;
+import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataFilter;
@@ -11,8 +13,7 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class TransitionObjectBuilderImpl extends
-        AnnotationMetaBuilderBase<TransitionObjectBuilder, StateMachineObjectBuilder> implements
-        TransitionObjectBuilder {
+        InheritableAnnotationMetaBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
 
     private Method transitionMethod;
     private TransitionMetadata template;
@@ -25,7 +26,7 @@ public class TransitionObjectBuilderImpl extends
     }
 
     @Override
-    public TransitionObjectBuilder build(Class<?> klass, StateMachineObjectBuilder parent) throws VerificationException {
+    public TransitionObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
         addKeys(template.getKeySet());
         return this;
     }
@@ -36,11 +37,6 @@ public class TransitionObjectBuilderImpl extends
     }
 
     @Override
-    public TransitionMetadata getTemplate() {
-        return template;
-    }
-
-    @Override
     public void verifyMetaData(VerificationFailureSet verificationSet) {
         // TODO Auto-generated method stub
     }
@@ -48,5 +44,10 @@ public class TransitionObjectBuilderImpl extends
     @Override
     public TransitionObjectBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         return this;
+    }
+
+    @Override
+    public TransitionMetadata getMetaType() {
+        return template;
     }
 }

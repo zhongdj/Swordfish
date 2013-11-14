@@ -11,18 +11,14 @@ import net.madz.lifecycle.annotations.action.Corrupt;
 import net.madz.lifecycle.annotations.action.Fail;
 import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
-import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
-import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
-import net.madz.meta.MetaDataFilterable;
+import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class TransitionMetaBuilderImpl extends
-        AnnotationMetaBuilderBase<TransitionMetaBuilder, StateMachineMetaBuilder> implements TransitionMetaBuilder {
+        InheritableAnnotationMetaBuilderBase<TransitionMetadata, StateMachineMetadata> implements TransitionMetaBuilder {
 
     private TransitionTypeEnum type = TransitionTypeEnum.Common;
     private boolean conditional;
@@ -30,7 +26,7 @@ public class TransitionMetaBuilderImpl extends
     private Class<? extends ConditionalTransition<?>> judgerClass;
     private boolean postValidate;
 
-    protected TransitionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
+    protected TransitionMetaBuilderImpl(StateMachineMetadata parent, String name) {
         super(parent, "TransitionSet." + name);
     }
 
@@ -38,7 +34,7 @@ public class TransitionMetaBuilderImpl extends
     public void verifyMetaData(VerificationFailureSet verificationSet) {}
 
     @Override
-    public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException {
+    public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
         configureCondition(clazz);
         configureType(clazz);
         addKeys(clazz);
@@ -107,18 +103,6 @@ public class TransitionMetaBuilderImpl extends
     @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public TransitionObject newInstance(Class<?> clazz) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

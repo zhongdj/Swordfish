@@ -1,15 +1,16 @@
 package net.madz.lifecycle.meta.builder;
 
+import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
-import net.madz.meta.MetaDataBuilder;
 import net.madz.verification.VerificationException;
 
-public interface StateMetaBuilder extends MetaDataBuilder<StateMetaBuilder, StateMachineMetaBuilder>, StateMetadata {
-
-    StateMetaBuilder build(Class<?> clazz, StateMachineMetaBuilder parent) throws VerificationException;
+public interface StateMetaBuilder extends AnnotationMetaBuilder<StateMetadata, StateMachineMetadata>, StateMetadata {
 
     @Override
-    StateMachineMetaBuilder getStateMachine();
+    StateMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException;
+
+    @Override
+    StateMachineMetadata getStateMachine();
 
     void configureFunctions(Class<?> stateClass) throws VerificationException;
 

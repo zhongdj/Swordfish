@@ -1,13 +1,13 @@
 package net.madz.lifecycle.meta.builder;
 
-import net.madz.lifecycle.AbsStateMachineRegistry;
+import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
-public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetaBuilder, StateMachineMetaBuilder>,
+public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetadata, StateMachineMetadata>,
         StateMachineMetadata {
 
-    void setRegistry(AbsStateMachineRegistry registry);
+    void setRegistry(LifecycleMetaRegistry registry);
 
     void setComposite(boolean b);
 
@@ -18,7 +18,6 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
     boolean hasTransition(Object obj);
 
     StateMachineMetaBuilder[] getCompositeStateMachines();
-    
-    AbsStateMachineRegistry getRegistry();
 
+    LifecycleMetaRegistry getRegistry();
 }
