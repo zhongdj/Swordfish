@@ -2,7 +2,6 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 
-import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.meta.Inheritable;
 import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;

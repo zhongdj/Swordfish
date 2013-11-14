@@ -8,8 +8,7 @@ import java.net.URL;
 
 public class FileUtils {
 
-    private FileUtils() {
-    }
+    private FileUtils() {}
 
     public static String readFileContent(URL file) {
         String content = null;
@@ -30,8 +29,7 @@ public class FileUtils {
             if ( null != br ) {
                 try {
                     br.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
         }
         return content;
