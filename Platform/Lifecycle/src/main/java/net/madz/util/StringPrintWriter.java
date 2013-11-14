@@ -23,6 +23,7 @@ import java.io.Writer;
  * 
  */
 public class StringPrintWriter extends PrintWriter {
+
     private final Writer base;
 
     /**

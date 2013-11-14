@@ -7,6 +7,7 @@ import net.madz.verification.VerificationRuntimeException;
  * not support that flavor.
  */
 public class FlavorNotSupportedException extends VerificationRuntimeException {
+
     private final static long serialVersionUID = 1L;
 
     /**
@@ -25,10 +26,9 @@ public class FlavorNotSupportedException extends VerificationRuntimeException {
      * Convert a flavor key to a String
      */
     private final static String toString(Object flavorKey) {
-        if (flavorKey instanceof Class) {
-            return ((Class<?>) flavorKey).getSimpleName();
+        if ( flavorKey instanceof Class ) {
+            return ( (Class<?>) flavorKey ).getSimpleName();
         }
         return flavorKey.toString();
     }
-
 }

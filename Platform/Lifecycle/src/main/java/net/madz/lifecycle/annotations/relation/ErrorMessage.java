@@ -14,5 +14,4 @@ public @interface ErrorMessage {
     String code();
 
     String bundle();
-    
 }

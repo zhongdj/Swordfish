@@ -98,8 +98,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         stateMachine.setTargetState(context.getTarget(), stateName);
     }
 
-    private void validateNextStateInboundWhile(StateMachineObject stateMachine,
-            InterceptContext<V> context) {
+    private void validateNextStateInboundWhile(StateMachineObject stateMachine, InterceptContext<V> context) {
         stateMachine.validateInboundWhiles(context.getTarget(), context.getTranstionKey());
     }
 
@@ -149,9 +148,8 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         String stateName = stateMachine.evaluateState(context.getTarget());
         StateMetadata stateMetadata = stateMachine.getMetaType().getState(stateName);
         if ( null == stateMetadata.getTransition(context.getTranstionKey()) ) {
-            throw new LifecycleException(getClass(), "lifecycle_common",
-                    LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTranstionKey(), stateName,
-                    context.getTarget());
+            throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTranstionKey(),
+                    stateName, context.getTarget());
         }
     }
 

@@ -1,6 +1,7 @@
 package net.madz.meta;
 
 public interface FlavorFactory {
+
     /**
      * Flavor factory.
      * 

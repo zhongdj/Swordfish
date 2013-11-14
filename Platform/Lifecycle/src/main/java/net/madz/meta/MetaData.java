@@ -9,7 +9,6 @@ public interface MetaData {
 
     MetaData getParent();
 
-    //String getNamespace();
-
+    // String getNamespace();
     void verifyMetaData(VerificationFailureSet verificationSet);
 }

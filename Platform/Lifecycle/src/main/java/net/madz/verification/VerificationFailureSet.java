@@ -18,8 +18,7 @@ import net.madz.util.json.io.JsonWriter;
 public class VerificationFailureSet implements Iterable<VerificationFailure>, Dumpable, Cloneable {
 
     @SuppressWarnings("unchecked")
-    public final static VerificationFailureSet NULL_SET = new VerificationFailureSet(
-            (Set<VerificationFailure>) Collections.EMPTY_SET);
+    public final static VerificationFailureSet NULL_SET = new VerificationFailureSet((Set<VerificationFailure>) Collections.EMPTY_SET);
     // private final static long serialVersionUID = 1L;
     private final Set<VerificationFailure> failureSet;
 
@@ -75,8 +74,7 @@ public class VerificationFailureSet implements Iterable<VerificationFailure>, Du
      * @param details
      *            Message error parameters
      */
-    public VerificationFailureSet add(Throwable e, Object source, String errorKey, String defaultErrorMessage,
-            Object... details) {
+    public VerificationFailureSet add(Throwable e, Object source, String errorKey, String defaultErrorMessage, Object... details) {
         add(new VerificationFailure(e, source, errorKey, defaultErrorMessage, details));
         return this;
     }

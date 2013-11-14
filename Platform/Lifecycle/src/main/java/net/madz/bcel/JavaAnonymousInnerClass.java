@@ -43,15 +43,13 @@ public class JavaAnonymousInnerClass {
     private final String sourceFile;
     private String location;
 
-    public JavaAnonymousInnerClass(String outerClassName, String enclosingMethodName, Type[] enclosingMethodArguments,
-            int innerClassSeq, String superClass, String interfaceClass) {
-        this(outerClassName, enclosingMethodName, enclosingMethodArguments, innerClassSeq, superClass, new Type[0],
-                interfaceClass, new Type[0], null);
+    public JavaAnonymousInnerClass(String outerClassName, String enclosingMethodName, Type[] enclosingMethodArguments, int innerClassSeq, String superClass,
+            String interfaceClass) {
+        this(outerClassName, enclosingMethodName, enclosingMethodArguments, innerClassSeq, superClass, new Type[0], interfaceClass, new Type[0], null);
     }
 
-    public JavaAnonymousInnerClass(String outerClassName, String enclosingMethodName, Type[] enclosingMethodArguments,
-            int innerClassSeq, String superClass, Type[] superClassTypeParameters, String interfaceClass,
-            Type[] interfaceClassTypeParameters, String location) {
+    public JavaAnonymousInnerClass(String outerClassName, String enclosingMethodName, Type[] enclosingMethodArguments, int innerClassSeq, String superClass,
+            Type[] superClassTypeParameters, String interfaceClass, Type[] interfaceClassTypeParameters, String location) {
         super();
         this.outerClassName = outerClassName;
         this.enclosingMethodName = enclosingMethodName;
@@ -78,8 +76,7 @@ public class JavaAnonymousInnerClass {
     }
 
     public ClassGen doGenerate() throws Throwable {
-        final ClassGen cgen = new ClassGen(this.thisClassName, this.superClass, this.sourceFile,
-                Constants.ACC_SYNCHRONIZED, new String[0]);
+        final ClassGen cgen = new ClassGen(this.thisClassName, this.superClass, this.sourceFile, Constants.ACC_SYNCHRONIZED, new String[0]);
         // generate interface
         if ( null != this.interfaceClass && !this.interfaceClass.isEmpty() ) {
             cgen.addInterface(this.interfaceClass);
@@ -117,8 +114,8 @@ public class JavaAnonymousInnerClass {
     private void generateInnerClassesAttribute(final ClassGen cgen) {
         ConstantPoolGen constantPool = cgen.getConstantPool();
         int innerClasses_index = constantPool.addUtf8("InnerClasses");
-        final InnerClasses inner = new InnerClasses(innerClasses_index, 10, new InnerClass[] { new InnerClass(
-                constantPool.lookupClass(thisClassName), constantPool.lookupClass(outerClassName),
+        final InnerClasses inner = new InnerClasses(innerClasses_index, 10, new InnerClass[] { new InnerClass(constantPool.lookupClass(thisClassName),
+                constantPool.lookupClass(outerClassName),
                 // If C is anonymous (JLS §15.9.5), the value of the
                 // inner_name_index item must be zero.
                 0,
@@ -141,8 +138,7 @@ public class JavaAnonymousInnerClass {
         sb.append(")");
         sb.append(lookupEnclosingMethodReturnType().getSignature());
         String enclosingMethodSignature = sb.toString();
-        int enclosingMethodNameAndType = constantPoolGen.addNameAndType(this.enclosingMethodName,
-                enclosingMethodSignature);
+        int enclosingMethodNameAndType = constantPoolGen.addNameAndType(this.enclosingMethodName, enclosingMethodSignature);
         // cgen.addAttribute(new
         // EnclosingMethodAttribute(enclosingMethodIndex, (short)
         // constantPoolGen
@@ -153,8 +149,7 @@ public class JavaAnonymousInnerClass {
         // while parsing a Java class, parser will treat enclosingMethod as
         // unknown attribute
         byte[] bytes = new byte[] { ( (byte) ( ( outClassIndex & 0xFF00 ) >>> 8 ) ), (byte) ( outClassIndex & 0x00FF ),
-                ( (byte) ( ( enclosingMethodNameAndType & 0xFF00 ) >>> 8 ) ),
-                (byte) ( enclosingMethodNameAndType & 0x00FF ) };
+                ( (byte) ( ( enclosingMethodNameAndType & 0xFF00 ) >>> 8 ) ), (byte) ( enclosingMethodNameAndType & 0x00FF ) };
         cgen.addAttribute(new Unknown(enclosingMethodIndex, 4, bytes, constantPoolGen.getConstantPool()));
     }
 
@@ -168,12 +163,11 @@ public class JavaAnonymousInnerClass {
         InstructionList iList = new InstructionList();
         final LocalVariableInstruction start = InstructionConstants.ALOAD_0;
         iList.append(start);
-        iList.append(ifact.createInvoke(thisClassName, "call", new ObjectType("java.lang.Void"), Type.NO_ARGS,
-                Constants.INVOKEVIRTUAL));
+        iList.append(ifact.createInvoke(thisClassName, "call", new ObjectType("java.lang.Void"), Type.NO_ARGS, Constants.INVOKEVIRTUAL));
         ReturnInstruction end = InstructionConstants.ARETURN;
         iList.append(end);
-        final MethodGen callMethodGen = new MethodGen(4161, new ObjectType("java.lang.Object"), Type.NO_ARGS,
-                new String[] {}, "call", thisClassName, iList, cgen.getConstantPool());
+        final MethodGen callMethodGen = new MethodGen(4161, new ObjectType("java.lang.Object"), Type.NO_ARGS, new String[] {}, "call", thisClassName, iList,
+                cgen.getConstantPool());
         callMethodGen.addException("java.lang.Exception");
         addMethod(cgen, callMethodGen);
         iList.dispose();
@@ -188,18 +182,16 @@ public class JavaAnonymousInnerClass {
             if ( "this".equals(var.getName()) ) {
                 iList.append(ifact.createGetField(thisClassName, "this$0", convertSignature2Type(var.getSignature())));
             } else {
-                iList.append(ifact.createGetField(thisClassName, "val$" + var.getName(),
-                        convertSignature2Type(var.getSignature())));
+                iList.append(ifact.createGetField(thisClassName, "val$" + var.getName(), convertSignature2Type(var.getSignature())));
             }
         }
         final Type returnType = lookupEnclosingMethodReturnType();
         final Type[] argTypes = lookupEnclosingMethodArgType();
-        iList.append(ifact.createInvoke(outerClassName, enclosingMethodName + POSTFIX, returnType, argTypes,
-                Constants.INVOKEVIRTUAL));
+        iList.append(ifact.createInvoke(outerClassName, enclosingMethodName + POSTFIX, returnType, argTypes, Constants.INVOKEVIRTUAL));
         iList.append(InstructionConstants.ACONST_NULL);
         iList.append(InstructionConstants.ARETURN);
-        final MethodGen callMethodGen = new MethodGen(1, new ObjectType("java.lang.Void"), Type.NO_ARGS,
-                new String[] {}, "call", thisClassName, iList, cgen.getConstantPool());
+        final MethodGen callMethodGen = new MethodGen(1, new ObjectType("java.lang.Void"), Type.NO_ARGS, new String[] {}, "call", thisClassName, iList,
+                cgen.getConstantPool());
         callMethodGen.addException("java.lang.Exception");
         addMethod(cgen, callMethodGen);
         iList.dispose();
@@ -243,9 +235,8 @@ public class JavaAnonymousInnerClass {
                 argumentNames[i] = arguments.get(i).getName();
             }
         }
-        final MethodGen constructorGen = new MethodGen(0, org.apache.bcel.generic.Type.VOID,
-                typeList.toArray(new Type[0]), argumentNames, "<init>", this.thisClassName, iList,
-                cgen.getConstantPool());
+        final MethodGen constructorGen = new MethodGen(0, org.apache.bcel.generic.Type.VOID, typeList.toArray(new Type[0]), argumentNames, "<init>",
+                this.thisClassName, iList, cgen.getConstantPool());
         addMethod(cgen, constructorGen);
         iList.dispose();
     }
@@ -378,8 +369,7 @@ public class JavaAnonymousInnerClass {
             final List<LocalVariable> result = new ArrayList<LocalVariable>();
             final LocalVariableTable localVariableTable = method.getLocalVariableTable();
             if ( null != localVariableTable ) {
-                for ( org.apache.bcel.classfile.LocalVariable localVariable : localVariableTable
-                        .getLocalVariableTable() ) {
+                for ( org.apache.bcel.classfile.LocalVariable localVariable : localVariableTable.getLocalVariableTable() ) {
                     if ( localVariable.getStartPC() == 0 ) {
                         result.add(new LocalVariable(localVariable.getName(), localVariable.getSignature()));
                     }

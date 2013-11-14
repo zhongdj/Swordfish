@@ -8,8 +8,7 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class ConditionMetaBuilderImpl extends
-        InheritableAnnotationMetaBuilderBase<ConditionMetadata, StateMachineMetadata> implements ConditionMetaBuilder {
+public class ConditionMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<ConditionMetadata, StateMachineMetadata> implements ConditionMetaBuilder {
 
     protected ConditionMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "ConditionSet." + name);

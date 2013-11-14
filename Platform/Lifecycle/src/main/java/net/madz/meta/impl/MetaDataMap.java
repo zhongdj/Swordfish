@@ -24,6 +24,7 @@ import net.madz.util.StringUtil;
  * 
  */
 public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
+
     protected final MetaData owner;
     protected final MetaDataFilter filter;
     protected final List<Value> valueList;
@@ -46,21 +47,18 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
     private MetaDataMap(MetaData owner, List<Value> cloneValueList, Map<Object, List<Integer>> valueKeyMap, MetaDataFilter filter, boolean lazyFilter) {
         this.owner = owner;
         this.filter = filter;
-
-        if (null != cloneValueList) {
+        if ( null != cloneValueList ) {
             this.valueList = new ArrayList<Value>(cloneValueList.size());
-
             //
             // When lazy filtering, copy every Value from the cloneValueList
             // into an UnfilteredValue
             // object. These objects will be filtered when accessed.
             //
-            if (lazyFilter) {
+            if ( lazyFilter ) {
                 this.valueKeyMap = valueKeyMap;
                 this.entryListCache = null;
-
-                for (Value cloneValue : cloneValueList) {
-                    if (null != cloneValue) {
+                for ( Value cloneValue : cloneValueList ) {
+                    if ( null != cloneValue ) {
                         this.valueList.add(new UnfilteredValue(cloneValue));
                     } else {
                         this.valueList.add(null);
@@ -71,22 +69,21 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
             // Otherwise create a Value from each entry
             //
             else {
-                Map<Object, List<Integer>> newKeyMap = new HashMap<Object, List<Integer>>((valueKeyMap.size() * 3) / 2);
+                Map<Object, List<Integer>> newKeyMap = new HashMap<Object, List<Integer>>(( valueKeyMap.size() * 3 ) / 2);
                 this.entryListCache = new ArrayList<MetaDataFilterable>(cloneValueList.size());
-                for (Value cloneValue : cloneValueList) {
-                    if (null != cloneValue) {
+                for ( Value cloneValue : cloneValueList ) {
+                    if ( null != cloneValue ) {
                         final MetaDataFilterable value = cloneValue.getFilteredValue(owner, filter);
-                        if (null != value) {
+                        if ( null != value ) {
                             Value filteredValue = new Value(this.valueList.size(), value, value.getKeySet());
                             this.valueList.add(filteredValue);
-
                             // Create the newKeyMap
                             Integer id = filteredValue.position;
                             entryListCache.add(value);
                             KeySet keySet = filteredValue.value.getKeySet();
-                            for (Object key : keySet) {
+                            for ( Object key : keySet ) {
                                 List<Integer> idList = newKeyMap.get(key);
-                                if (null == idList) {
+                                if ( null == idList ) {
                                     idList = new LinkedList<Integer>();
                                     newKeyMap.put(key, idList);
                                 }
@@ -113,6 +110,7 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
      * Filtered value
      */
     protected class Value {
+
         public final Integer position;
         protected final MetaDataFilterable value;
         protected final KeySet keySet;
@@ -140,7 +138,7 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
 
         @Override
         public final boolean equals(Object obj) {
-            return (obj instanceof MetaDataMap.Value) && ((MetaDataMap.Value) obj).position.equals(this.position);
+            return ( obj instanceof MetaDataMap.Value ) && ( (MetaDataMap.Value) obj ).position.equals(this.position);
         }
 
         @Override
@@ -149,14 +147,14 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
         }
 
         protected final MetaDataFilterable getFilteredValue(MetaData newOwner, MetaDataFilter filter) {
-            if (null != value && filter.canInclude(this.value)) {
+            if ( null != value && filter.canInclude(this.value) ) {
                 return value.filter(newOwner, filter, true);
             }
             return null;
         }
     }
-
     private class UnfilteredValue extends Value {
+
         public UnfilteredValue(Value cloneValue) {
             super(cloneValue.position, cloneValue.value, cloneValue.keySet);
         }
@@ -175,18 +173,17 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
 
     public Collection<MetaDataFilterable> getValues(Object key) {
         List<Integer> idList = this.valueKeyMap.get(key);
-        if (null != idList) {
+        if ( null != idList ) {
             ArrayList<MetaDataFilterable> results = new ArrayList<MetaDataFilterable>(idList.size());
-            for (Integer id : idList) {
+            for ( Integer id : idList ) {
                 Value valueEntry = this.valueList.get(id.intValue());
-                if (null != valueEntry) {
+                if ( null != valueEntry ) {
                     MetaDataFilterable value = valueEntry.getValue();
-                    if (null != value) {
+                    if ( null != value ) {
                         results.add(value);
                     }
                 }
             }
-
             return results;
         }
         return Collections.emptyList();
@@ -201,12 +198,12 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
      */
     public MetaDataFilterable get(Object key) {
         List<Integer> idList = this.valueKeyMap.get(key);
-        if (null != idList) {
-            for (Integer id : idList) {
+        if ( null != idList ) {
+            for ( Integer id : idList ) {
                 Value valueEntry = this.valueList.get(id.intValue());
-                if (null != valueEntry) {
+                if ( null != valueEntry ) {
                     MetaDataFilterable value = valueEntry.getValue();
-                    if (null != value) {
+                    if ( null != value ) {
                         return value;
                     }
                 }
@@ -258,18 +255,17 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
      * All entries in map
      */
     public <MD extends MetaDataFilterable> List<MD> getEntries() {
-        if (null == entryListCache) {
+        if ( null == entryListCache ) {
             entryListCache = new ArrayList<MetaDataFilterable>(this.valueList.size());
-            for (Value valueEntry : this.valueList) {
-                if (null != valueEntry) {
+            for ( Value valueEntry : this.valueList ) {
+                if ( null != valueEntry ) {
                     MetaDataFilterable value = valueEntry.getValue();
-                    if (null != value) {
+                    if ( null != value ) {
                         entryListCache.add(value);
                     }
                 }
             }
         }
-
         @SuppressWarnings("unchecked")
         List<MD> list = (List<MD>) entryListCache;
         return list;
@@ -277,7 +273,7 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
 
     @Override
     public void dump(Dumper dumper) {
-        for (MetaDataFilterable value : getEntries()) {
+        for ( MetaDataFilterable value : getEntries() ) {
             dumper.dump(value);
         }
     }
@@ -288,6 +284,7 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
     }
 
     static class Builder extends MetaDataMap {
+
         /**
          * Constructor
          * 
@@ -302,10 +299,9 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
         @Override
         public MetaDataMap filter(MetaData newOwner, MetaDataFilter filter, boolean lazyFilter) {
             Map<Object, List<Integer>> valueKeyMap = new HashMap<Object, List<Integer>>(this.valueKeyMap);
-            for (Map.Entry<Object, List<Integer>> mapEntry : valueKeyMap.entrySet()) {
+            for ( Map.Entry<Object, List<Integer>> mapEntry : valueKeyMap.entrySet() ) {
                 mapEntry.setValue(Collections.unmodifiableList(new ArrayList<Integer>(mapEntry.getValue())));
             }
-
             return new MetaDataMap(newOwner, valueList, Collections.unmodifiableMap(valueKeyMap), filter, lazyFilter);
         }
 
@@ -319,7 +315,7 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
          */
         public int shallowRemove(Object key) {
             List<Integer> idList = this.valueKeyMap.remove(key);
-            if (null != idList) {
+            if ( null != idList ) {
                 return idList.size();
             }
             return 0;
@@ -327,12 +323,11 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
 
         public void deepRemove(Object key) {
             List<Integer> idList = this.valueKeyMap.get(key);
-            if (null != idList) {
-                for (Integer id : idList) {
+            if ( null != idList ) {
+                for ( Integer id : idList ) {
                     Value valueEntry = valueList.set(id.intValue(), null);
-
                     KeySet keySet = valueEntry.value.getKeySet();
-                    for (Object valueKey : keySet) {
+                    for ( Object valueKey : keySet ) {
                         this.valueKeyMap.remove(valueKey);
                     }
                     this.entryListCache.remove(valueEntry.value);
@@ -342,13 +337,11 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
 
         public <MD extends MetaDataFilterable> void add(MD metaData) {
             this.entryListCache.add(metaData);
-
             Value valueEntry = new Value(valueList.size(), metaData, metaData.getKeySet());
             this.valueList.add(valueEntry);
-
-            for (Object key : metaData.getKeySet()) {
+            for ( Object key : metaData.getKeySet() ) {
                 List<Integer> idList = this.valueKeyMap.get(key);
-                if (null == idList) {
+                if ( null == idList ) {
                     idList = new LinkedList<Integer>();
                     this.valueKeyMap.put(key, idList);
                 }
@@ -356,5 +349,4 @@ public class MetaDataMap implements Iterable<MetaDataFilterable>, Dumpable {
             }
         }
     }
-
 }

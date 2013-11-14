@@ -24,15 +24,13 @@ import org.apache.bcel.generic.Type;
 public class BCELClassFileTransformer implements ClassFileTransformer {
 
     private static final Logger log = Logger.getLogger(BCELClassFileTransformer.class.getName());
-    public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/")
-            + ";";
-    public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L"
-            + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
+    public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/") + ";";
+    public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L" + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
     private String[] ignoredPackages = new String[] { "java.", "javax.", "sun." };
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer)
+            throws IllegalClassFormatException {
         if ( shouldIgnore(className) ) {
             return classfileBuffer;
         }
@@ -115,12 +113,10 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
         inst.addTransformer(new BCELClassFileTransformer());
     }
 
-    private static void doTransform(ClassGen cgen, int innerClassSeq, Method interceptingMethod, String location)
-            throws Throwable {
-        JavaAnonymousInnerClass c = new JavaAnonymousInnerClass(cgen.getClassName(), interceptingMethod.getName(),
-                interceptingMethod.getArgumentTypes(), innerClassSeq, Object.class.getName(), new Type[0],
-                java.util.concurrent.Callable.class.getName(), new Type[] { new ObjectType(Void.class.getName()) },
-                location);
+    private static void doTransform(ClassGen cgen, int innerClassSeq, Method interceptingMethod, String location) throws Throwable {
+        JavaAnonymousInnerClass c = new JavaAnonymousInnerClass(cgen.getClassName(), interceptingMethod.getName(), interceptingMethod.getArgumentTypes(),
+                innerClassSeq, Object.class.getName(), new Type[0], java.util.concurrent.Callable.class.getName(), new Type[] { new ObjectType(
+                        Void.class.getName()) }, location);
         ClassGen doGenerate = c.doGenerate();
         doGenerate.getJavaClass().getBytes();
         MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);

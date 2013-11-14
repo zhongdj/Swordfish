@@ -4,8 +4,7 @@ import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
-public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetadata, StateMachineMetadata>,
-        StateMachineMetadata {
+public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetadata, StateMachineMetadata>, StateMachineMetadata {
 
     void setRegistry(LifecycleMetaRegistry registry);
 

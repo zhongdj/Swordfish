@@ -260,8 +260,7 @@ public abstract class MetaDataUtil {
         final String methodName = method.getName();
         for ( String prefix : prefixes ) {
             if ( methodName.startsWith(prefix) && methodName.length() > prefix.length() ) {
-                String firstNameCharacter = Character
-                        .toString(Character.toLowerCase(methodName.charAt(prefix.length())));
+                String firstNameCharacter = Character.toString(Character.toLowerCase(methodName.charAt(prefix.length())));
                 String remainder = methodName.substring(prefix.length() + 1);
                 return firstNameCharacter + remainder;
             }

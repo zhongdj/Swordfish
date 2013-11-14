@@ -5,6 +5,7 @@ package net.madz.common;
  * PrintWriter.
  */
 public interface Dumpable {
+
     /**
      * Generate detailed debug information.
      * 

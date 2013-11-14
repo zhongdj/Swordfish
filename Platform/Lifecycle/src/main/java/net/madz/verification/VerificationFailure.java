@@ -32,8 +32,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
         }
     }
 
-    public VerificationFailure(Throwable cause, Object source, String errorKey, String errorCode,
-            String defaultErrorMessage, Object... details) {
+    public VerificationFailure(Throwable cause, Object source, String errorKey, String errorCode, String defaultErrorMessage, Object... details) {
         this(cause, source, errorKey, defaultErrorMessage, details);
         this.errorCode = errorCode;
     }
@@ -51,16 +50,14 @@ public class VerificationFailure implements Dumpable, Cloneable {
      * @param details
      *            Error parameters
      */
-    public VerificationFailure(Throwable cause, Object source, String errorKey, String defaultErrorMessage,
-            Object... details) {
+    public VerificationFailure(Throwable cause, Object source, String errorKey, String defaultErrorMessage, Object... details) {
         this.cause = cause;
         this.source = source;
         List<String> segements = new ArrayList<>();
-        for (String segement : errorKey.split("\\.")) {
+        for ( String segement : errorKey.split("\\.") ) {
             segements.add(segement);
         }
-        this.errorKey = source instanceof MetaData ? ( (MetaData) source ).getDottedPath().append(segements)
-                : DottedPath.parse(errorKey);
+        this.errorKey = source instanceof MetaData ? ( (MetaData) source ).getDottedPath().append(segements) : DottedPath.parse(errorKey);
         this.defaultErrorMessage = defaultErrorMessage;
         this.details = details;
         this.stack = Thread.currentThread().getStackTrace();
@@ -83,8 +80,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
         this(null, source, errorKey, defaultErrorMessage, details);
     }
 
-    public VerificationFailure(Object source, String errorKey, String errorCode, String defaultErrorMessage,
-            Object... details) {
+    public VerificationFailure(Object source, String errorKey, String errorCode, String defaultErrorMessage, Object... details) {
         this(null, source, errorKey, errorCode, defaultErrorMessage, details);
     }
 
@@ -155,5 +151,4 @@ public class VerificationFailure implements Dumpable, Cloneable {
             dumper.indent().dump(stack);
         }
     }
-
 }

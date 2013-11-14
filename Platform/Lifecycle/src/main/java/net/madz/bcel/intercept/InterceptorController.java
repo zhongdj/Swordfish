@@ -1,6 +1,5 @@
 package net.madz.bcel.intercept;
 
-
 import java.util.concurrent.Callable;
 
 public class InterceptorController<V> {

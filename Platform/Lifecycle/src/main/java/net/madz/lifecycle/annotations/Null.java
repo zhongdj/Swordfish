@@ -1,4 +1,3 @@
 package net.madz.lifecycle.annotations;
 
-public class Null {
-}
+public class Null {}

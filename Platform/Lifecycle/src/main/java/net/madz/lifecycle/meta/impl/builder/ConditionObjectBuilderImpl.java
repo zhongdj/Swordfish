@@ -13,8 +13,7 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObject, StateMachineObject>
-        implements ConditionObjectBuilder {
+public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObject, StateMachineObject> implements ConditionObjectBuilder {
 
     private ConditionMetadata template;
     private Method conditionGetter;
@@ -29,7 +28,6 @@ public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObjec
     public Method conditionGetter() {
         return conditionGetter;
     }
-
 
     @Override
     public void verifyMetaData(VerificationFailureSet verificationSet) {}

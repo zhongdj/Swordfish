@@ -17,8 +17,7 @@ import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class TransitionMetaBuilderImpl extends
-        InheritableAnnotationMetaBuilderBase<TransitionMetadata, StateMachineMetadata> implements TransitionMetaBuilder {
+public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<TransitionMetadata, StateMachineMetadata> implements TransitionMetaBuilder {
 
     private TransitionTypeEnum type = TransitionTypeEnum.Common;
     private boolean conditional;
@@ -42,10 +41,7 @@ public class TransitionMetaBuilderImpl extends
         return this;
     }
 
-    private void configureSuper(Class<?> clazz, StateMachineMetadata parent) {
-        
-        
-    }
+    private void configureSuper(Class<?> clazz, StateMachineMetadata parent) {}
 
     private void configureType(Class<?> clazz) {
         if ( null != clazz.getAnnotation(Corrupt.class) ) {
@@ -74,15 +70,13 @@ public class TransitionMetaBuilderImpl extends
         }
     }
 
-    private void verifyJudgerClass(Class<?> clazz, Class<?> judgerClass, Class<?> conditionClass)
-            throws VerificationException {
+    private void verifyJudgerClass(Class<?> clazz, Class<?> judgerClass, Class<?> conditionClass) throws VerificationException {
         for ( Type type : judgerClass.getGenericInterfaces() ) {
             if ( type instanceof ParameterizedType ) {
                 final ParameterizedType pType = (ParameterizedType) type;
                 if ( ConditionalTransition.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
                     if ( !conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]) ) {
-                        throw newVerificationException(getDottedPath(),
-                                SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass,
+                        throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass,
                                 judgerClass);
                     }
                 }

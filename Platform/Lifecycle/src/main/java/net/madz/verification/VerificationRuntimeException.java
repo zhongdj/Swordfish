@@ -9,6 +9,7 @@ import net.madz.meta.MetaData;
  * VerificationFailureSet.
  */
 public class VerificationRuntimeException extends RuntimeException implements Dumpable {
+
     private final static long serialVersionUID = 1L;
     private final VerificationFailureSet verificationSet;
 
@@ -76,5 +77,4 @@ public class VerificationRuntimeException extends RuntimeException implements Du
     public void dump(Dumper dumper) {
         dumper.dump(verificationSet);
     }
-
 }

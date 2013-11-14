@@ -13,8 +13,8 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationConstraintMetadata, StateMetadata>
-        implements RelationConstraintBuilder {
+public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationConstraintMetadata, StateMetadata> implements
+        RelationConstraintBuilder {
 
     private StateMachineMetadata relatedStateMachine;
     private final LinkedList<StateMetadata> onStates = new LinkedList<>();
@@ -25,8 +25,8 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
         return relatedStateMachine;
     }
 
-    public RelationConstraintBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates,
-            List<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
+    public RelationConstraintBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates, List<ErrorMessageObject> errorMessageObjects,
+            StateMachineMetadata stateMachineMetadata) {
         super(parent, name);
         this.onStates.addAll(onStates);
         this.errorMessageObjects.addAll(errorMessageObjects);
@@ -58,13 +58,9 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
     }
-    
-    
 
     @Override
-    protected void verifySuper(Class<?> metaClass) throws VerificationException {
-        
-    }
+    protected void verifySuper(Class<?> metaClass) throws VerificationException {}
 
     @Override
     protected RelationConstraintMetadata findSuper(Class<?> metaClass) throws VerificationException {

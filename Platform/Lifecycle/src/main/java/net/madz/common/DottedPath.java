@@ -12,29 +12,27 @@ import static com.google.common.collect.Lists.newArrayList;
  * This class is loosely modeled after java.io.File
  */
 public class DottedPath implements Iterable<DottedPath> {
+
     private final Optional<DottedPath> parent;
     private final String name, absoluteName;
     private List<String> paths;
 
     /** Constructor */
     public DottedPath(String name) {
-        this(Optional.<DottedPath>absent(), name);
+        this(Optional.<DottedPath> absent(), name);
     }
 
     private DottedPath(Optional<DottedPath> parent, String name) {
         this.parent = parent;
         this.name = name;
         this.absoluteName = this.parent.isPresent() ? this.parent.get().absoluteName + "." + this.name : this.name;
-
         this.paths = makePaths();
     }
 
     private List<String> makePaths() {
-        if (!this.parent.isPresent()) return newArrayList(this.name);
-
+        if ( !this.parent.isPresent() ) return newArrayList(this.name);
         List<String> paths = newArrayList(this.parent.get().paths);
         paths.add(this.name);
-
         return paths;
     }
 
@@ -42,7 +40,6 @@ public class DottedPath implements Iterable<DottedPath> {
         List<String> segments = Arrays.asList(path.split("\\."));
         DottedPath head = new DottedPath(segments.get(0));
         List<String> tail = segments.subList(1, segments.size());
-
         return head.append(tail);
     }
 
@@ -55,16 +52,15 @@ public class DottedPath implements Iterable<DottedPath> {
     }
 
     public DottedPath append(List<String> segments) {
-        if (segments.isEmpty()) {
+        if ( segments.isEmpty() ) {
             return this;
         }
-
         return this.append(segments.get(0)).append(segments.subList(1, segments.size()));
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof DottedPath) && ((DottedPath) obj).absoluteName.equals(this.absoluteName);
+        return ( obj instanceof DottedPath ) && ( (DottedPath) obj ).absoluteName.equals(this.absoluteName);
     }
 
     @Override
@@ -80,11 +76,9 @@ public class DottedPath implements Iterable<DottedPath> {
     }
 
     private List<DottedPath> toList() {
-        if (!this.parent.isPresent()) return newArrayList(this);
-
+        if ( !this.parent.isPresent() ) return newArrayList(this);
         ArrayList<DottedPath> dottedPaths = newArrayList(this.parent.get().toList());
         dottedPaths.add(this);
-
         return dottedPaths;
     }
 
@@ -119,7 +113,7 @@ public class DottedPath implements Iterable<DottedPath> {
     /**
      * Absolute name of this path using the specified separator.
      * 
-     *
+     * 
      * @param separator
      *            String to append between each path level
      * @return StringBuilder passed in or created
@@ -135,5 +129,4 @@ public class DottedPath implements Iterable<DottedPath> {
     public String toString() {
         return this.absoluteName;
     }
-
 }

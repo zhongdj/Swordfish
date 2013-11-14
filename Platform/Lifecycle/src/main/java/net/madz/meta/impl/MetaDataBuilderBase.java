@@ -13,6 +13,7 @@ import net.madz.meta.MetaData;
 import net.madz.meta.MetaDataBuilder;
 
 public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends MetaData> implements MetaData, MetaDataBuilder<SELF, PARENT>, Flavored {
+
     protected Class<?> containerType;
     protected final KeySet.Builder keySet;
     protected final MetaDataMap.Builder flavorMap;
@@ -23,8 +24,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
     protected MetaDataBuilderBase(PARENT parent, String name) {
         @SuppressWarnings("unchecked")
         final SELF self = (SELF) this;
-
-        if (null == parent) {
+        if ( null == parent ) {
             this.parent = null;
             this.path = DottedPath.parse(name);
         } else {
@@ -33,7 +33,6 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
         }
         this.keySet = new KeySet.Builder(3);
         this.flavorMap = new MetaDataMap.Builder(self, 3);
-
         addKey(this.path.getName());
         addKey(this.path.getAbsoluteName());
     }
@@ -45,7 +44,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
 
     @Override
     public void addFlavor(FlavorMetaData<? super SELF> flavor) {
-        if (null != flavor) {
+        if ( null != flavor ) {
             flavorMap.add(flavor);
         }
     }
@@ -68,13 +67,12 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
     @Override
     public <F> F getFlavor(Class<F> flavorInterface, boolean assertExists) {
         final Object flavor = getFlavorMetaData(flavorInterface, assertExists);
-        if (flavor instanceof FlavorFactory) {
-            return flavorInterface.cast(((FlavorFactory) flavor).getFlavor(flavorInterface, this));
-        } else if (flavorInterface.isInstance(flavor)) {
+        if ( flavor instanceof FlavorFactory ) {
+            return flavorInterface.cast(( (FlavorFactory) flavor ).getFlavor(flavorInterface, this));
+        } else if ( flavorInterface.isInstance(flavor) ) {
             return flavorInterface.cast(flavor);
         }
-
-        if (null != flavor || assertExists) {
+        if ( null != flavor || assertExists ) {
             throw new FlavorNotSupportedException(this, flavorInterface);
         }
         return null;
@@ -91,12 +89,11 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
     @Override
     public void handleError(Throwable e) {
         MetaDataError<?> metaError = getFlavor(MetaDataError.class, false);
-        if (null == metaError) {
+        if ( null == metaError ) {
             MetaDataError<SELF> newMetaError = new MetaDataError<SELF>();
             addFlavor(newMetaError);
             metaError = newMetaError;
         }
-
         metaError.addError(e);
     }
 
@@ -113,7 +110,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
 
     public Object getFlavorMetaData(Object key, boolean assertExists) {
         final Object flavorMetaData = this.flavorMap.get(key);
-        if (null == flavorMetaData && assertExists) {
+        if ( null == flavorMetaData && assertExists ) {
             throw new FlavorNotSupportedException(this, key);
         }
         return flavorMetaData;
@@ -169,5 +166,4 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
     public final String toString() {
         return toString(new ParameterString(getClass().getSimpleName())).toString();
     }
-
 }

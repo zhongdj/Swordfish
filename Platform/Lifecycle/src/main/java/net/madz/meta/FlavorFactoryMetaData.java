@@ -8,6 +8,7 @@ import net.madz.meta.impl.KeyedEnumerationMap;
  * MetaData flavor
  */
 public abstract class FlavorFactoryMetaData<OWNER extends MetaData, E extends Enum<E> & Keyed<Class<?>>> implements FlavorMetaData<OWNER>, FlavorFactory {
+
     private final KeySet keySet;
     private final Map<Class<?>, E> flavorKeyMap;
 
@@ -42,10 +43,10 @@ public abstract class FlavorFactoryMetaData<OWNER extends MetaData, E extends En
     @Override
     public final <T> T getFlavor(Class<T> flavorInterface, Object container) throws FlavorNotSupportedException {
         E type = this.flavorKeyMap.get(flavorInterface);
-        if (null != type) {
+        if ( null != type ) {
             try {
                 Object value = buildFlavor(type, container);
-                if (null != value) {
+                if ( null != value ) {
                     return flavorInterface.cast(value);
                 }
             } catch (Exception e) {
@@ -53,7 +54,6 @@ public abstract class FlavorFactoryMetaData<OWNER extends MetaData, E extends En
                 throw new FlavorNotSupportedException(this, flavorInterface);
             }
         }
-
         throw new FlavorNotSupportedException(this, flavorInterface);
     }
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import net.madz.util.MetaDataUtil;
 
 public class ParameterString {
+
     private final String name;
     private final String separator;
     private final StringBuilder sb = new StringBuilder();
@@ -43,26 +44,24 @@ public class ParameterString {
      * @return This ParameterString, for easy chaining
      */
     public ParameterString append(Object key, boolean value) {
-        if (value) {
+        if ( value ) {
             append(key);
         }
-
         return this;
     }
 
     protected void separate() {
-        if (sb.length() > 0) {
+        if ( sb.length() > 0 ) {
             sb.append(separator);
         }
     }
 
     public <V extends Object> ParameterString appendAll(Object key, V[] values) {
-        if (null != values) {
+        if ( null != values ) {
             boolean first = true;
-
-            for (V value : values) {
-                if (null != value) {
-                    if (first) {
+            for ( V value : values ) {
+                if ( null != value ) {
+                    if ( first ) {
                         separate();
                         sb.append(key).append("=").append(value);
                         first = false;
@@ -72,18 +71,15 @@ public class ParameterString {
                 }
             }
         }
-
         return this;
-
     }
 
     public ParameterString appendAll(Object key, Iterable<?> values) {
-        if (null != values) {
+        if ( null != values ) {
             boolean first = true;
-
-            for (Object value : values) {
-                if (null != value) {
-                    if (first) {
+            for ( Object value : values ) {
+                if ( null != value ) {
+                    if ( first ) {
                         separate();
                         sb.append(key).append("=").append(value);
                         first = false;
@@ -93,21 +89,19 @@ public class ParameterString {
                 }
             }
         }
-
         return this;
     }
 
     public ParameterString append(Object key, Object value) {
-        if (null != value) {
+        if ( null != value ) {
             separate();
             sb.append(key).append("=").append(value);
         }
-
         return this;
     }
 
     public ParameterString append(Object value) {
-        if (null != value) {
+        if ( null != value ) {
             separate();
             sb.append(value);
         }
@@ -115,26 +109,24 @@ public class ParameterString {
     }
 
     public ParameterString appendFields(Object obj) {
-        for (Class<?> type = obj.getClass(); type != null && type != Object.class; type = type.getSuperclass()) {
-            for (Field f : type.getDeclaredFields()) {
+        for ( Class<?> type = obj.getClass(); type != null && type != Object.class; type = type.getSuperclass() ) {
+            for ( Field f : type.getDeclaredFields() ) {
                 try {
-                    if (!f.isAccessible()) {
+                    if ( !f.isAccessible() ) {
                         f.setAccessible(true);
                     }
-
                     append(f.getName(), f.get(obj));
                 } catch (Exception e) {
                     // oh well
                 }
             }
         }
-
         return this;
     }
 
     @Override
     public String toString() {
-        if (null != name) {
+        if ( null != name ) {
             return name + "[" + sb.toString() + "]";
         }
         return sb.toString();

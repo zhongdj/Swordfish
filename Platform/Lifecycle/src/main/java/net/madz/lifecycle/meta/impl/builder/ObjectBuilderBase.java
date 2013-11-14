@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationFailureSet;
 
-public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends
-        InheritableAnnotationMetaBuilderBase<SELF, PARENT> {
+public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends InheritableAnnotationMetaBuilderBase<SELF, PARENT> {
 
     protected interface MethodScanner {
 
@@ -18,8 +17,7 @@ public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends Me
         super(parent, name);
     }
 
-    protected void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet,
-            final MethodScanner scanner) {
+    protected void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet, final MethodScanner scanner) {
         if ( 0 == klasses.length ) return;
         final ArrayList<Class<?>> superclasses = new ArrayList<Class<?>>();
         for ( Class<?> klass : klasses ) {

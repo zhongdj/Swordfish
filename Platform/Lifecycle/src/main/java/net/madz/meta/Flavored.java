@@ -4,6 +4,7 @@ package net.madz.meta;
  * Object that supports the Flavor pattern.
  */
 public interface Flavored {
+
     /**
      * Flavor handler.
      * 

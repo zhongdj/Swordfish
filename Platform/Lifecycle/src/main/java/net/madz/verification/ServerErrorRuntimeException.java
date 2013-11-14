@@ -6,6 +6,7 @@ import net.madz.meta.MetaData;
  * RuntimeException caused by server error.
  */
 public class ServerErrorRuntimeException extends VerificationRuntimeException {
+
     private static final long serialVersionUID = 1L;
 
     public ServerErrorRuntimeException(Throwable cause, MetaData metaData, String errorKey, String defaultErrorMessage, Object... details) {

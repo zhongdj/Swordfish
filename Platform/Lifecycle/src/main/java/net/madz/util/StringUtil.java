@@ -85,8 +85,7 @@ public class StringUtil {
         return toString(c, delimiter, before, after, ToStringFormatter.getInstance());
     }
 
-    public static <E> String toString(Collection<E> c, String delimiter, String before, String after,
-            Formatter<? super E> formatter) {
+    public static <E> String toString(Collection<E> c, String delimiter, String before, String after, Formatter<? super E> formatter) {
         if ( c == null ) {
             return null;
         }
@@ -107,8 +106,7 @@ public class StringUtil {
         append(sb, c, delimiter, before, after, ToStringFormatter.getInstance());
     }
 
-    public static <E> void append(StringBuilder sb, Collection<E> c, String delimiter, String before, String after,
-            Formatter<? super E> formatter) {
+    public static <E> void append(StringBuilder sb, Collection<E> c, String delimiter, String before, String after, Formatter<? super E> formatter) {
         if ( c.isEmpty() ) {
             return;
         }
@@ -130,54 +128,47 @@ public class StringUtil {
     }
 
     public static <K, V> String toString(Map<K, V> m, String delimiter) {
-        return toString(m, delimiter, "=", true, null, null, ToStringFormatter.getInstance(),
+        return toString(m, delimiter, "=", true, null, null, ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
+    }
+
+    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue) {
+        return toString(m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, null, null, ToStringFormatter.getInstance(),
                 ToStringFormatter.getInstance());
     }
 
-    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue) {
-        return toString(m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, null, null,
-                ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
+    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue, String before,
+            String after) {
+        return toString(m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after, ToStringFormatter.getInstance(),
+                ToStringFormatter.getInstance());
     }
 
-    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue, String before, String after) {
-        return toString(m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after,
-                ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
-    }
-
-    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue, String before, String after, Formatter<? super K> keyFormatter,
-            Formatter<? super V> valueFormatter) {
+    public static <K, V> String toString(Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue, String before,
+            String after, Formatter<? super K> keyFormatter, Formatter<? super V> valueFormatter) {
         if ( m == null ) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after, keyFormatter,
-                valueFormatter);
+        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after, keyFormatter, valueFormatter);
         return sb.toString();
     }
 
     public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter) {
-        append(sb, m, delimiter, "=", true, null, null, ToStringFormatter.getInstance(),
+        append(sb, m, delimiter, "=", true, null, null, ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
+    }
+
+    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue) {
+        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, null, null, ToStringFormatter.getInstance(),
                 ToStringFormatter.getInstance());
     }
 
-    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue) {
-        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, null, null,
-                ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
+    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue,
+            String before, String after) {
+        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after, ToStringFormatter.getInstance(),
+                ToStringFormatter.getInstance());
     }
 
-    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue, String before, String after) {
-        append(sb, m, delimiter, entryDelimiter, includeEntryDelimiterOnEmptyValue, before, after,
-                ToStringFormatter.getInstance(), ToStringFormatter.getInstance());
-    }
-
-    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter,
-            boolean includeEntryDelimiterOnEmptyValue, String before, String after, Formatter<? super K> keyFormatter,
-            Formatter<? super V> valueFormatter) {
+    public static <K, V> void append(StringBuilder sb, Map<K, V> m, String delimiter, String entryDelimiter, boolean includeEntryDelimiterOnEmptyValue,
+            String before, String after, Formatter<? super K> keyFormatter, Formatter<? super V> valueFormatter) {
         if ( m.isEmpty() ) {
             return;
         }

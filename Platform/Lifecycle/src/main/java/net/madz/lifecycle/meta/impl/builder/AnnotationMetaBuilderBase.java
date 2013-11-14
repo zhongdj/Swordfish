@@ -9,8 +9,7 @@ import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 
-public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends
-        MetaDataBuilderBase<SELF, PARENT> {
+public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends MetaDataBuilderBase<SELF, PARENT> {
 
     protected LifecycleMetaRegistry registry;
 
@@ -39,8 +38,8 @@ public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT ex
     }
 
     protected VerificationFailure newVerificationFailure(String dottedPathName, String errorCode, Object... args) {
-        return new VerificationFailure(this, dottedPathName, errorCode, BundleUtils.getBundledMessage(getClass(),
-                SyntaxErrors.SYNTAX_ERROR_BUNDLE, errorCode, args));
+        return new VerificationFailure(this, dottedPathName, errorCode, BundleUtils.getBundledMessage(getClass(), SyntaxErrors.SYNTAX_ERROR_BUNDLE, errorCode,
+                args));
     }
 
     protected void addKeys(Class<?> clazz) {

@@ -127,5 +127,4 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
     boolean hasCondition(Object conditionKey);
 
     LifecycleMetaRegistry getRegistry();
-
 }

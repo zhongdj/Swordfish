@@ -8,8 +8,8 @@ import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
 import net.madz.meta.MetaData;
 import net.madz.verification.VerificationException;
 
-public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends
-        AnnotationMetaBuilderBase<SELF, PARENT> implements AnnotationMetaBuilder<SELF, PARENT>, Inheritable<SELF> {
+public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends AnnotationMetaBuilderBase<SELF, PARENT>
+        implements AnnotationMetaBuilder<SELF, PARENT>, Inheritable<SELF> {
 
     private SELF superMeta;
     private boolean overriding;
@@ -65,9 +65,10 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
     protected abstract SELF findSuper(Class<?> metaClass) throws VerificationException;
 
     protected Class<?> getSuperMetaClass(Class<?> clazz) {
-//        if ( !hasSuper(clazz) ) {
-//            throw new IllegalStateException("Class " + clazz + " has no super class");
-//        }
+        // if ( !hasSuper(clazz) ) {
+        // throw new IllegalStateException("Class " + clazz +
+        // " has no super class");
+        // }
         if ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) ) {
             return clazz.getSuperclass();
         } else {
@@ -77,8 +78,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
     }
 
     protected boolean hasSuper(Class<?> metaClass) {
-        return ( null != metaClass.getSuperclass() && !Object.class.equals(metaClass.getSuperclass()) )
-                || ( 1 <= metaClass.getInterfaces().length );
+        return ( null != metaClass.getSuperclass() && !Object.class.equals(metaClass.getSuperclass()) ) || ( 1 <= metaClass.getInterfaces().length );
     }
 
     protected boolean hasDeclaredAnnotation(Class<?> clazz, final Class<? extends Annotation> annotationClass) {

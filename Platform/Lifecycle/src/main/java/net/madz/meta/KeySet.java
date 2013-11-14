@@ -12,6 +12,7 @@ import net.madz.util.StringUtil;
  * A Set of keys identifying a Keyed object.
  */
 public class KeySet implements Iterable<Object> {
+
     public final static KeySet EMPTY_SET = new KeySet();
     protected final Set<Object> keySet;
 
@@ -39,15 +40,15 @@ public class KeySet implements Iterable<Object> {
      */
     public KeySet(Object... keys) {
         switch (keys.length) {
-        case 0:
-            this.keySet = Collections.emptySet();
-            break;
-        case 1:
-            this.keySet = Collections.singleton(keys[0]);
-            break;
-        default:
-            this.keySet = Collections.unmodifiableSet(new HashSet<Object>(Arrays.asList(keys)));
-            break;
+            case 0:
+                this.keySet = Collections.emptySet();
+                break;
+            case 1:
+                this.keySet = Collections.singleton(keys[0]);
+                break;
+            default:
+                this.keySet = Collections.unmodifiableSet(new HashSet<Object>(Arrays.asList(keys)));
+                break;
         }
     }
 
@@ -61,7 +62,7 @@ public class KeySet implements Iterable<Object> {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof KeySet) && ((KeySet) obj).keySet.equals(this.keySet);
+        return ( obj instanceof KeySet ) && ( (KeySet) obj ).keySet.equals(this.keySet);
     }
 
     @Override
@@ -80,18 +81,19 @@ public class KeySet implements Iterable<Object> {
     }
 
     public static class Builder extends KeySet {
+
         public Builder(int size) {
             super(new HashSet<Object>(size));
         }
 
         public void addKeys(KeySet keySet) {
-            if (null != keySet) {
+            if ( null != keySet ) {
                 this.keySet.addAll(keySet.keySet);
             }
         }
 
         public void addKey(Object key) {
-            if (null != key) {
+            if ( null != key ) {
                 this.keySet.add(key);
             }
         }
@@ -100,5 +102,4 @@ public class KeySet implements Iterable<Object> {
             return new KeySet(this);
         }
     }
-
 }

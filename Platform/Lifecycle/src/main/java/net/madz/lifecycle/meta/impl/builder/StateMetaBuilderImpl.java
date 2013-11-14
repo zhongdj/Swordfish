@@ -33,8 +33,7 @@ import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<StateMetadata, StateMachineMetadata>
-        implements StateMetaBuilder {
+public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<StateMetadata, StateMachineMetadata> implements StateMetaBuilder {
 
     private boolean end;
     private boolean initial;
@@ -196,8 +195,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         return result.toArray(new RelationConstraintMetadata[0]);
     }
 
-    private void getValidWhileRelationMetadataRecursively(StateMetadata stateMetadata,
-            ArrayList<RelationConstraintMetadata> result) {
+    private void getValidWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationConstraintMetadata> result) {
         final RelationConstraintMetadata[] declaredValidWhiles = stateMetadata.getDeclaredValidWhiles();
         for ( final RelationConstraintMetadata relationMetadata : declaredValidWhiles ) {
             result.add(relationMetadata);
@@ -216,8 +214,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         }
     }
 
-    private void getInboundWhileRelationMetadataRecursively(StateMetadata stateMetadata,
-            ArrayList<RelationConstraintMetadata> result) {
+    private void getInboundWhileRelationMetadataRecursively(StateMetadata stateMetadata, ArrayList<RelationConstraintMetadata> result) {
         final RelationConstraintMetadata[] declaredInboundWhiles = stateMetadata.getDeclaredInboundWhiles();
         for ( final RelationConstraintMetadata relationMetadata : declaredInboundWhiles ) {
             result.add(relationMetadata);
@@ -305,18 +302,15 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             return;
         }
         if ( isFinalState(clazz) && !isShortCut(clazz) ) {
-            throw newVerificationException(getDottedPath(),
-                    SyntaxErrors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, clazz);
+            throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, clazz);
         } else if ( isShortCut(clazz) && !isFinalState(clazz) ) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END,
-                    clazz);
+            throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, clazz);
         } else if ( isShortCut(clazz) ) {
             final ShortCut shortCut = clazz.getAnnotation(ShortCut.class);
             final Class<?> targetStateClass = shortCut.value();
             StateMetadata found = findStateMetadata(targetStateClass, parent.getOwningStateMachine());
             if ( null == found ) {
-                throw newVerificationException(getDottedPath(),
-                        SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID, shortCut, clazz, targetStateClass);
+                throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID, shortCut, clazz, targetStateClass);
             }
         }
     }
@@ -361,18 +355,15 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             return new ArrayList<>();
         }
         if ( 0 == functionList.size() && !this.compositeState ) {
-            throw newVerificationException(getDottedPath().getAbsoluteName(),
-                    SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
+            throw newVerificationException(getDottedPath().getAbsoluteName(), SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
         }
         return functionList;
     }
 
-    private void addFunction(Class<?> stateClass, final ArrayList<Function> functionList,
-            final HashSet<Class<?>> transitionClassSet, Function function) throws VerificationException {
-        if ( transitionClassSet.contains(function.transition()) || !isOverriding()
-                && superStateHasFunction(function.transition()) ) {
-            throw newVerificationException(getDottedPath(),
-                    SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION, stateClass,
+    private void addFunction(Class<?> stateClass, final ArrayList<Function> functionList, final HashSet<Class<?>> transitionClassSet, Function function)
+            throws VerificationException {
+        if ( transitionClassSet.contains(function.transition()) || !isOverriding() && superStateHasFunction(function.transition()) ) {
+            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION, stateClass,
                     function.transition());
         } else {
             functionList.add(function);
@@ -381,8 +372,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     private boolean superStateHasFunction(Class<?> transitionClass) {
-        for ( StateMetadata metadata = isOverriding() ? null : getSuper(); null != metadata; metadata = metadata
-                .isOverriding() ? null : metadata.getSuper() ) {
+        for ( StateMetadata metadata = isOverriding() ? null : getSuper(); null != metadata; metadata = metadata.isOverriding() ? null : metadata.getSuper() ) {
             if ( null != metadata.getDeclaredFunctionMetadata(transitionClass) ) {
                 return true;
             }
@@ -417,37 +407,31 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             if ( this.parent.isComposite() ) {
                 if ( null != this.parent.getOwningStateMachine().getTransition(transitionClz) ) {
                     failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                            SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function,
-                            stateClass.getName(), transitionClz.getName()));
+                            SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function, stateClass.getName(), transitionClz.getName()));
                 } else {
-                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                            SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
-                            transitionClz.getName()));
+                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function,
+                            stateClass.getName(), transitionClz.getName()));
                 }
             } else {
-                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                        SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function, stateClass.getName(),
-                        transitionClz.getName()));
+                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function,
+                        stateClass.getName(), transitionClz.getName()));
             }
         }
         if ( 0 == stateCandidates.length ) {
-            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                    SyntaxErrors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function, stateClass.getName(),
-                    transitionClz.getName()));
+            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function,
+                    stateClass.getName(), transitionClz.getName()));
         } else if ( 1 < stateCandidates.length ) {
             if ( !transition.isConditional() ) {
                 failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
-                        SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(),
-                        transitionClz.getName()));
+                        SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(), transitionClz.getName()));
             }
         }
         for ( int i = 0; i < stateCandidates.length; i++ ) {
             final Class<?> stateCandidateClass = stateCandidates[i];
             StateMetadata stateMetadata = findSuper(stateCandidateClass);
             if ( null == stateMetadata ) {
-                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                        SyntaxErrors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, function, stateClass.getName(), parent
-                                .getDottedPath().getAbsoluteName(), stateCandidateClass.getName()));
+                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, function,
+                        stateClass.getName(), parent.getDottedPath().getAbsoluteName(), stateCandidateClass.getName()));
             }
         }
         if ( 0 < failureSet.size() ) {
@@ -480,17 +464,15 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             throw new VerificationException(failureSet);
         }
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
-            RelationConstraintMetadata relationMetadata = configureRelation(
-                    findRelatedStateMachine(inboundWhile.relation()), "InboundWhiles."
-                            + inboundWhile.relation().getSimpleName(), inboundWhile.relation(),
+            RelationConstraintMetadata relationMetadata = configureRelation(findRelatedStateMachine(inboundWhile.relation()), "InboundWhiles."
+                    + inboundWhile.relation().getSimpleName(), inboundWhile.relation(),
                     getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
                     configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
             this.inboundWhileRelations.add(relationMetadata);
         }
         for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
-            RelationConstraintMetadata relationMetadata = configureRelation(
-                    findRelatedStateMachine(validWhile.relation()), "ValidWhiles."
-                            + validWhile.relation().getSimpleName(), validWhile.relation(),
+            RelationConstraintMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()), "ValidWhiles."
+                    + validWhile.relation().getSimpleName(), validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
                     configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
             this.validWhileRelations.add(relationMetadata);
@@ -505,11 +487,9 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         return onStates;
     }
 
-    private RelationConstraintMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name,
-            Class<?> relationClass, LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects)
-            throws VerificationException {
-        return new RelationConstraintBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(
-                relationClass, this);
+    private RelationConstraintMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
+            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects) throws VerificationException {
+        return new RelationConstraintBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(relationClass, this);
     }
 
     private LinkedList<ErrorMessageObject> configureErrorMessageObjects(ErrorMessage[] otherwise, Class<?> clz) {
@@ -520,8 +500,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             for ( Class<?> stateClz : states ) {
                 errorStates.add(this.getParent().getState(stateClz));
             }
-            errorObjects.add(new ErrorMessageObject(item.bundle(), clz, item.code(), errorStates
-                    .toArray(new StateMetadata[0])));
+            errorObjects.add(new ErrorMessageObject(item.bundle(), clz, item.code(), errorStates.toArray(new StateMetadata[0])));
         }
         return errorObjects;
     }
@@ -540,8 +519,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         verifyRelation(inboundWhile, relatedStateClasses, relationClass, errorMessages, clazz, failureSet);
     }
 
-    private void verifyRelation(Annotation a, final Class<?>[] relatedStateClasses, final Class<?> relationClass,
-            final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet) {
+    private void verifyRelation(Annotation a, final Class<?>[] relatedStateClasses, final Class<?> relationClass, final ErrorMessage[] errorMessages,
+            Class<?> stateClass, VerificationFailureSet failureSet) {
         if ( !hasRelation(relationClass) ) {
             final String errorCode;
             if ( a instanceof InboundWhile ) {
@@ -549,8 +528,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             } else {
                 errorCode = SyntaxErrors.RELATION_VALIDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET;
             }
-            failureSet.add(newVerificationFailure(getDottedPath(), errorCode, relationClass, stateClass,
-                    parent.getDottedPath()));
+            failureSet.add(newVerificationFailure(getDottedPath(), errorCode, relationClass, stateClass, parent.getDottedPath()));
             return;
         }
         final StateMachineMetadata relatedStateMachine = findRelatedStateMachine(relationClass);
@@ -558,18 +536,16 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         verifyErrorMessages(a, errorMessages, stateClass, failureSet, relatedStateMachine);
     }
 
-    private void verifyOnRelatedStates(Annotation a, final Class<?>[] relatedStateClasses, Class<?> stateClass,
-            VerificationFailureSet failureSet, final StateMachineMetadata relatedStateMachine) {
+    private void verifyOnRelatedStates(Annotation a, final Class<?>[] relatedStateClasses, Class<?> stateClass, VerificationFailureSet failureSet,
+            final StateMachineMetadata relatedStateMachine) {
         for ( final Class<?> relateStateClass : relatedStateClasses ) {
             if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                 if ( a instanceof InboundWhile ) {
                     failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
-                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass,
-                            relatedStateMachine.getDottedPath()));
+                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION, a, stateClass, relatedStateMachine.getDottedPath()));
                 } else {
                     failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
-                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass,
-                            relatedStateMachine.getDottedPath()));
+                            SyntaxErrors.RELATION_ON_ATTRIBUTE_OF_VALIDWHILE_NOT_MACHING_RELATION, a, stateClass, relatedStateMachine.getDottedPath()));
                 }
             }
         }
@@ -583,19 +559,17 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         return getDottedPath().append(InboundWhile.class.getSimpleName()).append(relateStateClass.getSimpleName());
     }
 
-    private void verifyErrorMessages(Annotation a, final ErrorMessage[] errorMessages, Class<?> stateClass,
-            VerificationFailureSet failureSet, final StateMachineMetadata relatedStateMachine) {
+    private void verifyErrorMessages(Annotation a, final ErrorMessage[] errorMessages, Class<?> stateClass, VerificationFailureSet failureSet,
+            final StateMachineMetadata relatedStateMachine) {
         for ( ErrorMessage error : errorMessages ) {
             for ( final Class<?> relateStateClass : error.states() ) {
                 if ( null == findStateMetadata(relateStateClass, relatedStateMachine) ) {
                     if ( a instanceof InboundWhile ) {
                         failureSet.add(newVerificationFailure(getInboundWhilePath(relateStateClass),
-                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass,
-                                relatedStateMachine.getDottedPath()));
+                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_INBOUNDWHILE_INVALID, a, stateClass, relatedStateMachine.getDottedPath()));
                     } else {
                         failureSet.add(newVerificationFailure(getValidWhilePath(relateStateClass),
-                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass,
-                                relatedStateMachine.getDottedPath()));
+                                SyntaxErrors.RELATION_OTHERWISE_ATTRIBUTE_OF_VALIDWHILE_INVALID, a, stateClass, relatedStateMachine.getDottedPath()));
                     }
                 }
             }
@@ -618,15 +592,14 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
 
     private StateMachineMetadata findRelatedStateMachine(Class<?> relationClass) {
         RelationMetadata relationMetadata = null;
-        for ( StateMachineMetadata stateMachineMetadata = parent; relationMetadata == null
-                && stateMachineMetadata != null; stateMachineMetadata = stateMachineMetadata.getSuper() ) {
+        for ( StateMachineMetadata stateMachineMetadata = parent; relationMetadata == null && stateMachineMetadata != null; stateMachineMetadata = stateMachineMetadata
+                .getSuper() ) {
             relationMetadata = stateMachineMetadata.getRelationMetadata(relationClass);
             if ( null != relationMetadata ) {
                 return relationMetadata.getRelateToStateMachine();
             }
             if ( null == relationMetadata && stateMachineMetadata.isComposite() ) {
-                final RelationMetadata owingRelationMetadata = stateMachineMetadata.getOwningStateMachine()
-                        .getRelationMetadata(relationClass);
+                final RelationMetadata owingRelationMetadata = stateMachineMetadata.getOwningStateMachine().getRelationMetadata(relationClass);
                 if ( null != owingRelationMetadata ) {
                     return owingRelationMetadata.getRelateToStateMachine();
                 }
@@ -734,8 +707,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     @Override
     protected void verifySuper(Class<?> clazz) throws VerificationException {
         if ( null == findSuper(getSuperMetaClass(clazz)) ) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS,
-                    clazz, getSuperMetaClass(clazz));
+            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS, clazz, getSuperMetaClass(clazz));
         }
     }
 

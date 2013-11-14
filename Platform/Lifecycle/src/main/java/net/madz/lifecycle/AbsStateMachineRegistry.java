@@ -98,8 +98,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         }
     }
 
-    private void registerLifecycleMeta(final VerificationFailureSet failureSet, Class<?> clazz)
-            throws VerificationException {
+    private void registerLifecycleMeta(final VerificationFailureSet failureSet, Class<?> clazz) throws VerificationException {
         {
             if ( null != clazz.getAnnotation(StateMachine.class) ) {
                 if ( isRegistered(clazz) ) {
@@ -125,10 +124,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
                     addInstance(clazz, stateMachineInstance);
                 }
             } else {
-                final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
-                        SyntaxErrors.REGISTERED_META_ERROR, clazz);
-                failureSet.add(new VerificationFailure(this, getClass().getName(), SyntaxErrors.REGISTERED_META_ERROR,
-                        errorMessage));
+                final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error", SyntaxErrors.REGISTERED_META_ERROR, clazz);
+                failureSet.add(new VerificationFailure(this, getClass().getName(), SyntaxErrors.REGISTERED_META_ERROR, errorMessage));
             }
         }
     }
@@ -149,9 +146,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
                 typeMap.remove(key);
             }
             if ( typeMap.containsKey(key) && existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
-                throw new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString()
-                        + ", one is : " + existedStateMachine.getDottedPath() + " and another is:"
-                        + metaData.getDottedPath());
+                throw new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
+                        + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
             }
             typeMap.put(key, metaData);
         }
@@ -159,8 +155,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
 
     private StateMachineMetaBuilder createBuilder(Class<?> metadataClass) throws VerificationException {
         try {
-            final Constructor<? extends StateMachineMetaBuilder> c = builderMeta.value().getConstructor(
-                    AbsStateMachineRegistry.class, String.class);
+            final Constructor<? extends StateMachineMetaBuilder> c = builderMeta.value().getConstructor(AbsStateMachineRegistry.class, String.class);
             return c.newInstance(this, metadataClass.getName());
         } catch (Throwable t) {
             throw new IllegalStateException(t);
@@ -183,8 +178,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return this.instanceMap.get(key);
     }
 
-    private StateMachineMetadata createStateMachineMetaBuilder(Class<?> stateMachineClass,
-            StateMachineMetadata owningStateMachine, VerificationFailureSet failureSet) throws VerificationException {
+    private StateMachineMetadata createStateMachineMetaBuilder(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine,
+            VerificationFailureSet failureSet) throws VerificationException {
         StateMachineMetaBuilder metaBuilder = null;
         try {
             if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
@@ -230,15 +225,13 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     }
 
     @Override
-    public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass,
-            StateMachineMetadata owningStateMachine) throws VerificationException {
+    public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine) throws VerificationException {
         StateMachineMetadata stateMachineMeta = getStateMachineMeta(stateMachineClass);
         if ( null != stateMachineMeta ) return stateMachineMeta;
         return createStateMachineMetaBuilder(stateMachineClass, owningStateMachine, null);
     }
 
-    private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass,
-            StateMachineMetadata owningStateMachine) throws VerificationException {
+    private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine) throws VerificationException {
         Constructor<? extends StateMachineMetaBuilder> c;
         try {
             c = builderMeta.value().getConstructor(builderMeta.value(), String.class);

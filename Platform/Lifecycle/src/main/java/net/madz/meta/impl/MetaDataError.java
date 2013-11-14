@@ -19,14 +19,14 @@ import net.madz.meta.MetaDataFilter;
  * class.
  */
 public class MetaDataError<M extends MetaData> implements FlavorMetaData<M> {
+
     private final LinkedList<String> errors = new LinkedList<String>();
     private final static KeySet KEY_SET = new KeySet(MetaDataError.class);
 
     /**
      * Default constructor
      */
-    public MetaDataError() {
-    }
+    public MetaDataError() {}
 
     @Override
     public KeySet getKeySet() {
@@ -38,11 +38,10 @@ public class MetaDataError<M extends MetaData> implements FlavorMetaData<M> {
      */
     public void addError(Throwable e) {
         // Flatten exceptions caused by reflection
-        while (e instanceof InvocationTargetException) {
-            e = ((InvocationTargetException) e).getTargetException();
+        while ( e instanceof InvocationTargetException ) {
+            e = ( (InvocationTargetException) e ).getTargetException();
         }
-
-        if (e instanceof IllegalStateException) {
+        if ( e instanceof IllegalStateException ) {
             errors.add(e.getMessage());
         } else {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -70,5 +69,4 @@ public class MetaDataError<M extends MetaData> implements FlavorMetaData<M> {
     public MetaDataError<M> filter(MetaData owner, MetaDataFilter filter, boolean lazyFilter) {
         return this;
     }
-
 }

@@ -10,8 +10,7 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class RelationMetaBuilderImpl extends
-        InheritableAnnotationMetaBuilderBase<RelationMetadata, StateMachineMetadata> implements RelationMetaBuilder {
+public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationMetadata, StateMachineMetadata> implements RelationMetaBuilder {
 
     private StateMachineMetadata relatedStateMachine;
     private boolean parentRelation;
@@ -80,8 +79,7 @@ public class RelationMetaBuilderImpl extends
         }
     }
 
-    protected void configureRelatedStateMachine(Class<?> klass, StateMachineMetadata parent)
-            throws VerificationException {
+    protected void configureRelatedStateMachine(Class<?> klass, StateMachineMetadata parent) throws VerificationException {
         verifyRelateTo(klass);
         if ( hasSuper() && isOverriding() ) {
             final RelateTo relateTo = getDeclaredAnnotation(klass, RelateTo.class);

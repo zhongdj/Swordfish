@@ -9,6 +9,7 @@ import net.madz.util.StringPrintWriter;
  * Writes JSON formatted names and values to a Writer.
  */
 public class JsonWriter {
+
     private Formatter formatter;
     private final PrintWriter out;
 
@@ -41,6 +42,7 @@ public class JsonWriter {
     }
 
     private static class Formatter {
+
         private final Formatter parent;
         private final PrintWriter out;
         private final String prefix;
@@ -63,7 +65,7 @@ public class JsonWriter {
         }
 
         private Formatter doEndSection(String endString) {
-            if (!firstElement) {
+            if ( !firstElement ) {
                 out.println();
                 out.print(this.prefix);
             }
@@ -76,17 +78,15 @@ public class JsonWriter {
         }
 
         public void startElement(String name) {
-            if (!firstElement) {
+            if ( !firstElement ) {
                 out.print(",");
             }
             firstElement = false;
-
-            if (null != this.parent) {
+            if ( null != this.parent ) {
                 out.println();
             }
-
             out.print(this.prefix);
-            if (null != name && !skipLabels) {
+            if ( null != name && !skipLabels ) {
                 printString(name);
                 out.print(": ");
             }
@@ -97,39 +97,39 @@ public class JsonWriter {
         }
 
         public void printString(String str) {
-            if (null == str) {
+            if ( null == str ) {
                 out.print("null");
             } else {
                 out.print("\"");
-                for (char ch : str.toCharArray()) {
+                for ( char ch : str.toCharArray() ) {
                     switch (ch) {
-                    case '"':
-                        out.print("\\\"");
-                        break;
-                    case '\b':
-                        out.print("\\b");
-                        break;
-                    case '\f':
-                        out.print("\\f");
-                        break;
-                    case '\n':
-                        out.print("\\n");
-                        break;
-                    case '\r':
-                        out.print("\\r");
-                        break;
-                    case '\t':
-                        out.print("\\t");
-                        break;
-                    case '\\':
-                        out.print("\\\\");
-                        break;
-                    default:
-                        if (Character.isISOControl(ch) || ch > 127) {
-                            out.print(String.format("\\u+%04x", ((int) ch) & 0x0ffff));
-                        } else {
-                            out.print(ch);
-                        }
+                        case '"':
+                            out.print("\\\"");
+                            break;
+                        case '\b':
+                            out.print("\\b");
+                            break;
+                        case '\f':
+                            out.print("\\f");
+                            break;
+                        case '\n':
+                            out.print("\\n");
+                            break;
+                        case '\r':
+                            out.print("\\r");
+                            break;
+                        case '\t':
+                            out.print("\\t");
+                            break;
+                        case '\\':
+                            out.print("\\\\");
+                            break;
+                        default:
+                            if ( Character.isISOControl(ch) || ch > 127 ) {
+                                out.print(String.format("\\u+%04x", ( (int) ch ) & 0x0ffff));
+                            } else {
+                                out.print(ch);
+                            }
                     }
                 }
                 out.print("\"");
@@ -179,7 +179,7 @@ public class JsonWriter {
      */
     public void printNumber(String name, BigDecimal value) {
         formatter.startElement(name);
-        if (null == value) {
+        if ( null == value ) {
             formatter.print("null");
         } else {
             formatter.print(value.toPlainString());
@@ -196,7 +196,7 @@ public class JsonWriter {
      */
     public void printNumber(String name, Number value) {
         formatter.startElement(name);
-        if (null == value) {
+        if ( null == value ) {
             formatter.print("null");
         } else {
             formatter.print(value.toString());
@@ -213,7 +213,7 @@ public class JsonWriter {
      */
     public void printBoolean(String name, Boolean value) {
         formatter.startElement(name);
-        if (null == value) {
+        if ( null == value ) {
             formatter.print("null");
         } else {
             formatter.print(value.toString());
@@ -230,7 +230,7 @@ public class JsonWriter {
      */
     public void printEngineeringNumber(String name, BigDecimal value) {
         formatter.startElement(name);
-        if (null == value) {
+        if ( null == value ) {
             formatter.print("null");
         } else {
             formatter.print(value.toEngineeringString());
@@ -251,7 +251,7 @@ public class JsonWriter {
     }
 
     public void finish() {
-        while (this.formatter.parent != null) {
+        while ( this.formatter.parent != null ) {
             this.formatter = this.formatter.endSection();
         }
     }
@@ -273,19 +273,15 @@ public class JsonWriter {
         writer.printString("type", "Object");
         writer.printString("iso", "This has a tab(\t), a backslash (\\), a newline(\n), a null (\0), as well as some \u2341 stuff");
         writer.printNumber("value", 1243);
-
         writer.startArray("numberArray");
         try {
-            for (int idx = 1; idx < 10; idx++) {
+            for ( int idx = 1; idx < 10; idx++ ) {
                 writer.printNumber(null, idx);
             }
         } finally {
             writer.endArray();
         }
-
         writer.endObject();
-
         writer.close();
     }
-
 }

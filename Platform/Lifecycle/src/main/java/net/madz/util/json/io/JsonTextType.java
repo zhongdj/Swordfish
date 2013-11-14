@@ -8,7 +8,6 @@ package net.madz.util.json.io;
 public enum JsonTextType {
     /** JSON array text */
     array("[", "]"),
-
     /** JSON object text */
     object("{", "}");
 

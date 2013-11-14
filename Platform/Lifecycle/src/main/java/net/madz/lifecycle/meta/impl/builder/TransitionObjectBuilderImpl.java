@@ -12,14 +12,12 @@ import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class TransitionObjectBuilderImpl extends
-        ObjectBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
+public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
 
     private Method transitionMethod;
     private TransitionMetadata template;
 
-    public TransitionObjectBuilderImpl(StateMachineObjectBuilder parent, Method transitionMethod,
-            TransitionMetadata template) {
+    public TransitionObjectBuilderImpl(StateMachineObjectBuilder parent, Method transitionMethod, TransitionMetadata template) {
         super(parent, "TransitionSet." + template.getDottedPath().getName() + "." + transitionMethod.getName());
         this.transitionMethod = transitionMethod;
         this.template = template;

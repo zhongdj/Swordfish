@@ -7,6 +7,7 @@ import net.madz.common.Dumper;
  * Exception caused by a single VerificationFailure or a VerificationFailureSet.
  */
 public class VerificationException extends Exception implements Dumpable {
+
     private final static long serialVersionUID = 1L;
     private final VerificationFailureSet verificationSet;
 
@@ -79,5 +80,4 @@ public class VerificationException extends Exception implements Dumpable {
         newException.setStackTrace(this.getStackTrace());
         return newException;
     }
-
 }

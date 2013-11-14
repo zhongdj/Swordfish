@@ -12,8 +12,7 @@ public class FunctionMetadata {
     private final TransitionMetadata transition;
     private final LinkedList<StateMetadata> nextStates;
 
-    public FunctionMetadata(StateMetaBuilderImpl parent, TransitionMetadata transition,
-            LinkedList<StateMetadata> nextStates) {
+    public FunctionMetadata(StateMetaBuilderImpl parent, TransitionMetadata transition, LinkedList<StateMetadata> nextStates) {
         this.parent = parent;
         this.transition = transition;
         this.nextStates = nextStates;

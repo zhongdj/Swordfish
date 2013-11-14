@@ -9,5 +9,5 @@ public interface StateObject extends MetaObject<StateObject, StateMetadata> {
 
     void verifyValidWhile(Object target, RelationConstraintMetadata[] relation, ReadAccessor<?> evaluator);
 
-    void verifyInboundWhile(Object transitionKey, Object target,  String nextState, RelationConstraintMetadata[] relation, ReadAccessor<?> evaluator);
+    void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relation, ReadAccessor<?> evaluator);
 }
