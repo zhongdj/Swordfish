@@ -30,9 +30,6 @@ import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
-import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
@@ -44,8 +41,6 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     private boolean compositeState;
     private StateMachineMetadata compositeStateMachine;
     private StateMetadata owningState;
-    private boolean overriding = false;
-    private StateMetadata superStateMetadata;
     private LinkedList<RelationMetadata> validWhileRelations = new LinkedList<RelationMetadata>();
     private LinkedList<RelationMetadata> inboundWhileRelations = new LinkedList<RelationMetadata>();
     private HashMap<Object, FunctionMetadata> functionMetadataMap = new HashMap<>();
@@ -157,7 +152,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             if ( null != transitionMetadata ) {
                 return transitionMetadata;
             } else {
-                return this.getSuperStateMetadata().getTransition(transitionKey);
+                return this.getSuper().getTransition(transitionKey);
             }
         }
     }
@@ -170,16 +165,6 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     public boolean isTransitionValid(Object transitionKey) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public boolean isOverriding() {
-        return overriding;
-    }
-
-    @Override
-    public StateMetadata getSuperStateMetadata() {
-        return superStateMetadata;
     }
 
     @Override
@@ -225,8 +210,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         if ( isOverriding() ) {
             return;
         } else {
-            if ( null != stateMetadata.getSuperStateMetadata() ) {
-                getValidWhileRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
+            if ( null != stateMetadata.getSuper() ) {
+                getValidWhileRelationMetadataRecursively(stateMetadata.getSuper(), result);
             }
         }
     }
@@ -245,8 +230,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         if ( isOverriding() ) {
             return;
         } else {
-            if ( null != stateMetadata.getSuperStateMetadata() ) {
-                getValidWhileRelationMetadataRecursively(stateMetadata.getSuperStateMetadata(), result);
+            if ( null != stateMetadata.getSuper() ) {
+                getValidWhileRelationMetadataRecursively(stateMetadata.getSuper(), result);
             }
         }
     }
@@ -315,35 +300,35 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         if ( clazz.isInterface() ) {
             final Class<?>[] interfaces = clazz.getInterfaces();
             if ( interfaces.length > 0 ) {
-                this.superStateMetadata = findStateMetadata(interfaces[0]);
-                if ( null == this.superStateMetadata ) {
+                this.setSuper(findStateMetadata(interfaces[0]));
+                if ( null == this.getSuper() ) {
                     throw newVerificationException(getDottedPath(),
                             SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS, clazz, interfaces[0]);
                 }
-                if ( null != this.superStateMetadata && null != clazz.getAnnotation(Overrides.class) ) {
-                    this.overriding = true;
+                if ( null != this.getSuper() && null != clazz.getAnnotation(Overrides.class) ) {
+                    this.setOverriding(true);
                 } else {
-                    this.overriding = false;
+                    this.setOverriding(false);
                 }
             } else {
-                this.overriding = false;
-                this.superStateMetadata = null;
+                this.setOverriding(false);
+                this.setSuper(null);
             }
         } else {
             final Class<?> superStateClass = clazz.getSuperclass();
             if ( null != superStateClass && !Object.class.equals(superStateClass) ) {
-                this.superStateMetadata = findStateMetadata(superStateClass);
-                if ( null == this.superStateMetadata ) {
+                this.setSuper(findStateMetadata(superStateClass));
+                if ( null == this.getSuper() ) {
                     throw newVerificationException(getDottedPath(),
                             SyntaxErrors.STATE_SUPER_CLASS_IS_NOT_STATE_META_CLASS, clazz, superStateClass);
                 }
             } else {
-                this.superStateMetadata = null;
+                this.setSuper(null);
             }
             if ( null != clazz.getAnnotation(Overrides.class) ) {
-                this.overriding = true;
+                this.setOverriding(true);
             } else {
-                this.overriding = false;
+                this.setOverriding(false);
             }
         }
     }
@@ -409,7 +394,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
                 addFunction(stateClass, functionList, transitionClassSet, function);
             }
         }
-        if ( 0 == functionList.size() && null != this.superStateMetadata ) {
+        if ( 0 == functionList.size() && null != this.getSuper() ) {
             return new ArrayList<>();
         }
         if ( 0 == functionList.size() && !this.compositeState ) {
@@ -433,8 +418,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     private boolean superStateHasFunction(Class<?> transitionClass) {
-        for ( StateMetadata metadata = isOverriding() ? null : getSuperStateMetadata(); null != metadata; metadata = metadata
-                .isOverriding() ? null : metadata.getSuperStateMetadata() ) {
+        for ( StateMetadata metadata = isOverriding() ? null : getSuper(); null != metadata; metadata = metadata
+                .isOverriding() ? null : metadata.getSuper() ) {
             if ( null != metadata.getDeclaredFunctionMetadata(transitionClass) ) {
                 return true;
             }
@@ -753,7 +738,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
                     return false;
                 }
             } else {
-                return this.getSuperStateMetadata().hasMultipleStateCandidatesOn(transitionKey);
+                return this.getSuper().hasMultipleStateCandidatesOn(transitionKey);
             }
         }
     }
@@ -773,12 +758,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             if ( null != functionMetadata ) {
                 return functionMetadata;
             } else {
-                return this.getSuperStateMetadata().getFunctionMetadata(functionKey);
+                return this.getSuper().getFunctionMetadata(functionKey);
             }
         }
-    }
-
-    private boolean hasSuper() {
-        return null != getSuperStateMetadata();
     }
 }

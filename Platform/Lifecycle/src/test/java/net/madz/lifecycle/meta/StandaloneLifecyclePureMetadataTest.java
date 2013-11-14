@@ -29,6 +29,7 @@ import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -41,9 +42,7 @@ import static org.junit.Assert.fail;
 public class StandaloneLifecyclePureMetadataTest {
 
     private static StateMachineMetadata machineMetadata;
-
     private static StateMachineObject stateMachineInst;
-
     private static StateMachineRegistry registry;
 
     @LifecycleRegistry(IServiceOrder.class)
@@ -52,7 +51,8 @@ public class StandaloneLifecyclePureMetadataTest {
 
         protected StateMachineRegistry() throws VerificationException {
             super();
-        }}
+        }
+    }
 
     @BeforeClass
     public static void setup() throws VerificationException {
@@ -163,10 +163,12 @@ public class StandaloneLifecyclePureMetadataTest {
     public void testTransitionInstances() throws NoSuchMethodException {
         // Check 3 transition instances
         final TransitionObject[] transitionSet = stateMachineInst.getTransitionSet();
-        assertEquals(3, transitionSet.length);
-        validateTranitionMethod(IServiceOrder.class, stateMachineInst, Schedule.class, "allocateResources");
+        assertEquals(4, transitionSet.length);
+        validateTranitionMethod(IServiceOrder.class, stateMachineInst, Schedule.class, "allocateResources", Long.TYPE,
+                Long.TYPE, Long.TYPE);
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Start.class, "confirmStart");
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Finish.class, "confirmFinish");
+        validateTranitionMethod(IServiceOrder.class, stateMachineInst, Cancel.class, "cancel");
     }
 
     @Test
@@ -184,8 +186,8 @@ public class StandaloneLifecyclePureMetadataTest {
         assertNotNull(m.getDeclaredState(Cancelled.class.getName()));
         assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Created.class.getSimpleName()));
-        assertNotNull(m
-                .getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Queued.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
+                + Queued.class.getSimpleName()));
         assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
                 + Ongoing.class.getSimpleName()));
         assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
@@ -300,7 +302,7 @@ public class StandaloneLifecyclePureMetadataTest {
         assertEquals(m, created.getParent());
         assertNull(created.getRecoverTransition());
         assertNull(created.getRedoTransition());
-        assertNull(created.getSuperStateMetadata());
+        assertNull(created.getSuper());
         assertEquals(0, created.getValidWhiles().length);
         assertFalse(created.hasCorruptTransition());
         assertFalse(created.hasInboundWhiles());
@@ -344,17 +346,18 @@ public class StandaloneLifecyclePureMetadataTest {
     }
 
     @Test
+    @Ignore
     public void testStateMachineInst() throws Throwable {
         fail("Not implement Yet.");
     }
 
     private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass,
             final StateMachineObject stateMachineInst, final Class<?> transitionContainerClass,
-            final String expectMethodName) throws NoSuchMethodException {
+            final String expectMethodName, final Class<?>... argTypes) throws NoSuchMethodException {
         assertTrue(stateMachineInst.hasTransition(transitionContainerClass));
         final TransitionObject transition = stateMachineInst.getTransition(transitionContainerClass);
         final Method actualTransitionMethod = transition.getTransitionMethod();
-        final Method expectedTransitionMethod = lifecycleContainerClass.getMethod(expectMethodName);
+        final Method expectedTransitionMethod = lifecycleContainerClass.getMethod(expectMethodName, argTypes);
         assertEquals(expectedTransitionMethod, actualTransitionMethod);
     }
 }

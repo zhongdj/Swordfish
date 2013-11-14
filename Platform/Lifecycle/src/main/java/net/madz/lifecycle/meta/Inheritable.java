@@ -5,4 +5,6 @@ public interface Inheritable<T> {
     T getSuper();
 
     boolean isOverriding();
+
+    boolean hasSuper();
 }

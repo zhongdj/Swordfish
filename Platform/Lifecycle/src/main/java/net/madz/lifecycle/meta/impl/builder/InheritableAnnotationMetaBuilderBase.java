@@ -16,6 +16,11 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
     }
 
     @Override
+    public boolean hasSuper() {
+        return null != superMeta;
+    }
+
+    @Override
     public SELF getSuper() {
         return superMeta;
     }
@@ -23,5 +28,13 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
     @Override
     public boolean isOverriding() {
         return overriding;
+    }
+
+    protected void setOverriding(boolean overriding) {
+        this.overriding = overriding;
+    }
+
+    protected void setSuper(SELF superMeta) {
+        this.superMeta = superMeta;
     }
 }
