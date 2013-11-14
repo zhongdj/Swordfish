@@ -36,7 +36,7 @@ public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
      * @return related state dependencies, expected to be used post-state-change
      *         validation
      */
-    RelationMetadata[] getDeclaredInboundWhiles();
+    RelationConstraintMetadata[] getDeclaredInboundWhiles();
 
     boolean hasValidWhiles();
 
@@ -52,7 +52,7 @@ public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
      *         parent recursively.
      * 
      */
-    RelationMetadata[] getValidWhiles();
+    RelationConstraintMetadata[] getValidWhiles();
 
     /* ////////////////////////////////////////////////////////////////// */
     /* //////////////////////////Composite State///////////////////////// */
@@ -74,7 +74,7 @@ public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
 
     FunctionMetadata getFunctionMetadata(Object functionKey);
 
-    RelationMetadata[] getDeclaredValidWhiles();
+    RelationConstraintMetadata[] getDeclaredValidWhiles();
 
-    RelationMetadata[] getInboundWhiles();
+    RelationConstraintMetadata[] getInboundWhiles();
 }

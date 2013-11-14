@@ -10,21 +10,15 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
     /* ///////////////////////////////////////////////////////////// */
     /* // State Machine Relation with other State Machine Methods // */
     /* ///////////////////////////////////////////////////////////// */
-    boolean hasSuper();
-
-    StateMachineMetadata getSuperStateMachine();
-
     boolean hasParent();
 
     StateMachineMetadata getParent();
 
     boolean hasRelations();
 
-    StateMachineMetadata[] getRelatedStateMachineMetadata();
-
     boolean hasRelation(Class<?> relationClass);
 
-    StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
+    RelationMetadata getRelationMetadata(Class<?> metaClass);
 
     /* //////////////////////////////////////////////////// */
     /* /////////////// State Related Methods ////////////// */
@@ -133,4 +127,5 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
     boolean hasCondition(Object conditionKey);
 
     LifecycleMetaRegistry getRegistry();
+
 }

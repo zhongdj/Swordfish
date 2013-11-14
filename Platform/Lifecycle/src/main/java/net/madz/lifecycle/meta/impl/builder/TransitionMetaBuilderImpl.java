@@ -35,10 +35,16 @@ public class TransitionMetaBuilderImpl extends
 
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
+        configureSuper(clazz, parent);
         configureCondition(clazz);
         configureType(clazz);
         addKeys(clazz);
         return this;
+    }
+
+    private void configureSuper(Class<?> clazz, StateMachineMetadata parent) {
+        
+        
     }
 
     private void configureType(Class<?> clazz) {
@@ -123,5 +129,11 @@ public class TransitionMetaBuilderImpl extends
     @Override
     public boolean postValidate() {
         return postValidate;
+    }
+
+    @Override
+    protected TransitionMetadata findSuper(Class<?> metaClass) throws VerificationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

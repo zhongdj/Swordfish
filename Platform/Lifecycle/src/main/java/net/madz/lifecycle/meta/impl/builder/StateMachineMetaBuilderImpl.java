@@ -3,7 +3,6 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,11 +24,14 @@ import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.Overrides;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
+import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
+import net.madz.lifecycle.meta.builder.RelationMetaBuilderImpl;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
+import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -40,14 +42,7 @@ public class StateMachineMetaBuilderImpl extends
         InheritableAnnotationMetaBuilderBase<StateMachineMetadata, StateMachineMetadata> implements
         StateMachineMetaBuilder {
 
-    StateMachineMetadata superMeta;
     private StateMachineMetadata parentStateMachineMetadata;
-    /* //////////////////////////////////////////////////// */
-    /* //////// Fields For Related State Machine ////////// */
-    /* //////////////////////////////////////////////////// */
-    private HashSet<Class<?>> relationSet = new HashSet<>();
-    private HashMap<Object, StateMachineMetadata> relatedStateMachineMap = new HashMap<>();
-    private ArrayList<StateMachineMetadata> relatedStateMachineList = new ArrayList<>();
     /* //////////////////////////////////////////////////// */
     /* ////////////// Fields For Transitions ////////////// */
     /* //////////////////////////////////////////////////// */
@@ -84,6 +79,8 @@ public class StateMachineMetaBuilderImpl extends
     // Also for composite State Machine
     private final ArrayList<StateMetaBuilder> shortcutStateList = new ArrayList<>();
     private final ArrayList<StateMachineMetaBuilder> compositeStateMachineList = new ArrayList<>();
+    private final HashMap<Object, RelationMetadata> relationMetadataMap = new HashMap<>();
+    private final ArrayList<RelationMetadata> relationList = new ArrayList<>();
 
     public StateMachineMetaBuilderImpl(AbsStateMachineRegistry registry, String name) {
         super(null, name);
@@ -102,29 +99,13 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     @Override
-    public StateMachineMetadata getSuperStateMachine() {
-        return getSuper();
-    }
-
-    @Override
     public boolean hasParent() {
         return null != parentStateMachineMetadata;
     }
 
     @Override
     public boolean hasRelations() {
-        // return relationList.size() > 0;
-        return relationSet.size() > 0;
-    }
-
-    @Override
-    public StateMachineMetadata[] getRelatedStateMachineMetadata() {
-        return relatedStateMachineList.toArray(new StateMachineMetadata[relatedStateMachineList.size()]);
-    }
-
-    @Override
-    public StateMachineMetadata getRelatedStateMachine(Class<?> relationClass) {
-        return relatedStateMachineMap.get(relationClass);
+        return relationList.size() > 0;
     }
 
     @Override
@@ -254,12 +235,12 @@ public class StateMachineMetaBuilderImpl extends
         }
         // Step 2. Configure StateMachine
         {
-            configureSuperStateMachine(clazz);
+            configureSuper(clazz);
             configureConditionSet(clazz);
             configureTransitionSet(clazz);
             configureStateSetBasic(clazz);
             configureRelationSet(clazz);
-            configureStateSetRelations(clazz);
+            configureStateSetRelationConstraints(clazz);
             configureCompositeStateMachine(clazz);
             configureFunctions(clazz);
         }
@@ -296,19 +277,6 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
-    private void configureSuperStateMachine(Class<?> clazz) throws VerificationException {
-        if ( !hasSuperMetadataClass(clazz) ) {
-            return;
-        }
-        if ( isComposite() && isNotCompositeState(getSuperMetadataClass(clazz)) ) {
-            this.setSuper(null);
-        } else if ( isComposite() ) {
-            this.setSuper(registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this));
-        } else if ( hasSuperMetadataClass(clazz) ) {
-            this.setSuper(registry.loadStateMachineMetadata(getSuperMetadataClass(clazz), this));
-        }
-    }
-
     private boolean isNotCompositeState(Class<?> superMetadataClass) {
         if ( isCompositeStateMachine(superMetadataClass) ) {
             return false;
@@ -328,7 +296,7 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
-    private void configureStateSetRelations(Class<?> clazz) throws VerificationException {
+    private void configureStateSetRelationConstraints(Class<?> clazz) throws VerificationException {
         for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
             final StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
             stateMetaBuilder.configureRelations(stateClass);
@@ -338,45 +306,8 @@ public class StateMachineMetaBuilderImpl extends
     private void configureRelationSet(Class<?> clazz) throws VerificationException {
         verifyParentRelationSyntax(clazz);
         for ( Class<?> relationClass : findComponentClasses(clazz, RelationSet.class) ) {
-            verifyRelateTo(relationClass);
             addRelationMetadata(relationClass);
-            addRelatedStateMachine(relationClass);
         }
-    }
-
-    private void verifyRelateTo(Class<?> clazz) throws VerificationException {
-        if ( !hasSuperMetadataClass(clazz) ) {
-            if ( null == clazz.getAnnotation(RelateTo.class) ) {
-                throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
-            }
-        } else if ( isOverriding(clazz) ) {
-            if ( !hasRelateToDeclared(clazz) ) {
-                throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
-            }
-        } else {
-            if ( null != clazz.getAnnotation(RelateTo.class) ) {
-                verifyRelateTo(getSuperMetadataClass(clazz));
-            }
-        }
-    }
-
-    private boolean hasRelateToDeclared(Class<?> clazz) {
-        for ( Annotation anno : clazz.getDeclaredAnnotations() ) {
-            if ( RelateTo.class == anno.annotationType() ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isOverriding(Class<?> clazz) {
-        boolean overriding = false;
-        for ( Annotation anno : clazz.getDeclaredAnnotations() ) {
-            if ( Overrides.class == anno.annotationType() ) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private Class<?> getDeclaredParentRelation(Class<?> clazz) {
@@ -396,10 +327,10 @@ public class StateMachineMetaBuilderImpl extends
             } else if ( hasParent(relationClass) ) {
                 hasParentRelation = true;
                 if ( hasSuper() ) {
-                    if ( getSuperStateMachine().hasParent() && null == relationClass.getAnnotation(Overrides.class) ) {
+                    if ( getSuper().hasParent() && null == relationClass.getAnnotation(Overrides.class) ) {
                         throw newVerificationException(getDottedPath(),
                                 SyntaxErrors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
-                                clazz, getSuperMetadataClass(clazz));
+                                clazz, getSuperMetaClass(clazz));
                     }
                 }
             }
@@ -411,38 +342,27 @@ public class StateMachineMetaBuilderImpl extends
     }
 
     private void addRelationMetadata(Class<?> relationClass) throws VerificationException {
-        // RelationMetaBuilder relationBuilder = new
-        // RelationMetaBuilderImpl(this, relationClass.getSimpleName());
-        // relationBuilder.build(relationClass, this);
-        // this.relationList.add(relationBuilder);
-        // final Iterator<Object> iterator =
-        // relationBuilder.getKeySet().iterator();
-        // while ( iterator.hasNext() ) {
-        // this.relationMap.put(iterator.next(), relationBuilder);
-        // }
-        this.relationSet.add(relationClass);
-    }
-
-    private void addRelatedStateMachine(Class<?> relationClass) throws VerificationException {
-        final RelateTo relateTo = relationClass.getAnnotation(RelateTo.class);
-        final Class<?> relatedStateMachineClass = relateTo.value();
+        final RelationMetaBuilder relationBuilder = new RelationMetaBuilderImpl(this, relationClass.getSimpleName());
         try {
-            final StateMachineMetadata relatedStateMachineMetadata = registry.loadStateMachineMetadata(
-                    relatedStateMachineClass, this);
-            this.relatedStateMachineList.add(relatedStateMachineMetadata);
-            final Iterator<Object> keyIterator = relatedStateMachineMetadata.getKeySet().iterator();
-            while ( keyIterator.hasNext() ) {
-                this.relatedStateMachineMap.put(keyIterator.next(), relatedStateMachineMetadata);
-            }
-            this.relatedStateMachineMap.put(relationClass, relatedStateMachineMetadata);
-            if ( hasParent(relationClass) ) {
-                this.parentStateMachineMetadata = relatedStateMachineMetadata;
-            }
+            relationBuilder.build(relationClass, this);
         } catch (VerificationException e) {
             if ( SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION.equals(e.getVerificationFailureSet().iterator()
                     .next().getErrorCode()) ) {
                 throw newVerificationException(getDottedPath(),
-                        SyntaxErrors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE, relateTo);
+                        SyntaxErrors.RELATION_RELATED_TO_REFER_TO_NON_STATEMACHINE,
+                        relationClass.getAnnotation(RelateTo.class));
+            } else {
+                throw e;
+            }
+        }
+        final RelationMetadata metaData = relationBuilder.getMetaData();
+        this.relationList.add(metaData);
+        final Iterator<Object> iterator = relationBuilder.getKeySet().iterator();
+        while ( iterator.hasNext() ) {
+            final Object next = iterator.next();
+            this.relationMetadataMap.put(next, metaData);
+            if ( metaData.isParent() ) {
+                this.parentStateMachineMetadata = metaData.getRelateToStateMachine();
             }
         }
     }
@@ -547,18 +467,6 @@ public class StateMachineMetaBuilderImpl extends
         return null != stateMachineClass.getAnnotation(CompositeStateMachine.class);
     }
 
-    private Class<?> getSuperMetadataClass(Class<?> clazz) {
-        if ( !hasSuperMetadataClass(clazz) ) {
-            throw new IllegalStateException("Class " + clazz + " has no super class");
-        }
-        if ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) ) {
-            return clazz.getSuperclass();
-        } else {
-            // if clazz is interface or clazz implements an interface.
-            return clazz.getInterfaces()[0];
-        }
-    }
-
     /* //////////////////////////////////////////////////// */
     /* ////////////// Methods For Syntax Verification ///// */
     /* //////////////////////////////////////////////////// */
@@ -590,7 +498,7 @@ public class StateMachineMetaBuilderImpl extends
     private void verifyRequiredComponents(Class<?> clazz) throws VerificationException {
         final String stateSetPath = clazz.getName() + ".StateSet";
         final String transitionSetPath = clazz.getName() + ".TransitionSet";
-        if ( hasSuperMetadataClass(clazz) ) {
+        if ( hasSuper(clazz) ) {
             verifyStateOverrides(clazz);
             return;
         } else {
@@ -628,8 +536,8 @@ public class StateMachineMetaBuilderImpl extends
             return;
         }
         for ( Class<?> stateClass : stateClasses ) {
-            if ( hasSuperMetadataClass(stateClass) ) {
-                final Class<?> superStateClass = getSuperMetadataClass(stateClass);
+            if ( hasSuper(stateClass) ) {
+                final Class<?> superStateClass = getSuperMetaClass(stateClass);
                 if ( hasInitial(superStateClass) && hasOverrides(stateClass) ) {
                     throw newVerificationException(getDottedPath() + ".StateSet",
                             SyntaxErrors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE,
@@ -637,10 +545,6 @@ public class StateMachineMetaBuilderImpl extends
                 }
             }
         }
-    }
-
-    private boolean hasOverrides(Class<?> stateClass) {
-        return null != stateClass.getAnnotation(Overrides.class);
     }
 
     private boolean hasInitial(Class<?> superClass) {
@@ -700,12 +604,18 @@ public class StateMachineMetaBuilderImpl extends
         }
     }
 
-    private boolean hasSuperMetadataClass(Class<?> clazz) {
-        return ( null != clazz.getSuperclass() && !Object.class.equals(clazz.getSuperclass()) )
-                || ( 1 <= clazz.getInterfaces().length );
+    private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
+        if ( clazz.isInterface() && clazz.getInterfaces().length <= 0 ) {
+            if ( null == clazz.getAnnotation(StateMachine.class)
+                    && null == clazz.getAnnotation(CompositeStateMachine.class) ) {
+                throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
+                        clazz);
+            }
+        }
     }
 
-    private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
+    @Override
+    protected void verifySuper(Class<?> clazz) throws VerificationException {
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
             final Class<?> superclass = clazz.getSuperclass();
             if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
@@ -723,12 +633,6 @@ public class StateMachineMetaBuilderImpl extends
             } else if ( null == clz.getAnnotation(StateMachine.class) ) {
                 throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
                         new Object[] { clz.getName() });
-            }
-        } else if ( clazz.isInterface() && clazz.getInterfaces().length <= 0 ) {
-            if ( null == clazz.getAnnotation(StateMachine.class)
-                    && null == clazz.getAnnotation(CompositeStateMachine.class) ) {
-                throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
-                        clazz);
             }
         }
     }
@@ -758,7 +662,7 @@ public class StateMachineMetaBuilderImpl extends
 
     @Override
     public boolean hasRelation(Class<?> relationClass) {
-        if ( this.relationSet.contains(relationClass) ) {
+        if ( this.relationMetadataMap.containsKey(relationClass) ) {
             return true;
         }
         for ( StateMachineMetaBuilder builder : getCompositeStateMachines() ) {
@@ -766,9 +670,9 @@ public class StateMachineMetaBuilderImpl extends
                 return true;
             }
         }
-        if ( !isComposite() || ( isComposite() && getOwningStateMachine().equals(getSuperStateMachine()) ) ) {
-            if ( null != getSuperStateMachine() ) {
-                if ( getSuperStateMachine().hasRelation(relationClass) ) {
+        if ( !isComposite() || ( isComposite() && getOwningStateMachine().equals(getSuper()) ) ) {
+            if ( null != getSuper() ) {
+                if ( getSuper().hasRelation(relationClass) ) {
                     return true;
                 }
             }
@@ -789,8 +693,8 @@ public class StateMachineMetaBuilderImpl extends
         for ( final StateMachineMetadata compositeStateMachine : stateMachineMetaBuilder.getCompositeStateMachines() ) {
             populateTransitions(compositeStateMachine, result);
         }
-        if ( null != stateMachineMetaBuilder.getSuperStateMachine() ) {
-            loadTransitions(stateMachineMetaBuilder.getSuperStateMachine(), result);
+        if ( null != stateMachineMetaBuilder.getSuper() ) {
+            loadTransitions(stateMachineMetaBuilder.getSuper(), result);
         }
     }
 
@@ -815,7 +719,7 @@ public class StateMachineMetaBuilderImpl extends
             transitionMetadata = builder.getDeclaredTransition(transitionKey);
             if ( null != transitionMetadata ) return transitionMetadata;
         }
-        return findTransition(getSuperStateMachine(), transitionKey);
+        return findTransition(getSuper(), transitionKey);
     }
 
     @Override
@@ -848,7 +752,7 @@ public class StateMachineMetaBuilderImpl extends
             }
         }
         if ( !stateMachine.isComposite() || stateMachine.isComposite() && !stateMachine.getOwningState().isOverriding() ) {
-            populateStateMetadatas(stateMachine.getSuperStateMachine(), results, overridedStates);
+            populateStateMetadatas(stateMachine.getSuper(), results, overridedStates);
         }
     }
 
@@ -895,7 +799,7 @@ public class StateMachineMetaBuilderImpl extends
                 return state;
             }
         }
-        return findState(stateMachine.getSuperStateMachine(), stateKey);
+        return findState(stateMachine.getSuper(), stateKey);
     }
 
     @Override
@@ -922,7 +826,7 @@ public class StateMachineMetaBuilderImpl extends
                 conditions.add(conditionMetadata);
             }
         }
-        getCondition(stateMachine.getSuperStateMachine(), conditions);
+        getCondition(stateMachine.getSuper(), conditions);
     }
 
     @Override
@@ -936,7 +840,7 @@ public class StateMachineMetaBuilderImpl extends
             }
         }
         if ( hasSuper() ) {
-            return getSuperStateMachine().getCondtion(conditionKey);
+            return getSuper().getCondtion(conditionKey);
         }
         return null;
     }
@@ -952,8 +856,34 @@ public class StateMachineMetaBuilderImpl extends
             }
         }
         if ( hasSuper() ) {
-            return getSuperStateMachine().hasCondition(conditionKey);
+            return getSuper().hasCondition(conditionKey);
         }
         return false;
+    }
+
+    @Override
+    protected StateMachineMetadata findSuper(Class<?> metaClass) throws VerificationException {
+        return registry.loadStateMachineMetadata(metaClass, this);
+    }
+
+    @Override
+    protected boolean hasSuper(Class<?> metaClass) {
+        if ( !super.hasSuper(metaClass) ) {
+            return false;
+        }
+        if ( isComposite() ) {
+            if ( isNotCompositeState(getSuperMetaClass(metaClass)) ) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public RelationMetadata getRelationMetadata(Class<?> metaClass) {
+        return this.relationMetadataMap.get(metaClass);
     }
 }

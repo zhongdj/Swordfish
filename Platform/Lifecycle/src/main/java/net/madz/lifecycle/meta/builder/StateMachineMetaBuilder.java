@@ -13,8 +13,6 @@ public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMach
 
     void setOwningState(StateMetadata stateMetaBuilderImpl);
 
-    StateMachineMetadata getRelatedStateMachine(Class<?> relationClass);
-
     boolean hasTransition(Object obj);
 
     StateMachineMetaBuilder[] getCompositeStateMachines();

@@ -37,7 +37,7 @@ import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
-import net.madz.lifecycle.meta.template.RelationMetadata;
+import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -285,12 +285,12 @@ public class StateMachineObjectBuilderImpl extends
     private void verifyRelationsAllBeCoveraged(Class<?> klass) throws VerificationException {
         StateMetadata[] allStates = getMetaType().getAllStates();
         for ( StateMetadata state : allStates ) {
-            for ( RelationMetadata relation : state.getValidWhiles() ) {
+            for ( RelationConstraintMetadata relation : state.getValidWhiles() ) {
                 for ( TransitionMetadata transition : state.getPossibleTransitions() ) {
                     verifyRelationBeCovered(klass, relation, transition);
                 }
             }
-            for ( RelationMetadata relation : state.getDeclaredInboundWhiles() ) {
+            for ( RelationConstraintMetadata relation : state.getDeclaredInboundWhiles() ) {
                 for ( TransitionMetadata transition : getTransitionsToState(state) ) {
                     verifyRelationBeCovered(klass, relation, transition);
                 }
@@ -325,7 +325,7 @@ public class StateMachineObjectBuilderImpl extends
         return false;
     }
 
-    private void verifyRelationBeCovered(Class<?> klass, final RelationMetadata relation,
+    private void verifyRelationBeCovered(Class<?> klass, final RelationConstraintMetadata relation,
             final TransitionMetadata transition) throws VerificationException {
         final TransitionMethodScanner scanner = new TransitionMethodScanner(transition);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
@@ -343,7 +343,7 @@ public class StateMachineObjectBuilderImpl extends
         }
     }
 
-    private boolean hasRelationOnMethodParameters(final RelationMetadata relation, final Method method)
+    private boolean hasRelationOnMethodParameters(final RelationConstraintMetadata relation, final Method method)
             throws VerificationException {
         for ( Annotation[] annotations : method.getParameterAnnotations() ) {
             for ( Annotation annotation : annotations ) {
@@ -360,7 +360,7 @@ public class StateMachineObjectBuilderImpl extends
         return false;
     }
 
-    private boolean scanFieldsRelation(Class<?> klass, final RelationMetadata relation) {
+    private boolean scanFieldsRelation(Class<?> klass, final RelationConstraintMetadata relation) {
         for ( Class<?> c = klass; Object.class != c; c = c.getSuperclass() ) {
             for ( Field field : c.getDeclaredFields() ) {
                 if ( hasRelationOnField(relation, field) ) return true;
@@ -369,7 +369,7 @@ public class StateMachineObjectBuilderImpl extends
         return false;
     }
 
-    private boolean hasRelationOnField(final RelationMetadata relation, Field field) {
+    private boolean hasRelationOnField(final RelationConstraintMetadata relation, Field field) {
         Relation r = field.getAnnotation(Relation.class);
         if ( null == r ) return false;
         if ( Null.class != r.value() ) {
@@ -384,7 +384,7 @@ public class StateMachineObjectBuilderImpl extends
         return false;
     }
 
-    private boolean isKeyOfRelationMetadata(final RelationMetadata relation, Object key) {
+    private boolean isKeyOfRelationMetadata(final RelationConstraintMetadata relation, Object key) {
         return relation.getKeySet().contains(key);
     }
 
@@ -490,9 +490,9 @@ public class StateMachineObjectBuilderImpl extends
     }
     private final class RelationGetterScanner implements MethodScanner {
 
-        private RelationMetadata relationMetadata;
+        private RelationConstraintMetadata relationMetadata;
 
-        public RelationGetterScanner(RelationMetadata relation) {
+        public RelationGetterScanner(RelationConstraintMetadata relation) {
             this.relationMetadata = relation;
         }
 
@@ -1134,12 +1134,12 @@ public class StateMachineObjectBuilderImpl extends
     @Override
     public void validateValidWhiles(Object target) {
         final StateMetadata state = getMetaType().getState(evaluateState(target));
-        final RelationMetadata[] validWhiles = state.getValidWhiles();
-        final HashMap<String, List<RelationMetadata>> mergedRelations = mergeRelations(validWhiles);
-        for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
+        final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
+        final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
+        for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
             getState(state.getDottedPath()).verifyValidWhile(target,
-                    relationMetadataEntry.getValue().toArray(new RelationMetadata[0]), evaluator);
+                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), evaluator);
         }
     }
 
@@ -1159,23 +1159,23 @@ public class StateMachineObjectBuilderImpl extends
         final StateMetadata state = getMetaType().getState(evaluateState(target));
         final String nextState = getNextState(target, transitionKey);
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
-        for ( final Entry<String, List<RelationMetadata>> relationMetadataEntry : mergeRelations(
+        for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(
                 nextStateMetadata.getInboundWhiles()).entrySet() ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
-                    relationMetadataEntry.getValue().toArray(new RelationMetadata[0]), evaluator);
+                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), evaluator);
         }
     }
 
-    private HashMap<String, List<RelationMetadata>> mergeRelations(RelationMetadata[] relations) {
-        final HashMap<String, List<RelationMetadata>> mergedRelations = new HashMap<>();
-        for ( final RelationMetadata relationMetadata : relations ) {
+    private HashMap<String, List<RelationConstraintMetadata>> mergeRelations(RelationConstraintMetadata[] relations) {
+        final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = new HashMap<>();
+        for ( final RelationConstraintMetadata relationMetadata : relations ) {
             final String relationKey = relationMetadata.getRelatedStateMachine().getDottedPath().getAbsoluteName();
             if ( mergedRelations.containsKey(relationKey) ) {
-                final List<RelationMetadata> list = mergedRelations.get(relationKey);
+                final List<RelationConstraintMetadata> list = mergedRelations.get(relationKey);
                 list.add(relationMetadata);
             } else {
-                final ArrayList<RelationMetadata> list = new ArrayList<>();
+                final ArrayList<RelationConstraintMetadata> list = new ArrayList<>();
                 list.add(relationMetadata);
                 mergedRelations.put(relationKey, list);
             }
@@ -1187,6 +1187,12 @@ public class StateMachineObjectBuilderImpl extends
     public boolean evaluateConditionBeforeTransition(Object transitionKey) {
         TransitionMetadata transition = getMetaType().getTransition(transitionKey);
         return !transition.postValidate();
+    }
+
+    @Override
+    protected StateMachineObject findSuper(Class<?> metaClass) throws VerificationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

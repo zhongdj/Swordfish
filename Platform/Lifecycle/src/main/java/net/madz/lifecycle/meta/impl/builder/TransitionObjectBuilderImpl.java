@@ -13,7 +13,7 @@ import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public class TransitionObjectBuilderImpl extends
-        InheritableAnnotationMetaBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
+        ObjectBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
 
     private Method transitionMethod;
     private TransitionMetadata template;
@@ -49,5 +49,11 @@ public class TransitionObjectBuilderImpl extends
     @Override
     public TransitionMetadata getMetaType() {
         return template;
+    }
+
+    @Override
+    protected TransitionObject findSuper(Class<?> metaClass) throws VerificationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

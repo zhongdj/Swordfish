@@ -10,13 +10,12 @@ import net.madz.lifecycle.meta.builder.StateObjectBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject.ReadAccessor;
 import net.madz.lifecycle.meta.instance.StateObject;
-import net.madz.lifecycle.meta.template.RelationMetadata;
+import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, StateMachineObject> implements
-        StateObjectBuilder {
+public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, StateMachineObject> implements StateObjectBuilder {
 
     private StateMetadata template;
 
@@ -40,14 +39,13 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     }
 
     @Override
-    public void verifyValidWhile(Object target, RelationMetadata[] relationMetadataArray, ReadAccessor<?> evaluator) {
+    public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, ReadAccessor<?> evaluator) {
         try {
             final Object relatedTarget = evaluator.read(target);
-            final StateMachineObject relatedStateMachineObject = this.getRegistry().loadStateMachineObject(
-                    relatedTarget.getClass());
+            final StateMachineObject relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
             final String relatedEvaluateState = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean found = false;
-            for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+            for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
                     if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
                         found = true;
@@ -57,14 +55,13 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
             }
             if ( !found ) {
                 final LinkedHashSet<String> validRelationStates = new LinkedHashSet<>();
-                for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+                for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                     for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
                         validRelationStates.add(metadata.getSimpleName());
                     }
                 }
-                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE,
-                        LifecycleCommonErrors.STATE_INVALID, target, this.template.getSimpleName(), relatedTarget,
-                        relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
+                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.STATE_INVALID, target,
+                        this.template.getSimpleName(), relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
             }
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
@@ -72,15 +69,15 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     }
 
     @Override
-    public void verifyInboundWhile(Object transitionKey, Object target, String nextState,
-            RelationMetadata[] relationMetadataArray, ReadAccessor<?> evaluator) {
+    public void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relationMetadataArray,
+            ReadAccessor<?> evaluator) {
         try {
             final Object relatedTarget = evaluator.read(target);
             StateMachineObject relatedStateMachineInst;
             relatedStateMachineInst = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
             final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
             boolean find = false;
-            for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+            for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
                     if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
                         find = true;
@@ -90,18 +87,22 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
             }
             if ( !find ) {
                 final LinkedHashSet<String> validRelationStates = new LinkedHashSet<>();
-                for ( RelationMetadata relationMetadata : relationMetadataArray ) {
+                for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                     for ( StateMetadata metadata : relationMetadata.getOnStates() ) {
                         validRelationStates.add(metadata.getSimpleName());
                     }
                 }
-                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE,
-                        LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT, transitionKey, nextState,
-                        target, relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates
-                                .toArray(new String[0])));
+                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
+                        transitionKey, nextState, target, relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
             }
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }
+    }
+
+    @Override
+    protected StateObject findSuper(Class<?> metaClass) throws VerificationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

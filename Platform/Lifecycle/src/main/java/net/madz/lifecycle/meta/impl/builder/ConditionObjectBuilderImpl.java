@@ -49,4 +49,10 @@ public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObjec
     public ConditionMetadata getMetaType() {
         return template;
     }
+
+    @Override
+    protected ConditionObject findSuper(Class<?> metaClass) throws VerificationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

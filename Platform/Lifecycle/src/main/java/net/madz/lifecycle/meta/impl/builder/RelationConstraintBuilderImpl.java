@@ -4,17 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.madz.common.Dumper;
-import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
+import net.madz.lifecycle.meta.builder.RelationConstraintBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
-import net.madz.lifecycle.meta.template.RelationMetadata;
+import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationMetadata, StateMetadata>
-        implements RelationMetaBuilder {
+public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuilderBase<RelationConstraintMetadata, StateMetadata>
+        implements RelationConstraintBuilder {
 
     private StateMachineMetadata relatedStateMachine;
     private final LinkedList<StateMetadata> onStates = new LinkedList<>();
@@ -25,7 +25,7 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
         return relatedStateMachine;
     }
 
-    public RelationMetaBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates,
+    public RelationConstraintBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates,
             List<ErrorMessageObject> errorMessageObjects, StateMachineMetadata stateMachineMetadata) {
         super(parent, name);
         this.onStates.addAll(onStates);
@@ -39,7 +39,7 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
     }
 
     @Override
-    public RelationMetaBuilder build(Class<?> klass, StateMetadata parent) throws VerificationException {
+    public RelationConstraintBuilder build(Class<?> klass, StateMetadata parent) throws VerificationException {
         addKeys(klass);
         return this;
     }
@@ -57,5 +57,17 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
     @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
+    }
+    
+    
+
+    @Override
+    protected void verifySuper(Class<?> metaClass) throws VerificationException {
+        
+    }
+
+    @Override
+    protected RelationConstraintMetadata findSuper(Class<?> metaClass) throws VerificationException {
+        return null;
     }
 }
