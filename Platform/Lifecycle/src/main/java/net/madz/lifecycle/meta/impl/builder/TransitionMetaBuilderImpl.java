@@ -72,16 +72,23 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
 
     private void verifyJudgerClass(Class<?> clazz, Class<?> judgerClass, Class<?> conditionClass) throws VerificationException {
         for ( Type type : judgerClass.getGenericInterfaces() ) {
-            if ( type instanceof ParameterizedType ) {
-                final ParameterizedType pType = (ParameterizedType) type;
-                if ( ConditionalTransition.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
-                    if ( !conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]) ) {
-                        throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass,
-                                judgerClass);
-                    }
-                }
+            if ( !( type instanceof ParameterizedType ) ) {
+                continue;
+            }
+            final ParameterizedType pType = (ParameterizedType) type;
+            if ( isConditionalTransition((Class<?>) pType.getRawType()) && !isConditionClassMatchingJudgerGenericType(conditionClass, pType) ) {
+                throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER, clazz, conditionClass,
+                        judgerClass);
             }
         }
+    }
+
+    private boolean isConditionClassMatchingJudgerGenericType(Class<?> conditionClass, final ParameterizedType pType) {
+        return conditionClass.isAssignableFrom((Class<?>) pType.getActualTypeArguments()[0]);
+    }
+
+    private boolean isConditionalTransition(final Class<?> rawType) {
+        return ConditionalTransition.class.isAssignableFrom(rawType);
     }
 
     @Override
