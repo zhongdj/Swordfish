@@ -165,8 +165,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             @Initial
             @Function(transition = CustomerLifecycleMeta.Transitions.Activate.class, value = { Active.class })
             static interface Draft {}
-            @Functions({
-                    @Function(transition = CustomerLifecycleMeta.Transitions.Suspend.class, value = Suspended.class),
+            @Functions({ @Function(transition = CustomerLifecycleMeta.Transitions.Suspend.class, value = Suspended.class),
                     @Function(transition = CustomerLifecycleMeta.Transitions.Cancel.class, value = Canceled.class) })
             static interface Active {}
             @Function(transition = CustomerLifecycleMeta.Transitions.Resume.class, value = Active.class)
@@ -209,13 +208,10 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = InternetServiceLifecycleMeta.Transitions.Start.class,
-                    value = { InternetServiceLifecycleMeta.States.InService.class })
-            @ValidWhile(on = { CustomerLifecycleMeta.States.Active.class },
-                    relation = InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
+            @Function(transition = InternetServiceLifecycleMeta.Transitions.Start.class, value = { InternetServiceLifecycleMeta.States.InService.class })
+            @ValidWhile(on = { CustomerLifecycleMeta.States.Active.class }, relation = InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
             static interface New {}
-            @Function(transition = InternetServiceLifecycleMeta.Transitions.End.class,
-                    value = { InternetServiceLifecycleMeta.States.Ended.class })
+            @Function(transition = InternetServiceLifecycleMeta.Transitions.End.class, value = { InternetServiceLifecycleMeta.States.Ended.class })
             // @InboundWhile(on = { CustomerLifecycleMeta.States.Active.class },
             // relation =
             // InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
@@ -294,10 +290,8 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
             @Initial
             @Overrides
-            @ValidWhile(relation = VOIPServiceLifecycleMeta.Relations.VoipProvider.class,
-                    on = VOIPProviderLifecycleMeta.States.ServiceAvailable.class)
-            @Function(transition = VOIPServiceLifecycleMeta.Transitions.Start.class,
-                    value = { VOIPServiceLifecycleMeta.States.InService.class })
+            @ValidWhile(relation = VOIPServiceLifecycleMeta.Relations.VoipProvider.class, on = VOIPProviderLifecycleMeta.States.ServiceAvailable.class)
+            @Function(transition = VOIPServiceLifecycleMeta.Transitions.Start.class, value = { VOIPServiceLifecycleMeta.States.InService.class })
             static interface New extends InternetServiceLifecycleMeta.States.New {}
         }
         @RelationSet
@@ -531,13 +525,21 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = PressAnyKey.class, value = { ReadingInput.class, Broken.class/*, NotReading.class */})
+            @Function(transition = PressAnyKey.class, value = { ReadingInput.class, Broken.class /*
+                                                                                                  * ,
+                                                                                                  * NotReading
+                                                                                                  * .
+                                                                                                  * class
+                                                                                                  */})
             @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
             static interface ReadingInput {}
-//            @Function(transition = PressAnyKey.class, value = { ReadingInput.class })
-//            @ValidWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
-//            @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOff.class }, relation = PowerRelation.class)
-//            static interface NotReading {}
+            // @Function(transition = PressAnyKey.class, value = {
+            // ReadingInput.class })
+            // @ValidWhile(on = { PowerLifecycleMetadata.States.PowerOn.class },
+            // relation = PowerRelation.class)
+            // @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOff.class
+            // }, relation = PowerRelation.class)
+            // static interface NotReading {}
             @InboundWhile(on = { PowerLifecycleMetadata.States.PowerOn.class }, relation = PowerRelation.class)
             @End
             static interface Broken {}
@@ -545,7 +547,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @TransitionSet
         static interface Transitions {
 
-            @Conditional(condition = TimesLeft.class, judger = ConditionJudgerImpl.class, postValidate = false)
+            @Conditional(condition = TimesLeft.class, judger = ConditionJudgerImpl.class, postEval = false)
             static interface PressAnyKey {}
         }
         @RelationSet
@@ -568,9 +570,10 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
 
             @Override
             public Class<?> doConditionJudge(TimesLeft t) {
-//                if ( t.isPowerOff() ) {
-//                    return KeyBoardLifecycleMetadataPreValidateCondition.States.NotReading.class;
-//                } else 
+                // if ( t.isPowerOff() ) {
+                // return
+                // KeyBoardLifecycleMetadataPreValidateCondition.States.NotReading.class;
+                // } else
                 if ( t.timesLeft() ) {
                     return KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class;
                 } else {
@@ -580,15 +583,14 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         }
     }
     @StateMachine
-    static interface KeyBoardLifecycleMetadataPostValidateCondition extends
-            KeyBoardLifecycleMetadataPreValidateCondition {
+    static interface KeyBoardLifecycleMetadataPostValidateCondition extends KeyBoardLifecycleMetadataPreValidateCondition {
 
         @TransitionSet
         static interface Transitions extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions {
 
             @Overrides
-            @Conditional(condition = KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class,
-                    judger = ConditionJudgerImpl.class, postValidate = true)
+            @Conditional(condition = KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class, judger = ConditionJudgerImpl.class,
+                    postEval = true)
             static interface PressAnyKey extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey {}
         }
     }

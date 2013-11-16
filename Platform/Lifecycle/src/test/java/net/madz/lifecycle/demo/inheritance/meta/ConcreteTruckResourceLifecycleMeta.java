@@ -15,11 +15,9 @@ public interface ConcreteTruckResourceLifecycleMeta extends SchedulableLifecycle
 
         @Function(transition = Detach.class, value = Detached.class)
         public static class Idle extends SchedulableLifecycleMeta.States.Idle {}
-
         @End
         public static class Detached {}
     }
-
     @TransitionSet
     public class Transitions extends SchedulableLifecycleMeta.Transitions {
 

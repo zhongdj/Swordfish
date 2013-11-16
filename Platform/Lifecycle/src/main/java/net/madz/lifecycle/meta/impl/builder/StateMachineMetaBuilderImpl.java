@@ -595,6 +595,9 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
                 throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION, clazz);
             }
         }
+        if ( isComposite() && getOwningStateMachine().equals(getSuper()) ) {
+            throw newVerificationException(getDottedPath(), SyntaxErrors.COMPOSITE_STATEMACHINE_CANNOT_EXTENDS_OWNING_STATEMACHINE, clazz);
+        }
     }
 
     @Override
@@ -649,7 +652,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
                 return true;
             }
         }
-        if ( !isComposite() || ( isComposite() && getOwningStateMachine().equals(getSuper()) ) ) {
+        if ( !isComposite() || ( !isComposite() && getOwningStateMachine().equals(getSuper()) ) ) {
             if ( null != getSuper() ) {
                 if ( getSuper().hasRelation(relationClass) ) {
                     return true;

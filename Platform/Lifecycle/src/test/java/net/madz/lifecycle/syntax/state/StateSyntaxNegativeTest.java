@@ -35,8 +35,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS,
-                    A.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, A.class.getName());
             throw e;
         }
     }
@@ -52,17 +51,15 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, C.class.getAnnotation(Function.class),
-                    C.class.getName(),
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE,
+                    C.class.getAnnotation(Function.class), C.class.getName(),
                     net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class.getName());
             throw e;
         }
     }
 
     @Test(expected = VerificationException.class)
-    public void test_state_function_with_invalid_conditional_transition_without_conditional_annotation()
-            throws VerificationException {
+    public void test_state_function_with_invalid_conditional_transition_without_conditional_annotation() throws VerificationException {
         @LifecycleRegistry(S3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -72,9 +69,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, E.class.getAnnotation(Function.class),
-                    E.class.getName(), Y.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION,
+                    E.class.getAnnotation(Function.class), E.class.getName(), Y.class.getName());
             throw e;
         }
     }
@@ -90,9 +86,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID, S5_A.class.getAnnotation(Function.class),
-                    S5_A.class.getName(), S5.class.getName(), D.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_NEXT_STATESET_OF_FUNCTION_INVALID,
+                    S5_A.class.getAnnotation(Function.class), S5_A.class.getName(), S5.class.getName(), D.class.getName());
             throw e;
         }
     }
@@ -108,8 +103,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE,
                     NSC1_CB.class.getAnnotation(Function.class), NSC1_CB.class.getName(), NSC1_X.class.getName());
             throw e;
         }
@@ -126,9 +120,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID, NCS2_CC.class.getAnnotation(ShortCut.class),
-                    NCS2_CC.class, NSC1_C.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID,
+                    NCS2_CC.class.getAnnotation(ShortCut.class), NCS2_CC.class, NSC1_C.class);
             throw e;
         }
     }
@@ -144,8 +137,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, NCS3_CC.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT, NCS3_CC.class);
             throw e;
         }
     }
@@ -161,8 +153,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, NCS4_CC.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END, NCS4_CC.class);
             throw e;
         }
     }
@@ -178,10 +169,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
-                    Multiple_Function_Referring_Same_Transition.States.Created.class,
-                    Multiple_Function_Referring_Same_Transition.Transitions.X.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
+                    Multiple_Function_Referring_Same_Transition.States.Created.class, Multiple_Function_Referring_Same_Transition.Transitions.X.class);
             throw e;
         }
     }
@@ -197,8 +186,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_DEFINED_MULTIPLE_FUNCTION_REFERRING_SAME_TRANSITION,
                     Multiple_Function_Referring_Same_Transition_Child.States.Created.class,
                     Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class);
             throw e;
@@ -233,8 +221,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE,
                     NegativeOverridesMissingInitial.States.A.class, CorrectBase.States.A.class);
             throw e;
         }

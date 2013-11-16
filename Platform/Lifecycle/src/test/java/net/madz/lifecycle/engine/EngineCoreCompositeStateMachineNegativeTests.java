@@ -1,15 +1,10 @@
 package net.madz.lifecycle.engine;
 
+import static org.junit.Assert.fail;
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
-import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.Contract;
-import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.ContractLifecycle;
-import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.OverridesComposite;
-import net.madz.lifecycle.engine.EngineCoreCompositeStateMachineMetadata.SM1_Overrides;
 
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreCompositeStateMachineMetadata {
 
@@ -82,8 +77,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
         order.start();
-        assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.OrderCreated.class,
-                order);
+        assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.OrderCreated.class, order);
         contract.cancel();
         assertState(ContractLifecycle.States.Canceled.class, contract);
         try {
@@ -109,8 +103,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
         order.start();
-        assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.OrderCreated.class,
-                order);
+        assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.OrderCreated.class, order);
         contract.cancel();
         assertState(ContractLifecycle.States.Canceled.class, contract);
         try {
@@ -146,8 +139,8 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             noOverride.doActionT1();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, noOverride, ContractLifecycle.States.Draft.class,
-                    ContractLifecycle.States.Active.class, ContractLifecycle.States.Expired.class);
+            assertInvalidStateErrorByValidWhile(e, contract, noOverride, ContractLifecycle.States.Draft.class, ContractLifecycle.States.Active.class,
+                    ContractLifecycle.States.Expired.class);
         }
     }
 
@@ -168,8 +161,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             noOverride.doActionT3();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
-                    SM1_No_Overrides.States.S2.CTransitions.T3.class,
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, SM1_No_Overrides.States.S2.CTransitions.T3.class,
                     SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
         }
     }
@@ -191,9 +183,8 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             noOverride.doActionT5();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
-                    SM2.States.S2.CTransitions.T5.class, SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
-                    noOverride);
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, SM2.States.S2.CTransitions.T5.class,
+                    SM1_No_Overrides.States.S1.CStates.CS0.class.getSimpleName(), noOverride);
         }
     }
 
@@ -210,8 +201,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT1();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
-                    ContractLifecycle.States.Draft.class);
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class, ContractLifecycle.States.Draft.class);
             throw e;
         }
     }
@@ -229,8 +219,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT2();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
-                    ContractLifecycle.States.Draft.class);
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class, ContractLifecycle.States.Draft.class);
             throw e;
         }
     }
@@ -248,8 +237,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT6();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
-                    ContractLifecycle.States.Draft.class);
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class, ContractLifecycle.States.Draft.class);
             throw e;
         }
     }
@@ -269,8 +257,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT6();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class,
-                    ContractLifecycle.States.Draft.class);
+            assertInvalidStateErrorByValidWhile(e, contract, object, ContractLifecycle.States.Expired.class, ContractLifecycle.States.Draft.class);
             throw e;
         }
     }
@@ -290,9 +277,8 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT6();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
-                    SM1_Overrides.Transitions.T6.class, SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
-                    object);
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, SM1_Overrides.Transitions.T6.class,
+                    SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(), object);
         }
     }
 
@@ -307,9 +293,8 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
         try {
             object.doActionT6();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE,
-                    SM1_Overrides.Transitions.T6.class, SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(),
-                    object);
+            assertLifecycleError(e, LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, SM1_Overrides.Transitions.T6.class,
+                    SM1_Overrides.States.S1.CStates.CS0.class.getSimpleName(), object);
         }
     }
 }

@@ -23,10 +23,8 @@ public class TransitionSyntaxNegativeTest extends TransitionSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER,
-                    TransitionSyntaxMetadata.S1.Transitions.S1_Transition_X.class,
-                    TransitionSyntaxMetadata.S1.Conditions.S1_Condition_B.class,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER,
+                    TransitionSyntaxMetadata.S1.Transitions.S1_Transition_X.class, TransitionSyntaxMetadata.S1.Conditions.S1_Condition_B.class,
                     TransitionSyntaxMetadata.S1.VolumeMeasurableTransition.class);
             throw e;
         }

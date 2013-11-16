@@ -99,10 +99,4 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }
     }
-
-    @Override
-    protected StateObject findSuper(Class<?> metaClass) throws VerificationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

@@ -24,8 +24,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NS1_Z.class.getSimpleName(), S2.class.getName(), NLM_1.class.getSimpleName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM, NS1_Z.class.getSimpleName(),
+                    S2.class.getName(), NLM_1.class.getSimpleName());
             throw e;
         }
     }
@@ -41,8 +41,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    NS1_Z.class.getSimpleName(), S2.class.getName(), NLM_2.class.getSimpleName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM, NS1_Z.class.getSimpleName(),
+                    S2.class.getName(), NLM_2.class.getSimpleName());
             throw e;
         }
     }
@@ -58,15 +58,14 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_METHOD_NAME_INVALID,
-                    S2.class.getName(), "nS1_Xyz", NLM_3.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_METHOD_NAME_INVALID, S2.class.getName(), "nS1_Xyz",
+                    NLM_3.class.getName());
             throw e;
         }
     }
 
     @Test(expected = VerificationException.class)
-    public void test_LM_method_transition_beyond_stateMachine() throws VerificationException, NoSuchMethodException,
-            SecurityException {
+    public void test_LM_method_transition_beyond_stateMachine() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -76,9 +75,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, NLM_4.class.getMethod("nS1_X")
-                            .getAnnotation(Transition.class), "nS1_X", NLM_4.class.getName(), S2.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, NLM_4.class
+                    .getMethod("nS1_X").getAnnotation(Transition.class), "nS1_X", NLM_4.class.getName(), S2.class.getName());
             throw e;
         }
     }
@@ -94,9 +92,8 @@ public class LMSyntaxNegativeTest extends LMSyntaxMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, S3_Y.class.getSimpleName(), "@Redo",
-                    S3.class.getName(), NLM_5.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
+                    S3_Y.class.getSimpleName(), "@Redo", S3.class.getName(), NLM_5.class.getName());
             throw e;
         }
     }

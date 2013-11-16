@@ -27,8 +27,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s7_X",
-                    NLM_1.class.getName(), S7_R.class.getSimpleName(), S7.class.getName() + ".StateSet." + S7_B.class.getSimpleName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s7_X", NLM_1.class.getName(),
+                    S7_R.class.getSimpleName(), S7.class.getName() + ".StateSet." + S7_B.class.getSimpleName());
             throw e;
         }
     }
@@ -44,8 +44,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s8_X",
-                    NLM_2.class.getName(), S8_R.class.getSimpleName(), S8.class.getName() + ".StateSet."+ S8_A.class.getSimpleName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s8_X", NLM_2.class.getName(),
+                    S8_R.class.getSimpleName(), S8.class.getName() + ".StateSet." + S8_A.class.getSimpleName());
             throw e;
         }
     }
@@ -61,9 +61,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X",
-                    NLM_3.class.getName(), S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet."+ S5_B_A.class.getSimpleName());
-
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X", NLM_3.class.getName(),
+                    S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet." + S5_B_A.class.getSimpleName());
             throw e;
         }
     }
@@ -79,9 +78,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X",
-                    NLM_4.class.getName(), S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet."+ S5_B_A.class.getSimpleName());
-
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, "s5_B_X", NLM_4.class.getName(),
+                    S5_B_R1.class.getSimpleName(), S5.class.getName() + ".CompositeStateMachine.S5_B.StateSet." + S5_B_A.class.getSimpleName());
             throw e;
         }
     }
@@ -97,8 +95,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, NLM_5.class.getName(),
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, NLM_5.class.getName(),
                     S4.Relations.R1.class.getName(), S5.class.getName());
             throw e;
         }
@@ -115,8 +112,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, NLM_6.class.getName(),
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, NLM_6.class.getName(),
                     S4.Relations.R1.class.getName(), R1_S.class.getName());
             throw e;
         }
@@ -133,8 +129,8 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE,
-                    NLM_7.class.getName(), S4.Relations.R3.class.getName());
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, NLM_7.class.getName(),
+                    S4.Relations.R3.class.getName());
             throw e;
         }
     }

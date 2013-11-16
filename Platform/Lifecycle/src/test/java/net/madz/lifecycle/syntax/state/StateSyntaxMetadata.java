@@ -69,8 +69,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
 
             @Initial
-            @Function(transition = net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class,
-                    value = { D.class })
+            @Function(transition = net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class, value = { D.class })
             static interface C {}
             @End
             static interface D {}
@@ -420,11 +419,8 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
 
             @Initial
-            @Functions({
-                    @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class,
-                            value = Ended.class),
-                    @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class,
-                            value = Ended.class) })
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class, value = Ended.class),
+                    @Function(transition = Multiple_Function_Referring_Same_Transition.Transitions.X.class, value = Ended.class) })
             static interface Created {}
             @End
             static interface Ended {}
@@ -442,8 +438,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         static interface States {
 
             @Initial
-            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
-                    value = Ended.class) })
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class, value = Ended.class) })
             static interface Created {}
             @End
             static interface Ended {}
@@ -455,27 +450,23 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
-    static interface Multiple_Function_Referring_Same_Transition_Child extends
-            Multiple_Function_Referring_Same_Transition_Super {
+    static interface Multiple_Function_Referring_Same_Transition_Child extends Multiple_Function_Referring_Same_Transition_Super {
 
         @StateSet
         static interface States extends Multiple_Function_Referring_Same_Transition_Super.States {
 
-            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
-                    value = Ended.class) })
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class, value = Ended.class) })
             static interface Created extends Multiple_Function_Referring_Same_Transition_Super.States.Created {}
         }
     }
     @StateMachine
-    static interface State_Overriding_Function_Referring_Same_Transition_With_Super_State extends
-            Multiple_Function_Referring_Same_Transition_Super {
+    static interface State_Overriding_Function_Referring_Same_Transition_With_Super_State extends Multiple_Function_Referring_Same_Transition_Super {
 
         @StateSet
         static interface States extends Multiple_Function_Referring_Same_Transition_Super.States {
 
             @Initial
-            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class,
-                    value = Ended.class) })
+            @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class, value = Ended.class) })
             @Overrides
             static interface Created extends Multiple_Function_Referring_Same_Transition_Super.States.Created {}
         }

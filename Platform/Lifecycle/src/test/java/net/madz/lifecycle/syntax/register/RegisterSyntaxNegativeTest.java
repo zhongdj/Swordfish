@@ -34,8 +34,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             Iterator<VerificationFailure> iterator = failureSet.iterator();
             assertEquals(1, failureSet.size());
             VerificationFailure failure = iterator.next();
-            final String expectedErrorMessage = getMessage(SyntaxErrors.REGISTERED_META_ERROR,
-                    WithoutMetadataAnnotationErrorSyntax.class);
+            final String expectedErrorMessage = getMessage(SyntaxErrors.REGISTERED_META_ERROR, WithoutMetadataAnnotationErrorSyntax.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(SyntaxErrors.REGISTERED_META_ERROR, failure.getErrorCode());
@@ -96,8 +95,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation()
-            throws VerificationException {
+    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation() throws VerificationException {
         @LifecycleRegistry(value = { WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation.class })
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -107,8 +105,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION,
                     WrongStateMachineSyntaxWithoutAnnotation.class);
             throw e;
         }

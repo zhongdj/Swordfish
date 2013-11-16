@@ -63,7 +63,7 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
             conditional = true;
             conditionClass = conditionalAnno.condition();
             judgerClass = conditionalAnno.judger();
-            postValidate = conditionalAnno.postValidate();
+            postValidate = conditionalAnno.postEval();
             verifyJudgerClass(clazz, judgerClass, conditionClass);
         } else {
             conditional = false;

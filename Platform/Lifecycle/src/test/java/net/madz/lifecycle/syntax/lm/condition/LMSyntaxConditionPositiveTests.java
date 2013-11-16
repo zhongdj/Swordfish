@@ -19,22 +19,24 @@ public class LMSyntaxConditionPositiveTests extends LMSyntaxConditionMetadata {
         }
         new Registry();
     }
+
     @Test
     public final void test_composite_state_machine_case() throws VerificationException {
         @LifecycleRegistry(PLM_2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             public Registry() throws VerificationException {}
         }
         new Registry();
     }
+
     @Test
     public final void test_super_state_machine_case() throws VerificationException {
         @LifecycleRegistry(PLM_3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
-            
+
             public Registry() throws VerificationException {}
         }
         new Registry();

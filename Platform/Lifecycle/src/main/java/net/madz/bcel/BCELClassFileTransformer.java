@@ -1,6 +1,8 @@
 package net.madz.bcel;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -120,5 +122,11 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
         ClassGen doGenerate = c.doGenerate();
         doGenerate.getJavaClass().getBytes();
         MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);
+        // final String fileName = location
+        // + cgen.getClassName().replaceAll("\\.", File.separator)
+        // + ".class";
+        // FileOutputStream fos = new FileOutputStream(fileName);
+        // cgen.getJavaClass().dump(fos);
+        // fos.close();
     }
 }

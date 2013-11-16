@@ -15,16 +15,13 @@ public interface PlantResourceLifecycleMeta extends SchedulableLifecycleMeta {
 
         @Function(transition = Maintain.class, value = Maintaining.class)
         public static class Idle extends SchedulableLifecycleMeta.States.Idle {}
-
         @Function(transition = ConfirmMaintainOver.class, value = Idle.class)
         public static class Maintaining {}
     }
-
     @TransitionSet
     public static class Transitions extends SchedulableLifecycleMeta.Transitions {
 
         public static class Maintain {}
-
         public static class ConfirmMaintainOver {}
     }
 }

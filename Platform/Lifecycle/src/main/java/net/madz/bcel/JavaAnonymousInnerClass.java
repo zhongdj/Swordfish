@@ -41,7 +41,7 @@ public class JavaAnonymousInnerClass {
     private final Type[] interfaceClassTypeParameters;
     private final String thisClassName;
     private final String sourceFile;
-    private String location;
+    private final String location;
 
     public JavaAnonymousInnerClass(String outerClassName, String enclosingMethodName, Type[] enclosingMethodArguments, int innerClassSeq, String superClass,
             String interfaceClass) {

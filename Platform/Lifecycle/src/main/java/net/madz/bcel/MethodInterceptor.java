@@ -56,13 +56,15 @@ public class MethodInterceptor {
         final InstructionList ilist = new InstructionList();
         try {
             final MethodGen wrapMethodGen = new MethodGen(method, interceptingClass, constantPoolGen);
+            // wrapMethodGen.removeAttributes();
+            wrapMethodGen.removeCodeAttributes();
             wrapMethodGen.setInstructionList(ilist);
             final String innerClassName = createInterceptMethodCode(classGen, anonymousInnerClassSeq, interceptingClass, interceptingMethod, ifact, ilist,
                     constantPoolGen, method);
             // finalize the constructed method
             wrapMethodGen.stripAttributes(true);
-            wrapMethodGen.setMaxStack();
             wrapMethodGen.setMaxLocals();
+            wrapMethodGen.setMaxStack();
             classGen.addMethod(wrapMethodGen.getMethod());
             //
             processInnerClassesAttributes(classGen, classGen.getConstantPool(), innerClassName);
@@ -153,9 +155,8 @@ public class MethodInterceptor {
         /*
          * ilist.append(new LDC_W(interceptingMethodIndex));
          * ilist.append(ifact.createInvoke(InterceptContext.class.getName(),
-         * "<init>", Type.VOID,
-         * new Type[]{new ObjectType("java.lang.Class"), new
-         * ObjectType("java.lang.Object"), new
+         * "<init>", Type.VOID, new Type[]{new ObjectType("java.lang.Class"),
+         * new ObjectType("java.lang.Object"), new
          * ObjectType("java.lang.reflect.Method")}, Constants.INVOKESPECIAL));
          */
         final int contextIndex = localVariableSlotCursor;
@@ -260,7 +261,8 @@ public class MethodInterceptor {
                     // If C is anonymous (JLS 15.9.5), the value of the
                     // inner_name_index item must be zero.
                     0,
-                    // They should be set to zero in generated class files and
+                    // They should be set to zero in generated class
+                    // files and
                     // should be ignored by Java Virtual Machine
                     // implementations.
                     0) }, constantPoolGen.getConstantPool());

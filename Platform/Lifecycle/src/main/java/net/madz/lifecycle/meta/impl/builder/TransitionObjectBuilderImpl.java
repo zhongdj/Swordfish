@@ -48,10 +48,4 @@ public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObj
     public TransitionMetadata getMetaType() {
         return template;
     }
-
-    @Override
-    protected TransitionObject findSuper(Class<?> metaClass) throws VerificationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

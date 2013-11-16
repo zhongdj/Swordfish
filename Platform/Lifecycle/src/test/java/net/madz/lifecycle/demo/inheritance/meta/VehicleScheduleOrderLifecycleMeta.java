@@ -23,7 +23,7 @@ public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
         @Overrides
         @CompositeStateMachine
         public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {
-            
+
             @StateSet
             public static class SubStates {
 
@@ -38,11 +38,9 @@ public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
                 @ShortCut(Finished.class)
                 public static class Exit {}
             }
-            
-            
             @TransitionSet
             public static class SubTransitions extends OrderLifecycleMeta.Transitions {
-                
+
                 public static class DoTransport {}
                 public static class DoConstruct {}
             }

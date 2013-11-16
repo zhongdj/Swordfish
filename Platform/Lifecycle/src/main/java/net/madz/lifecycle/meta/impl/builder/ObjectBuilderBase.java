@@ -3,7 +3,9 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import net.madz.lifecycle.meta.instance.ConditionObject;
 import net.madz.meta.MetaData;
+import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
 public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends InheritableAnnotationMetaBuilderBase<SELF, PARENT> {
@@ -35,5 +37,15 @@ public abstract class ObjectBuilderBase<SELF extends MetaData, PARENT extends Me
             }
         }
         scanMethodsOnClasses(superclasses.toArray(new Class<?>[superclasses.size()]), failureSet, scanner);
+    }
+
+    @Override
+    public boolean hasSuper() {
+        return false;
+    }
+
+    @Override
+    protected SELF findSuper(Class<?> metaClass) throws VerificationException {
+        return null;
     }
 }

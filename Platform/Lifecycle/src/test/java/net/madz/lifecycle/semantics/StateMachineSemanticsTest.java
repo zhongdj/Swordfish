@@ -33,20 +33,13 @@ public class StateMachineSemanticsTest extends StateMachineSemanticsMetadata {
                 statesMap.put(state.getDottedPath(), state);
             }
             Assert.assertEquals("Expected 4 States in StateMachine", 4, allStates.length);
-            Assert.assertNotNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_E", statesMap));
-            Assert.assertNotNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_A", statesMap));
-            Assert.assertNotNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_C", statesMap));
-            Assert.assertNotNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_D", statesMap));
-            Assert.assertNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_A", statesMap));
-            Assert.assertNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_B", statesMap));
-            Assert.assertNull(findStateInStatesMap(
-                    "net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S2.StateSet.S2_A", statesMap));
+            Assert.assertNotNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_E", statesMap));
+            Assert.assertNotNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S3.StateSet.S3_A", statesMap));
+            Assert.assertNotNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_C", statesMap));
+            Assert.assertNotNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_D", statesMap));
+            Assert.assertNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_A", statesMap));
+            Assert.assertNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S1.StateSet.S1_B", statesMap));
+            Assert.assertNull(findStateInStatesMap("net.madz.lifecycle.semantics.StateMachineSemanticsMetadata$S2.StateSet.S2_A", statesMap));
         } catch (VerificationException e) {
             e.printStackTrace();
             fail("No exception expeced");

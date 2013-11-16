@@ -101,14 +101,10 @@ public class StandaloneLifecyclePureMetadataTest {
             assertNotNull(m.getDeclaredTransition(Finish.class.getName()));
             assertNotNull(m.getDeclaredTransition(Cancel.class.getName()));
             // Dotted Path Key Validation
-            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
-                    + Schedule.class.getSimpleName()));
-            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
-                    + Start.class.getSimpleName()));
-            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
-                    + Finish.class.getSimpleName()));
-            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet."
-                    + Cancel.class.getSimpleName()));
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet." + Schedule.class.getSimpleName()));
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet." + Start.class.getSimpleName()));
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet." + Finish.class.getSimpleName()));
+            assertNotNull(m.getDeclaredTransition(ServiceableLifecycleMeta.class.getName() + ".TransitionSet." + Cancel.class.getSimpleName()));
         }
         // Check 4 transition metadata
         {
@@ -117,9 +113,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertEquals(0, scheduleTransition.getTimeout());
             assertEquals(m, scheduleTransition.getParent());
             assertEquals(TransitionTypeEnum.Common, scheduleTransition.getType());
-            assertEquals(
-                    DottedPath
-                            .parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Schedule"),
+            assertEquals(DottedPath.parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Schedule"),
                     scheduleTransition.getDottedPath());
         }
         {
@@ -128,9 +122,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertEquals(0, startTransition.getTimeout());
             assertEquals(m, startTransition.getParent());
             assertEquals(TransitionTypeEnum.Common, startTransition.getType());
-            assertEquals(
-                    DottedPath.parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Start"),
-                    startTransition.getDottedPath());
+            assertEquals(DottedPath.parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Start"), startTransition.getDottedPath());
         }
         {
             final TransitionMetadata finishTransition = m.getDeclaredTransition(Finish.class);
@@ -138,10 +130,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertEquals(0, finishTransition.getTimeout());
             assertEquals(m, finishTransition.getParent());
             assertEquals(TransitionTypeEnum.Common, finishTransition.getType());
-            assertEquals(
-                    DottedPath
-                            .parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Finish"),
-                    finishTransition.getDottedPath());
+            assertEquals(DottedPath.parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Finish"), finishTransition.getDottedPath());
         }
         {
             final TransitionMetadata cancelTransition = m.getDeclaredTransition(Cancel.class);
@@ -149,10 +138,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertEquals(0, cancelTransition.getTimeout());
             assertEquals(m, cancelTransition.getParent());
             assertEquals(TransitionTypeEnum.Common, cancelTransition.getType());
-            assertEquals(
-                    DottedPath
-                            .parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Cancel"),
-                    cancelTransition.getDottedPath());
+            assertEquals(DottedPath.parse("net.madz.lifecycle.demo.standalone.ServiceableLifecycleMeta.TransitionSet.Cancel"), cancelTransition.getDottedPath());
         }
     }
 
@@ -164,8 +150,7 @@ public class StandaloneLifecyclePureMetadataTest {
         // Check 3 transition instances
         final TransitionObject[] transitionSet = stateMachineInst.getTransitionSet();
         assertEquals(4, transitionSet.length);
-        validateTranitionMethod(IServiceOrder.class, stateMachineInst, Schedule.class, "allocateResources", Long.TYPE,
-                Long.TYPE, Long.TYPE);
+        validateTranitionMethod(IServiceOrder.class, stateMachineInst, Schedule.class, "allocateResources", Long.TYPE, Long.TYPE, Long.TYPE);
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Start.class, "confirmStart");
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Finish.class, "confirmFinish");
         validateTranitionMethod(IServiceOrder.class, stateMachineInst, Cancel.class, "cancel");
@@ -184,24 +169,17 @@ public class StandaloneLifecyclePureMetadataTest {
         assertNotNull(m.getDeclaredState(Ongoing.class.getName()));
         assertNotNull(m.getDeclaredState(Finished.class.getName()));
         assertNotNull(m.getDeclaredState(Cancelled.class.getName()));
-        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                + Created.class.getSimpleName()));
-        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                + Queued.class.getSimpleName()));
-        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                + Ongoing.class.getSimpleName()));
-        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                + Finished.class.getSimpleName()));
-        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                + Cancelled.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Created.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Queued.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Ongoing.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Finished.class.getSimpleName()));
+        assertNotNull(m.getDeclaredState(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Cancelled.class.getSimpleName()));
         assertEquals(5, m.getDeclaredStateSet().length);
         assertEquals(m.getDeclaredState(Created.class), m.getInitialState());
         assertEquals(2, m.getFinalStates().length);
         assertTrue(m.getFinalStates()[0] != m.getFinalStates()[1]);
-        assertTrue(m.getFinalStates()[0] == m.getDeclaredState(Finished.class)
-                || m.getFinalStates()[0] == m.getDeclaredState(Cancelled.class));
-        assertTrue(m.getFinalStates()[1] == m.getDeclaredState(Finished.class)
-                || m.getFinalStates()[1] == m.getDeclaredState(Cancelled.class));
+        assertTrue(m.getFinalStates()[0] == m.getDeclaredState(Finished.class) || m.getFinalStates()[0] == m.getDeclaredState(Cancelled.class));
+        assertTrue(m.getFinalStates()[1] == m.getDeclaredState(Finished.class) || m.getFinalStates()[1] == m.getDeclaredState(Cancelled.class));
     }
 
     // //////////////////////////////////////////////////////////////////
@@ -221,9 +199,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertTrue(created.isInitial());
             assertFalse(created.isCompositeState());
             assertFalse(created.isFinal());
-            assertEquals(
-                    DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                            + Created.class.getSimpleName()), created.getDottedPath());
+            assertEquals(DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Created.class.getSimpleName()), created.getDottedPath());
             simpleStateValidation(m, created);
         }
         {
@@ -237,9 +213,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertFalse(queued.isInitial());
             assertFalse(queued.isCompositeState());
             assertFalse(queued.isFinal());
-            assertEquals(
-                    DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                            + Queued.class.getSimpleName()), queued.getDottedPath());
+            assertEquals(DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Queued.class.getSimpleName()), queued.getDottedPath());
             simpleStateValidation(m, queued);
         }
         {
@@ -253,9 +227,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertFalse(ongoing.isInitial());
             assertFalse(ongoing.isCompositeState());
             assertFalse(ongoing.isFinal());
-            assertEquals(
-                    DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                            + Ongoing.class.getSimpleName()), ongoing.getDottedPath());
+            assertEquals(DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Ongoing.class.getSimpleName()), ongoing.getDottedPath());
             simpleStateValidation(m, ongoing);
         }
         {
@@ -269,9 +241,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertFalse(finished.isInitial());
             assertFalse(finished.isCompositeState());
             assertTrue(finished.isFinal());
-            assertEquals(
-                    DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                            + Finished.class.getSimpleName()), finished.getDottedPath());
+            assertEquals(DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Finished.class.getSimpleName()), finished.getDottedPath());
             simpleStateValidation(m, finished);
         }
         {
@@ -285,9 +255,7 @@ public class StandaloneLifecyclePureMetadataTest {
             assertFalse(cancelled.isInitial());
             assertFalse(cancelled.isCompositeState());
             assertTrue(cancelled.isFinal());
-            assertEquals(
-                    DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet."
-                            + Cancelled.class.getSimpleName()), cancelled.getDottedPath());
+            assertEquals(DottedPath.parse(ServiceableLifecycleMeta.class.getName() + ".StateSet." + Cancelled.class.getSimpleName()), cancelled.getDottedPath());
             simpleStateValidation(m, cancelled);
         }
     }
@@ -351,9 +319,8 @@ public class StandaloneLifecyclePureMetadataTest {
         fail("Not implement Yet.");
     }
 
-    private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass,
-            final StateMachineObject stateMachineInst, final Class<?> transitionContainerClass,
-            final String expectMethodName, final Class<?>... argTypes) throws NoSuchMethodException {
+    private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass, final StateMachineObject stateMachineInst,
+            final Class<?> transitionContainerClass, final String expectMethodName, final Class<?>... argTypes) throws NoSuchMethodException {
         assertTrue(stateMachineInst.hasTransition(transitionContainerClass));
         final TransitionObject transition = stateMachineInst.getTransition(transitionContainerClass);
         final Method actualTransitionMethod = transition.getTransitionMethod();

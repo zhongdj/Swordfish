@@ -171,7 +171,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         String state;
 
         @Transition(S4.Transitions.X.class)
-        void tM1(@Relation(R1.class) PLM_R1_S x) {
+        void tM1(@Relation(S4.Relations.R1.class) PLM_R1_S x) {
             System.out.println(". print inside tM1 .");
         }
 

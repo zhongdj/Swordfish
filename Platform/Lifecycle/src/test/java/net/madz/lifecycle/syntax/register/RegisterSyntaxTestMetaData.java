@@ -24,39 +24,33 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
             @Initial
             @Function(transition = TransitionOne.class, value = StateB.class)
             static interface StateA {}
-
             @End
             static interface StateB {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             static interface TransitionOne {}
         }
     }
-
     @LifecycleMeta(CorrectStateMachineSyntax.class)
     protected static class CorrectLifecycleMetaSyntax {
 
         private String state;
 
         @Transition(TransitionOne.class)
-        public void foo() {
-        }
+        public void foo() {}
 
         public String getState() {
             return state;
         }
-        
+
         @SuppressWarnings("unused")
         private void setState(String stateName) {
             this.state = stateName;
         }
     }
-
     protected static class WithoutMetadataAnnotationErrorSyntax {}
-
     @StateMachine
     public static interface CorrectStateMachineInheritanceSuperSyntax {
 
@@ -66,21 +60,17 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
             @Initial
             @Function(transition = TransitionTwo.class, value = StateD.class)
             static interface StateC {}
-
             @End
             static interface StateD {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             static interface TransitionTwo {}
         }
     }
-
     @StateMachine
     public static interface CorrectStateMachineInheritanceChildSyntax extends CorrectStateMachineInheritanceSuperSyntax {}
-
     public static interface IncorrectStateMachineInheritanceSuperSyntax {
 
         @StateSet
@@ -89,21 +79,17 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
             @Initial
             @Function(transition = TransitionThree.class, value = StateF.class)
             static interface StateE {}
-
             @End
             static interface StateF {}
         }
-
         @TransitionSet
         static interface Transitions {
 
             static interface TransitionThree {}
         }
     }
-
     @StateMachine
     public static interface IncorrectStateMachineInheritanceChildSyntax extends IncorrectStateMachineInheritanceSuperSyntax {}
-
     @StateMachine
     public static interface IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax extends CorrectStateMachineInheritanceSuperSyntax,
             IncorrectStateMachineInheritanceSuperSyntax {}
@@ -113,7 +99,6 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
     }
 
     protected static interface WrongStateMachineSyntaxWithoutAnnotation {}
-
     @LifecycleMeta(WrongStateMachineSyntaxWithoutAnnotation.class)
     protected static class WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation {}
 }

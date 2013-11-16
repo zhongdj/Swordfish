@@ -13,22 +13,19 @@ import net.madz.lifecycle.demo.inheritance.meta.SchedulableLifecycleMeta.Transit
 public interface SchedulableLifecycleMeta {
 
     @StateSet
-    //abstract only indicate there is no final(@End) states definition
+    // abstract only indicate there is no final(@End) states definition
     public static abstract class States {
 
         @Initial
         @Functions({ @Function(transition = Assign.class, value = Busy.class) })
         public static class Idle {}
-
         @Function(transition = Release.class, value = Idle.class)
         public static class Busy {}
     }
-
     @TransitionSet
     public static class Transitions {
 
         public static class Assign {}
-
         public static class Release {}
     }
 }

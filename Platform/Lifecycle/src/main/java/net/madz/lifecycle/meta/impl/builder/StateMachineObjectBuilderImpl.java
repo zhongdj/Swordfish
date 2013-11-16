@@ -1146,10 +1146,4 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         TransitionMetadata transition = getMetaType().getTransition(transitionKey);
         return !transition.postValidate();
     }
-
-    @Override
-    protected StateMachineObject findSuper(Class<?> metaClass) throws VerificationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

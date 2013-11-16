@@ -24,8 +24,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR,
                     NNoDefaultStateIndicatorInterface.class);
             throw e;
         }
@@ -44,8 +43,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
                     NDefaultPublicStateSetterClass.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
@@ -64,8 +62,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
                     NDefaultStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
@@ -84,8 +81,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD,
                     NPublicStateFieldClass.class.getDeclaredField("state"));
             throw e;
         }
@@ -104,8 +100,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
                     NPublicStateSetterClass.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
@@ -124,8 +119,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER,
                     NPublicStateIndicatorInterface.class.getDeclaredMethod("setState", String.class));
             throw e;
         }
@@ -144,8 +138,7 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_SETTER_NOT_FOUND,
-                    NStateIndicatorSetterNotFound.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_SETTER_NOT_FOUND, NStateIndicatorSetterNotFound.class);
             throw e;
         }
     }
@@ -163,8 +156,8 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
-                    NNeedConverter.class, Integer.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND, NNeedConverter.class,
+                    Integer.class);
             throw e;
         }
     }
@@ -201,8 +194,8 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, NegativeMultipleStateIndicator.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR,
+                    NegativeMultipleStateIndicator.class);
             throw e;
         }
     }
@@ -220,8 +213,8 @@ public class StateIndicatorNegativeTest extends StateIndicatorMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(),
-                    SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, NegativeMultipleStateIndicatorChild.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR,
+                    NegativeMultipleStateIndicatorChild.class);
             throw e;
         }
     }

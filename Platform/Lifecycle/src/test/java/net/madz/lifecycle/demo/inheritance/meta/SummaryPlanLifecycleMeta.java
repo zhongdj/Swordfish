@@ -24,8 +24,7 @@ public interface SummaryPlanLifecycleMeta {
     @StateSet
     public static class States {
 
-        @Functions({
-                @Function(transition = CreateServiceOrder.class, value = { Ongoing.class, VolumeLeftEmpty.class }),
+        @Functions({ @Function(transition = CreateServiceOrder.class, value = { Ongoing.class, VolumeLeftEmpty.class }),
                 @Function(transition = ConfirmFinish.class, value = Done.class),
                 @Function(transition = AdjustTotalVolume.class, value = { Ongoing.class, VolumeLeftEmpty.class }) })
         @Initial

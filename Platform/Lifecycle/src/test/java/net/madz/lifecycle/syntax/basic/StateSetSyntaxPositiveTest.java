@@ -17,8 +17,7 @@ public class StateSetSyntaxPositiveTest extends StateSetSyntaxMetadata {
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
 
-            protected Registry() throws VerificationException {
-            }
+            protected Registry() throws VerificationException {}
         }
         try {
             new Registry();

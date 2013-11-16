@@ -1,4 +1,4 @@
-package net.madz.lifecycle.annotations.action;
+package net.madz.lifecycle.annotations.callback;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,11 +7,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Conditional {
+public @interface Callbacks {
 
-    Class<? extends ConditionalTransition<?>> judger();
+    PreStateChange[] preStateChange() default {};
 
-    boolean postEval() default false;
-
-    Class<?> condition();
+    PostStateChange[] postStateChange() default {};
 }

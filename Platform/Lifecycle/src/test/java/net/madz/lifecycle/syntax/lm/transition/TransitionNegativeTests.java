@@ -38,14 +38,11 @@ public class TransitionNegativeTests extends TransitionTestMetadata {
             next = iterator.next();
             errors.put(next.getErrorKey().getName(), next);
             assertFailure(errors.get("Inactivate"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
-                    NegativeProcess.class.getDeclaredMethod("inactivate", Integer.TYPE),
-                    Inactivate.class.getSimpleName(), TransitionTypeEnum.Corrupt);
+                    NegativeProcess.class.getDeclaredMethod("inactivate", Integer.TYPE), Inactivate.class.getSimpleName(), TransitionTypeEnum.Corrupt);
             assertFailure(errors.get("Activate"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
-                    NegativeProcess.class.getDeclaredMethod("activate", Integer.TYPE), Activate.class.getSimpleName(),
-                    TransitionTypeEnum.Recover);
+                    NegativeProcess.class.getDeclaredMethod("activate", Integer.TYPE), Activate.class.getSimpleName(), TransitionTypeEnum.Recover);
             assertFailure(errors.get("Restart"), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER,
-                    NegativeProcess.class.getDeclaredMethod("restart", Integer.TYPE), Restart.class.getSimpleName(),
-                    TransitionTypeEnum.Redo);
+                    NegativeProcess.class.getDeclaredMethod("restart", Integer.TYPE), Restart.class.getSimpleName(), TransitionTypeEnum.Redo);
             throw e;
         }
     }

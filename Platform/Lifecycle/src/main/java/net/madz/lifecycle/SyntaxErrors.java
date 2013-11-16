@@ -109,6 +109,10 @@ public interface SyntaxErrors {
     public static final String COMPOSITE_STATEMACHINE_SHORTCUT_WITHOUT_END = "002-2801";
     public static final String COMPOSITE_STATEMACHINE_FINAL_STATE_WITHOUT_SHORTCUT = "002-2802";
     public static final String COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID = "002-2803";
+    /**
+     * @param {0} composite state machine class
+     */
+    public static final String COMPOSITE_STATEMACHINE_CANNOT_EXTENDS_OWNING_STATEMACHINE = "002-2804";
     // State's Relation
     public static final String RELATION_INBOUNDWHILE_RELATION_NOT_DEFINED_IN_RELATIONSET = "002-2911";
     public static final String RELATION_ON_ATTRIBUTE_OF_INBOUNDWHILE_NOT_MATCHING_RELATION = "002-2912";

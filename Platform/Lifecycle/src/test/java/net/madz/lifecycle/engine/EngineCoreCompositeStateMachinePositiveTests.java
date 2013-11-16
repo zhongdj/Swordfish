@@ -104,17 +104,14 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
             assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Created.class, product);
             // Outer Transition
             product.start();
-            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.OrderCreated.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.OrderCreated.class, product);
         }
         {
             // Composite State + Composite Transition => Composite State
             product.doProduce();
-            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.Producing.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.Producing.class, product);
             product.doDeliver();
-            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.Delivering.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubStates.Delivering.class, product);
         }
         {
             // Composite State + Composite Transition => Composite Final State
@@ -139,17 +136,14 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
             assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Created.class, product);
             // Outer Transition
             product.start();
-            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.OrderCreated.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.OrderCreated.class, product);
         }
         {
             // Composite State + Composite Transition => Composite State
             product.doProduce();
-            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.Producing.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.Producing.class, product);
             product.doDeliver();
-            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.Delivering.class,
-                    product);
+            assertState(RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubStates.Delivering.class, product);
         }
         {
             // Composite State + Composite Transition => Composite Final State
@@ -278,7 +272,6 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
         assertState(SM1_Overrides.States.S3.class, object);
     }
 
-
     @Test
     public void test_overrides_relational_composite_state_machine_with_T1_Expired_contract() {
         final Contract contract = new Contract();
@@ -314,5 +307,4 @@ public class EngineCoreCompositeStateMachinePositiveTests extends EngineCoreComp
         object.doActionT2();
         assertState(SM1_Overrides.States.S3.class, object);
     }
-
 }
