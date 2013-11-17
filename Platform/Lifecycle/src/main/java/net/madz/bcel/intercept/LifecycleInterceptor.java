@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.LifecycleCommonErrors;
+import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.relation.Relation;
+import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
@@ -68,7 +71,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
             setNextState(stateMachine, context);
             performCallbacksAfterStateChange(stateMachine, context);
         } finally {
-            if ( isLockEnabled() ) {
+            if ( isLockEnabled(stateMachine) ) {
                 unlock(stateMachine, context);
             }
             fireLifecycleEvents(stateMachine, context);
@@ -77,16 +80,31 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void fireLifecycleEvents(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        final LifecycleEventHandler eventHandler = registry.getLifecycleEventHandler();
+        if ( null != eventHandler ) {
+            eventHandler.onEvent(new LifecycleEventImpl(context));
+        }
     }
 
     private void unlock(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        final LifecycleLockStrategry lockStrategry = context.getLockStrategry();
+        if ( null == lockStrategry ) {
+            return;
+        }
+        final Object targetReactiveObject = context.getTarget();
+        final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
+        final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
+        for ( Object relative : relativeObjects ) {
+            lockStrategry.unlockRelative(relative);
+        }
+        if ( null != parentReactiveObject ) {
+            lockStrategry.unlockParent(parentReactiveObject);
+        }
+        lockStrategry.unlock(targetReactiveObject);
     }
 
-    private boolean isLockEnabled() {
-        // TODO Auto-generated method stub
-        return false;
+    private boolean isLockEnabled(StateMachineObject stateMachine) {
+        return null != stateMachine.getLifecycleLockStrategy();
     }
 
     private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
@@ -129,7 +147,9 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     protected void preExec(InterceptContext<V> context) {
         super.preExec(context);
         final StateMachineObject stateMachine = lookupStateMachine(context);
-        if ( isLockEnabled() ) {
+        if ( isLockEnabled(stateMachine) ) {
+            final LifecycleLockStrategry lock = stateMachine.getLifecycleLockStrategy();
+            context.setLockStrategry(lock);
             lock(stateMachine, context);
         }
         validateStateValidWhiles(stateMachine, context);
@@ -158,7 +178,20 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void lock(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        final LifecycleLockStrategry lockStrategry = context.getLockStrategry();
+        if ( null == lockStrategry ) {
+            return;
+        }
+        final Object targetReactiveObject = context.getTarget();
+        final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
+        final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
+        lockStrategry.lock(targetReactiveObject);
+        if ( null != parentReactiveObject ) {
+            lockStrategry.lockParent(parentReactiveObject);
+        }
+        for ( Object relative : relativeObjects ) {
+            lockStrategry.lockRelative(relative);
+        }
     }
 
     // processRelations(context);

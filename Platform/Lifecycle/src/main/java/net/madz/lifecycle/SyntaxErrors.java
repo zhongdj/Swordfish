@@ -128,6 +128,50 @@ public interface SyntaxErrors {
     public static final String LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD = "002-3214";
     public static final String LM_MUST_CONCRETE_ALL_RELATIONS = "002-3220";
     /**
+     * @param {0} @LifecycleMeta Class
+     * @param {1} invalid relation instance
+     * @param {2} StateMachine
+     */
+    public static final String LM_REFERENCE_INVALID_RELATION_INSTANCE = "002-3221";
+    /**
+     * @param {0} @LifecycleMeta Class
+     * @param {1} relation instance
+     */
+    public static final String LM_RELATION_INSTANCE_MUST_BE_UNIQUE = "002-3222";
+    /**
+     * @param {0} method
+     * @param {1} @LifecycleMeta Class
+     * @param {2} relation
+     * @param {3} state
+     */
+    public static final String LM_RELATION_NOT_BE_CONCRETED = "002-3223";
+    /**
+     * @param {0} method
+     * 
+     */
+    public static final String LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE = "002-3224";
+    /**
+     * @param {0} @LifecycleMeta class
+     * @param {1} @StateMachine dottedPath
+     * @param {2} Condition Class
+     */
+    public static final String LM_CONDITION_NOT_COVERED = "002-3230";
+    /**
+     * @param {0} Method full qualified name
+     * @param {1} Invalid condition class
+     */
+    public static final String LM_CONDITION_REFERENCE_INVALID = "002-3231";
+    /**
+     * @param {0} @LifecycleMeta class
+     * @param {1} Condition class
+     */
+    public static final String LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION = "002-3232";
+    /**
+     * @param {0} Method class
+     * @param {1} Condition class
+     */
+    public static final String LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE = "002-3233";
+    /**
      * @param {0} class annotated with @LifecycleMeta
      */
     public static final String STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR = "002-3300";
@@ -184,47 +228,11 @@ public interface SyntaxErrors {
      */
     public static final String RELATION_NO_RELATED_TO_DEFINED = "002-3504";
     /**
-     * @param {0} @LifecycleMeta Class
-     * @param {1} invalid relation instance
-     * @param {2} StateMachine
+     * @param {0} Lifecycle Lock class
      */
-    public static final String LM_REFERENCE_INVALID_RELATION_INSTANCE = "002-3221";
+    public static final String LIFECYCLE_LOCK_SHOULD_HAVE_NO_ARGS_CONSTRUCTOR = "002-3600";
     /**
-     * @param {0} @LifecycleMeta Class
-     * @param {1} relation instance
+     * @param {0} Lifecycle Event Handler Class
      */
-    public static final String LM_RELATION_INSTANCE_MUST_BE_UNIQUE = "002-3222";
-    /**
-     * @param {0} method
-     * @param {1} @LifecycleMeta Class
-     * @param {2} relation
-     * @param {3} state
-     */
-    public static final String LM_RELATION_NOT_BE_CONCRETED = "002-3223";
-    /**
-     * @param {0} method
-     * 
-     */
-    public static final String LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE = "002-3224";
-    /**
-     * @param {0} @LifecycleMeta class
-     * @param {1} @StateMachine dottedPath
-     * @param {2} Condition Class
-     */
-    public static final String LM_CONDITION_NOT_COVERED = "002-3230";
-    /**
-     * @param {0} Method full qualified name
-     * @param {1} Invalid condition class
-     */
-    public static final String LM_CONDITION_REFERENCE_INVALID = "002-3231";
-    /**
-     * @param {0} @LifecycleMeta class
-     * @param {1} Condition class
-     */
-    public static final String LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION = "002-3232";
-    /**
-     * @param {0} Method class
-     * @param {1} Condition class
-     */
-    public static final String LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE = "002-3233";
+    public static final String LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR = "002-3601";
 }
