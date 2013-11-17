@@ -1,6 +1,8 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.meta.Inheritable;
@@ -11,12 +13,15 @@ import net.madz.verification.VerificationException;
 public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData, PARENT extends MetaData> extends AnnotationMetaBuilderBase<SELF, PARENT>
         implements AnnotationMetaBuilder<SELF, PARENT>, Inheritable<SELF> {
 
+    private static Logger logger = Logger.getLogger("Lifecycle Framework");
     private SELF superMeta;
     private boolean overriding;
 
     protected InheritableAnnotationMetaBuilderBase(PARENT parent, String name) {
         super(parent, name);
-        System.out.println(getDottedPath().getAbsoluteName());
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine(getDottedPath().getAbsoluteName());
+        }
     }
 
     @Override

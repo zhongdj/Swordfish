@@ -1,9 +1,12 @@
 package net.madz.bcel.intercept;
 
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class Interceptor<V> {
 
+    private static final Logger logger = Logger.getLogger("Lifecycle Framework");
     private Interceptor<V> next;
 
     public Interceptor() {}
@@ -13,36 +16,44 @@ public abstract class Interceptor<V> {
         this.next = next;
     }
 
-    public V intercept(InterceptContext<V> context, Callable<V> callable) {
+    public V intercept(InterceptContext<V> context, Callable<V> callable) throws Throwable {
         try {
             preExec(context);
             V result = next.intercept(context, callable);
             postExec(context);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             handleException(e);
-            throw new IllegalStateException(e);
+            throw e;
         } finally {
             cleanup(context);
         }
     }
 
-    protected void handleException(Exception e) {
+    protected void handleException(Throwable e) {
         if ( e instanceof RuntimeException ) {
             throw (RuntimeException) e;
         }
-        System.out.println("intercepting with :" + getClass().getName() + " @handleException");
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("intercepting with:" + getClass().getName() + " @handleException");
+        }
     }
 
     protected void cleanup(InterceptContext<V> context) {
-        System.out.println("intercepting with :" + getClass().getName() + " @cleanup");
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("intercepting with :" + getClass().getName() + " @cleanup");
+        }
     }
 
     protected void postExec(InterceptContext<V> context) {
-        System.out.println("intercepting with :" + getClass().getName() + " @postExec");
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("intercepting with :" + getClass().getName() + " @postExec");
+        }
     }
 
     protected void preExec(InterceptContext<V> context) {
-        System.out.println("intercepting with :" + getClass().getName() + " @preExec");
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("intercepting with :" + getClass().getName() + " @preExec");
+        }
     }
 }

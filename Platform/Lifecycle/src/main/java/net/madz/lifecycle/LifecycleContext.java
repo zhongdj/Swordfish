@@ -8,6 +8,8 @@ public interface LifecycleContext<T, S> {
 
     S getFromState();
 
+    S getToState();
+
     S[] getPossibleToStates();
 
     Method getTransitionMethod();

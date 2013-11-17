@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.madz.common.Dumper;
@@ -25,6 +26,8 @@ import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;
 
 public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
+
+    private static Logger logger = Logger.getLogger("Lifecycle Framework");
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -49,7 +52,6 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         Class<? extends StateMachineMetaBuilder> value() default StateMachineMetaBuilderImpl.class;
     }
 
-    protected static final Logger logger = Logger.getLogger(AbsStateMachineRegistry.class.getName());
     /**
      * The key might be class object as:
      * The life cycle interface itself that has a @StateMachine,
@@ -90,7 +92,9 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     }
 
     public void registerLifecycleMeta(final Class<?> clazz) throws VerificationException {
-        System.out.println("registering .. " + clazz);
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("registering .. " + clazz);
+        }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         registerLifecycleMeta(failureSet, clazz);
         if ( failureSet.size() > 0 ) {

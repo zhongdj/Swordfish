@@ -1,8 +1,6 @@
 package net.madz.bcel;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
@@ -25,7 +23,7 @@ import org.apache.bcel.generic.Type;
 
 public class BCELClassFileTransformer implements ClassFileTransformer {
 
-    private static final Logger log = Logger.getLogger(BCELClassFileTransformer.class.getName());
+    private static final Logger log = Logger.getLogger("Lifecycle Framework Byte Code Transformer");
     public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/") + ";";
     public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L" + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
     private String[] ignoredPackages = new String[] { "java.", "javax.", "sun." };
@@ -105,13 +103,17 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
      */
     public static void premain(String options, Instrumentation ins) {
         // 注册我自己的字节码转换器
-        System.out.println("======================premain==========================");
+        if ( log.isLoggable(Level.FINE) ) {
+            log.fine("======================premain==========================");
+        }
         ins.addTransformer(new BCELClassFileTransformer());
     }
 
     public static void agentmain(String args, Instrumentation inst) {
         // 注册我自己的字节码转换器
-        System.out.println("======================agentmain==========================");
+        if ( log.isLoggable(Level.FINE) ) {
+            log.fine("======================agentmain==========================");
+        }
         inst.addTransformer(new BCELClassFileTransformer());
     }
 

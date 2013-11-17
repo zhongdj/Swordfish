@@ -2,14 +2,18 @@ package net.madz.bcel.intercept;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.util.StringUtil;
 
 public class InterceptContext<V> {
 
+    private static Logger logger = Logger.getLogger("Lifecycle Framework");
     private final Annotation[] annotation;
     private final Class<?> klass;
     private final Method method;
@@ -22,6 +26,7 @@ public class InterceptContext<V> {
     private Throwable failureCause;
     private long startTime;
     private long endTime;
+    private TransitionTypeEnum transitionType;
 
     public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType, Object[] arguments) {
         super();
@@ -38,8 +43,11 @@ public class InterceptContext<V> {
         for ( Object o : this.arguments ) {
             sb.append(String.valueOf(o)).append(" ");
         }
-        System.out.println("Found Intercept Point: " + klass + "." + methodName + "( " + sb.toString() + " )");
-        System.out.println("Intercepting....instatiating InterceptContext ...");
+        startTime = System.currentTimeMillis();
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("Found Intercept Point: " + klass + "." + methodName + "( " + sb.toString() + " )");
+            logger.fine("Intercepting....instatiating InterceptContext ...");
+        }
     }
 
     public String getFromState() {
@@ -50,11 +58,11 @@ public class InterceptContext<V> {
         this.fromState = fromState;
     }
 
-    public String getNextState() {
+    public String getToState() {
         return nextState;
     }
 
-    public void setNextState(String nextState) {
+    public void setToState(String nextState) {
         this.nextState = nextState;
     }
 
@@ -86,8 +94,8 @@ public class InterceptContext<V> {
         return endTime;
     }
 
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
+    public void end() {
+        this.endTime = System.currentTimeMillis();
     }
 
     public Object[] getArguments() {
@@ -137,5 +145,13 @@ public class InterceptContext<V> {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public TransitionTypeEnum getTransitionType() {
+        return transitionType;
+    }
+
+    public void setTransitionType(TransitionTypeEnum transitionType) {
+        this.transitionType = transitionType;
     }
 }

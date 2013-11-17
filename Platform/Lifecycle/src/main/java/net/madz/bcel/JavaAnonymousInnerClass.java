@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.bcel.Constants;
 import org.apache.bcel.Repository;
@@ -30,6 +32,7 @@ import org.apache.bcel.verifier.statics.StringRepresentation;
 
 public class JavaAnonymousInnerClass {
 
+    private static final Logger logger = Logger.getLogger("Lifecycle Framework Byte Code Transformer");
     private static final String POSTFIX = "$Impl";
     private final String outerClassName;
     private final String enclosingMethodName;
@@ -101,7 +104,9 @@ public class JavaAnonymousInnerClass {
         }
         // Dump
         StringRepresentation visitor = new StringRepresentation(cgen.getJavaClass());
-        System.out.println(visitor.toString());
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine(visitor.toString());
+        }
         try {
             final String path = this.location + thisClassName.replaceAll("\\.", File.separator) + ".class";
             cgen.getJavaClass().dump(path);
@@ -302,8 +307,6 @@ public class JavaAnonymousInnerClass {
     }
 
     private void createField(String fieldName, String signature, ClassGen cgen) {
-        System.out.println(fieldName);
-        System.out.println(signature);
         Type type = null;
         if ( "this$0".equals(fieldName) ) {
             type = new ObjectType(this.outerClassName);
