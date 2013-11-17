@@ -3,6 +3,7 @@ package net.madz.bcel.intercept;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.util.StringUtil;
@@ -14,6 +15,7 @@ public class InterceptContext<V> {
     private final Method method;
     private final Object target;
     private final Object[] arguments;
+    private LifecycleLockStrategry lockStrategry;
     private String fromState;
     private String nextState;
     private String transition;
@@ -106,6 +108,14 @@ public class InterceptContext<V> {
 
     public Object getTarget() {
         return target;
+    }
+
+    public LifecycleLockStrategry getLockStrategry() {
+        return lockStrategry;
+    }
+
+    public void setLockStrategry(LifecycleLockStrategry lockStrategry) {
+        this.lockStrategry = lockStrategry;
     }
 
     public Object getTranstionKey() {

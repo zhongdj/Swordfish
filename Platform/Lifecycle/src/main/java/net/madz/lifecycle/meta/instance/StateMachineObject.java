@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
@@ -190,4 +191,10 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
     void validateInboundWhiles(Object target, Object transtionKey);
 
     boolean evaluateConditionBeforeTransition(Object transtionKey);
+
+    LifecycleLockStrategry getLifecycleLockStrategy();
+
+    Object evaluateParent(Object target);
+
+    Object[] evaluateRelatives(Object target);
 }

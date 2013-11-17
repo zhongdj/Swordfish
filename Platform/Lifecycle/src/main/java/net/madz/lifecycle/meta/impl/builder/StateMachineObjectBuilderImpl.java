@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
+import net.madz.lifecycle.annotations.LifecycleLock;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
@@ -59,6 +61,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     private final HashMap<Object, StateObject> stateMap = new HashMap<>();
     private final ArrayList<StateObject> stateList = new ArrayList<>();
     private final HashMap<Object, ReadAccessor<?>> relationObjectsMap = new HashMap<>();
+    private LifecycleLockStrategry lifecycleLockStrategry;
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
@@ -77,7 +80,19 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         configureTransitionObjects(klass);
         configureStateObjects(klass);
         configureRelationObject(klass);
+        configureLifecycleLock(klass);
         return this;
+    }
+
+    private void configureLifecycleLock(Class<?> klass) throws VerificationException {
+        final LifecycleLock annotation = klass.getAnnotation(LifecycleLock.class);
+        if ( annotation != null ) {
+            try {
+                this.lifecycleLockStrategry = annotation.value().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw newVerificationException(getDottedPath(), SyntaxErrors.LIFECYCLE_LOCK_SHOULD_HAVE_NO_ARGS_CONSTRUCTOR, annotation.value());
+            }
+        }
     }
 
     private void configureRelationObject(Class<?> klass) throws VerificationException {
@@ -1145,5 +1160,22 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     public boolean evaluateConditionBeforeTransition(Object transitionKey) {
         TransitionMetadata transition = getMetaType().getTransition(transitionKey);
         return !transition.postValidate();
+    }
+
+    @Override
+    public LifecycleLockStrategry getLifecycleLockStrategy() {
+        return this.lifecycleLockStrategry;
+    }
+
+    @Override
+    public Object evaluateParent(Object target) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Object[] evaluateRelatives(Object target) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
