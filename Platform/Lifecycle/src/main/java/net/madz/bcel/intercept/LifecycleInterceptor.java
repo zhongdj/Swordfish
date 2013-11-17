@@ -99,7 +99,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void validateNextStateInboundWhile(StateMachineObject stateMachine, InterceptContext<V> context) {
-        stateMachine.validateInboundWhiles(context.getTarget(), context.getTranstionKey());
+        stateMachine.validateInboundWhiles(context);
     }
 
     private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject stateMachine, InterceptContext<V> context) {
@@ -154,7 +154,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void validateStateValidWhiles(StateMachineObject stateMachine, InterceptContext<V> context) {
-        stateMachine.validateValidWhiles(context.getTarget());
+        stateMachine.validateValidWhiles(context);
     }
 
     private void lock(StateMachineObject stateMachine, InterceptContext<V> context) {

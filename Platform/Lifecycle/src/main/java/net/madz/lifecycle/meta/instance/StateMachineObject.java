@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
@@ -185,9 +186,9 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     String getNextState(Object target, Object transtionKey);
 
-    void validateValidWhiles(Object target);
+    void validateValidWhiles(final InterceptContext context);
 
-    void validateInboundWhiles(Object target, Object transtionKey);
+    void validateInboundWhiles(final InterceptContext context);
 
     boolean evaluateConditionBeforeTransition(Object transtionKey);
 }
