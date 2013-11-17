@@ -14,7 +14,7 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.relation.RelationSyntaxMetadata.POwningStateMachine.Transitions.OwningX;
@@ -487,7 +487,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
 
             @Parent
             @RelateTo(RelatedSM.class)
-            @Overrides
+            @LifecycleOverride
             static interface PCR {}
         }
     }
@@ -577,7 +577,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
                 static interface CRelations {
 
                     @Parent
-                    @Overrides
+                    @LifecycleOverride
                     // It's illegal whether overrides or not
                     @RelateTo(RelatedSM.class)
                     static interface NCR {}

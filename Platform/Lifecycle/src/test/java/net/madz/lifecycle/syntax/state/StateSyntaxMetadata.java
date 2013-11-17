@@ -12,7 +12,7 @@ import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CTransitions.NCS2_CX;
@@ -467,7 +467,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
 
             @Initial
             @Functions({ @Function(transition = Multiple_Function_Referring_Same_Transition_Super.Transitions.X.class, value = Ended.class) })
-            @Overrides
+            @LifecycleOverride
             static interface Created extends Multiple_Function_Referring_Same_Transition_Super.States.Created {}
         }
     }
@@ -498,7 +498,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         static interface States extends CorrectBase.States {
 
             @Initial
-            @Overrides
+            @LifecycleOverride
             @Function(transition = CorrectBase.Transitions.X.class, value = CorrectBase.States.B.class)
             static interface A {}
         }
@@ -511,7 +511,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         @StateSet
         static interface States extends CorrectBase.States {
 
-            @Overrides
+            @LifecycleOverride
             // Should define another @Initial state or add @Initial to this
             // @Initial State
             static interface A extends CorrectBase.States.A {}

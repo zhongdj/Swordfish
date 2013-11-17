@@ -20,7 +20,7 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.CustomerLifecycleMeta.States.Draft;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.InternetTVServiceLifecycle.Relations.TVProvider;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft;
@@ -289,7 +289,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         static interface States extends InternetServiceLifecycleMeta.States {
 
             @Initial
-            @Overrides
+            @LifecycleOverride
             @ValidWhile(relation = VOIPServiceLifecycleMeta.Relations.VoipProvider.class, on = VOIPProviderLifecycleMeta.States.ServiceAvailable.class)
             @Function(transition = VOIPServiceLifecycleMeta.Transitions.Start.class, value = { VOIPServiceLifecycleMeta.States.InService.class })
             static interface New extends InternetServiceLifecycleMeta.States.New {}
@@ -588,7 +588,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @TransitionSet
         static interface Transitions extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions {
 
-            @Overrides
+            @LifecycleOverride
             @Conditional(condition = KeyBoardLifecycleMetadataPreValidateCondition.Conditions.TimesLeft.class, judger = ConditionJudgerImpl.class,
                     postEval = true)
             static interface PressAnyKey extends KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey {}

@@ -11,7 +11,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.lm.stateindicator.StateIndicatorMetadata.PS1.Transitions.S1_X;
 
@@ -287,7 +287,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
     static interface PositiveMultipleStateIndicatorChild extends PositiveMultipleStateIndicatorSuper {
 
         @StateIndicator
-        @Overrides
+        @LifecycleOverride
         String getStateY();
     }
     @LifecycleMeta(PS1.class)

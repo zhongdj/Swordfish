@@ -14,7 +14,7 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.verification.VerificationException;
 
@@ -509,7 +509,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
 
             @Initial
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S1.class)
-            @Overrides
+            @LifecycleOverride
             static interface S0 extends SM2.States.S0 {}
             @CompositeStateMachine
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S2.class)
@@ -587,12 +587,12 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
 
             @Initial
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S1.class)
-            @Overrides
+            @LifecycleOverride
             static interface S0 extends SM2.States.S0 {}
             @CompositeStateMachine
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S2.class)
             @ValidWhile(relation = SM1_Overrides.Relations.R2.class, on = { ContractLifecycle.States.Draft.class })
-            @Overrides
+            @LifecycleOverride
             static interface S1 extends SM2.States.S1 {
 
                 @StateSet
@@ -620,7 +620,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             }
             @CompositeStateMachine
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S3.class)
-            @Overrides
+            @LifecycleOverride
             static interface S2 extends SM2.States.S2 {
 
                 @StateSet

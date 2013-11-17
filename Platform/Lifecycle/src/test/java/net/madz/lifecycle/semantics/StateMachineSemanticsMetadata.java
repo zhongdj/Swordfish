@@ -7,7 +7,7 @@ import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.semantics.StateMachineSemanticsMetadata.S1.Transitions.S1_X;
 import net.madz.lifecycle.semantics.StateMachineSemanticsMetadata.S1.Transitions.S1_Y;
@@ -49,10 +49,10 @@ public class StateMachineSemanticsMetadata {
         public static interface States extends S1.States {
 
             @Initial
-            @Overrides
+            @LifecycleOverride
             @Function(transition = S2_Z.class, value = { S1_C.class })
             public static interface S2_A extends S1.States.S1_A {}
-            @Overrides
+            @LifecycleOverride
             @CompositeStateMachine
             public static interface S2_B extends S1.States.S1_B {
 
@@ -86,7 +86,7 @@ public class StateMachineSemanticsMetadata {
         public static interface States extends S2.States {
 
             @Initial
-            @Overrides
+            @LifecycleOverride
             @Function(transition = S3_Z.class, value = { S1_D.class })
             public static interface S3_A extends S2_A {}
             @CompositeStateMachine

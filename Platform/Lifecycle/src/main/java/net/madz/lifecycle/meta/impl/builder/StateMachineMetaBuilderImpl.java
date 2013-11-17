@@ -21,7 +21,7 @@ import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
@@ -325,7 +325,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
             } else if ( hasParent(relationClass) ) {
                 hasParentRelation = true;
                 if ( hasSuper() ) {
-                    if ( getSuper().hasParent() && null == relationClass.getAnnotation(Overrides.class) ) {
+                    if ( getSuper().hasParent() && null == relationClass.getAnnotation(LifecycleOverride.class) ) {
                         throw newVerificationException(getDottedPath(), SyntaxErrors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
                                 clazz, getSuperMetaClass(clazz));
                     }
@@ -374,7 +374,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     private void verifyStateClassBasic(Class<?> klass) throws VerificationException {
-        if ( null != klass.getAnnotation(Overrides.class) ) {
+        if ( null != klass.getAnnotation(LifecycleOverride.class) ) {
             if ( klass.isInterface() ) {
                 if ( 0 >= klass.getInterfaces().length ) {
                     throw newVerificationException(getDottedPath() + ".StateSet." + klass.getSimpleName(), SyntaxErrors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS,

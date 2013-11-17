@@ -7,7 +7,7 @@ import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.state.End;
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.scheduling.meta.OrderLifecycleMeta.Transitions.Finish;
 import net.madz.scheduling.meta.PlantScheduleOrderLifecycleMeta.Relations.ServiceOrder;
 
@@ -22,7 +22,7 @@ public interface PlantScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
 
         @InboundWhile(on = { ServiceOrderLifecycleMeta.States.Ongoing.class }, relation = ServiceOrder.class)
         @Function(transition = Finish.class, value = { Finished.class })
-        @Overrides
+        @LifecycleOverride
         public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {}
 
         @End

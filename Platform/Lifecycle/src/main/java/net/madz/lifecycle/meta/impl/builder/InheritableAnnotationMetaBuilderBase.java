@@ -2,7 +2,7 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 
-import net.madz.lifecycle.annotations.state.Overrides;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.meta.Inheritable;
 import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
 import net.madz.meta.MetaData;
@@ -59,7 +59,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
     protected void verifySuper(Class<?> metaClass) throws VerificationException {}
 
     protected boolean hasOverrides(Class<?> metaClass) {
-        return null != metaClass.getAnnotation(Overrides.class);
+        return null != metaClass.getAnnotation(LifecycleOverride.class);
     }
 
     protected abstract SELF findSuper(Class<?> metaClass) throws VerificationException;
