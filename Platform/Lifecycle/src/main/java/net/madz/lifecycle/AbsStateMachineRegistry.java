@@ -62,6 +62,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     protected final HashMap<Object, StateMachineObject> instanceMap = new HashMap<>();
     private final LifecycleRegistry lifecycleRegistry;
     private final StateMachineBuilder builderMeta;
+    private LifecycleEventHandler lifecycleEventHandler;
 
     protected AbsStateMachineRegistry() throws VerificationException {
         lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
@@ -99,34 +100,41 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     }
 
     private void registerLifecycleMeta(final VerificationFailureSet failureSet, Class<?> clazz) throws VerificationException {
-        {
-            if ( null != clazz.getAnnotation(StateMachine.class) ) {
-                if ( isRegistered(clazz) ) {
-                    return;
-                }
-                createStateMachineMetaBuilder(clazz, null, failureSet);
-            } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
-                final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
-                final StateMachineMetadata metaData;
-                if ( !isRegistered(stateMachineClass) ) {
-                    metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
-                } else {
-                    metaData = loadStateMachineMetadata(stateMachineClass);
-                }
-                if ( null == metaData ) {
-                    // Failed to create State machine Meta Builder will return
-                    // null.
-                    return;
-                }
-                if ( null == getStateMachineInst(clazz) ) {
-                    StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
-                    stateMachineInstance.verifyMetaData(failureSet);
-                    addInstance(clazz, stateMachineInstance);
-                }
-            } else {
-                final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error", SyntaxErrors.REGISTERED_META_ERROR, clazz);
-                failureSet.add(new VerificationFailure(this, getClass().getName(), SyntaxErrors.REGISTERED_META_ERROR, errorMessage));
+        if ( LifecycleEventHandler.class.isAssignableFrom(clazz) ) {
+            try {
+                this.lifecycleEventHandler = (LifecycleEventHandler) clazz.newInstance();
+            } catch (Exception e) {
+                final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error",
+                        SyntaxErrors.LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR, clazz);
+                throw new VerificationException(new VerificationFailure(this, getClass().getName(),
+                        SyntaxErrors.LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR, errorMessage));
             }
+        } else if ( null != clazz.getAnnotation(StateMachine.class) ) {
+            if ( isRegistered(clazz) ) {
+                return;
+            }
+            createStateMachineMetaBuilder(clazz, null, failureSet);
+        } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
+            final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
+            final StateMachineMetadata metaData;
+            if ( !isRegistered(stateMachineClass) ) {
+                metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
+            } else {
+                metaData = loadStateMachineMetadata(stateMachineClass);
+            }
+            if ( null == metaData ) {
+                // Failed to create State machine Meta Builder will return
+                // null.
+                return;
+            }
+            if ( null == getStateMachineInst(clazz) ) {
+                StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
+                stateMachineInstance.verifyMetaData(failureSet);
+                addInstance(clazz, stateMachineInstance);
+            }
+        } else {
+            final String errorMessage = BundleUtils.getBundledMessage(getClass(), "syntax_error", SyntaxErrors.REGISTERED_META_ERROR, clazz);
+            failureSet.add(new VerificationFailure(this, getClass().getName(), SyntaxErrors.REGISTERED_META_ERROR, errorMessage));
         }
     }
 
@@ -244,5 +252,9 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
             }
             throw new IllegalStateException(t);
         }
+    }
+
+    public LifecycleEventHandler getLifecycleEventHandler() {
+        return this.lifecycleEventHandler;
     }
 }

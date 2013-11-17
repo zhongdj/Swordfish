@@ -231,4 +231,8 @@ public interface SyntaxErrors {
      * @param {0} Lifecycle Lock class
      */
     public static final String LIFECYCLE_LOCK_SHOULD_HAVE_NO_ARGS_CONSTRUCTOR = "002-3600";
+    /**
+     * @param {0} Lifecycle Event Handler Class
+     */
+    public static final String LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR = "002-3601";
 }

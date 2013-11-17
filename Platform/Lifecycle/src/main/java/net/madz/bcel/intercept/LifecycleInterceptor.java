@@ -9,9 +9,11 @@ import java.util.logging.Logger;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.LifecycleCommonErrors;
+import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.relation.Relation;
+import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
@@ -78,7 +80,10 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void fireLifecycleEvents(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        final LifecycleEventHandler eventHandler = registry.getLifecycleEventHandler();
+        if ( null != eventHandler ) {
+            eventHandler.onEvent(new LifecycleEventImpl(context));
+        }
     }
 
     private void unlock(StateMachineObject stateMachine, InterceptContext<V> context) {
