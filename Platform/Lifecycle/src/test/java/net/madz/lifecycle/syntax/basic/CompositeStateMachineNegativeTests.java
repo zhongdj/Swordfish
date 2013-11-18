@@ -1,9 +1,9 @@
 package net.madz.lifecycle.syntax.basic;
 
 import net.madz.lifecycle.AbsStateMachineRegistry;
-import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeStateMachine;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -16,8 +16,6 @@ import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 public class CompositeStateMachineNegativeTests extends BaseMetaDataTest {
 
