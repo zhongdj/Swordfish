@@ -17,7 +17,6 @@ import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
-import net.madz.lifecycle.annotations.callback.AnyState;
 import net.madz.lifecycle.annotations.callback.PostStateChange;
 import net.madz.lifecycle.annotations.callback.PreStateChange;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
@@ -470,7 +469,6 @@ public class CallbackTestMetadata extends EngineTestBase {
         protected int count = 0;
 
         public OrderObject() {
-            super();
             initialState(OrderStateMachine.States.New.class.getSimpleName());
         }
 
@@ -533,10 +531,6 @@ public class CallbackTestMetadata extends EngineTestBase {
         @Transition
         public void cancel() {}
 
-        public BigProductOrderObjectWithOverridesCallbackDefinition() {
-            initialState(BigProductOrderStateMachine.States.New.class.getSimpleName());
-        }
-
         /**
          * Use case 2: overrides the call back definition on the
          * overridden state "Delivered".<br/>
@@ -558,4 +552,3 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
 }
-
