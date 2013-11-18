@@ -235,4 +235,9 @@ public interface SyntaxErrors {
      * @param {0} Lifecycle Event Handler Class
      */
     public static final String LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR = "002-3601";
+    /**
+     * @param {0} To state
+     * @param {1} Method
+     */
+    public static final String PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID = "002-3700";
 }
