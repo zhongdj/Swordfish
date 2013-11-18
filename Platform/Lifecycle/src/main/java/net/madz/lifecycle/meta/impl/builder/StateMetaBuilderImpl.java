@@ -442,6 +442,18 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         StateMetadata stateMetadata = null;
         for ( StateMachineMetadata sm = stateMachine; sm != null && null == stateMetadata; sm = sm.getSuper() ) {
             stateMetadata = sm.getDeclaredState(stateCandidateClass);
+            if ( null == stateMetadata ) {
+                for ( StateMachineMetadata compositeStateMachine : stateMachine.getCompositeStateMachines() ) {
+                    stateMetadata = findStateMetadata(stateCandidateClass, compositeStateMachine);
+                    if ( null != stateMetadata ) {
+                        return stateMetadata;
+                    } else {
+                        continue;
+                    }
+                }
+            } else {
+                return stateMetadata;
+            }
         }
         return stateMetadata;
     }
