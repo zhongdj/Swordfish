@@ -643,18 +643,18 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     @Override
-    public boolean hasRelation(Class<?> relationClass) {
-        if ( this.relationMetadataMap.containsKey(relationClass) ) {
+    public boolean hasRelation(Object relationKey) {
+        if ( this.relationMetadataMap.containsKey(relationKey) ) {
             return true;
         }
         for ( StateMachineMetaBuilder builder : getCompositeStateMachines() ) {
-            if ( builder.hasRelation(relationClass) ) {
+            if ( builder.hasRelation(relationKey) ) {
                 return true;
             }
         }
         if ( !isComposite() || ( !isComposite() && getOwningStateMachine().equals(getSuper()) ) ) {
             if ( null != getSuper() ) {
-                if ( getSuper().hasRelation(relationClass) ) {
+                if ( getSuper().hasRelation(relationKey) ) {
                     return true;
                 }
             }
@@ -858,7 +858,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     @Override
-    public RelationMetadata getRelationMetadata(Class<?> metaClass) {
-        return this.relationMetadataMap.get(metaClass);
+    public RelationMetadata getRelationMetadata(Object relationKey) {
+        return this.relationMetadataMap.get(relationKey);
     }
 }
