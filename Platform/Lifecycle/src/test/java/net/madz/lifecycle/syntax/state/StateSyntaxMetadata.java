@@ -394,6 +394,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
                     @ShortCut(NCS4_C.class)
                     static interface NCS4_CC {}
                     @End
+                    @ShortCut(NCS4_C.class)
                     static interface NCS4_CD {}
                 }
                 @TransitionSet
