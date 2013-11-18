@@ -198,4 +198,8 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
     Object evaluateParent(Object target);
 
     Object[] evaluateRelatives(Object target);
+
+    StateMachineObject getParentStateMachine();
+
+    StateMachineObject getRelatedStateMachine(Class<?> relativeClass);
 }

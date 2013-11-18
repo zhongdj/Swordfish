@@ -23,14 +23,14 @@ public abstract class Interceptor<V> {
             postExec(context);
             return result;
         } catch (Throwable e) {
-            handleException(e);
+            handleException(context, e);
             throw e;
         } finally {
             cleanup(context);
         }
     }
 
-    protected void handleException(Throwable e) {
+    protected void handleException(InterceptContext<V> context, Throwable e) {
         if ( e instanceof RuntimeException ) {
             throw (RuntimeException) e;
         }

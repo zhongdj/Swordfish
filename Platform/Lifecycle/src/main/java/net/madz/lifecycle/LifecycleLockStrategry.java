@@ -2,15 +2,11 @@ package net.madz.lifecycle;
 
 public interface LifecycleLockStrategry {
 
-    void lock(Object reactiveObject);
+    void lockRead(Object reactiveObject);
 
-    void lockParent(Object parentReactiveObject);
+    void unlockRead(Object targetReactiveObject);
 
-    void lockRelative(Object relatedReactiveObject);
+    void lockWrite(Object reactiveObject);
 
-    void unlock(Object targetReactiveObject);
-
-    void unlockParent(Object parentReactiveObject);
-
-    void unlockRelative(Object relative);
+    void unlockWrite(Object targetReactiveObject);
 }

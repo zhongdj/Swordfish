@@ -53,6 +53,12 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @Override
+    protected void handleException(InterceptContext<V> context, Throwable e) {
+        context.setFailureCause(e);
+        super.handleException(context, e);
+    }
+
+    @Override
     protected void preExec(InterceptContext<V> context) {
         super.preExec(context);
         final StateMachineObject stateMachine = lookupStateMachine(context);
@@ -73,7 +79,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         validateStateValidWhiles(stateMachine, context);
         // 2. Validate Transition validity
         if ( logger.isLoggable(Level.FINE) ) {
-            logger.fine("\tStep 2. start validating transition: [" + context.getTransition() + "] on state: [" + context.getFromState() + "]");
+            logger.fine("\tStep 2. start validating transition: [" + context.getTransitionKey() + "] on state: [" + context.getFromState() + "]");
         }
         validateTransition(stateMachine, context);
         // 3. Validate in-bound Relation constraint if next state is predictable
@@ -117,6 +123,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
                 logger.fine("\tStep 7. Start Callback after state change.");
             }
             performCallbacksAfterStateChange(stateMachine, context);
+            context.setSuccess(true);
         } finally {
             if ( isLockEnabled(stateMachine) ) {
                 unlock(stateMachine, context);
@@ -136,6 +143,10 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....LifecycleInterceptor is doing cleanup ...");
         }
+        final StateMachineObject stateMachine = lookupStateMachine(context);
+        if ( !context.isSuccess() && isLockEnabled(stateMachine) ) {
+            unlock(stateMachine, context);
+        }
     }
 
     private void fireLifecycleEvents(StateMachineObject stateMachine, InterceptContext<V> context) {
@@ -154,12 +165,14 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
         final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
         for ( Object relative : relativeObjects ) {
-            lockStrategry.unlockRelative(relative);
+            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(relative.getClass()).getLifecycleLockStrategy();
+            relativeLock.unlockRead(relative);
         }
         if ( null != parentReactiveObject ) {
-            lockStrategry.unlockParent(parentReactiveObject);
+            final LifecycleLockStrategry parentLock = stateMachine.getParentStateMachine().getLifecycleLockStrategy();
+            parentLock.unlockRead(parentReactiveObject);
         }
-        lockStrategry.unlock(targetReactiveObject);
+        lockStrategry.unlockWrite(targetReactiveObject);
     }
 
     private boolean isLockEnabled(StateMachineObject stateMachine) {
@@ -171,7 +184,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void setNextState(StateMachineObject stateMachine, InterceptContext<V> context) {
-        final String stateName = stateMachine.getNextState(context.getTarget(), context.getTranstionKey());
+        final String stateName = stateMachine.getNextState(context.getTarget(), context.getTransitionKey());
         stateMachine.setTargetState(context.getTarget(), stateName);
         context.setToState(stateName);
     }
@@ -190,13 +203,13 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private boolean canEvaluateConditionBeforeTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
-        return stateMachine.evaluateConditionBeforeTransition(context.getTranstionKey());
+        return stateMachine.evaluateConditionBeforeTransition(context.getTransitionKey());
     }
 
     private boolean hasOnlyOneStateCandidate(StateMachineObject stateMachine, InterceptContext<V> context) {
         final String stateName = stateMachine.evaluateState(context.getTarget());
         final StateMetadata state = stateMachine.getMetaType().getState(stateName);
-        if ( state.hasMultipleStateCandidatesOn(context.getTranstionKey()) ) {
+        if ( state.hasMultipleStateCandidatesOn(context.getTransitionKey()) ) {
             return false;
         } else {
             return true;
@@ -209,9 +222,9 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
 
     private void validateTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
         StateMetadata stateMetadata = stateMachine.getMetaType().getState(context.getFromState());
-        TransitionMetadata transition = stateMetadata.getTransition(context.getTranstionKey());
+        TransitionMetadata transition = stateMetadata.getTransition(context.getTransitionKey());
         if ( null == transition ) {
-            throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTranstionKey(),
+            throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTransitionKey(),
                     context.getFromState(), context.getTarget());
         } else {
             context.setTransitionType(transition.getType());
@@ -230,12 +243,16 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         final Object targetReactiveObject = context.getTarget();
         final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
         final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
-        lockStrategry.lock(targetReactiveObject);
+        lockStrategry.lockWrite(targetReactiveObject);
         if ( null != parentReactiveObject ) {
-            lockStrategry.lockParent(parentReactiveObject);
+            final LifecycleLockStrategry parentLock = stateMachine.getParentStateMachine().getLifecycleLockStrategy();
+            if ( null != parentLock ) {
+                parentLock.lockRead(parentReactiveObject);
+            }
         }
         for ( Object relative : relativeObjects ) {
-            lockStrategry.lockRelative(relative);
+            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(relative.getClass()).getLifecycleLockStrategy();
+            relativeLock.lockRead(relative);
         }
     }
 }

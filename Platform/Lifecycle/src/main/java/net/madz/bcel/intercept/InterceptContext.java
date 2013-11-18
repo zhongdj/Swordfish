@@ -27,6 +27,7 @@ public class InterceptContext<V> {
     private long startTime;
     private long endTime;
     private TransitionTypeEnum transitionType;
+    private boolean success;
 
     public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType, Object[] arguments) {
         super();
@@ -79,6 +80,7 @@ public class InterceptContext<V> {
     }
 
     public void setFailureCause(Throwable failureCause) {
+        this.success = false;
         this.failureCause = failureCause;
     }
 
@@ -126,7 +128,7 @@ public class InterceptContext<V> {
         this.lockStrategry = lockStrategry;
     }
 
-    public Object getTranstionKey() {
+    public Object getTransitionKey() {
         final Class<?> keyClass = method.getAnnotation(Transition.class).value();
         if ( Null.class.equals(keyClass) ) {
             return StringUtil.toUppercaseFirstCharacter(method.getName());
@@ -153,5 +155,14 @@ public class InterceptContext<V> {
 
     public void setTransitionType(TransitionTypeEnum transitionType) {
         this.transitionType = transitionType;
+    }
+
+    public void setSuccess(boolean b) {
+        this.success = b;
+        this.failureCause = null;
+    }
+
+    public boolean isSuccess() {
+        return success;
     }
 }
