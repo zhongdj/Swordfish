@@ -17,6 +17,7 @@ import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionSet;
 import net.madz.lifecycle.annotations.action.Conditional;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
+import net.madz.lifecycle.annotations.callback.AnyState;
 import net.madz.lifecycle.annotations.callback.PostStateChange;
 import net.madz.lifecycle.annotations.callback.PreStateChange;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
@@ -103,6 +104,30 @@ public class CallbackTestMetadata extends EngineTestBase {
 
         @PreStateChange(to = CallbackStateMachine.States.Started.class)
         public void interceptPreStateChange(LifecycleContext<PreCallbackFromAnyToStart, String> context) {
+            this.callbackInvokeCounter++;
+        }
+    }
+    @LifecycleMeta(CallbackStateMachine.class)
+    static class PostCallbackFromAnyToAny extends CallbackObjectBase {
+
+        @PostStateChange
+        public void interceptPostStateChange(LifecycleContext<PostCallbackFromAnyToAny, String> context) {
+            this.callbackInvokeCounter++;
+        }
+    }
+    @LifecycleMeta(CallbackStateMachine.class)
+    static class PostCallbackFromAnyToStart extends CallbackObjectBase {
+
+        @PostStateChange(to = CallbackStateMachine.States.Started.class)
+        public void interceptPostStateChange(LifecycleContext<PostCallbackFromAnyToStart, String> context) {
+            this.callbackInvokeCounter++;
+        }
+    }
+    @LifecycleMeta(CallbackStateMachine.class)
+    static class PostCallbackFromStartToAny extends CallbackObjectBase {
+
+        @PostStateChange(from = CallbackStateMachine.States.Started.class)
+        public void interceptPostStateChange(LifecycleContext<PostCallbackFromStartToAny, String> context) {
             this.callbackInvokeCounter++;
         }
     }
@@ -394,152 +419,143 @@ public class CallbackTestMetadata extends EngineTestBase {
         public List<InvoiceItemNonRelationalCallback> getItems() {
             return Collections.unmodifiableList(items);
         }
+    }
+    @StateMachine
+    public static interface OrderStateMachine {
 
-        @StateMachine
-        public static interface OrderStateMachine {
+        @StateSet
+        public static interface States {
 
-            @StateSet
-            public static interface States {
-
-                @Initial
-                @Function(transition = Transitions.Pay.class, value = { States.Paid.class })
-                public static interface New {}
-                @Function(transition = Transitions.Deliver.class, value = { States.Delivered.class })
-                public static interface Paid {}
-                @End
-                public static interface Delivered {}
-            }
-            @TransitionSet
-            public static interface Transitions {
-
-                public static interface Pay {}
-                public static interface Deliver {}
-            }
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { States.Paid.class })
+            public static interface New {}
+            @Function(transition = Transitions.Deliver.class, value = { States.Delivered.class })
+            public static interface Paid {}
+            @End
+            public static interface Delivered {}
         }
-        @StateMachine
-        public static interface BigProductOrderStateMachine extends OrderStateMachine {
+        @TransitionSet
+        public static interface Transitions {
 
-            @StateSet
-            public static interface States extends OrderStateMachine.States {
-
-                @Function(transition = Transitions.Cancel.class, value = { Cancelled.class })
-                public static interface New extends OrderStateMachine.States.New {}
-                @LifecycleOverride
-                @Function(transition = Transitions.Install.class, value = { States.Installed.class })
-                public static interface Delivered extends OrderStateMachine.States.Delivered {}
-                @End
-                public static interface Installed {}
-                @End
-                public static interface Cancelled {}
-            }
-            @TransitionSet
-            public static interface Transitions extends OrderStateMachine.Transitions {
-
-                public static interface Install {}
-                public static interface Cancel {}
-            }
+            public static interface Pay {}
+            public static interface Deliver {}
         }
-        @LifecycleMeta(OrderStateMachine.class)
-        public static class OrderObject extends ReactiveObject {
+    }
+    @StateMachine
+    public static interface BigProductOrderStateMachine extends OrderStateMachine {
 
-            @Transition
-            public void pay() {}
+        @StateSet
+        public static interface States extends OrderStateMachine.States {
 
-            @Transition
-            public void deliver() {}
-
-            @PostStateChange(from = OrderStateMachine.States.New.class)
-            public void interceptPostStateChange(LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("Order is created.");
-            }
-
-            @PostStateChange(to = OrderStateMachine.States.Delivered.class)
-            public void interceptPostStateChangeWhenOrderFinished(
-                    LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("Order is delivered.");
-            }
-        }
-        @LifecycleMeta(BigProductOrderStateMachine.class)
-        public static class BigProductOrderObjectWithOverridesCallbackOnOverridesState extends OrderObject {
-
-            @Transition
-            public void install() {}
-
-            @Transition
-            public void cancel() {}
-
-            /**
-             * Use case 1-1: extends the call back method on the non overridden
-             * state "New".<br/>
-             * Scenario: <li>StateOverride: No</li> <li>Lifecycle Override: No</li>
-             * 
-             * Expected Behavior:<br/>
-             * When state transit from New or Delivered state, the
-             * call back method be invoked.
-             */
-            @PostStateChange(from = BigProductOrderStateMachine.States.Delivered.class)
-            @Override
-            public void interceptPostStateChange(LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("interceptPostStateChange in " + getClass().getSimpleName());
-            }
-
-            /**
-             * Use case 2-1: overrides the call back definition on the
-             * overridden state "Delivered".<br/>
-             * Scenario: <li>StateOverride: Yes</li> <li>Lifecycle Override: Yes
-             * </li> Expected Behavior:<br/>
-             * When state transit to state "Delivered",
-             * the call back method in OrderObject will be
-             * invoked.
-             * When state transit to state "Installed", this method will be
-             * invoked.
-             */
+            @Function(transition = Transitions.Cancel.class, value = { Cancelled.class })
+            public static interface New extends OrderStateMachine.States.New {}
             @LifecycleOverride
-            @PostStateChange(to = BigProductOrderStateMachine.States.Installed.class)
-            @Override
-            public void interceptPostStateChangeWhenOrderFinished(
-                    LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("Big Product Order is finished.");
-            }
+            @Function(transition = Transitions.Install.class, value = { States.Installed.class })
+            public static interface Delivered extends OrderStateMachine.States.Delivered {}
+            @End
+            public static interface Installed {}
+            @End
+            public static interface Cancelled {}
         }
-        @LifecycleMeta(BigProductOrderStateMachine.class)
-        public static class BigProductOrderObjectWithOverridesCallbackOnNonOverridesState extends OrderObject {
+        @TransitionSet
+        public static interface Transitions extends OrderStateMachine.Transitions {
 
-            @Transition
-            public void install() {}
+            public static interface Install {}
+            public static interface Cancel {}
+        }
+    }
+    @LifecycleMeta(OrderStateMachine.class)
+    public static class OrderObject<T> extends ReactiveObject {
 
-            @Transition
-            public void cancel() {}
+        protected int count = 0;
 
-            /**
-             * Use case 1-2: Overrides the call back definition on non
-             * overridden state "New".<br/>
-             * Scenario: <li>StateOverride: No</li> <li>Lifecycle Override: Yes</li>
-             * Expected behavior:<br/>
-             * When state transit to "Installed", this method will be invoked.
-             * When state transit from "New", this method will not be invoked.
-             */
-            @PostStateChange(to = BigProductOrderStateMachine.States.Installed.class)
-            @LifecycleOverride
-            @Override
-            public void interceptPostStateChange(LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("interceptPostStateChange in " + getClass().getSimpleName());
-            }
+        public OrderObject() {
+            super();
+            initialState(OrderStateMachine.States.New.class.getSimpleName());
+        }
 
-            /**
-             * Use case 2-2: extends the call back definition on overridden
-             * state "Delivered".<br/>
-             * Scenario: <li>StateOverride: Yes</li> <li>Lifecycle Override: No</li>
-             * Expected behavior:<br/>
-             * When state transit to "Delivered", only the call back method in
-             * this class will be invoked.
-             */
-            @PostStateChange(to = BigProductOrderStateMachine.States.Delivered.class)
-            @Override
-            public void interceptPostStateChangeWhenOrderFinished(
-                    LifecycleContext<PreCallbackFromAnyToStart, String> context) {
-                System.out.println("Big Product Order is delivered.");
-            }
+        @Transition
+        public void pay() {}
+
+        @Transition
+        public void deliver() {}
+
+        public int getCount() {
+            return count;
+        }
+
+        @PostStateChange(from = OrderStateMachine.States.New.class)
+        public void interceptPostStateChange(LifecycleContext<T, String> context) {
+            count++;
+            System.out.println("Order is created.");
+        }
+
+        @PostStateChange(to = OrderStateMachine.States.Delivered.class)
+        public void interceptPostStateChangeWhenOrderFinished(LifecycleContext<T, String> context) {
+            count++;
+            System.out.println("Order is delivered.");
+        }
+    }
+    @LifecycleMeta(BigProductOrderStateMachine.class)
+    public static class BigProductOrderObjectWithExtendsCallbackDefinition extends
+            OrderObject<BigProductOrderObjectWithExtendsCallbackDefinition> {
+
+        @Transition
+        public void install() {}
+
+        @Transition
+        public void cancel() {}
+
+        /**
+         * Use case 1: extends the call back method on the non overridden
+         * state "New".<br/>
+         * Scenario: <li>StateOverride: No</li> <li>Lifecycle Override: No</li>
+         * 
+         * Expected Behavior:<br/>
+         * When state transit from New or Delivered state, the
+         * call back method will be invoked.
+         */
+        @PostStateChange(from = BigProductOrderStateMachine.States.Delivered.class)
+        @Override
+        public void interceptPostStateChange(
+                LifecycleContext<BigProductOrderObjectWithExtendsCallbackDefinition, String> context) {
+            count++;
+            System.out.println("interceptPostStateChange in " + getClass().getSimpleName());
+        }
+    }
+    @LifecycleMeta(BigProductOrderStateMachine.class)
+    public static class BigProductOrderObjectWithOverridesCallbackDefinition extends
+            OrderObject<BigProductOrderObjectWithOverridesCallbackDefinition> {
+
+        @Transition
+        public void install() {}
+
+        @Transition
+        public void cancel() {}
+
+        public BigProductOrderObjectWithOverridesCallbackDefinition() {
+            initialState(BigProductOrderStateMachine.States.New.class.getSimpleName());
+        }
+
+        /**
+         * Use case 2: overrides the call back definition on the
+         * overridden state "Delivered".<br/>
+         * Scenario: <li>StateOverride: Yes</li> <li>Lifecycle Override: Yes</li>
+         * Expected Behavior:<br/>
+         * When state transit to state "Delivered",
+         * this call back method will not be
+         * invoked.
+         * When state transit to state "Installed", this method will be
+         * invoked.
+         */
+        @LifecycleOverride
+        @PostStateChange(to = BigProductOrderStateMachine.States.Installed.class)
+        @Override
+        public void interceptPostStateChangeWhenOrderFinished(
+                LifecycleContext<BigProductOrderObjectWithOverridesCallbackDefinition, String> context) {
+            count++;
+            System.out.println("Big Product Order is finished.");
         }
     }
 }
+

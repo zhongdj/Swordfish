@@ -167,7 +167,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        
     }
 
     private void setNextState(StateMachineObject stateMachine, InterceptContext<V> context) {
