@@ -133,7 +133,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
 
     @Override
     public String toString() {
-        return errorKey + "(" + String.format(defaultErrorMessage, details) + ")";
+        return errorCode + "(" + String.format(defaultErrorMessage, details) + ")";
     }
 
     public String getErrorMessage(String overrideErrorMessage) {
@@ -142,7 +142,7 @@ public class VerificationFailure implements Dumpable, Cloneable {
 
     @Override
     public void dump(Dumper dumper) {
-        dumper.print(errorKey).print(": ").println(String.format(defaultErrorMessage, details));
+        dumper.print(errorCode).print(": ").println(String.format(defaultErrorMessage, details));
         if ( null != cause ) {
             StringPrintWriter str = new StringPrintWriter();
             this.cause.printStackTrace(str);
