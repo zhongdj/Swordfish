@@ -1,7 +1,7 @@
 package net.madz.lifecycle.syntax.relation;
 
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -403,7 +403,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = OwningX.class, value = OwningB.class)
             static interface OwningA {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = OwningY.class, value = OwningC.class)
             static interface OwningB {
 
@@ -546,7 +546,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NOwningStateMachine.Transitions.NOwningX.class, value = NOwningB.class)
             static interface NOwningA {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = NOwningStateMachine.Transitions.NOwningY.class, value = NOwningC.class)
             static interface NOwningB {
 
@@ -609,7 +609,7 @@ public class RelationSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = N2OwningStateMachine.Transitions.N2OwningX.class, value = N2OwningB.class)
             static interface N2OwningA {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = N2OwningStateMachine.Transitions.N2OwningY.class, value = N2OwningC.class)
             static interface N2OwningB {
 

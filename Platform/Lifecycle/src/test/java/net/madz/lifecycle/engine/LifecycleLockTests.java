@@ -28,7 +28,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
 
     private void doConcurrent(Class<? extends ILockingReactiveObject> klass) throws Throwable {
         final ExecutorService executorService = Executors.newFixedThreadPool(7);
-        for ( int i = 0; i < 1000; i++ ) {
+        for ( int i = 0; i < 100; i++ ) {
             final ILockingReactiveObject object = klass.newInstance();
             object.start();
             Callable<LifecycleException> c1 = new Callable<LifecycleException>() {

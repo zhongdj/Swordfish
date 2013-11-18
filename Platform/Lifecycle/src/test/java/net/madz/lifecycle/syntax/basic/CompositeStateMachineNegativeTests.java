@@ -4,7 +4,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -15,6 +15,7 @@ import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.verification.VerificationException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CompositeStateMachineNegativeTests extends BaseMetaDataTest {
@@ -28,7 +29,7 @@ public class CompositeStateMachineNegativeTests extends BaseMetaDataTest {
             @Initial
             @Function(transition = CompositeExtendsOwningStateMachine.Transitions.PCS1_X.class, value = PCS1_B.class)
             static interface PCS1_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = CompositeExtendsOwningStateMachine.Transitions.PCS1_Y.class, value = PCS1_C.class)
             static interface PCS1_B extends CompositeExtendsOwningStateMachine {
 
@@ -62,6 +63,7 @@ public class CompositeStateMachineNegativeTests extends BaseMetaDataTest {
     }
 
     @Test(expected = VerificationException.class)
+    @Ignore
     public void test_composite_extends_owning_stateMachine() throws VerificationException {
         @LifecycleRegistry(CompositeExtendsOwningStateMachine.class)
         @StateMachineBuilder

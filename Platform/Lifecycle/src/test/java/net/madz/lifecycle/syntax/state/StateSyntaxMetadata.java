@@ -1,7 +1,7 @@
 package net.madz.lifecycle.syntax.state;
 
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -218,7 +218,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = PCS1_X.class, value = PCS1_B.class)
             static interface PCS1_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = PCS1_Y.class, value = PCS1_C.class)
             static interface PCS1_B {
 
@@ -259,7 +259,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NSC1_X.class, value = NSC1_B.class)
             static interface NSC1_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = NSC1_Y.class, value = NSC1_C.class)
             static interface NSC1_B {
 
@@ -300,7 +300,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NCS2_X.class, value = NCS2_B.class)
             static interface NCS2_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = NCS2_Y.class, value = NCS2_C.class)
             static interface NCS2_B {
 
@@ -339,7 +339,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NCS3_X.class, value = NCS3_B.class)
             static interface NCS3_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = NCS3_Y.class, value = NCS3_C.class)
             static interface NCS3_B {
 
@@ -379,7 +379,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = NCS4_X.class, value = NCS4_B.class)
             static interface NCS4_A {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = NCS4_Y.class, value = NCS4_C.class)
             static interface NCS4_B {
 

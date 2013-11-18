@@ -1,6 +1,6 @@
 package net.madz.lifecycle.demo.inheritance.meta;
 
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -21,7 +21,7 @@ public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
     public static class States extends OrderLifecycleMeta.States {
 
         @LifecycleOverride
-        @CompositeStateMachine
+        @CompositeState
         public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {
 
             @StateSet

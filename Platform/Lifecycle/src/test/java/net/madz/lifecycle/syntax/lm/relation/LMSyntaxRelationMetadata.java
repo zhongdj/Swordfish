@@ -1,6 +1,6 @@
 package net.madz.lifecycle.syntax.lm.relation;
 
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -208,7 +208,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = S5_X.class, value = { S5_B.class })
             static interface S5_A {}
-            @CompositeStateMachine
+            @CompositeState
             static interface S5_B {
 
                 @StateSet
@@ -279,6 +279,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             @ValidWhile(on = { R1_S.States.R1_S_A.class }, relation = S6_R1.class)
             static interface S6_A extends S5_A {}
             @InboundWhile(on = { R2_S.States.R2_S_A.class }, relation = S6_R2.class)
+            @CompositeState
             static interface S6_B extends S5_B {}
         }
         @TransitionSet

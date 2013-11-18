@@ -1,6 +1,6 @@
 package net.madz.lifecycle.engine;
 
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -39,7 +39,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Initial
             @Function(transition = Transitions.Start.class, value = Started.class)
             static interface Created {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = Transitions.Cancel.class, value = Canceled.class)
             static interface Started {
 
@@ -158,7 +158,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Function(transition = Transitions.Start.class, value = Started.class)
             @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = Relations.Contract.class)
             static interface Created {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = Transitions.Cancel.class, value = Canceled.class)
             static interface Started {
 
@@ -251,7 +251,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Function(transition = Transitions.Start.class, value = Started.class)
             @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = Relations.Contract.class)
             static interface Created {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = Transitions.Cancel.class, value = Canceled.class)
             @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = Relations.Contract.class)
             static interface Started {
@@ -338,7 +338,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Initial
             @Function(transition = Transitions.Start.class, value = Started.class)
             static interface Created {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = Transitions.Cancel.class, value = Canceled.class)
             static interface Started {
 
@@ -432,7 +432,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Initial
             @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S1.class)
             static interface S0 {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S2.class)
             @ValidWhile(relation = SM2.Relations.R6.class, on = { ContractLifecycle.States.Active.class })
             static interface S1 {
@@ -460,7 +460,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     static interface R4 {}
                 }
             }
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM2.Transitions.T6.class, value = SM2.States.S3.class)
             static interface S2 {
 
@@ -511,7 +511,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S1.class)
             @LifecycleOverride
             static interface S0 extends SM2.States.S0 {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S2.class)
             @ValidWhile(relation = SM1_No_Overrides.Relations.R2.class, on = { ContractLifecycle.States.Draft.class })
             static interface S1 extends SM2.States.S1 {
@@ -538,7 +538,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     static interface R1 {}
                 }
             }
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM1_No_Overrides.Transitions.T2.class, value = SM1_No_Overrides.States.S3.class)
             static interface S2 extends SM2.States.S2 {
 
@@ -589,7 +589,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S1.class)
             @LifecycleOverride
             static interface S0 extends SM2.States.S0 {}
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S2.class)
             @ValidWhile(relation = SM1_Overrides.Relations.R2.class, on = { ContractLifecycle.States.Draft.class })
             @LifecycleOverride
@@ -618,7 +618,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     static interface R1 {}
                 }
             }
-            @CompositeStateMachine
+            @CompositeState
             @Function(transition = SM1_Overrides.Transitions.T2.class, value = SM1_Overrides.States.S3.class)
             @LifecycleOverride
             static interface S2 extends SM2.States.S2 {

@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.relation.ErrorMessage;
@@ -329,11 +329,11 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
 
     @Override
     public void configureCompositeStateMachine(Class<?> stateClass) throws VerificationException {
-        final CompositeStateMachine csm = stateClass.getAnnotation(CompositeStateMachine.class);
+        final CompositeState csm = stateClass.getAnnotation(CompositeState.class);
         if ( null == csm ) {
             return;
         }
-        this.compositeState = true;
+        this.setCompositeState(true);
         this.compositeStateMachine = parent.getRegistry().loadStateMachineMetadata(stateClass, parent);
     }
 
@@ -354,7 +354,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         if ( 0 == functionList.size() && null != this.getSuper() ) {
             return new ArrayList<>();
         }
-        if ( 0 == functionList.size() && !this.compositeState ) {
+        if ( 0 == functionList.size() && !this.isCompositeState() ) {
             throw newVerificationException(getDottedPath().getAbsoluteName(), SyntaxErrors.STATE_NON_FINAL_WITHOUT_FUNCTIONS, stateClass.getName());
         }
         return functionList;
@@ -714,5 +714,9 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     @Override
     protected StateMetadata findSuper(Class<?> metaClass) throws VerificationException {
         return findStateMetadata(metaClass, this.parent);
+    }
+
+    private void setCompositeState(boolean compositeState) {
+        this.compositeState = compositeState;
     }
 }

@@ -1,6 +1,6 @@
 package net.madz.scheduling.meta;
 
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -22,7 +22,7 @@ public interface VehicleScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
     public static class States {
 
         @LifecycleOverride
-        @CompositeStateMachine
+        @CompositeState
         public static class Ongoing extends OrderLifecycleMeta.States.Ongoing {
 
             @Initial

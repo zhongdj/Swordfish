@@ -1,6 +1,6 @@
 package net.madz.lifecycle.semantics;
 
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -53,7 +53,7 @@ public class StateMachineSemanticsMetadata {
             @Function(transition = S2_Z.class, value = { S1_C.class })
             public static interface S2_A extends S1.States.S1_A {}
             @LifecycleOverride
-            @CompositeStateMachine
+            @CompositeState
             public static interface S2_B extends S1.States.S1_B {
 
                 @StateSet
@@ -89,7 +89,7 @@ public class StateMachineSemanticsMetadata {
             @LifecycleOverride
             @Function(transition = S3_Z.class, value = { S1_D.class })
             public static interface S3_A extends S2_A {}
-            @CompositeStateMachine
+            @CompositeState
             public static interface S3_E extends S2.States.S2_B {}
         }
         @TransitionSet

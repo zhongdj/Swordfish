@@ -1,7 +1,7 @@
 package net.madz.lifecycle.syntax.lm.condition;
 
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -98,7 +98,7 @@ public class LMSyntaxConditionMetadata extends BaseMetaDataTest {
             @Initial
             @Function(transition = S2_Transition_X.class, value = EnclosingState.class)
             static interface S2_Intial {}
-            @CompositeStateMachine
+            @CompositeState
             static interface EnclosingState {
 
                 @StateSet

@@ -10,7 +10,7 @@ import java.util.List;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -458,7 +458,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     private boolean isCompositeStateMachine(Class<?> stateMachineClass) {
-        return null != stateMachineClass.getAnnotation(CompositeStateMachine.class);
+        return null != stateMachineClass.getAnnotation(CompositeState.class);
     }
 
     /* //////////////////////////////////////////////////// */
@@ -591,7 +591,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
 
     private void verifyStateMachineDefinition(Class<?> clazz) throws VerificationException {
         if ( clazz.isInterface() && clazz.getInterfaces().length <= 0 ) {
-            if ( null == clazz.getAnnotation(StateMachine.class) && null == clazz.getAnnotation(CompositeStateMachine.class) ) {
+            if ( null == clazz.getAnnotation(StateMachine.class) && null == clazz.getAnnotation(CompositeState.class) ) {
                 throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_CLASS_WITHOUT_ANNOTATION, clazz);
             }
         }
@@ -717,47 +717,41 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     public StateMetadata[] getAllStates() {
         final ArrayList<StateMetadata> results = new ArrayList<StateMetadata>();
         final ArrayList<StateMetadata> overridedStates = new ArrayList<StateMetadata>();
-        populateStateMetadatas(this, results, overridedStates);
+        populateStateMetadataFromStateMachineHierarchy(this, results, overridedStates);
         return results.toArray(new StateMetadata[0]);
     }
 
-    private void populateStateMetadatas(final StateMachineMetadata stateMachine, final ArrayList<StateMetadata> results,
-            final ArrayList<StateMetadata> overridedStates) {
+    private void populateStateMetadataFromStateMachineHierarchy(final StateMachineMetadata stateMachine, final ArrayList<StateMetadata> results,
+            final ArrayList<StateMetadata> extendedStates) {
         if ( null == stateMachine ) {
             return;
         }
-        populateStates(results, stateMachine, overridedStates);
+        {// populate declared states
+            for ( StateMetadata stateMetadata : stateMachine.getDeclaredStateSet() ) {
+                if ( extendedStates.contains(stateMetadata) ) {
+                    continue;
+                }
+                results.add(stateMetadata);
+                markExtendedStates(extendedStates, stateMetadata.getSuper());
+            }
+        }
         for ( final StateMachineMetadata stateMachineMeta : stateMachine.getCompositeStateMachines() ) {
-            if ( !overridedStates.contains(stateMachineMeta.getOwningState()) ) {
-                populateStates(results, stateMachineMeta, overridedStates);
+            if ( !extendedStates.contains(stateMachineMeta.getOwningState()) ) {
+                populateStateMetadataFromStateMachineHierarchy(stateMachineMeta, results, extendedStates);
             }
         }
         if ( !stateMachine.isComposite() || stateMachine.isComposite() && !stateMachine.getOwningState().isOverriding() ) {
-            populateStateMetadatas(stateMachine.getSuper(), results, overridedStates);
+            populateStateMetadataFromStateMachineHierarchy(stateMachine.getSuper(), results, extendedStates);
         }
     }
 
-    private void populateStates(final ArrayList<StateMetadata> results, final StateMachineMetadata stateMachineMeta,
-            final ArrayList<StateMetadata> overridedStates) {
-        for ( StateMetadata stateMetadata : stateMachineMeta.getDeclaredStateSet() ) {
-            if ( !overridedStates.contains(stateMetadata) ) {
-                results.add(stateMetadata);
-                if ( null != stateMetadata.getSuper() ) { // stateMetadata.isOverriding()
-                                                          // ) {
-                    addOverridedStates(overridedStates, stateMetadata.getSuper());
-                }
-            }
-        }
-    }
-
-    private void addOverridedStates(ArrayList<StateMetadata> overridedStates, StateMetadata superStateMetadata) {
+    private void markExtendedStates(ArrayList<StateMetadata> extendedStates, StateMetadata superStateMetadata) {
         if ( null == superStateMetadata ) {
             return;
         }
-        overridedStates.add(superStateMetadata);
-        if ( null != superStateMetadata.getSuper() ) {// .isOverriding()
-                                                      // ) {
-            addOverridedStates(overridedStates, superStateMetadata.getSuper());
+        extendedStates.add(superStateMetadata);
+        if ( null != superStateMetadata.getSuper() ) {
+            markExtendedStates(extendedStates, superStateMetadata.getSuper());
         }
     }
 

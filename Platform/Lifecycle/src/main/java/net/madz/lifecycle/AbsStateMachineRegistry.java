@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.madz.common.Dumper;
-import net.madz.lifecycle.annotations.CompositeStateMachine;
+import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
@@ -194,7 +194,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
             VerificationFailureSet failureSet) throws VerificationException {
         StateMachineMetaBuilder metaBuilder = null;
         try {
-            if ( null != stateMachineClass.getAnnotation(CompositeStateMachine.class) ) {
+            if ( null != stateMachineClass.getAnnotation(CompositeState.class) ) {
                 metaBuilder = createCompositeBuilder(stateMachineClass, owningStateMachine);
             } else {
                 metaBuilder = createBuilder(stateMachineClass);
