@@ -838,7 +838,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
 
     @Override
     protected StateMachineMetadata findSuper(Class<?> metaClass) throws VerificationException {
-        return registry.loadStateMachineMetadata(metaClass, this);
+        return registry.loadStateMachineMetadata(metaClass, null);
     }
 
     @Override
