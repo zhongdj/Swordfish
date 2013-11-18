@@ -567,9 +567,16 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 continue;
             }
             Class<?> relationClass = relation.value();
-            if ( !getMetaType().hasRelation(relationClass) ) {
-                throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(),
-                        relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
+            if ( Null.class != relationClass ) {
+                if ( !getMetaType().hasRelation(relationClass) ) {
+                    throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE,
+                            klass.getName(), relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
+                }
+            } else {
+                if ( !getMetaType().hasRelation(StringUtil.toUppercaseFirstCharacter(field.getName())) ) {
+                    throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE,
+                            klass.getName(), relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
+                }
             }
         }
         verifyRelationInstanceOnFieldNotBeyondStateMachine(klass.getSuperclass());
