@@ -9,6 +9,7 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.verification.VerificationException;
 
 public interface StateMachineObject extends MetaObject<StateMachineObject, StateMachineMetadata> {
 
@@ -187,9 +188,9 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     String getNextState(Object target, Object transtionKey);
 
-    void validateValidWhiles(final InterceptContext context);
+    void validateValidWhiles(final InterceptContext<?> context);
 
-    void validateInboundWhiles(final InterceptContext context);
+    void validateInboundWhiles(final InterceptContext<?> context);
 
     boolean evaluateConditionBeforeTransition(Object transtionKey);
 
@@ -199,7 +200,7 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     Object[] evaluateRelatives(Object target);
 
-    StateMachineObject getParentStateMachine();
+    StateMachineObject getParentStateMachine(Object target);
 
-    StateMachineObject getRelatedStateMachine(Class<?> relativeClass);
+    StateMachineObject getRelatedStateMachine(Object target, Object relativeKey);
 }

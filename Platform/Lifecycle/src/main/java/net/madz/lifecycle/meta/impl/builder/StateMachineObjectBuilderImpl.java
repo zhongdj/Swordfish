@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.swing.text.Utilities;
+
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
@@ -28,6 +30,7 @@ import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
+import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
 import net.madz.lifecycle.annotations.state.LifecycleOverride;
@@ -62,6 +65,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     private final HashMap<Object, StateObject> stateMap = new HashMap<>();
     private final ArrayList<StateObject> stateList = new ArrayList<>();
     private final HashMap<Object, ReadAccessor<?>> relationObjectsMap = new HashMap<>();
+    private final ArrayList<ReadAccessor<Object>> relationEvaluatorList = new ArrayList<>();
+    private ReadAccessor<Object> parentEvaluator;
     private LifecycleLockStrategry lifecycleLockStrategry;
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
@@ -125,9 +130,26 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             // getMetaType().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
             getMetaType().getRegistry().loadStateMachineObject(field.getType());
             final FieldEvaluator evaluator = new FieldEvaluator(field);
-            this.relationObjectsMap.put(relationClass, evaluator);
-            this.relationObjectsMap.put(relationClass.getSimpleName(), evaluator);
+            if ( null != relationClass ) {
+                addRelation(klass, evaluator, relationClass, relationClass.getSimpleName());
+            } else {
+                addRelation(klass, evaluator, StringUtil.toUppercaseFirstCharacter(field.getName()));
+            }
         }
+    }
+
+    private void addRelation(Class<?> klass, final FieldEvaluator evaluator, final Object... relationKeys) {
+        for ( final Object key : relationKeys ) {
+            this.relationObjectsMap.put(key, evaluator);
+        }
+        this.relationEvaluatorList.add(evaluator);
+        if ( isParentRelation(klass) ) {
+            this.parentEvaluator = evaluator;
+        }
+    }
+
+    private boolean isParentRelation(Class<?> klass) {
+        return null != klass.getAnnotation(Parent.class);
     }
 
     private void configureStateObjects(Class<?> klass) throws VerificationException {
@@ -489,6 +511,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 } else {
                     relationObjectsMap.put(relation.value(), evaluator);
                 }
+                relationEvaluatorList.add(evaluator);
                 try {
                     getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
                 } catch (VerificationException e) {
@@ -1047,7 +1070,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     @Override
     public String evaluateState(Object target) {
-        return (String) this.stateAccessor.read(target);
+        return this.stateAccessor.read(target);
     }
 
     @Override
@@ -1217,16 +1240,47 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     @Override
     public Object[] evaluateRelatives(Object target) {
-        return new Object[0];
+        final ArrayList<Object> result = new ArrayList<>();
+        for ( ReadAccessor<Object> accessor : this.relationEvaluatorList ) {
+            result.add(accessor.read(target));
+        }
+        return result.toArray();
     }
 
     @Override
-    public StateMachineObject getParentStateMachine() {
-        return null;
+    public StateMachineObject getParentStateMachine(Object target) {
+        if ( null == parentEvaluator ) {
+            return null;
+        } else {
+            final Object parentObject = parentEvaluator.read(target);
+            if ( null != parentObject ) {
+                try {
+                    return registry.loadStateMachineObject(parentObject.getClass());
+                } catch (VerificationException e) {
+                    throw new IllegalStateException(e);
+                }
+            } else {
+                return null;
+            }
+        }
     }
 
     @Override
-    public StateMachineObject getRelatedStateMachine(Class<?> relativeClass) {
-        return null;
+    public StateMachineObject getRelatedStateMachine(Object target, Object relativeKey) {
+        final ReadAccessor<?> relationEvaluator = relationObjectsMap.get(relativeKey);
+        if ( null == relationEvaluator ) {
+            throw new IllegalArgumentException("Cannot find relation with Key: " + relativeKey);
+        } else {
+            Object relation = relationEvaluator.read(target);
+            if ( null != relation ) {
+                try {
+                    return registry.loadStateMachineObject(relation.getClass());
+                } catch (VerificationException e) {
+                    throw new IllegalStateException(e);
+                }
+            } else {
+                return null;
+            }
+        }
     }
 }

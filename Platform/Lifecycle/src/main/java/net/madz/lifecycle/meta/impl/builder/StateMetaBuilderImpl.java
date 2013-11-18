@@ -162,8 +162,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
 
     @Override
     public boolean isTransitionValid(Object transitionKey) {
-        // TODO Auto-generated method stub
-        return false;
+        return null != getTransition(transitionKey);
     }
 
     @Override
