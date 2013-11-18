@@ -14,6 +14,7 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.TransitionSet;
 import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.InboundWhiles;
+import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.RelateTo;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.relation.RelationSet;
@@ -281,6 +282,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
                 @RelationSet
                 static interface Relations {
 
+                    @Parent
                     @RelateTo(CustomerStateMachine.class)
                     static interface Customer {}
                 }
@@ -341,6 +343,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
                 @RelationSet
                 static interface Relations {
 
+                    @Parent
                     @RelateTo(ContractStateMachine.class)
                     static interface Contract {}
                     @RelateTo(ResourceStateMachine.class)
@@ -405,6 +408,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(InformativeStateMachine.class)
+    @LifecycleLock(SimpleLock.class)
     static class InformativeObject extends ReactiveObject {
 
         public InformativeObject() {
@@ -502,6 +506,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         public void complete() {}
     }
     @LifecycleMeta(ResourceStateMachine.class)
+    @LifecycleLock(SimpleLock.class)
     static class ResourceObject extends ReactiveObject {
 
         public ResourceObject() {
