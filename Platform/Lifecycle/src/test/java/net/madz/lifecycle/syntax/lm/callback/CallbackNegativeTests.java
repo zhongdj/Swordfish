@@ -14,7 +14,7 @@ import org.junit.Test;
 public class CallbackNegativeTests extends CallbackTestBase {
 
     @Test(expected = VerificationException.class)
-    public final void test_PreStateChange_To_Possible_Next_State() throws NoSuchMethodException, SecurityException,
+    public final void test_prestatechange_to_possible_next_state() throws NoSuchMethodException, SecurityException,
             VerificationException {
         @LifecycleRegistry(NLM_With_PreStateChange_To_Possible_Next_State.class)
         @StateMachineBuilder
