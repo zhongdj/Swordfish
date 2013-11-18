@@ -240,4 +240,52 @@ public interface SyntaxErrors {
      * @param {1} Method
      */
     public static final String PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID = "002-3700";
+    /**
+     * @param {0} From state class
+     * @param {1} Method class
+     * @param {2} State Machine class
+     */
+    public static final String PRE_STATE_CHANGE_FROM_STATE_IS_INVALID = "002-3701";
+    /**
+     * @param {0} To state class
+     * @param {1} Method class
+     * @param {2} State Machine class
+     */
+    public static final String PRE_STATE_CHANGE_TO_STATE_IS_INVALID = "002-3702";
+    /**
+     * @param {0} From state class
+     * @param {1} Method class
+     * @param {2} State Machine class
+     */
+    public static final String POST_STATE_CHANGE_FROM_STATE_IS_INVALID = "002-3703";
+    /**
+     * @param {0} To state class
+     * @param {1} Method class
+     * @param {2} State Machine class
+     */
+    public static final String POST_STATE_CHANGE_TO_STATE_IS_INVALID = "002-3704";
+    /**
+     * @param {0} relation
+     * @param {1} Method class
+     * @param {2} State Machine object class
+     */
+    public static final String PRE_STATE_CHANGE_RELATION_INVALID = "002-3705";
+    /**
+     * @param {0} mappedby
+     * @param {1} Method class
+     * @param {2} Relation Class
+     */
+    public static final String PRE_STATE_CHANGE_MAPPEDBY_INVALID = "002-3706";
+    /**
+     * @param {0} relation
+     * @param {1} Method class
+     * @param {2} State Machine object class
+     */
+    public static final String POST_STATE_CHANGE_RELATION_INVALID = "002-3707";
+    /**
+     * @param {0} mappedby
+     * @param {1} Method class
+     * @param {2} Relation Class
+     */
+    public static final String POST_STATE_CHANGE_MAPPEDBY_INVALID = "002-3708";
 }
