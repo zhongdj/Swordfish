@@ -1135,7 +1135,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public void validateValidWhiles(final InterceptContext context) {
+    public void validateValidWhiles(final InterceptContext<?> context) {
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final StateMetadata state = getMetaType().getState(evaluateState(context.getTarget()));
         final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
@@ -1157,7 +1157,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return null;
     }
 
-    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext context) {
+    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext<?> context) {
         final Object[] arguments = context.getArguments();
         final Method method = context.getMethod();
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -1183,7 +1183,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public void validateInboundWhiles(InterceptContext context) {
+    public void validateInboundWhiles(InterceptContext<?> context) {
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
@@ -1197,7 +1197,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private Object getRelationInstance(InterceptContext context, final HashMap<Class<?>, Object> relationsInMethodParameters,
+    private Object getRelationInstance(InterceptContext<?> context, final HashMap<Class<?>, Object> relationsInMethodParameters,
             final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
         Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry.getValue().get(0).getKeySet());
         if ( null == relationObject ) {
