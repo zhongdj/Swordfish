@@ -16,5 +16,5 @@ public interface StateMetaBuilder extends AnnotationMetaBuilder<StateMetadata, S
 
     void configureCompositeStateMachine(Class<?> stateClass) throws VerificationException;
 
-    void configureRelations(Class<?> clazz) throws VerificationException;
+    void configureRelationConstrants(Class<?> clazz) throws VerificationException;
 }

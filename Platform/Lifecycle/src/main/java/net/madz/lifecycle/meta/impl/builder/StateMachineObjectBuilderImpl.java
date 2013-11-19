@@ -53,9 +53,9 @@ import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachineObject, StateMachineObject> implements StateMachineObjectBuilder {
+public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachineObject, StateMachineObject, StateMachineMetadata> implements
+        StateMachineObjectBuilder {
 
-    private final StateMachineMetaBuilder template;
     private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
     private final ArrayList<TransitionObject> transitionObjectList = new ArrayList<>();
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
@@ -71,23 +71,12 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
-        this.template = template;
+        this.setMetaType(template);
     }
 
     @Override
     public void verifyMetaData(VerificationFailureSet verificationSet) {
         // TODO Auto-generated method stub
-    }
-
-    public StateMachineObjectBuilder build(Class<?> klass) throws VerificationException {
-        verifySyntax(klass);
-        configureStateIndicatorAccessor(klass);
-        configureConditions(klass);
-        configureTransitionObjects(klass);
-        configureStateObjects(klass);
-        configureRelationObject(klass);
-        configureLifecycleLock(klass);
-        return this;
     }
 
     private void configureLifecycleLock(Class<?> klass) throws VerificationException {
@@ -130,7 +119,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             // getMetaType().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
             getMetaType().getRegistry().loadStateMachineObject(field.getType());
             final FieldEvaluator evaluator = new FieldEvaluator(field);
-            if ( null != relationClass ) {
+            if ( Null.class != relationClass ) {
                 addRelation(klass, evaluator, relationClass, relationClass.getSimpleName());
             } else {
                 addRelation(klass, evaluator, StringUtil.toUppercaseFirstCharacter(field.getName()));
@@ -1056,13 +1045,15 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public StateMachineMetaBuilder getMetaType() {
-        return template;
-    }
-
-    @Override
     public StateMachineObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
-        addKeys(klass);
+        super.build(klass, parent);
+        verifySyntax(klass);
+        configureStateIndicatorAccessor(klass);
+        configureConditions(klass);
+        configureTransitionObjects(klass);
+        configureStateObjects(klass);
+        configureRelationObject(klass);
+        configureLifecycleLock(klass);
         return this;
     }
 
@@ -1107,12 +1098,18 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass + ". Please provide no-arg constructor.");
             }
         } else if ( 1 == functionMetadata.getNextStates().size() ) {
-            StateMetadata nextState = functionMetadata.getNextStates().get(0);
+            StateMetadata nextState = findStateFromBottomToTop(functionMetadata);
             nextState = handleCompositeStateMachineLinkage(nextState);
             return nextState.getSimpleName();
         } else {
             throw new IllegalArgumentException("No next states found with fuction: " + functionMetadata);
         }
+    }
+
+    private StateMetadata findStateFromBottomToTop(final FunctionMetadata functionMetadata) {
+        StateMetadata nextState = functionMetadata.getNextStates().get(0);
+        nextState = getState(nextState.getPrimaryKey()).getMetaType();
+        return nextState;
     }
 
     private Object evaluateJudgeable(Object target, final TransitionMetadata transitionMetadata) throws IllegalAccessException, InvocationTargetException {
@@ -1177,15 +1174,12 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return relationObjectMap;
     }
 
-    private ReadAccessor<?> getEvaluator(KeySet keySet) {
-        final Iterator<Object> iterator = keySet.iterator();
-        while ( iterator.hasNext() ) {
-            final Object relationKey = iterator.next();
-            if ( relationObjectsMap.containsKey(relationKey) ) {
-                return relationObjectsMap.get(relationKey);
-            }
+    private ReadAccessor<?> getEvaluator(Object relationKey) {
+        if ( relationObjectsMap.containsKey(relationKey) ) {
+            return relationObjectsMap.get(relationKey);
         }
-        throw new IllegalStateException("The evaluate is not found, which should not happen. Check the verifyRelationsAllBeCoveraged method.");
+        throw new IllegalStateException("The evaluate is not found, which should not happen. Check the verifyRelationsAllBeCoveraged method with key:"
+                + relationKey);
     }
 
     @Override
@@ -1207,7 +1201,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
         Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry.getValue().get(0).getKeySet());
         if ( null == relationObject ) {
-            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getKeySet());
+            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getPrimaryKey());
             relationObject = evaluator.read(context.getTarget());
         }
         return relationObject;
