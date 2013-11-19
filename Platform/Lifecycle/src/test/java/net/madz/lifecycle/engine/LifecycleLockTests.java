@@ -166,7 +166,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         };
         final ExecutorService executorService = Executors.newFixedThreadPool(2);
         final Future<LifecycleException> f1 = executorService.submit(c1);
-        final Future<Void> f2 = executorService.submit(c2);
+        executorService.submit(c2);
         assertInvalidStateErrorByValidWhile(f1.get(), customer, contract, CustomerStateMachine.States.Confirmed.ConfirmedStates.InService.class);
     }
 }
