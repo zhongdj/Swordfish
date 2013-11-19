@@ -18,6 +18,16 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
 
     boolean hasRelation(Object relationKey);
 
+    /**
+     * @param relationKey
+     * @return RelationMetadata in current StateMachine
+     */
+    RelationMetadata getDeclaredRelationMetadata(Object relationKey);
+
+    /**
+     * @param relationKey
+     * @return RelationMetadata in StateMachine hierarchy.
+     */
     RelationMetadata getRelationMetadata(Object relationKey);
 
     /* //////////////////////////////////////////////////// */

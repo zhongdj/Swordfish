@@ -18,13 +18,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.swing.text.Utilities;
-
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.LifecycleLock;
+import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
@@ -39,11 +38,13 @@ import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.instance.ConditionObject;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
+import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.instance.StateObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.ConditionMetadata;
 import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
+import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -53,7 +54,8 @@ import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachineObject, StateMachineObject, StateMachineMetadata> implements
+public class StateMachineObjectBuilderImpl extends
+        ObjectBuilderBase<StateMachineObject, StateMachineObject, StateMachineMetadata> implements
         StateMachineObjectBuilder {
 
     private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
@@ -64,9 +66,9 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     private StateAccessor<String> stateAccessor;
     private final HashMap<Object, StateObject> stateMap = new HashMap<>();
     private final ArrayList<StateObject> stateList = new ArrayList<>();
-    private final HashMap<Object, ReadAccessor<?>> relationObjectsMap = new HashMap<>();
-    private final ArrayList<ReadAccessor<Object>> relationEvaluatorList = new ArrayList<>();
-    private ReadAccessor<Object> parentEvaluator;
+    private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
+    private final ArrayList<RelationObject> relationObjectList = new ArrayList<>();
+    private RelationObject parentRelationObject;
     private LifecycleLockStrategry lifecycleLockStrategry;
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
@@ -85,7 +87,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             try {
                 this.lifecycleLockStrategry = annotation.value().newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.LIFECYCLE_LOCK_SHOULD_HAVE_NO_ARGS_CONSTRUCTOR, annotation.value());
+                throw newVerificationException(getDottedPath(),
+                        SyntaxErrors.LIFECYCLE_LOCK_SHOULD_HAVE_NO_ARGS_CONSTRUCTOR, annotation.value());
             }
         }
     }
@@ -99,13 +102,12 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         if ( Object.class == klass || null == klass ) {
             return;
         }
-        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner();
+        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this);
         final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
         scanMethodsOnClasses(new Class<?>[] { klass }, verificationFailureSet, scanner);
         if ( 0 < verificationFailureSet.size() ) throw new VerificationException(verificationFailureSet);
     }
 
-    @SuppressWarnings({ "rawtypes" })
     private void configureRelationObjectsOnField(Class<?> klass) throws VerificationException {
         if ( klass.isInterface() || Object.class == klass || null == klass ) {
             return;
@@ -115,25 +117,27 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             if ( null == relation ) {
                 continue;
             }
-            Class<?> relationClass = relation.value();
-            // getMetaType().getRegistry().registerLifecycleMeta(relationClass.getAnnotation(RelateTo.class).value());
             getMetaType().getRegistry().loadStateMachineObject(field.getType());
-            final FieldEvaluator evaluator = new FieldEvaluator(field);
+            final Class<?> relationClass = relation.value();
+            RelationObject relationObject = null;
+            RelationMetadata relationMetadata = null;
             if ( Null.class != relationClass ) {
-                addRelation(klass, evaluator, relationClass, relationClass.getSimpleName());
+                relationMetadata = getMetaType().getRelationMetadata(relationClass);
             } else {
-                addRelation(klass, evaluator, StringUtil.toUppercaseFirstCharacter(field.getName()));
+                relationMetadata = getMetaType().getRelationMetadata(
+                        StringUtil.toUppercaseFirstCharacter(field.getName()));
             }
+            relationObject = new RelationObjectBuilderImpl(this, field, relationMetadata).build(klass, this)
+                    .getMetaData();
+            addRelation(klass, relationObject, relationMetadata.getPrimaryKey());
         }
     }
 
-    private void addRelation(Class<?> klass, final FieldEvaluator evaluator, final Object... relationKeys) {
-        for ( final Object key : relationKeys ) {
-            this.relationObjectsMap.put(key, evaluator);
-        }
-        this.relationEvaluatorList.add(evaluator);
+    private void addRelation(Class<?> klass, final RelationObject relationObject, final Object primaryKey) {
+        this.relationObjectsMap.put(primaryKey, relationObject);
+        this.relationObjectList.add(relationObject);
         if ( isParentRelation(klass) ) {
-            this.parentEvaluator = evaluator;
+            this.parentRelationObject = relationObject;
         }
     }
 
@@ -194,7 +198,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             this.stateAccessor = new FieldStateAccessor<String>(stateField);
         } else {
             try {
-                final StateConverter<?> stateConverter = stateField.getAnnotation(Converter.class).value().newInstance();
+                final StateConverter<?> stateConverter = stateField.getAnnotation(Converter.class).value()
+                        .newInstance();
                 this.stateAccessor = new ConverterAccessor(stateConverter, new FieldStateAccessor(stateField));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
@@ -220,12 +225,13 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private void verifyConditionBeCovered(Class<?> klass, final ConditionMetadata conditionMetadata) throws VerificationException {
+    private void verifyConditionBeCovered(Class<?> klass, final ConditionMetadata conditionMetadata)
+            throws VerificationException {
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
         if ( !scanner.isCovered() ) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getMetaType().getDottedPath(),
-                    conditionMetadata.getDottedPath());
+            throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getMetaType()
+                    .getDottedPath(), conditionMetadata.getDottedPath());
         }
     }
 
@@ -257,7 +263,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class[] { klass }, failureSet, new ConditionProviderMethodScanner(klass, getMetaType()));
+        scanMethodsOnClasses(new Class[] { klass }, failureSet,
+                new ConditionProviderMethodScanner(klass, getMetaType()));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -280,17 +287,20 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             if ( null != condition ) {
                 if ( template.hasCondition(condition.value()) ) {
                     if ( conditions.contains(condition.value()) ) {
-                        failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
+                        failureSet.add(newVerificationException(klass.getName(),
+                                SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
                                 condition.value()));
                     } else {
                         if ( !condition.value().isAssignableFrom(method.getReturnType()) ) {
-                            failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
-                                    method, condition.value()));
+                            failureSet.add(newVerificationException(klass.getName(),
+                                    SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE, method,
+                                    condition.value()));
                         }
                         conditions.add(condition.value());
                     }
                 } else {
-                    failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_REFERENCE_INVALID, method, condition.value()));
+                    failureSet.add(newVerificationException(klass.getName(),
+                            SyntaxErrors.LM_CONDITION_REFERENCE_INVALID, method, condition.value()));
                 }
             }
             return false;
@@ -345,8 +355,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return false;
     }
 
-    private void verifyRelationBeCovered(Class<?> klass, final RelationConstraintMetadata relation, final TransitionMetadata transition)
-            throws VerificationException {
+    private void verifyRelationBeCovered(Class<?> klass, final RelationConstraintMetadata relation,
+            final TransitionMetadata transition) throws VerificationException {
         final TransitionMethodScanner scanner = new TransitionMethodScanner(transition);
         scanMethodsOnClasses(new Class[] { klass }, null, scanner);
         final Method[] transitionMethods = scanner.getTransitionMethods();
@@ -363,18 +373,21 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             if ( relationGetterScanner.isCovered() ) {
                 continue NEXT_TRANSITION_METHOD;
             }
-            throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, method.getName(),
-                    klass.getName(), relation.getDottedPath().getName(), relation.getParent().getDottedPath()));
+            throw new VerificationException(newVerificationFailure(getDottedPath(),
+                    SyntaxErrors.LM_RELATION_NOT_BE_CONCRETED, method.getName(), klass.getName(), relation
+                            .getDottedPath().getName(), relation.getParent().getDottedPath()));
         }
     }
 
-    private boolean hasRelationOnMethodParameters(final RelationConstraintMetadata relation, final Method method) throws VerificationException {
+    private boolean hasRelationOnMethodParameters(final RelationConstraintMetadata relation, final Method method)
+            throws VerificationException {
         for ( Annotation[] annotations : method.getParameterAnnotations() ) {
             for ( Annotation annotation : annotations ) {
                 if ( annotation instanceof Relation ) {
                     Relation r = (Relation) annotation;
                     if ( Null.class == r.value() ) {
-                        throw newVerificationException(getDottedPath(), SyntaxErrors.LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE, method);
+                        throw newVerificationException(getDottedPath(),
+                                SyntaxErrors.LM_RELATION_ON_METHOD_PARAMETER_MUST_SPECIFY_VALUE, method);
                     }
                     if ( isKeyOfRelationMetadata(relation, r.value()) ) return true;
                 }
@@ -430,7 +443,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                         transitionMethodList.add(method);
                     }
                 } else {
-                    if ( StringUtil.toUppercaseFirstCharacter(method.getName()).equals(transition.getDottedPath().getName()) ) {
+                    if ( StringUtil.toUppercaseFirstCharacter(method.getName()).equals(
+                            transition.getDottedPath().getName()) ) {
                         transitionMethodList.add(method);
                     }
                 }
@@ -477,8 +491,9 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 return false;
             } else {
                 if ( Null.class == relation.value() ) {} else if ( !getMetaType().hasRelation(relation.value()) ) {
-                    failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method
-                            .getDeclaringClass().getName(), relation.value().getName(), getMetaType().getDottedPath().getAbsoluteName()));
+                    failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(),
+                            SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method.getDeclaringClass().getName(),
+                            relation.value().getName(), getMetaType().getDottedPath().getAbsoluteName()));
                 }
             }
             return false;
@@ -486,21 +501,37 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
     private final class RelationGetterConfigureScanner implements MethodScanner {
 
-        @SuppressWarnings("rawtypes")
+        final private StateMachineObject stateMachineObject;
+
+        public RelationGetterConfigureScanner(StateMachineObject stateMachineObject) {
+            this.stateMachineObject = stateMachineObject;
+        }
+
         @Override
         public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
             Relation relation = method.getAnnotation(Relation.class);
             if ( null != relation ) {
-                final PropertyEvaluator evaluator = new PropertyEvaluator(method);
+                RelationObject relationObject = null;
+                RelationMetadata relationMetadata = null;
+                StateMachineMetadata relatedStateMachine = null;
+                try {
+                    relatedStateMachine = getMetaType().getRegistry().loadStateMachineMetadata(
+                            method.getDeclaringClass().getAnnotation(LifecycleMeta.class).value(), null);
+                } catch (VerificationException e) {
+                    failureSet.add(e);
+                }
                 if ( Null.class == relation.value() ) {
                     if ( method.getName().startsWith("get") ) {
-                        relationObjectsMap.put(method.getName().substring(3), evaluator);
+                        relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil
+                                .toUppercaseFirstCharacter(method.getName().substring(3)));
                     }
-                    relationObjectsMap.put(method.getName(), evaluator);
+                    relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil
+                            .toUppercaseFirstCharacter(method.getName()));
                 } else {
-                    relationObjectsMap.put(relation.value(), evaluator);
+                    relationMetadata = relatedStateMachine.getRelationMetadata(relation.value());
                 }
-                relationEvaluatorList.add(evaluator);
+                relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
+                addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
                 try {
                     getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
                 } catch (VerificationException e) {
@@ -558,13 +589,15 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             Class<?> relationClass = relation.value();
             if ( Null.class != relationClass ) {
                 if ( !getMetaType().hasRelation(relationClass) ) {
-                    throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE,
-                            klass.getName(), relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
+                    throw new VerificationException(newVerificationFailure(getDottedPath(),
+                            SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(),
+                            relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
                 }
             } else {
                 if ( !getMetaType().hasRelation(StringUtil.toUppercaseFirstCharacter(field.getName())) ) {
-                    throw new VerificationException(newVerificationFailure(getDottedPath(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE,
-                            klass.getName(), relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
+                    throw new VerificationException(newVerificationFailure(getDottedPath(),
+                            SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, klass.getName(),
+                            relationClass.getName(), getMetaType().getDottedPath().getAbsoluteName()));
                 }
             }
         }
@@ -599,10 +632,12 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private void checkRelationInstanceWhetherExists(Class<?> klass, final Set<Class<?>> relations, final Relation relation) throws VerificationException {
+    private void checkRelationInstanceWhetherExists(Class<?> klass, final Set<Class<?>> relations,
+            final Relation relation) throws VerificationException {
         if ( null != relation ) {
             if ( relations.contains(relation.value()) ) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, klass.getName(), relation.value().getName());
+                throw newVerificationException(getDottedPath(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE,
+                        klass.getName(), relation.value().getName());
             }
             relations.add(relation.value());
         }
@@ -623,7 +658,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             // verify default
             final Method defaultGetter = findDefaultStateGetterMethod(klass);
             if ( null == defaultGetter ) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
+                throw newVerificationException(getDottedPath(),
+                        SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
             } else {
                 verifyStateIndicatorElement(klass, defaultGetter, defaultGetter.getReturnType());
             }
@@ -642,7 +678,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private void verifyStateIndicatorElement(Class<?> klass, AnnotatedElement getter, Class<?> stateType) throws VerificationException {
+    private void verifyStateIndicatorElement(Class<?> klass, AnnotatedElement getter, Class<?> stateType)
+            throws VerificationException {
         verifyStateIndicatorElementSetterVisibility(klass, getter, stateType);
         if ( stateType.equals(java.lang.String.class) ) {
             return;
@@ -650,7 +687,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         verifyStateIndicatorConverter(getter, stateType);
     }
 
-    private void verifyStateIndicatorConverter(AnnotatedElement getter, Class<?> stateType) throws VerificationException {
+    private void verifyStateIndicatorConverter(AnnotatedElement getter, Class<?> stateType)
+            throws VerificationException {
         final Class<?> getterDeclaringClass;
         if ( getter instanceof Method ) {
             getterDeclaringClass = ( (Method) getter ).getDeclaringClass();
@@ -661,15 +699,18 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
         final Converter converterMeta = getter.getAnnotation(Converter.class);
         if ( null == converterMeta ) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND, getterDeclaringClass, stateType);
+            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND,
+                    getterDeclaringClass, stateType);
         } else {
             Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
             for ( Type type : genericInterfaces ) {
                 if ( type instanceof ParameterizedType ) {
                     ParameterizedType pType = (ParameterizedType) type;
-                    if ( pType.getRawType() instanceof Class && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
+                    if ( pType.getRawType() instanceof Class
+                            && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
                         if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
-                            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
+                            throw newVerificationException(getDottedPath(),
+                                    SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
                                     converterMeta.value(), pType.getActualTypeArguments()[0]);
                         }
                     }
@@ -680,21 +721,25 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private void verifyStateIndicatorElementSetterVisibility(final Class<?> klass, AnnotatedElement getter, Class<?> returnType) throws VerificationException {
+    private void verifyStateIndicatorElementSetterVisibility(final Class<?> klass, AnnotatedElement getter,
+            Class<?> returnType) throws VerificationException {
         if ( getter instanceof Method ) {
             final String getterName = ( (Method) getter ).getName();
             final String setterName = convertSetterName(getterName, returnType);
             final Method setter = findMethod(klass, setterName, returnType);
             if ( null == setter && !klass.isInterface() ) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_SETTER_NOT_FOUND, ( (Method) getter ).getDeclaringClass());
+                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_SETTER_NOT_FOUND,
+                        ( (Method) getter ).getDeclaringClass());
             } else {
                 if ( null != setter && !Modifier.isPrivate(( setter ).getModifiers()) ) {
-                    throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER, setter);
+                    throw newVerificationException(getDottedPath(),
+                            SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_SETTER, setter);
                 }
             }
         } else if ( getter instanceof Field ) {
             if ( !Modifier.isPrivate(( (Field) getter ).getModifiers()) ) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
+                throw newVerificationException(getDottedPath(),
+                        SyntaxErrors.STATE_INDICATOR_CANNOT_EXPOSE_STATE_INDICATOR_FIELD, getter);
             }
         } else {
             throw new IllegalArgumentException();
@@ -747,12 +792,14 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata, VerificationFailureSet failureSet) {
+    private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata,
+            VerificationFailureSet failureSet) {
         CoverageVerifier coverage = new CoverageVerifier(transitionMetadata);
         scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, coverage);
         if ( coverage.notCovered() ) {
-            failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
-                    transitionMetadata.getDottedPath().getName(), getMetaType().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
+            failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(),
+                    SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM, transitionMetadata.getDottedPath().getName(),
+                    getMetaType().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
         }
     }
 
@@ -787,7 +834,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         });
     }
 
-    protected void configureCondition(Class<?> klass, Method method, ConditionMetadata conditionMetadata) throws VerificationException {
+    protected void configureCondition(Class<?> klass, Method method, ConditionMetadata conditionMetadata)
+            throws VerificationException {
         ConditionObjectBuilder builder = new ConditionObjectBuilderImpl(this, method, conditionMetadata);
         builder.build(klass, this);
         final Iterator<Object> iterator = builder.getKeySet().iterator();
@@ -808,7 +856,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 }
                 final TransitionMetadata transitionMetadata;
                 if ( Null.class == transitionAnno.value() ) {
-                    transitionMetadata = getMetaType().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
+                    transitionMetadata = getMetaType().getTransition(
+                            StringUtil.toUppercaseFirstCharacter(method.getName()));
                 } else {
                     transitionMetadata = getMetaType().getTransition(transitionAnno.value());
                 }
@@ -862,7 +911,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 return false;
             } else if ( null != stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
                 if ( !overridingFound ) {
-                    failureSet.add(newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
+                    failureSet.add(newVerificationException(getDottedPath(),
+                            SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
                     return true;
                 }
             }
@@ -886,7 +936,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
         @Override
         public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
-            if ( null == targetMethod && targetMethodName.equals(method.getName()) && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
+            if ( null == targetMethod && targetMethodName.equals(method.getName())
+                    && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
                 targetMethod = method;
                 return true;
             }
@@ -921,14 +972,17 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             }
             final TransitionTypeEnum type = transitionMetadata.getType();
             if ( isUniqueTransition(type) ) {
-                failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(), SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
-                        transitionMetadata.getDottedPath().getName(), "@" + type.name(), getMetaType().getDottedPath(), getDottedPath().getAbsoluteName()));
+                failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
+                        SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD, transitionMetadata
+                                .getDottedPath().getName(), "@" + type.name(), getMetaType().getDottedPath(),
+                        getDottedPath().getAbsoluteName()));
             }
             return false;
         }
 
         private boolean isUniqueTransition(final TransitionTypeEnum type) {
-            return type == TransitionTypeEnum.Corrupt || type == TransitionTypeEnum.Recover || type == TransitionTypeEnum.Redo;
+            return type == TransitionTypeEnum.Corrupt || type == TransitionTypeEnum.Recover
+                    || type == TransitionTypeEnum.Redo;
         }
 
         private boolean match(TransitionMetadata transitionMetadata, Method transitionMethod) {
@@ -952,15 +1006,18 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         if ( Null.class == transition.value() ) {
             transitionMetadata = verifyTransitionMethodDefaultStyle(method, failureSet, transitionMetadata);
         } else {
-            transitionMetadata = verifyTransitionMethodWithTransitionClassKey(method, failureSet, transition, transitionMetadata);
+            transitionMetadata = verifyTransitionMethodWithTransitionClassKey(method, failureSet, transition,
+                    transitionMetadata);
         }
         if ( null != transitionMetadata ) {
             verifySpecialTransitionMethodHasZeroArgument(method, failureSet, transitionMetadata);
         }
     }
 
-    private void configureTransitionObject(final Class<?> klass, final Method method, final TransitionMetadata transitionMetadata) throws VerificationException {
-        final TransitionObjectBuilderImpl transitionObjectBuilder = new TransitionObjectBuilderImpl(this, method, transitionMetadata);
+    private void configureTransitionObject(final Class<?> klass, final Method method,
+            final TransitionMetadata transitionMetadata) throws VerificationException {
+        final TransitionObjectBuilderImpl transitionObjectBuilder = new TransitionObjectBuilderImpl(this, method,
+                transitionMetadata);
         transitionObjectBuilder.build(klass, this);
         transitionObjectList.add(transitionObjectBuilder.getMetaData());
         final Iterator<Object> iterator = transitionObjectBuilder.getKeySet().iterator();
@@ -976,28 +1033,31 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         }
     }
 
-    private TransitionMetadata verifyTransitionMethodWithTransitionClassKey(Method method, VerificationFailureSet failureSet, final Transition transition,
-            TransitionMetadata transitionMetadata) {
+    private TransitionMetadata verifyTransitionMethodWithTransitionClassKey(Method method,
+            VerificationFailureSet failureSet, final Transition transition, TransitionMetadata transitionMetadata) {
         if ( !getMetaType().hasTransition(transition.value()) ) {
-            failureSet.add(newVerificationFailure(getMethodDottedPath(method), SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition,
-                    method.getName(), method.getDeclaringClass().getName(), getMetaType().getDottedPath()));
+            failureSet.add(newVerificationFailure(getMethodDottedPath(method),
+                    SyntaxErrors.LM_TRANSITION_METHOD_WITH_INVALID_TRANSITION_REFERENCE, transition, method.getName(),
+                    method.getDeclaringClass().getName(), getMetaType().getDottedPath()));
         } else {
             transitionMetadata = getMetaType().getTransition(transition.value());
         }
         return transitionMetadata;
     }
 
-    private TransitionMetadata verifyTransitionMethodDefaultStyle(Method method, VerificationFailureSet failureSet, TransitionMetadata transitionMetadata) {
+    private TransitionMetadata verifyTransitionMethodDefaultStyle(Method method, VerificationFailureSet failureSet,
+            TransitionMetadata transitionMetadata) {
         if ( !getMetaType().hasTransition(StringUtil.toUppercaseFirstCharacter(method.getName())) ) {
-            failureSet.add(newVerificationFailure(getMethodDottedPath(method), SyntaxErrors.LM_METHOD_NAME_INVALID, getMetaType().getDottedPath(),
-                    method.getName(), method.getDeclaringClass().getName()));
+            failureSet.add(newVerificationFailure(getMethodDottedPath(method), SyntaxErrors.LM_METHOD_NAME_INVALID,
+                    getMetaType().getDottedPath(), method.getName(), method.getDeclaringClass().getName()));
         } else {
             transitionMetadata = getMetaType().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
         }
         return transitionMetadata;
     }
 
-    private void verifySpecialTransitionMethodHasZeroArgument(Method method, VerificationFailureSet failureSet, TransitionMetadata transitionMetadata) {
+    private void verifySpecialTransitionMethodHasZeroArgument(Method method, VerificationFailureSet failureSet,
+            TransitionMetadata transitionMetadata) {
         switch (transitionMetadata.getType()) {
             case Corrupt:
                 // fall through
@@ -1083,19 +1143,24 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         final StateObject state = getState(stateName);
         final FunctionMetadata functionMetadata = state.getMetaType().getFunctionMetadata(transitionKey);
         if ( null == functionMetadata ) {
-            throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey + " while searching function metadata from state: "
-                    + state);
+            throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey
+                    + " while searching function metadata from state: " + state);
         }
         if ( 1 < functionMetadata.getNextStates().size() ) {
             final TransitionMetadata transitionMetadata = functionMetadata.getTransition();
             Class<? extends ConditionalTransition<?>> judgerClass = transitionMetadata.getJudgerClass();
             try {
-                ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass.newInstance();
-                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target, transitionMetadata));
-                final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass).getMetaType());
+                ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass
+                        .newInstance();
+                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target,
+                        transitionMetadata));
+                final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass)
+                        .getMetaType());
                 return nextState.getSimpleName();
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass + ". Please provide no-arg constructor.");
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass
+                        + ". Please provide no-arg constructor.");
             }
         } else if ( 1 == functionMetadata.getNextStates().size() ) {
             StateMetadata nextState = findStateFromBottomToTop(functionMetadata);
@@ -1112,7 +1177,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return nextState;
     }
 
-    private Object evaluateJudgeable(Object target, final TransitionMetadata transitionMetadata) throws IllegalAccessException, InvocationTargetException {
+    private Object evaluateJudgeable(Object target, final TransitionMetadata transitionMetadata)
+            throws IllegalAccessException, InvocationTargetException {
         final ConditionObject conditionObject = getConditionObject(transitionMetadata.getConditionClass());
         Object getJudgeable = conditionObject.conditionGetter().invoke(target);
         return getJudgeable;
@@ -1135,15 +1201,16 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public void validateValidWhiles(final InterceptContext context) {
+    public void validateValidWhiles(final InterceptContext<?> context) {
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final StateMetadata state = getMetaType().getState(evaluateState(context.getTarget()));
         final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
         final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
-            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters, relationMetadataEntry);
-            getState(state.getDottedPath()).verifyValidWhile(context.getTarget(), relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]),
-                    relationInstance);
+            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters,
+                    relationMetadataEntry);
+            getState(state.getDottedPath()).verifyValidWhile(context.getTarget(),
+                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
         }
     }
 
@@ -1157,7 +1224,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return null;
     }
 
-    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext context) {
+    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext<?> context) {
         final Object[] arguments = context.getArguments();
         final Method method = context.getMethod();
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -1176,30 +1243,35 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     private ReadAccessor<?> getEvaluator(Object relationKey) {
         if ( relationObjectsMap.containsKey(relationKey) ) {
-            return relationObjectsMap.get(relationKey);
+            return (ReadAccessor<?>) relationObjectsMap.get(relationKey).getEvaluator();
         }
-        throw new IllegalStateException("The evaluate is not found, which should not happen. Check the verifyRelationsAllBeCoveraged method with key:"
-                + relationKey);
+        throw new IllegalStateException(
+                "The evaluate is not found, which should not happen. Check the verifyRelationsAllBeCoveraged method with key:"
+                        + relationKey);
     }
 
     @Override
-    public void validateInboundWhiles(InterceptContext context) {
+    public void validateInboundWhiles(InterceptContext<?> context) {
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final StateMetadata state = getMetaType().getState(evaluateState(target));
         final String nextState = getNextState(target, transitionKey);
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
-        for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
-            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters, relationMetadataEntry);
+        for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(
+                nextStateMetadata.getInboundWhiles()).entrySet() ) {
+            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters,
+                    relationMetadataEntry);
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
                     relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
         }
     }
 
-    private Object getRelationInstance(InterceptContext context, final HashMap<Class<?>, Object> relationsInMethodParameters,
+    private Object getRelationInstance(InterceptContext<?> context,
+            final HashMap<Class<?>, Object> relationsInMethodParameters,
             final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
-        Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry.getValue().get(0).getKeySet());
+        Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry
+                .getValue().get(0).getKeySet());
         if ( null == relationObject ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getPrimaryKey());
             relationObject = evaluator.read(context.getTarget());
@@ -1242,18 +1314,18 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     @Override
     public Object[] evaluateRelatives(Object target) {
         final ArrayList<Object> result = new ArrayList<>();
-        for ( ReadAccessor<Object> accessor : this.relationEvaluatorList ) {
-            result.add(accessor.read(target));
+        for ( RelationObject relationObject : this.relationObjectList ) {
+            result.add(relationObject.getEvaluator().read(target));
         }
         return result.toArray();
     }
 
     @Override
     public StateMachineObject getParentStateMachine(Object target) {
-        if ( null == parentEvaluator ) {
+        if ( null == parentRelationObject ) {
             return null;
         } else {
-            final Object parentObject = parentEvaluator.read(target);
+            final Object parentObject = parentRelationObject.getEvaluator().read(target);
             if ( null != parentObject ) {
                 try {
                     return registry.loadStateMachineObject(parentObject.getClass());
@@ -1268,7 +1340,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     @Override
     public StateMachineObject getRelatedStateMachine(Object target, Object relativeKey) {
-        final ReadAccessor<?> relationEvaluator = relationObjectsMap.get(relativeKey);
+        final ReadAccessor<?> relationEvaluator = (ReadAccessor<?>) relationObjectsMap.get(relativeKey).getEvaluator();
         if ( null == relationEvaluator ) {
             throw new IllegalArgumentException("Cannot find relation with Key: " + relativeKey);
         } else {
