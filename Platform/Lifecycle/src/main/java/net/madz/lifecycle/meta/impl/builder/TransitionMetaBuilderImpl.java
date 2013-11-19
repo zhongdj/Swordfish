@@ -2,7 +2,6 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 
 import net.madz.common.Dumper;
 import net.madz.lifecycle.SyntaxErrors;
@@ -14,7 +13,6 @@ import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
-import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
