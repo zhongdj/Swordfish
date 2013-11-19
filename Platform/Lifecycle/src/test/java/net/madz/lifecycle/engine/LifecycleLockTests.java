@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
@@ -116,6 +119,9 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         final ResourceObject resource = new ResourceObject();
         resource.test();
         resource.goLive();
+        final ReentrantLock lock = new ReentrantLock();
+        final Condition condition = lock.newCondition();
+        final AtomicInteger indicator = new AtomicInteger(1);
         final Callable<LifecycleException> c1 = new Callable<LifecycleException>() {
 
             @Override
@@ -126,6 +132,13 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
                     order.confirm();
                     order.startProduce(resource);
                     order.startPackage();
+                    lock.lock();
+                    indicator.incrementAndGet();
+                    condition.signal();
+                    while ( indicator.intValue() != 3 ) {
+                        condition.await();
+                    }
+                    lock.unlock();
                     order.deliver();
                     order.complete();
                     assertState(OrderStateMachine.States.Finished.class, order);
@@ -139,7 +152,16 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
 
             @Override
             public Void call() throws Exception {
+                lock.lock();
+                while ( indicator.intValue() != 2 ) {
+                    condition.await();
+                }
+                lock.unlock();
                 customer.cancel();
+                lock.lock();
+                indicator.incrementAndGet();
+                condition.signal();
+                lock.unlock();
                 return null;
             }
         };
