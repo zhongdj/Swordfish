@@ -1,12 +1,10 @@
-package net.madz.lifecycle.meta.builder;
-
-import java.util.Iterator;
+package net.madz.lifecycle.meta.impl.builder;
 
 import net.madz.common.Dumper;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.RelateTo;
-import net.madz.lifecycle.meta.impl.builder.InheritableAnnotationMetaBuilderBase;
+import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.verification.VerificationException;
@@ -61,7 +59,7 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
 
     @Override
     protected RelationMetadata findSuper(Class<?> metaClass) throws VerificationException {
-        return parent.getSuper().getRelationMetadata(metaClass);
+        return parent.getSuper().getDeclaredRelationMetadata(metaClass);
     }
 
     protected void verifyRelateTo(Class<?> clazz) throws VerificationException {
