@@ -90,6 +90,7 @@ public class EngineTestBase {
             for ( final Class<?> c : cursorClass.getDeclaredClasses() ) {
                 for ( final Annotation a : c.getDeclaredAnnotations() ) {
                     if ( LifecycleMeta.class == a.annotationType() ) {
+                        System.out.println("Registering Lifecycle class:  " + c);
                         DefaultStateMachineRegistry.getInstance().registerLifecycleMeta(c);
                         break;
                     }

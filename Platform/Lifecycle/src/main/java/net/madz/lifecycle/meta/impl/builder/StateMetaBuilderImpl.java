@@ -605,12 +605,12 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         RelationMetadata relationMetadata = null;
         for ( StateMachineMetadata stateMachineMetadata = parent; relationMetadata == null && stateMachineMetadata != null; stateMachineMetadata = stateMachineMetadata
                 .getSuper() ) {
-            relationMetadata = stateMachineMetadata.getRelationMetadata(relationClass);
+            relationMetadata = stateMachineMetadata.getDeclaredRelationMetadata(relationClass);
             if ( null != relationMetadata ) {
                 return relationMetadata.getRelateToStateMachine();
             }
             if ( null == relationMetadata && stateMachineMetadata.isComposite() ) {
-                final RelationMetadata owingRelationMetadata = stateMachineMetadata.getOwningStateMachine().getRelationMetadata(relationClass);
+                final RelationMetadata owingRelationMetadata = stateMachineMetadata.getOwningStateMachine().getDeclaredRelationMetadata(relationClass);
                 if ( null != owingRelationMetadata ) {
                     return owingRelationMetadata.getRelateToStateMachine();
                 }

@@ -25,13 +25,9 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         }
     }
 
-    private String inboundWhileDottedPath(Class<?> stateClass, Class<?> relationKeyClss) {
-        return stateClass.getDeclaringClass().getDeclaringClass().getName() + ".StateSet." + stateClass.getSimpleName() + ".InboundWhiles."
-                + relationKeyClss.getSimpleName();
-    }
-
     @Test(expected = LifecycleException.class)
-    public void test_inherited_valid_while_relation_validation_negative_with_super_valid_while() throws LifecycleException {
+    public void test_inherited_valid_while_relation_validation_negative_with_super_valid_while()
+            throws LifecycleException {
         final InternetTVServiceProvider provider = new InternetTVServiceProvider();
         assertEquals(InternetTVProviderLifecycle.States.ServiceAvailable.class.getSimpleName(), provider.getState());
         final Customer customer = new Customer();
@@ -50,7 +46,8 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inherited_valid_while_relation_validation_negative_with_self_valid_while() throws LifecycleException {
+    public void test_inherited_valid_while_relation_validation_negative_with_self_valid_while()
+            throws LifecycleException {
         final InternetTVServiceProvider provider = new InternetTVServiceProvider();
         assertEquals(InternetTVProviderLifecycle.States.ServiceAvailable.class.getSimpleName(), provider.getState());
         provider.shutdown();
@@ -63,13 +60,15 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, provider, service, VOIPProviderLifecycleMeta.States.ServiceAvailable.class);
+            assertInvalidStateErrorByValidWhile(e, provider, service,
+                    VOIPProviderLifecycleMeta.States.ServiceAvailable.class);
             throw e;
         }
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_overrides_inherited_valid_while_relation_validation_negative_with_self_valid_while() throws LifecycleException {
+    public void test_overrides_inherited_valid_while_relation_validation_negative_with_self_valid_while()
+            throws LifecycleException {
         final VOIPProvider provider = new VOIPProvider();
         final Customer customer = new Customer();
         assertEquals(CustomerLifecycleMeta.States.Draft.class.getSimpleName(), customer.getState());
@@ -81,7 +80,8 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, provider, service, VOIPProviderLifecycleMeta.States.ServiceAvailable.class);
+            assertInvalidStateErrorByValidWhile(e, provider, service,
+                    VOIPProviderLifecycleMeta.States.ServiceAvailable.class);
             throw e;
         }
     }
@@ -90,14 +90,17 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     public void test_inbound_while_with_non_conditional_transition() {
         final Customer customer = new Customer();
         customer.activate();
-        InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null, customer, "3 years");
+        InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null,
+                customer, "3 years");
         customer.cancel();
         assertEquals(CustomerLifecycleMeta.States.Canceled.class.getSimpleName(), customer.getState());
         try {
             service.start();
         } catch (LifecycleException e) {
-            assertViolateInboundWhileRelationConstraint(e, InternetServiceLifecycleMetaWithInboundWhile.Transitions.Start.class,
-                    InternetServiceLifecycleMetaWithInboundWhile.States.InService.class, service, customer, CustomerLifecycleMeta.States.Active.class);
+            assertViolateInboundWhileRelationConstraint(e,
+                    InternetServiceLifecycleMetaWithInboundWhile.Transitions.Start.class,
+                    InternetServiceLifecycleMetaWithInboundWhile.States.InService.class, service, customer,
+                    CustomerLifecycleMeta.States.Active.class);
         }
     }
 
@@ -110,8 +113,10 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {
-            assertViolateInboundWhileRelationConstraint(e, KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
-                    KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class, keyboard, power, PowerLifecycleMetadata.States.PowerOn.class);
+            assertViolateInboundWhileRelationConstraint(e,
+                    KeyBoardLifecycleMetadataPreValidateCondition.Transitions.PressAnyKey.class,
+                    KeyBoardLifecycleMetadataPreValidateCondition.States.ReadingInput.class, keyboard, power,
+                    PowerLifecycleMetadata.States.PowerOn.class);
         }
     }
 
@@ -124,8 +129,10 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             keyboard.pressAnyKey();
         } catch (LifecycleException e) {
-            assertViolateInboundWhileRelationConstraint(e, KeyBoardLifecycleMetadataPostValidateCondition.Transitions.PressAnyKey.class,
-                    KeyBoardLifecycleMetadataPostValidateCondition.States.Broken.class, keyboard, power, PowerLifecycleMetadata.States.PowerOn.class);
+            assertViolateInboundWhileRelationConstraint(e,
+                    KeyBoardLifecycleMetadataPostValidateCondition.Transitions.PressAnyKey.class,
+                    KeyBoardLifecycleMetadataPostValidateCondition.States.Broken.class, keyboard, power,
+                    PowerLifecycleMetadata.States.PowerOn.class);
         }
     }
 }

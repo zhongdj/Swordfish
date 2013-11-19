@@ -9,7 +9,6 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
-import net.madz.verification.VerificationException;
 
 public interface StateMachineObject extends MetaObject<StateMachineObject, StateMachineMetadata> {
 
@@ -25,10 +24,6 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     StateAccessor<String> getStateAccessor();
 
-    public static interface ReadAccessor<T> {
-
-        T read(Object reactiveObject);
-    }
     public final static class FieldEvaluator<T> implements ReadAccessor<T> {
 
         private final Field objField;
