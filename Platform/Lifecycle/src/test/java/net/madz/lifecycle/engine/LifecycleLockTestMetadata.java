@@ -472,7 +472,11 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         public void invalidate() {}
 
         @Transition
-        public void startService() {}
+        public void startService() {
+            // try {
+            // Thread.sleep(1000L);
+            // } catch (InterruptedException e) {}
+        }
 
         @Transition
         public void abortService() {}
