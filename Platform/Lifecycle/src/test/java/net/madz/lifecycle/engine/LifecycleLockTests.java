@@ -86,4 +86,19 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
             }
         }
     }
+
+    @Test
+    public void test_relational_locking() {
+        final CustomerObject customer = new CustomerObject();
+        final ContractObject contract = new ContractObject(customer);
+        final OrderObject order = new OrderObject(contract);
+        final ResourceObject resource = new ResourceObject();
+        customer.confirm();
+        contract.confirm();
+        order.confirm();
+        order.startProduce(resource);
+        order.startPackage();
+        order.complete();
+        assertState(OrderStateMachine.States.Finished.class, order);
+    }
 }
