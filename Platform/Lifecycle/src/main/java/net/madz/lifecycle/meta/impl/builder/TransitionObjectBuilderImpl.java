@@ -12,20 +12,19 @@ import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObject, StateMachineObject> implements TransitionObjectBuilder {
+public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObject, StateMachineObject, TransitionMetadata> implements TransitionObjectBuilder {
 
     private Method transitionMethod;
-    private TransitionMetadata template;
 
     public TransitionObjectBuilderImpl(StateMachineObjectBuilder parent, Method transitionMethod, TransitionMetadata template) {
         super(parent, "TransitionSet." + template.getDottedPath().getName() + "." + transitionMethod.getName());
         this.transitionMethod = transitionMethod;
-        this.template = template;
+        this.setMetaType(template);
     }
 
     @Override
     public TransitionObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
-        addKeys(template.getKeySet());
+        super.build(klass, parent);
         return this;
     }
 
@@ -42,10 +41,5 @@ public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObj
     @Override
     public TransitionObjectBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         return this;
-    }
-
-    @Override
-    public TransitionMetadata getMetaType() {
-        return template;
     }
 }

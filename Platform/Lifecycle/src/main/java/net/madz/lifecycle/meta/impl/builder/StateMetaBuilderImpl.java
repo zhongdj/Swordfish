@@ -259,11 +259,11 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
 
     @Override
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
+        super.build(clazz, parent);
         verifyBasicSyntax(clazz);
         configureSuper(clazz);
         configureStateType(clazz);
         configureShortcutState(clazz, parent);
-        addKeys(clazz);
         return this;
     }
 
@@ -463,7 +463,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     @Override
-    public void configureRelations(Class<?> clazz) throws VerificationException {
+    public void configureRelationConstrants(Class<?> clazz) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
             verifyInboundWhile(inboundWhile, clazz, failureSet);
@@ -475,14 +475,14 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             throw new VerificationException(failureSet);
         }
         for ( InboundWhile inboundWhile : findInboundWhiles(clazz) ) {
-            RelationConstraintMetadata relationMetadata = configureRelation(findRelatedStateMachine(inboundWhile.relation()), "InboundWhiles."
+            RelationConstraintMetadata relationMetadata = configureRelationConstraint(findRelatedStateMachine(inboundWhile.relation()), "InboundWhiles."
                     + inboundWhile.relation().getSimpleName(), inboundWhile.relation(),
                     getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
                     configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
             this.inboundWhileRelations.add(relationMetadata);
         }
         for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
-            RelationConstraintMetadata relationMetadata = configureRelation(findRelatedStateMachine(validWhile.relation()), "ValidWhiles."
+            RelationConstraintMetadata relationMetadata = configureRelationConstraint(findRelatedStateMachine(validWhile.relation()), "ValidWhiles."
                     + validWhile.relation().getSimpleName(), validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
                     configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
@@ -498,7 +498,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         return onStates;
     }
 
-    private RelationConstraintMetadata configureRelation(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
+    private RelationConstraintMetadata configureRelationConstraint(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
             LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects) throws VerificationException {
         return new RelationConstraintBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(relationClass, this);
     }
@@ -729,5 +729,10 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
 
     private void setCompositeState(boolean compositeState) {
         this.compositeState = compositeState;
+    }
+
+    @Override
+    protected boolean extendsSuperKeySet() {
+        return true;
     }
 }

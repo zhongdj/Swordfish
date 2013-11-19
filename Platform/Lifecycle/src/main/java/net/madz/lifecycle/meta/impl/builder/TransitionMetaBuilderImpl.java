@@ -2,6 +2,7 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 
 import net.madz.common.Dumper;
 import net.madz.lifecycle.SyntaxErrors;
@@ -13,6 +14,7 @@ import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
@@ -34,10 +36,10 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
 
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
+        super.build(clazz, parent);
         configureSuper(clazz, parent);
         configureCondition(clazz);
         configureType(clazz);
-        addKeys(clazz);
         return this;
     }
 
@@ -134,7 +136,14 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
 
     @Override
     protected TransitionMetadata findSuper(Class<?> metaClass) throws VerificationException {
-        // TODO Auto-generated method stub
-        return null;
+        if ( !parent.hasSuper() ) {
+            throw new IllegalStateException("No super transition expected.");
+        }
+        return parent.getSuper().getTransition(metaClass);
+    }
+
+    @Override
+    protected boolean extendsSuperKeySet() {
+        return true;
     }
 }

@@ -19,8 +19,8 @@ public class ConditionMetaBuilderImpl extends InheritableAnnotationMetaBuilderBa
 
     @Override
     public ConditionMetaBuilder build(Class<?> klass, StateMachineMetadata builder) throws VerificationException {
+        super.build(klass, builder);
         configureSuper(klass);
-        addKeys(klass);
         return this;
     }
 
@@ -49,5 +49,10 @@ public class ConditionMetaBuilderImpl extends InheritableAnnotationMetaBuilderBa
     @Override
     protected ConditionMetadata findSuper(Class<?> metaClass) throws VerificationException {
         return parent.getSuper().getCondtion(metaClass);
+    }
+
+    @Override
+    protected boolean extendsSuperKeySet() {
+        return true;
     }
 }

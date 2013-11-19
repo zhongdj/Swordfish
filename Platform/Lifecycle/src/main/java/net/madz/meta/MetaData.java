@@ -9,6 +9,11 @@ public interface MetaData {
 
     MetaData getParent();
 
+    // For Inheritance
+    KeySet getKeySet();
+
+    Object getPrimaryKey();
+
     // String getNamespace();
     void verifyMetaData(VerificationFailureSet verificationSet);
 }

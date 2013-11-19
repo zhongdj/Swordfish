@@ -1,6 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +60,16 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
         } else {
             this.setOverriding(false);
         }
+        if ( extendsSuperKeySet() ) {
+            final Iterator<Object> iterator = getSuper().getKeySet().iterator();
+            while ( iterator.hasNext() ) {
+                addKey(iterator.next());
+            }
+        }
+    }
+
+    protected boolean extendsSuperKeySet() {
+        return false;
     }
 
     protected void verifySuper(Class<?> metaClass) throws VerificationException {}

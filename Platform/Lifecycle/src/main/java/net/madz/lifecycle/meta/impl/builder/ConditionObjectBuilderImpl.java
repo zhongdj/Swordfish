@@ -13,14 +13,13 @@ import net.madz.meta.MetaDataFilterable;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObject, StateMachineObject> implements ConditionObjectBuilder {
+public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObject, StateMachineObject, ConditionMetadata> implements ConditionObjectBuilder {
 
-    private ConditionMetadata template;
     private Method conditionGetter;
 
     protected ConditionObjectBuilderImpl(StateMachineObjectBuilder parent, Method method, ConditionMetadata template) {
         super(parent, "ConditionSet." + template.getDottedPath().getName());
-        this.template = template;
+        this.setMetaType(template);
         this.conditionGetter = method;
     }
 
@@ -34,17 +33,12 @@ public class ConditionObjectBuilderImpl extends ObjectBuilderBase<ConditionObjec
 
     @Override
     public ConditionObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
-        addKeys(template.getKeySet());
+        super.build(klass, parent);
         return this;
     }
 
     @Override
     public MetaDataFilterable filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
         return this;
-    }
-
-    @Override
-    public ConditionMetadata getMetaType() {
-        return template;
     }
 }

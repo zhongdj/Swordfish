@@ -1,5 +1,6 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
 
     @Override
     public RelationConstraintBuilder build(Class<?> klass, StateMetadata parent) throws VerificationException {
-        addKeys(klass);
+        super.build(klass, parent);
         return this;
     }
 
@@ -65,5 +66,10 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     @Override
     protected RelationConstraintMetadata findSuper(Class<?> metaClass) throws VerificationException {
         return null;
+    }
+
+    @Override
+    protected boolean extendsSuperKeySet() {
+        return true;
     }
 }

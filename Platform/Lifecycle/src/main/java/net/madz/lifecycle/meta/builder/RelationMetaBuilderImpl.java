@@ -1,5 +1,7 @@
 package net.madz.lifecycle.meta.builder;
 
+import java.util.Iterator;
+
 import net.madz.common.Dumper;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.relation.Parent;
@@ -36,10 +38,10 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
 
     @Override
     public RelationMetaBuilder build(Class<?> klass, StateMachineMetadata parent) throws VerificationException {
+        super.build(klass, parent);
         configureSuper(klass);
         configureParent(klass);
         configureRelatedStateMachine(klass, parent);
-        addKeys(klass);
         return this;
     }
 
@@ -95,5 +97,10 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
     @Override
     public boolean isParent() {
         return parentRelation;
+    }
+
+    @Override
+    protected boolean extendsSuperKeySet() {
+        return true;
     }
 }

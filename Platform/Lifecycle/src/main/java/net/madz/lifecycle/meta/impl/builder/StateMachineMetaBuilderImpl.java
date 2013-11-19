@@ -27,6 +27,7 @@ import net.madz.lifecycle.meta.builder.ConditionMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationMetaBuilderImpl;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
+import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
@@ -144,9 +145,9 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
 
     @Override
     public StateMachineObject newInstance(Class<?> clazz) throws VerificationException {
-        final StateMachineObjectBuilderImpl builder = new StateMachineObjectBuilderImpl(this, clazz.getName());
+        final StateMachineObjectBuilder builder = new StateMachineObjectBuilderImpl(this, clazz.getName());
         builder.setRegistry(registry);
-        return builder.build(clazz).getMetaData();
+        return builder.build(clazz, null).getMetaData();
     }
 
     @Override
@@ -227,6 +228,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     /* //////////////////////////////////////////////////// */
     @Override
     public StateMachineMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
+        super.build(clazz, parent);
         preConfigureStateMachineType(clazz);
         // Step 1. Syntax Validation
         {
@@ -243,7 +245,6 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
             configureCompositeStateMachine(clazz);
             configureFunctions(clazz);
         }
-        addKeys(clazz);
         return this;
     }
 
@@ -297,7 +298,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     private void configureStateSetRelationConstraints(Class<?> clazz) throws VerificationException {
         for ( final Class<?> stateClass : findComponentClasses(clazz, StateSet.class) ) {
             final StateMetaBuilder stateMetaBuilder = this.stateMap.get(stateClass);
-            stateMetaBuilder.configureRelations(stateClass);
+            stateMetaBuilder.configureRelationConstrants(stateClass);
         }
     }
 
