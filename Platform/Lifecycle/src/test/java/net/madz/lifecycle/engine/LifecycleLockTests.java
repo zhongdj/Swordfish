@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -95,10 +96,50 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         final ResourceObject resource = new ResourceObject();
         customer.confirm();
         contract.confirm();
+        contract.startService();
         order.confirm();
         order.startProduce(resource);
         order.startPackage();
         order.complete();
         assertState(OrderStateMachine.States.Finished.class, order);
+    }
+
+    @Test
+    public void test_relational_locking_concurrent_cancel_parent_first() throws Throwable {
+        final CustomerObject customer = new CustomerObject();
+        customer.confirm();
+        final ContractObject contract = new ContractObject(customer);
+        final OrderObject order = new OrderObject(contract);
+        final ResourceObject resource = new ResourceObject();
+        final Callable<LifecycleException> c1 = new Callable<LifecycleException>() {
+
+            @Override
+            public LifecycleException call() throws Exception {
+                try {
+                    contract.confirm();
+                    contract.startService();
+                    order.confirm();
+                    order.startProduce(resource);
+                    order.startPackage();
+                    order.complete();
+                    assertState(OrderStateMachine.States.Finished.class, order);
+                    return null;
+                } catch (LifecycleException e) {
+                    return e;
+                }
+            }
+        };
+        final Callable<Void> c2 = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                customer.cancel();
+                return null;
+            }
+        };
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final Future<LifecycleException> f1 = executorService.submit(c1);
+        final Future<Void> f2 = executorService.submit(c2);
+        assertInvalidStateErrorByValidWhile(f1.get(), customer, order, CustomerStateMachine.States.Confirmed.ConfirmedStates.InService.class);
     }
 }
