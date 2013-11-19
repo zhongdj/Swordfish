@@ -34,11 +34,11 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, Object relatedTarget) {
         try {
             final StateMachineObject relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
-            final String relatedEvaluateState = relatedStateMachineObject.evaluateState(relatedTarget);
+            final String relatedStateName = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean found = false;
             for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
-                    if ( stateMetadata.getKeySet().contains(relatedEvaluateState) ) {
+                    if ( stateMetadata.getKeySet().contains(relatedStateName) ) {
                         found = true;
                         break;
                     }
@@ -52,7 +52,9 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
                     }
                 }
                 throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.STATE_INVALID, target, this.getMetaType()
-                        .getSimpleName(), relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
+                        .getSimpleName(), relatedTarget, relatedStateName, Arrays.toString(validRelationStates.toArray(new String[0])));
+            } else {
+                relatedStateMachineObject.validateValidWhiles(relatedTarget);
             }
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");

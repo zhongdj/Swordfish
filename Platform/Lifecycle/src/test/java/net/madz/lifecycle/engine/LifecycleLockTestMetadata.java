@@ -434,6 +434,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         public void finish() {}
     }
     @LifecycleMeta(CustomerStateMachine.class)
+    @LifecycleLock(SimpleLock.class)
     static class CustomerObject extends InformativeObject {
 
         @Transition
@@ -458,6 +459,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         public void disconnect() {}
     }
     @LifecycleMeta(ContractStateMachine.class)
+    @LifecycleLock(SimpleLock.class)
     static class ContractObject extends InformativeObject {
 
         @Relation(ContractStateMachine.States.Confirmed.Relations.Customer.class)
@@ -485,6 +487,7 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         public void terminateService() {}
     }
     @LifecycleMeta(OrderStateMachine.class)
+    @LifecycleLock(SimpleLock.class)
     static class OrderObject extends InformativeObject {
 
         @Relation

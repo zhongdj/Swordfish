@@ -1150,22 +1150,30 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     @Override
     public void validateValidWhiles(final InterceptContext<?> context) {
-        final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
-        final StateMetadata state = getMetaType().getState(evaluateState(context.getTarget()));
+        // final HashMap<Class<?>, Object> relationsInMethodParameters =
+        // evaluatorRelationsInMethodParameters(context);
+        final Object target = context.getTarget();
+        validateValidWhiles(target);
+    }
+
+    @Override
+    public void validateValidWhiles(final Object target) {
+        final StateMetadata state = getMetaType().getState(evaluateState(target));
         final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
         final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
+        final StateObject stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
-            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters, relationMetadataEntry);
-            getState(state.getDottedPath()).verifyValidWhile(context.getTarget(), relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]),
-                    relationInstance);
+            final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
+            stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
         }
     }
 
     private Object getRelationInMethodParameters(HashMap<Class<?>, Object> relationsInMethodParameters, KeySet keySet) {
         Iterator<Object> iterator = keySet.iterator();
         while ( iterator.hasNext() ) {
-            if ( relationsInMethodParameters.containsKey(iterator.next()) ) {
-                return relationsInMethodParameters.get(iterator.next());
+            final Object key = iterator.next();
+            if ( relationsInMethodParameters.containsKey(key) ) {
+                return relationsInMethodParameters.get(key);
             }
         }
         return null;
@@ -1198,25 +1206,25 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
 
     @Override
     public void validateInboundWhiles(InterceptContext<?> context) {
+        final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();
-        final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final StateMetadata state = getMetaType().getState(evaluateState(target));
         final String nextState = getNextState(target, transitionKey);
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
-            final Object relationInstance = getRelationInstance(context, relationsInMethodParameters, relationMetadataEntry);
+            final Object relationInstance = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
                     relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
         }
     }
 
-    private Object getRelationInstance(InterceptContext<?> context, final HashMap<Class<?>, Object> relationsInMethodParameters,
+    private Object getRelationInstance(Object contextTarget, final HashMap<Class<?>, Object> relationsInMethodParameters,
             final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
         Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry.getValue().get(0).getKeySet());
         if ( null == relationObject ) {
             ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getPrimaryKey());
-            relationObject = evaluator.read(context.getTarget());
+            relationObject = evaluator.read(contextTarget);
         }
         return relationObject;
     }
@@ -1254,12 +1262,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public Object[] evaluateRelatives(Object target) {
-        final ArrayList<Object> result = new ArrayList<>();
-        for ( RelationObject relationObject : this.relationObjectList ) {
-            result.add(relationObject.getEvaluator().read(target));
-        }
-        return result.toArray();
+    public RelationObject[] evaluateRelatives(Object target) {
+        return relationObjectList.toArray(new RelationObject[0]);
     }
 
     @Override

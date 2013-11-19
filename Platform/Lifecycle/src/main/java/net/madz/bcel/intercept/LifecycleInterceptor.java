@@ -9,6 +9,7 @@ import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
+import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -163,11 +164,11 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
         final Object targetReactiveObject = context.getTarget();
         final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
-        final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
-        for ( Object relative : relativeObjects ) {
-            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(targetReactiveObject, relative.getClass())
+        final RelationObject[] relationObjects = stateMachine.evaluateRelatives(context.getTarget());
+        for ( RelationObject relative : relationObjects ) {
+            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(targetReactiveObject, relative.getPrimaryKey())
                     .getLifecycleLockStrategy();
-            relativeLock.unlockRead(relative);
+            relativeLock.unlockRead(relative.getEvaluator().read(targetReactiveObject));
         }
         if ( null != parentReactiveObject ) {
             final LifecycleLockStrategry parentLock = stateMachine.getParentStateMachine(targetReactiveObject).getLifecycleLockStrategy();
@@ -241,7 +242,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
         final Object targetReactiveObject = context.getTarget();
         final Object parentReactiveObject = stateMachine.evaluateParent(context.getTarget());
-        final Object[] relativeObjects = stateMachine.evaluateRelatives(context.getTarget());
+        final RelationObject[] relationObjects = stateMachine.evaluateRelatives(context.getTarget());
         lockStrategry.lockWrite(targetReactiveObject);
         if ( null != parentReactiveObject ) {
             final LifecycleLockStrategry parentLock = stateMachine.getParentStateMachine(targetReactiveObject).getLifecycleLockStrategy();
@@ -249,10 +250,10 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
                 parentLock.lockRead(parentReactiveObject);
             }
         }
-        for ( Object relative : relativeObjects ) {
-            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(targetReactiveObject, relative.getClass())
+        for ( RelationObject relative : relationObjects ) {
+            final LifecycleLockStrategry relativeLock = stateMachine.getRelatedStateMachine(targetReactiveObject, relative.getPrimaryKey())
                     .getLifecycleLockStrategy();
-            relativeLock.lockRead(relative);
+            relativeLock.lockRead(relative.getEvaluator().read(targetReactiveObject));
         }
     }
 }

@@ -193,9 +193,11 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     Object evaluateParent(Object target);
 
-    Object[] evaluateRelatives(Object target);
+    RelationObject[] evaluateRelatives(Object target);
 
     StateMachineObject getParentStateMachine(Object target);
 
     StateMachineObject getRelatedStateMachine(Object target, Object relativeKey);
+
+    void validateValidWhiles(Object target);
 }

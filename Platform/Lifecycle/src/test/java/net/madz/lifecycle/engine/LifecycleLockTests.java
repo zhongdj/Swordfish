@@ -98,8 +98,11 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         contract.confirm();
         contract.startService();
         order.confirm();
+        resource.test();
+        resource.goLive();
         order.startProduce(resource);
         order.startPackage();
+        order.deliver();
         order.complete();
         assertState(OrderStateMachine.States.Finished.class, order);
     }
@@ -111,6 +114,8 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         final ContractObject contract = new ContractObject(customer);
         final OrderObject order = new OrderObject(contract);
         final ResourceObject resource = new ResourceObject();
+        resource.test();
+        resource.goLive();
         final Callable<LifecycleException> c1 = new Callable<LifecycleException>() {
 
             @Override
@@ -121,6 +126,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
                     order.confirm();
                     order.startProduce(resource);
                     order.startPackage();
+                    order.deliver();
                     order.complete();
                     assertState(OrderStateMachine.States.Finished.class, order);
                     return null;
@@ -140,6 +146,6 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         final ExecutorService executorService = Executors.newFixedThreadPool(2);
         final Future<LifecycleException> f1 = executorService.submit(c1);
         final Future<Void> f2 = executorService.submit(c2);
-        assertInvalidStateErrorByValidWhile(f1.get(), customer, order, CustomerStateMachine.States.Confirmed.ConfirmedStates.InService.class);
+        assertInvalidStateErrorByValidWhile(f1.get(), customer, contract, CustomerStateMachine.States.Confirmed.ConfirmedStates.InService.class);
     }
 }
