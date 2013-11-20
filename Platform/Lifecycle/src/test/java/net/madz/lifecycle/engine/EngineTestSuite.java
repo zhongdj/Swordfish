@@ -6,5 +6,5 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ EngineCoreFunctionPositiveTests.class, EngineCoreFunctionNegativeTests.class, EngineCoreCompositeStateMachinePositiveTests.class,
-        EngineCoreCompositeStateMachineNegativeTests.class, CallbackTests.class, LifecycleLockTests.class })
+        EngineCoreCompositeStateMachineNegativeTests.class, CallbackTests.class, LifecycleLockTests.class, LifecycleEventTests.class })
 public class EngineTestSuite {}

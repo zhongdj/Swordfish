@@ -11,39 +11,21 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
+import net.madz.verification.VerificationException;
 
 public class LifecycleInterceptor<V> extends Interceptor<V> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
-    private static volatile AbsStateMachineRegistry registry = null;
-    static {
-        synchronized (AbsStateMachineRegistry.class) {
-            final String registryClass = System.getProperty("net.madz.lifecycle.StateMachineRegistry");
-            if ( null != registryClass ) {
-                try {
-                    // TODO There are two patterns to use registry:
-                    // 1. using Annotation to register LifecycleMetadata
-                    // classes.
-                    // 2. using
-                    // AbsStateMachineRegistry.registerLifecycleMeta(Class<?>
-                    // class);
-                    // For now ONLY 1st pattern is supported with extending
-                    // AbsStateMachineRegistry.
-                    registry = (AbsStateMachineRegistry) Class.forName(registryClass).newInstance();
-                } catch (Throwable t) {
-                    logger.log(Level.SEVERE, "Cannot Instantiate State Machine Registry: " + registryClass, t);
-                    throw new IllegalStateException(t);
-                }
-            } else {
-                registry = DefaultStateMachineRegistry.getInstance();
-            }
-        }
-    }
 
     private static synchronized StateMachineObject lookupStateMachine(InterceptContext<?> context) {
-        return registry.getStateMachineInst(context.getTarget().getClass());
+        try {
+            return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getTarget().getClass());
+        } catch (VerificationException e) {
+            throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+        }
     }
 
     public LifecycleInterceptor(Interceptor<V> next) {
@@ -151,7 +133,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void fireLifecycleEvents(StateMachineObject stateMachine, InterceptContext<V> context) {
-        final LifecycleEventHandler eventHandler = registry.getLifecycleEventHandler();
+        final LifecycleEventHandler eventHandler = AbsStateMachineRegistry.getInstance().getLifecycleEventHandler();
         if ( null != eventHandler ) {
             eventHandler.onEvent(new LifecycleEventImpl(context));
         }
@@ -228,6 +210,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         } else {
             TransitionMetadata transition = stateMetadata.getTransition(context.getTransitionKey());
             context.setTransitionType(transition.getType());
+            context.setTransition(transition.getDottedPath().getName());
         }
     }
 
