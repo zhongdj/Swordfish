@@ -132,13 +132,16 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
                     order.startProduce(resource);
                     order.startPackage();
                     { // control test flow
-                        lock.lock();
-                        indicator.incrementAndGet();
-                        condition.signal();
-                        while ( indicator.intValue() != 3 ) {
-                            condition.await();
+                        try {
+                            lock.lock();
+                            indicator.incrementAndGet();
+                            condition.signal();
+                            while ( indicator.intValue() != 3 ) {
+                                condition.await();
+                            }
+                        } finally {
+                            lock.unlock();
                         }
-                        lock.unlock();
                     }
                     order.deliver();
                     order.complete();
@@ -154,18 +157,24 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
             @Override
             public Void call() throws Exception {
                 { // control test flow
-                    lock.lock();
-                    while ( indicator.intValue() != 2 ) {
-                        condition.await();
+                    try {
+                        lock.lock();
+                        while ( indicator.intValue() != 2 ) {
+                            condition.await();
+                        }
+                    } finally {
+                        lock.unlock();
                     }
-                    lock.unlock();
                 }
                 customer.cancel();
                 { // control test flow
-                    lock.lock();
-                    indicator.incrementAndGet();
-                    condition.signal();
-                    lock.unlock();
+                    try {
+                        lock.lock();
+                        indicator.incrementAndGet();
+                        condition.signal();
+                    } finally {
+                        lock.unlock();
+                    }
                 }
                 return null;
             }

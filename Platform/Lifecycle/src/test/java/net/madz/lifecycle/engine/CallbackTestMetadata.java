@@ -137,11 +137,10 @@ public class CallbackTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = InvoiceStateMachineMeta.Transitions.Post.class,
-                    value = { InvoiceStateMachineMeta.States.Posted.class })
+            @Function(transition = InvoiceStateMachineMeta.Transitions.Post.class, value = { InvoiceStateMachineMeta.States.Posted.class })
             static interface Draft {}
-            @Functions({ @Function(transition = InvoiceStateMachineMeta.Transitions.Pay.class, value = {
-                    States.PartialPaid.class, InvoiceStateMachineMeta.States.PaidOff.class }) })
+            @Functions({ @Function(transition = InvoiceStateMachineMeta.Transitions.Pay.class, value = { States.PartialPaid.class,
+                    InvoiceStateMachineMeta.States.PaidOff.class }) })
             static interface Posted {}
             @Function(transition = InvoiceStateMachineMeta.Transitions.Pay.class, value = { States.PartialPaid.class,
                     InvoiceStateMachineMeta.States.PaidOff.class })
@@ -172,8 +171,7 @@ public class CallbackTestMetadata extends EngineTestBase {
 
                 @Override
                 public Class<?> doConditionJudge(Payable t) {
-                    if ( 0 < t.getPayedAmount().compareTo(BigDecimal.ZERO)
-                            && 0 < t.getTotalAmount().compareTo(t.getPayedAmount()) ) {
+                    if ( 0 < t.getPayedAmount().compareTo(BigDecimal.ZERO) && 0 < t.getTotalAmount().compareTo(t.getPayedAmount()) ) {
                         return PartialPaid.class;
                     } else if ( 0 >= t.getTotalAmount().compareTo(t.getPayedAmount()) ) {
                         return PaidOff.class;
@@ -191,12 +189,10 @@ public class CallbackTestMetadata extends EngineTestBase {
         static interface States {
 
             @Initial
-            @Function(transition = InvoiceItemStateMachineMeta.Transitions.Pay.class,
-                    value = { InvoiceItemStateMachineMeta.States.Paid.class })
+            @Function(transition = InvoiceItemStateMachineMeta.Transitions.Pay.class, value = { InvoiceItemStateMachineMeta.States.Paid.class })
             static interface Unpaid {}
             @End
-            @InboundWhile(on = { InvoiceStateMachineMeta.States.Posted.class,
-                    InvoiceStateMachineMeta.States.PartialPaid.class },
+            @InboundWhile(on = { InvoiceStateMachineMeta.States.Posted.class, InvoiceStateMachineMeta.States.PartialPaid.class },
                     relation = InvoiceItemStateMachineMeta.Relations.ParentInvoice.class)
             static interface Paid {}
         }
@@ -215,13 +211,13 @@ public class CallbackTestMetadata extends EngineTestBase {
     @LifecycleMeta(InvoiceStateMachineMeta.class)
     public static class Invoice extends ReactiveObject implements InvoiceStateMachineMeta.Conditions.Payable {
 
-        private final BigDecimal totalAmount = new BigDecimal(0D);
-        private final BigDecimal payedAmount = new BigDecimal(0D);
+        private final BigDecimal totalAmount;;
+        private BigDecimal payedAmount = new BigDecimal(0D);
         private final List<InvoiceItem> items = new ArrayList<>();
 
         public Invoice(final BigDecimal totalAmount) {
             initialState(InvoiceStateMachineMeta.States.Draft.class.getSimpleName());
-            this.totalAmount.add(totalAmount);
+            this.totalAmount = totalAmount;
         }
 
         @Condition(InvoiceStateMachineMeta.Conditions.Payable.class)
@@ -245,7 +241,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         @Transition(InvoiceStateMachineMeta.Transitions.Pay.class)
         @PostStateChange(to = InvoiceItemStateMachineMeta.States.Paid.class, relation = "items", mappedBy = "parent")
         public synchronized void onItemPaied(InvoiceItem item) {
-            payedAmount.add(item.getPayedAmount());
+            payedAmount = payedAmount.add(item.getPayedAmount());
         }
 
         public void addItem(InvoiceItem invoiceItem) {
@@ -377,13 +373,13 @@ public class CallbackTestMetadata extends EngineTestBase {
     @LifecycleMeta(InvoiceStateMachineMeta.class)
     public static class InvoiceNonRelationalCallback extends ReactiveObject implements Conditions.Payable {
 
-        private final BigDecimal totalAmount = new BigDecimal(0D);
-        private final BigDecimal payedAmount = new BigDecimal(0D);
+        private final BigDecimal totalAmount;
+        private BigDecimal payedAmount = new BigDecimal(0D);
         private final List<InvoiceItemNonRelationalCallback> items = new ArrayList<>();
 
         public InvoiceNonRelationalCallback(final BigDecimal totalAmount) {
             initialState(InvoiceStateMachineMeta.States.Draft.class.getSimpleName());
-            this.totalAmount.add(totalAmount);
+            this.totalAmount = totalAmount;
         }
 
         @Condition(InvoiceStateMachineMeta.Conditions.Payable.class)
@@ -406,7 +402,7 @@ public class CallbackTestMetadata extends EngineTestBase {
 
         @Transition(InvoiceStateMachineMeta.Transitions.Pay.class)
         public synchronized void onItemPaied(InvoiceItemNonRelationalCallback item) {
-            payedAmount.add(item.getPayedAmount());
+            payedAmount = payedAmount.add(item.getPayedAmount());
         }
 
         public void addItem(InvoiceItemNonRelationalCallback invoiceItem) {
@@ -495,8 +491,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(BigProductOrderStateMachine.class)
-    public static class BigProductOrderObjectWithExtendsCallbackDefinition extends
-            OrderObject<BigProductOrderObjectWithExtendsCallbackDefinition> {
+    public static class BigProductOrderObjectWithExtendsCallbackDefinition extends OrderObject<BigProductOrderObjectWithExtendsCallbackDefinition> {
 
         @Transition
         public void install() {}
@@ -515,15 +510,13 @@ public class CallbackTestMetadata extends EngineTestBase {
          */
         @PostStateChange(from = BigProductOrderStateMachine.States.Delivered.class)
         @Override
-        public void interceptPostStateChange(
-                LifecycleContext<BigProductOrderObjectWithExtendsCallbackDefinition, String> context) {
+        public void interceptPostStateChange(LifecycleContext<BigProductOrderObjectWithExtendsCallbackDefinition, String> context) {
             count++;
             System.out.println("interceptPostStateChange in " + getClass().getSimpleName());
         }
     }
     @LifecycleMeta(BigProductOrderStateMachine.class)
-    public static class BigProductOrderObjectWithOverridesCallbackDefinition extends
-            OrderObject<BigProductOrderObjectWithOverridesCallbackDefinition> {
+    public static class BigProductOrderObjectWithOverridesCallbackDefinition extends OrderObject<BigProductOrderObjectWithOverridesCallbackDefinition> {
 
         @Transition
         public void install() {}
@@ -545,8 +538,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         @LifecycleOverride
         @PostStateChange(to = BigProductOrderStateMachine.States.Installed.class)
         @Override
-        public void interceptPostStateChangeWhenOrderFinished(
-                LifecycleContext<BigProductOrderObjectWithOverridesCallbackDefinition, String> context) {
+        public void interceptPostStateChangeWhenOrderFinished(LifecycleContext<BigProductOrderObjectWithOverridesCallbackDefinition, String> context) {
             count++;
             System.out.println("Big Product Order is finished.");
         }
