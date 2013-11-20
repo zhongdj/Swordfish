@@ -16,7 +16,11 @@ public class CallableInterceptor<V> extends Interceptor<V> {
             }
             return callable.call();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            if ( e instanceof RuntimeException ) {
+                throw (RuntimeException) e;
+            } else {
+                throw new IllegalStateException(e);
+            }
         }
     }
 }

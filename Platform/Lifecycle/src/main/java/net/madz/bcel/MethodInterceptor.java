@@ -58,6 +58,10 @@ public class MethodInterceptor {
             final MethodGen wrapMethodGen = new MethodGen(method, interceptingClass, constantPoolGen);
             // wrapMethodGen.removeAttributes();
             wrapMethodGen.removeCodeAttributes();
+            wrapMethodGen.removeExceptionHandlers();
+            wrapMethodGen.removeNOPs();
+            wrapMethodGen.removeLineNumbers();
+            wrapMethodGen.removeLocalVariables();
             wrapMethodGen.setInstructionList(ilist);
             final String innerClassName = createInterceptMethodCode(classGen, anonymousInnerClassSeq, interceptingClass, interceptingMethod, ifact, ilist,
                     constantPoolGen, method);

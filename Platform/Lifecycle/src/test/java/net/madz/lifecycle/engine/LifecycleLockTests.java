@@ -8,6 +8,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
@@ -97,9 +100,73 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         contract.confirm();
         contract.startService();
         order.confirm();
+        resource.test();
+        resource.goLive();
         order.startProduce(resource);
         order.startPackage();
+        order.deliver();
         order.complete();
         assertState(OrderStateMachine.States.Finished.class, order);
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_relational_locking_concurrent_cancel_parent_first() throws Throwable {
+        final CustomerObject customer = new CustomerObject();
+        customer.confirm();
+        final ContractObject contract = new ContractObject(customer);
+        final OrderObject order = new OrderObject(contract);
+        final ResourceObject resource = new ResourceObject();
+        resource.test();
+        resource.goLive();
+        final ReentrantLock lock = new ReentrantLock();
+        final Condition condition = lock.newCondition();
+        final AtomicInteger indicator = new AtomicInteger(1);
+        final Callable<LifecycleException> c1 = new Callable<LifecycleException>() {
+
+            @Override
+            public LifecycleException call() throws Exception {
+                try {
+                    contract.confirm();
+                    contract.startService();
+                    order.confirm();
+                    order.startProduce(resource);
+                    order.startPackage();
+                    lock.lock();
+                    indicator.incrementAndGet();
+                    condition.signal();
+                    while ( indicator.intValue() != 3 ) {
+                        condition.await();
+                    }
+                    lock.unlock();
+                    order.deliver();
+                    order.complete();
+                    assertState(OrderStateMachine.States.Finished.class, order);
+                    return null;
+                } catch (LifecycleException e) {
+                    return e;
+                }
+            }
+        };
+        final Callable<Void> c2 = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                lock.lock();
+                while ( indicator.intValue() != 2 ) {
+                    condition.await();
+                }
+                lock.unlock();
+                customer.cancel();
+                lock.lock();
+                indicator.incrementAndGet();
+                condition.signal();
+                lock.unlock();
+                return null;
+            }
+        };
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final Future<LifecycleException> f1 = executorService.submit(c1);
+        executorService.submit(c2);
+        assertInvalidStateErrorByValidWhile(f1.get(), customer, contract, CustomerStateMachine.States.Confirmed.ConfirmedStates.InService.class);
     }
 }

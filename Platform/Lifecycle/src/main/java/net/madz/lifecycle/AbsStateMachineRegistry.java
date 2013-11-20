@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.madz.bcel.intercept.DefaultStateMachineRegistry;
 import net.madz.common.Dumper;
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -28,6 +29,34 @@ import net.madz.verification.VerificationFailureSet;
 public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
 
     private static Logger logger = Logger.getLogger("Lifecycle Framework");
+    private static volatile LifecycleMetaRegistry instance = null;
+
+    public static LifecycleMetaRegistry getInstance() {
+        if ( null != instance ) {
+            return instance;
+        } else {
+            final String registryClass = System.getProperty("net.madz.lifecycle.StateMachineRegistry");
+            if ( null != registryClass ) {
+                try {
+                    // TODO There are two patterns to use registry:
+                    // 1. using Annotation to register LifecycleMetadata
+                    // classes.
+                    // 2. using
+                    // AbsStateMachineRegistry.registerLifecycleMeta(Class<?>
+                    // class);
+                    // For now ONLY 1st pattern is supported with extending
+                    // AbsStateMachineRegistry.
+                    Class.forName(registryClass).newInstance();
+                } catch (Throwable t) {
+                    logger.log(Level.SEVERE, "Cannot Instantiate State Machine Registry: " + registryClass, t);
+                    throw new IllegalStateException(t);
+                }
+            } else {
+                DefaultStateMachineRegistry.getInstance();
+            }
+        }
+        return instance;
+    }
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -67,6 +96,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     private LifecycleEventHandler lifecycleEventHandler;
 
     protected AbsStateMachineRegistry() throws VerificationException {
+        instance = this;
         lifecycleRegistry = getClass().getAnnotation(LifecycleRegistry.class);
         builderMeta = getClass().getAnnotation(StateMachineBuilder.class);
         registerStateMachines();
