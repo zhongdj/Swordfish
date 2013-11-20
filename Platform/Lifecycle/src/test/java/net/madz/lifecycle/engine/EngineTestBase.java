@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import net.madz.bcel.intercept.DefaultStateMachineRegistry;
 import net.madz.bcel.intercept.LifecycleInterceptor;
+import net.madz.common.ConsoleLoggingTestBase;
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -20,7 +21,7 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycl
 import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 
-public class EngineTestBase {
+public class EngineTestBase extends ConsoleLoggingTestBase {
 
     public abstract static class ReactiveObject {
 
@@ -100,6 +101,7 @@ public class EngineTestBase {
     }
 
     protected static void assertLifecycleError(LifecycleException e, final String expectedErrorCode, final Object... messageVars) {
+        System.out.println();
         System.out.println("expected error code: " + expectedErrorCode);
         System.out.println("  actual error code: " + e.getErrorCode());
         assertEquals(expectedErrorCode, e.getErrorCode());

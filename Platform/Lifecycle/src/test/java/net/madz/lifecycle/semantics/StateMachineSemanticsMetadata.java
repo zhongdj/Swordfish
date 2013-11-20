@@ -1,5 +1,6 @@
 package net.madz.lifecycle.semantics;
 
+import net.madz.common.ConsoleLoggingTestBase;
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
@@ -16,7 +17,7 @@ import net.madz.lifecycle.semantics.StateMachineSemanticsMetadata.S2.States.S2_B
 import net.madz.lifecycle.semantics.StateMachineSemanticsMetadata.S2.Transitions.S2_Z;
 import net.madz.lifecycle.semantics.StateMachineSemanticsMetadata.S3.Transitions.S3_Z;
 
-public class StateMachineSemanticsMetadata {
+public class StateMachineSemanticsMetadata extends ConsoleLoggingTestBase {
 
     @StateMachine
     public static interface S1 {
