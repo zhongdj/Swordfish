@@ -127,7 +127,9 @@ public class EngineTestBase {
         try {
             assertLifecycleError(e, LifecycleCommonErrors.STATE_INVALID, itself, itself.getState(), relationObject, relationObject.getState(),
                     Arrays.toString(validNames.toArray()));
-        } catch (LifecycleException ex) {}
+        } catch (LifecycleException ex) {
+            throw ex;
+        }
     }
 
     /**
