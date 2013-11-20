@@ -118,7 +118,7 @@ public class EngineCoreCompositeStateMachineNegativeTests extends EngineCoreComp
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
     // Part II: composite state machine with inheritance)
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Test
+    @Test(expected = LifecycleException.class)
     public void test_no_overrides_relational_composite_state_machine_with_canceled_contract() {
         final Contract contract = new Contract();
         {
