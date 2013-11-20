@@ -95,6 +95,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
         final ResourceObject resource = new ResourceObject();
         customer.confirm();
         contract.confirm();
+        contract.startService();
         order.confirm();
         order.startProduce(resource);
         order.startPackage();
