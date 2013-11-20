@@ -8,7 +8,7 @@ public class InterceptorController<V> {
 
     private static Logger logger = Logger.getLogger("Lifecycle Framework");
 
-    public V exec(InterceptContext<V> context, Callable<V> callable) throws Throwable {
+    public V exec(InterceptContext<V> context, Callable<V> callable) {
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....InterceptorController is doing exec ...");
         }

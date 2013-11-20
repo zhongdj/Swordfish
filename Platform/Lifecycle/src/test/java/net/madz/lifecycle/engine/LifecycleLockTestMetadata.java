@@ -1,7 +1,10 @@
 package net.madz.lifecycle.engine;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import net.madz.bcel.intercept.InterceptContext;
+import net.madz.bcel.intercept.InterceptorController;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
@@ -473,11 +476,27 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
         @Transition
         public void invalidate() {}
 
+        // @Transition
+        // public void startService() {
+        // final Object[] arguments = new Object[0];
+        // final InterceptorController<Void> c = new InterceptorController<>();
+        // final InterceptContext<Void> context = new
+        // InterceptContext<>(ContractObject.class, this, "startService", new
+        // Class[0], arguments);
+        // c.exec(context, new Callable<Void>() {
+        //
+        // @Override
+        // public Void call() throws Exception {
+        // startService$Impl();
+        // return null;
+        // }
+        // });
+        // }
         @Transition
         public void startService() {
-            // try {
-            // Thread.sleep(1000L);
-            // } catch (InterruptedException e) {}
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {}
         }
 
         @Transition

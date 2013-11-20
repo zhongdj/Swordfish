@@ -16,7 +16,7 @@ public abstract class Interceptor<V> {
         this.next = next;
     }
 
-    public V intercept(InterceptContext<V> context, Callable<V> callable) throws Throwable {
+    public V intercept(InterceptContext<V> context, Callable<V> callable) {
         try {
             preExec(context);
             V result = next.intercept(context, callable);
