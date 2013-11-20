@@ -79,29 +79,29 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
             initialState(LockingStateMachine.States.Created.class.getSimpleName());
         }
 
-        private volatile int counter = 0;
+        private volatile AtomicInteger counter = new AtomicInteger(0);
 
         @Override
         public int getCounter() {
-            return counter;
+            return counter.intValue();
         }
 
         @Override
         @Transition
         public synchronized void start() {
-            counter++;
+            counter.incrementAndGet();
         }
 
         @Override
         @Transition
         public synchronized void stop() {
-            counter++;
+            counter.incrementAndGet();
         }
 
         @Override
         @Transition
         public synchronized void cancel() {
-            counter++;
+            counter.incrementAndGet();
         }
     }
     public static class SimpleLock implements LifecycleLockStrategry {
