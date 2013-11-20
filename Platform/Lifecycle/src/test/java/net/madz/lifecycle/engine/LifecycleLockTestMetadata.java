@@ -1,5 +1,6 @@
 package net.madz.lifecycle.engine;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
@@ -159,25 +160,25 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
             initialState(LockingStateMachine.States.Created.class.getSimpleName());
         }
 
-        private volatile int counter = 0;
+        private volatile AtomicInteger counter = new AtomicInteger(0);
 
         public int getCounter() {
-            return counter;
+            return counter.intValue();
         }
 
         @Transition
         public void start() {
-            counter++;
+            counter.incrementAndGet();
         }
 
         @Transition
         public void stop() {
-            counter++;
+            counter.incrementAndGet();
         }
 
         @Transition
         public void cancel() {
-            counter++;
+            counter.incrementAndGet();
         }
     }
     // ///////////////////////////////////////////////////////
