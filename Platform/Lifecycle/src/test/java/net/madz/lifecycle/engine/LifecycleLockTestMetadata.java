@@ -1,10 +1,8 @@
 package net.madz.lifecycle.engine;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Logger;
 
-import net.madz.bcel.intercept.InterceptContext;
-import net.madz.bcel.intercept.InterceptorController;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
@@ -107,25 +105,49 @@ public class LifecycleLockTestMetadata extends EngineTestBase {
     }
     public static class SimpleLock implements LifecycleLockStrategry {
 
+        private static Logger logger = Logger.getLogger("Lifecycle Framework");
+        private static volatile int depth = 0;
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
         @Override
         public void lockRead(Object reactiveObject) {
+            logLockingMethod(reactiveObject, "lockRead: ");
             lock.readLock().lock();
+            depth++;
+        }
+
+        private void logLockingMethod(Object reactiveObject, String methodName) {
+            final StringBuilder builder = getIndent();
+            builder.append(methodName + reactiveObject);
+            logger.fine(builder.toString());
+        }
+
+        private StringBuilder getIndent() {
+            StringBuilder builder = new StringBuilder();
+            for ( int i = 0; i < depth; i++ ) {
+                builder.append("\t");
+            }
+            return builder;
         }
 
         @Override
         public void unlockRead(Object targetReactiveObject) {
+            depth--;
+            logLockingMethod(targetReactiveObject, "unlockRead: ");
             lock.readLock().unlock();
         }
 
         @Override
         public void lockWrite(Object reactiveObject) {
+            logLockingMethod(reactiveObject, "lockWrite: ");
             lock.writeLock().lock();
+            depth++;
         }
 
         @Override
         public void unlockWrite(Object targetReactiveObject) {
+            depth--;
+            logLockingMethod(targetReactiveObject, "unlockWrite: ");
             lock.writeLock().unlock();
         }
     }

@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.madz.bcel.intercept.InterceptContext;
+import net.madz.bcel.intercept.UnlockableStack;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
@@ -1175,18 +1176,19 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         // final HashMap<Class<?>, Object> relationsInMethodParameters =
         // evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
-        validateValidWhiles(target);
+        validateValidWhiles(target, context);
     }
 
     @Override
-    public void validateValidWhiles(final Object target) {
+    public void validateValidWhiles(final Object target, final UnlockableStack stack) {
         final StateMetadata state = getMetaType().getState(evaluateState(target));
         final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
         final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
         final StateObject stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
-            stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
+            
+            stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
         }
     }
 
@@ -1237,7 +1239,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
             final Object relationInstance = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
-                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance);
+                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, context);
         }
     }
 

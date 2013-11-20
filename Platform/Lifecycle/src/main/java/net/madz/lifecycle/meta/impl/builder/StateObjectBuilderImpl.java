@@ -3,8 +3,11 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
+import net.madz.bcel.intercept.Unlockable;
+import net.madz.bcel.intercept.UnlockableStack;
 import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateObjectBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
@@ -31,9 +34,10 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     }
 
     @Override
-    public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, Object relatedTarget) {
+    public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, final Object relatedTarget, UnlockableStack stack) {
         try {
             final StateMachineObject relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            lockRelatedObject(relatedTarget, stack, relatedStateMachineObject);
             final String relatedStateName = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean found = false;
             for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
@@ -54,19 +58,36 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
                 throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.STATE_INVALID, target, this.getMetaType()
                         .getSimpleName(), relatedTarget, relatedStateName, Arrays.toString(validRelationStates.toArray(new String[0])));
             } else {
-                relatedStateMachineObject.validateValidWhiles(relatedTarget);
+                relatedStateMachineObject.validateValidWhiles(relatedTarget, stack);
             }
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }
     }
 
+    private void lockRelatedObject(final Object relatedTarget, UnlockableStack stack, final StateMachineObject relatedStateMachineObject) {
+        if (!isLockEnabled(relatedStateMachineObject)) {
+            return;
+        }
+        final LifecycleLockStrategry lifecycleLockStrategy = relatedStateMachineObject.getLifecycleLockStrategy();
+        lifecycleLockStrategy.lockRead(relatedTarget);
+        stack.pushUnlockable(new Unlockable() {
+
+            @Override
+            public void unlock() {
+                lifecycleLockStrategy.unlockRead(relatedTarget);
+            }
+        });
+    }
+    private boolean isLockEnabled(StateMachineObject stateMachine) {
+        return null != stateMachine.getLifecycleLockStrategy();
+    }
     @Override
     public void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relationMetadataArray,
-            Object relatedTarget) {
+            Object relatedTarget, UnlockableStack stack) {
         try {
-            StateMachineObject relatedStateMachineInst;
-            relatedStateMachineInst = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            final StateMachineObject relatedStateMachineInst = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            lockRelatedObject(relatedTarget, stack, relatedStateMachineInst);
             final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
             boolean find = false;
             for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
@@ -86,7 +107,10 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
                 }
                 throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
                         transitionKey, nextState, target, relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
+            } else {
+                relatedStateMachineInst.validateValidWhiles(relatedTarget, stack);
             }
+            
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }

@@ -2,16 +2,16 @@ package net.madz.bcel.intercept;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.util.StringUtil;
 
-public class InterceptContext<V> {
+public class InterceptContext<V> implements UnlockableStack {
 
     private static Logger logger = Logger.getLogger("Lifecycle Framework");
     private final Annotation[] annotation;
@@ -19,7 +19,6 @@ public class InterceptContext<V> {
     private final Method method;
     private final Object target;
     private final Object[] arguments;
-    private LifecycleLockStrategry lockStrategry;
     private String fromState;
     private String nextState;
     private String transition;
@@ -28,6 +27,7 @@ public class InterceptContext<V> {
     private long endTime;
     private TransitionTypeEnum transitionType;
     private boolean success;
+    private final Stack<Unlockable> lockedRelatedObjectStack = new Stack<>();
 
     public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType, Object[] arguments) {
         super();
@@ -120,14 +120,6 @@ public class InterceptContext<V> {
         return target;
     }
 
-    public LifecycleLockStrategry getLockStrategry() {
-        return lockStrategry;
-    }
-
-    public void setLockStrategry(LifecycleLockStrategry lockStrategry) {
-        this.lockStrategry = lockStrategry;
-    }
-
     public Object getTransitionKey() {
         final Class<?> keyClass = method.getAnnotation(Transition.class).value();
         if ( Null.class.equals(keyClass) ) {
@@ -164,5 +156,19 @@ public class InterceptContext<V> {
 
     public boolean isSuccess() {
         return success;
+    }
+
+    public Unlockable popUnlockable() {
+        return lockedRelatedObjectStack.pop();
+    }
+
+    @Override
+    public void pushUnlockable(Unlockable unlockable) {
+        this.lockedRelatedObjectStack.push(unlockable);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.lockedRelatedObjectStack.isEmpty();
     }
 }
