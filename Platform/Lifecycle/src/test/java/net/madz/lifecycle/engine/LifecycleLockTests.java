@@ -131,13 +131,15 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
                     order.confirm();
                     order.startProduce(resource);
                     order.startPackage();
-                    lock.lock();
-                    indicator.incrementAndGet();
-                    condition.signal();
-                    while ( indicator.intValue() != 3 ) {
-                        condition.await();
+                    { // control test flow
+                        lock.lock();
+                        indicator.incrementAndGet();
+                        condition.signal();
+                        while ( indicator.intValue() != 3 ) {
+                            condition.await();
+                        }
+                        lock.unlock();
                     }
-                    lock.unlock();
                     order.deliver();
                     order.complete();
                     assertState(OrderStateMachine.States.Finished.class, order);
@@ -151,16 +153,20 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
 
             @Override
             public Void call() throws Exception {
-                lock.lock();
-                while ( indicator.intValue() != 2 ) {
-                    condition.await();
+                { // control test flow
+                    lock.lock();
+                    while ( indicator.intValue() != 2 ) {
+                        condition.await();
+                    }
+                    lock.unlock();
                 }
-                lock.unlock();
                 customer.cancel();
-                lock.lock();
-                indicator.incrementAndGet();
-                condition.signal();
-                lock.unlock();
+                { // control test flow
+                    lock.lock();
+                    indicator.incrementAndGet();
+                    condition.signal();
+                    lock.unlock();
+                }
                 return null;
             }
         };
