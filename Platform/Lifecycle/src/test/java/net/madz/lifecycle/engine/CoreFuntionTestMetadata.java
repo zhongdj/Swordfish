@@ -30,6 +30,8 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ReducePower;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ShutDown;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycle.States.ServiceAvailable;
+import net.madz.lifecycle.engine.EngineTestBase.BaseServiceProvider;
+import net.madz.lifecycle.engine.EngineTestBase.ReactiveObject;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
@@ -694,5 +696,51 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         public boolean isPowerOff() {
             return !powerObject.powerLeft();
         }
+    }
+    @LifecycleMeta(InternetServiceLifecycleMeta.class)
+    public static class BaseServiceWithRelationOnFields<T extends BaseServiceProvider> extends ReactiveObject {
+
+        @Relation(InternetServiceLifecycleMeta.Relations.CustomerRelation.class)
+        private Customer customer;
+
+        public BaseServiceWithRelationOnFields(Customer customer) {
+            initialState(InternetServiceLifecycleMeta.States.New.class.getSimpleName());
+            this.customer = customer;
+        }
+
+        private T provider;
+
+        public T getProvider() {
+            return provider;
+        }
+
+        public void setProvider(T provider) {
+            this.provider = provider;
+        }
+
+        public Customer getCustomer() {
+            return customer;
+        }
+
+        public void setCustomer(Customer customer) {
+            this.customer = customer;
+        }
+
+        @Transition
+        void start() {}
+
+        @Transition
+        void end() {}
+    }
+    @LifecycleMeta(InternetTVServiceLifecycle.class)
+    public static class InternetTVServiceWithRelationOnFields extends BaseServiceWithRelationOnFields<InternetTVServiceProvider> {
+
+        public InternetTVServiceWithRelationOnFields(Customer customer,InternetTVServiceProvider provider ) {
+            super(customer);
+            this.provider = provider;
+        }
+
+        @Relation(InternetTVServiceLifecycle.Relations.TVProvider.class)
+        public InternetTVServiceProvider provider;
     }
 }

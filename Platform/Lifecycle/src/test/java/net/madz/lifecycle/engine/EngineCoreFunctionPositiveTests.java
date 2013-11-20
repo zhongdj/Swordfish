@@ -85,4 +85,14 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         keyboard.pressAnyKey();
         assertState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class, keyboard);
     }
+
+    @Test
+    public void test_relations_concreted_on_fields_in_hierarachy_classes() {
+        final Customer customer = new Customer();
+        customer.activate();
+        final InternetTVServiceProvider tvProvider = new InternetTVServiceProvider();
+        InternetTVServiceWithRelationOnFields tvService = new InternetTVServiceWithRelationOnFields(customer, tvProvider);
+        tvService.start();
+        assertState(InternetTVServiceLifecycle.States.InService.class, tvService);
+    }
 }
