@@ -108,7 +108,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     private void configureRelationObjectsFromField(Class<?> klass) throws VerificationException {
-        if ( klass.isInterface() || Object.class == klass || null == klass ) {
+        if ( null == klass || klass.isInterface() || Object.class == klass ) {
             return;
         }
         final ArrayList<RelationMetadata> extendedRelationMetadata = new ArrayList<>();
@@ -520,26 +520,27 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             Relation relation = method.getAnnotation(Relation.class);
             if ( null != relation ) {
                 RelationObject relationObject = null;
-                RelationMetadata relationMetadata = null;
                 StateMachineMetadata relatedStateMachine = null;
                 try {
                     relatedStateMachine = getMetaType().getRegistry().loadStateMachineMetadata(
                             method.getDeclaringClass().getAnnotation(LifecycleMeta.class).value(), null);
-                } catch (VerificationException e) {
-                    failureSet.add(e);
-                }
-                if ( Null.class == relation.value() ) {
-                    if ( method.getName().startsWith("get") ) {
-                        relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName().substring(3)));
+                    final RelationMetadata relationMetadata;
+                    if ( Null.class == relation.value() ) {
+                        if ( method.getName().startsWith("get") ) {
+                            relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName().substring(3)));
+                        } else {
+                            relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName()));
+                        }
+                    } else {
+                        relationMetadata = relatedStateMachine.getRelationMetadata(relation.value());
                     }
-                    relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName()));
-                } else {
-                    relationMetadata = relatedStateMachine.getRelationMetadata(relation.value());
-                }
-                relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
-                addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
-                try {
-                    getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
+                    relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
+                    addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
+                    try {
+                        getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
+                    } catch (VerificationException e) {
+                        failureSet.add(e);
+                    }
                 } catch (VerificationException e) {
                     failureSet.add(e);
                 }
@@ -584,7 +585,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     private void verifyRelationInstanceOnFieldNotBeyondStateMachine(Class<?> klass) throws VerificationException {
-        if ( klass.isInterface() || Object.class == klass || null == klass ) {
+        if ( null == klass || klass.isInterface() || Object.class == klass ) {
             return;
         }
         for ( Field field : klass.getDeclaredFields() ) {
@@ -1187,7 +1188,6 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         final StateObject stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
-            
             stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
         }
     }

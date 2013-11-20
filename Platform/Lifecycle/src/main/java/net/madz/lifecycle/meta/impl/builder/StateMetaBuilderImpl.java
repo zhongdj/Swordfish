@@ -261,10 +261,17 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     public StateMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
         super.build(clazz, parent);
         verifyBasicSyntax(clazz);
+        configureOwningState(parent);
         configureSuper(clazz);
         configureStateType(clazz);
         configureShortcutState(clazz, parent);
         return this;
+    }
+
+    private void configureOwningState(StateMachineMetadata parent) {
+        if ( parent.isComposite() ) {
+            this.owningState = parent.getOwningState();
+        }
     }
 
     private void configureStateType(Class<?> clazz) {
