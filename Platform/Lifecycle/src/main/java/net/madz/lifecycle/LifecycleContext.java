@@ -10,8 +10,6 @@ public interface LifecycleContext<T, S> {
 
     S getToState();
 
-    S[] getPossibleToStates();
-
     Method getTransitionMethod();
 
     Object[] getArguments();

@@ -17,7 +17,7 @@ public class InterceptContext<V> implements UnlockableStack {
     private final Annotation[] annotation;
     private final Class<?> klass;
     private final Method method;
-    private final Object target;
+    private final V target;
     private final Object[] arguments;
     private String fromState;
     private String nextState;
@@ -29,7 +29,7 @@ public class InterceptContext<V> implements UnlockableStack {
     private boolean success;
     private final Stack<Unlockable> lockedRelatedObjectStack = new Stack<>();
 
-    public InterceptContext(Class<?> klass, Object target, String methodName, Class<?>[] argsType, Object[] arguments) {
+    public InterceptContext(Class<?> klass, V target, String methodName, Class<?>[] argsType, Object[] arguments) {
         super();
         this.klass = klass;
         this.method = findMethod(klass, methodName, argsType);
@@ -116,7 +116,7 @@ public class InterceptContext<V> implements UnlockableStack {
         return method;
     }
 
-    public Object getTarget() {
+    public V getTarget() {
         return target;
     }
 

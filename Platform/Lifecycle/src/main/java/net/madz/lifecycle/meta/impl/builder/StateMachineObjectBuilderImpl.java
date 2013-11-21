@@ -1312,6 +1312,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
                     relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, context);
         }
+        context.setToState(nextState);
     }
 
     private Object getRelationInstance(Object contextTarget, final HashMap<Class<?>, Object> relationsInMethodParameters,
@@ -1399,8 +1400,46 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public void performPreStateChangeCallback(LifecycleContext<?, ?> callbackContext) {}
+    public void performPreStateChangeCallback(LifecycleContext<?, String> callbackContext) {
+        final String fromState = callbackContext.getFromState();
+        String toState = callbackContext.getToState();
+        if ( null != toState ) {
+            invokeSpecificPreStateChangeCallbacks(callbackContext);
+        }
+        final StateObject fromStateObject = getState(fromState);
+        fromStateObject.invokeFromPreStateChangeCallbacks(callbackContext);
+        if ( null != toState ) {
+            final StateObject toStateObject = getState(toState);
+            toStateObject.invokeToPreStateChangeCallbacks(callbackContext);
+        }
+        invokeCommonPreStateChangeCallbacks(callbackContext);
+    }
 
     @Override
-    public void performPostStateChangeCallback(LifecycleContext<?, ?> callbackContext) {}
+    public void performPostStateChangeCallback(LifecycleContext<?, String> callbackContext) {
+        final String fromState = callbackContext.getFromState();
+        String toState = callbackContext.getToState();
+        invokeSpecificPostStateChangeCallbacks(callbackContext);
+        final StateObject fromStateObject = getState(fromState);
+        fromStateObject.invokeFromPostStateChangeCallbacks(callbackContext);
+        final StateObject toStateObject = getState(toState);
+        toStateObject.invokeToPostStateChangeCallbacks(callbackContext);
+        invokeCommonPostStateChangeCallbacks(callbackContext);
+    }
+
+    private void invokeCommonPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+        // TODO Auto-generated method stub
+    }
+
+    private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+        // TODO Auto-generated method stub
+    }
+
+    private void invokeCommonPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+        // TODO Auto-generated method stub
+    }
+
+    private void invokeSpecificPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+        // TODO Auto-generated method stub
+    }
 }

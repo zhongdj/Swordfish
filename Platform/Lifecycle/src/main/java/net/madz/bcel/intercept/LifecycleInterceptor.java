@@ -8,6 +8,7 @@ import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
+import net.madz.lifecycle.impl.LifecycleContextImpl;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;
@@ -72,7 +73,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
         // 4. Callback before state change
         if ( logger.isLoggable(Level.FINE) ) {
-            logger.fine("\tStep 4. start callback before state change.");
+            logger.fine("\tStep 4. start callback before state change from : " + context.getFromState() + " => to : " + context.getToState());
         }
         performCallbacksBeforeStateChange(stateMachine, context);
     }
@@ -192,7 +193,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
-        // TODO Auto-generated method stub
+        stateMachine.performPreStateChangeCallback(new LifecycleContextImpl<V>(context));
     }
 
     private void validateTransition(StateMachineObject stateMachine, InterceptContext<V> context) {

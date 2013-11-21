@@ -203,7 +203,7 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     void validateValidWhiles(Object target, UnlockableStack stack);
 
-    void performPreStateChangeCallback(LifecycleContext<?, ?> callbackContext);
+    void performPreStateChangeCallback(LifecycleContext<?, String> callbackContext);
 
-    void performPostStateChangeCallback(LifecycleContext<?, ?> callbackContext);
+    void performPostStateChangeCallback(LifecycleContext<?, String> callbackContext);
 }

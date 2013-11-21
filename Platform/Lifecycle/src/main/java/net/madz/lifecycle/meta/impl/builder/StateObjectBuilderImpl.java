@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import net.madz.bcel.intercept.Unlockable;
 import net.madz.bcel.intercept.UnlockableStack;
 import net.madz.lifecycle.LifecycleCommonErrors;
+import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
@@ -66,7 +67,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     }
 
     private void lockRelatedObject(final Object relatedTarget, UnlockableStack stack, final StateMachineObject relatedStateMachineObject) {
-        if (!isLockEnabled(relatedStateMachineObject)) {
+        if ( !isLockEnabled(relatedStateMachineObject) ) {
             return;
         }
         final LifecycleLockStrategry lifecycleLockStrategy = relatedStateMachineObject.getLifecycleLockStrategy();
@@ -79,9 +80,11 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
             }
         });
     }
+
     private boolean isLockEnabled(StateMachineObject stateMachine) {
         return null != stateMachine.getLifecycleLockStrategy();
     }
+
     @Override
     public void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relationMetadataArray,
             Object relatedTarget, UnlockableStack stack) {
@@ -110,9 +113,20 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
             } else {
                 relatedStateMachineInst.validateValidWhiles(relatedTarget, stack);
             }
-            
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }
     }
+
+    @Override
+    public void invokeFromPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+
+    @Override
+    public void invokeToPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+
+    @Override
+    public void invokeFromPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+
+    @Override
+    public void invokeToPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
 }
