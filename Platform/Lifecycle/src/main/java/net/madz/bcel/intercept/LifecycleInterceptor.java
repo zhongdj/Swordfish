@@ -157,7 +157,9 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         return null != stateMachine.getLifecycleLockStrategy();
     }
 
-    private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {}
+    private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
+        stateMachine.performPostStateChangeCallback(new LifecycleContextImpl<V>(context));
+    }
 
     private void setNextState(StateMachineObject stateMachine, InterceptContext<V> context) {
         final String stateName = stateMachine.getNextState(context.getTarget(), context.getTransitionKey());
