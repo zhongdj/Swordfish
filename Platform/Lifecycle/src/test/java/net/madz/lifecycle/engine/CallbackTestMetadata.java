@@ -240,8 +240,8 @@ public class CallbackTestMetadata extends EngineTestBase {
 
         @Transition(InvoiceStateMachineMeta.Transitions.Pay.class)
         @PostStateChange(to = InvoiceItemStateMachineMeta.States.Paid.class, relation = "items", mappedBy = "parent")
-        public synchronized void onItemPaied(InvoiceItem item) {
-            payedAmount = payedAmount.add(item.getPayedAmount());
+        public synchronized void onItemPaied(LifecycleContext<InvoiceItem, String> context) {
+            payedAmount = payedAmount.add(context.getTarget().getPayedAmount());
         }
 
         public void addItem(InvoiceItem invoiceItem) {
