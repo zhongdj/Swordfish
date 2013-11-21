@@ -31,6 +31,10 @@ import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
+import net.madz.lifecycle.annotations.callback.AnyState;
+import net.madz.lifecycle.annotations.callback.Callbacks;
+import net.madz.lifecycle.annotations.callback.PostStateChange;
+import net.madz.lifecycle.annotations.callback.PreStateChange;
 import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
@@ -231,6 +235,72 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         verifyStateIndicator(klass);
         verifyRelations(klass);
         verifyConditions(klass);
+        verifyCallbackMethods(klass);
+    }
+
+    private void verifyCallbackMethods(Class<?> klass) throws VerificationException {
+        final CallbackMethodScanner scanner = new CallbackMethodScanner();
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class[] { klass }, failureSet, scanner);
+        if ( failureSet.size() > 0 ) {
+            throw new VerificationException(failureSet);
+        }
+    }
+
+    private final class CallbackMethodScanner implements MethodScanner {
+
+        @Override
+        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            final PreStateChange preStateChange = method.getAnnotation(PreStateChange.class);
+            if ( null != preStateChange ) {
+                verifyPreStateChange(method, failureSet, preStateChange);
+            }
+            final PostStateChange postStateChange = method.getAnnotation(PostStateChange.class);
+            if ( null != postStateChange ) {
+                verifyPostStateChange(method, failureSet, postStateChange);
+            }
+            final Callbacks callbacks = method.getAnnotation(Callbacks.class);
+            if (null != callbacks) {
+                for ( PreStateChange item : callbacks.preStateChange() ) {
+                    verifyPreStateChange(method, failureSet, item);
+                }
+                for ( PostStateChange item : callbacks.postStateChange() ) {
+                    verifyPostStateChange(method, failureSet, item);
+                }
+            }
+            return false;
+        }
+
+        private void verifyPostStateChange(Method method, VerificationFailureSet failureSet, final PostStateChange postStateChange) {
+            Class<?> fromStateClass = postStateChange.from();
+            Class<?> toStateClass = postStateChange.to();
+            String relation = postStateChange.relation();
+            String mappedBy = postStateChange.mappedBy();
+            if ( PostStateChange.NULL_STR.equals(relation) ) {
+                verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID);
+                verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID);
+            } else {}
+        }
+
+        private void verifyPreStateChange(Method method, VerificationFailureSet failureSet, final PreStateChange preStateChange) {
+            Class<?> fromStateClass = preStateChange.from();
+            Class<?> toStateClass = preStateChange.to();
+            String relation = preStateChange.relation();
+            String mappedBy = preStateChange.mappedBy();
+            if ( PreStateChange.NULL_STR.equals(relation) ) {
+                verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID);
+                verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID);
+            } else {}
+        }
+
+        private void verifyStateWithoutRelation(final Method method, final VerificationFailureSet failureSet, final Class<?> stateClass, final String errorCode) {
+            if ( AnyState.class != stateClass ) {
+                if ( null == getMetaType().getState(stateClass) ) {
+                    failureSet
+                            .add(newVerificationException(method.getDeclaringClass().getName() + "." + stateClass + "." + errorCode, errorCode, stateClass, method, getMetaType().getPrimaryKey()));
+                }
+            }
+        }
     }
 
     private void verifyConditions(Class<?> klass) throws VerificationException {
