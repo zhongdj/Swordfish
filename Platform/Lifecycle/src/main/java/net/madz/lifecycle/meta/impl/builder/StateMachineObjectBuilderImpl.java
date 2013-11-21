@@ -20,6 +20,7 @@ import java.util.Set;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.bcel.intercept.UnlockableStack;
+import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
@@ -1326,4 +1327,10 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             }
         }
     }
+
+    @Override
+    public void performPreStateChangeCallback(LifecycleContext<?, ?> callbackContext) {}
+
+    @Override
+    public void performPostStateChangeCallback(LifecycleContext<?, ?> callbackContext) {}
 }

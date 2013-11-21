@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.bcel.intercept.UnlockableStack;
+import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
@@ -201,4 +202,8 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
     StateMachineObject getRelatedStateMachine(Object target, Object relativeKey);
 
     void validateValidWhiles(Object target, UnlockableStack stack);
+
+    void performPreStateChangeCallback(LifecycleContext<?, ?> callbackContext);
+
+    void performPostStateChangeCallback(LifecycleContext<?, ?> callbackContext);
 }
