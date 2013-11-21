@@ -5,19 +5,33 @@ import java.util.Arrays;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.LifecycleContext;
+import net.madz.lifecycle.StateConverter;
 
-public class LifecycleContextImpl<T> implements LifecycleContext<T, String> {
+public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
 
     private final T target;
-    private final String fromState;
-    private final String toState;
+    private final S fromState;
+    private final S toState;
     private final Method transitionMethod;
     private final Object[] arguments;
 
-    public LifecycleContextImpl(InterceptContext<T> context) {
+    @SuppressWarnings("unchecked")
+    public LifecycleContextImpl(InterceptContext<T> context, StateConverter<S> converter) {
         this.target = context.getTarget();
-        this.fromState = context.getFromState();
-        this.toState = context.getToState();
+        if ( null != converter ) {
+            this.fromState = converter.fromState(context.getFromState());
+        } else {
+            this.fromState = (S) context.getFromState();
+        }
+        if ( null == context.getToState() ) {
+            this.toState = null;
+        } else {
+            if ( null != converter ) {
+                this.toState = converter.fromState(context.getToState());
+            } else {
+                this.toState = (S) context.getToState();
+            }
+        }
         this.transitionMethod = context.getMethod();
         this.arguments = context.getArguments();
     }
@@ -28,12 +42,12 @@ public class LifecycleContextImpl<T> implements LifecycleContext<T, String> {
     }
 
     @Override
-    public String getFromState() {
+    public S getFromState() {
         return fromState;
     }
 
     @Override
-    public String getToState() {
+    public S getToState() {
         return toState;
     }
 
