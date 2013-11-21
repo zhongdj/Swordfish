@@ -7,9 +7,13 @@ public interface LifecycleContext<T, S> {
     T getTarget();
 
     S getFromState();
+    
+    String getFromStateName();
 
     S getToState();
 
+    String getToStateName();
+    
     Method getTransitionMethod();
 
     Object[] getArguments();

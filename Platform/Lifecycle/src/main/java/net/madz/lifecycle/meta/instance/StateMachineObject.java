@@ -10,6 +10,7 @@ import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
+import net.madz.lifecycle.meta.impl.builder.RelationalCallbackObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 
 public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>, StateMachineMetadata> {
@@ -210,4 +211,16 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
     StateConverter<S> getStateConverter();
 
     boolean isLockEnabled();
+
+    RelationObject getRelationObject(Object primaryKey);
+
+    void addSpecificPreStateChangeCallbackObject(RelationalCallbackObject item);
+
+    void addCommonPreStateChangeCallbackObject(RelationalCallbackObject item);
+
+    void addSpecificPostStateChangeCallbackObject(RelationalCallbackObject item);
+
+    void addCommonPostStateChangeCallbackObject(RelationalCallbackObject item);
+
+    RelationObject getParentRelationObject();
 }

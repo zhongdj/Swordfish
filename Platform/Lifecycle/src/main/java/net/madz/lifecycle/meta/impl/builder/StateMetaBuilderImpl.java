@@ -2,10 +2,12 @@ package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.madz.common.DottedPath;
 import net.madz.common.Dumper;
@@ -43,7 +45,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     private LinkedList<RelationConstraintMetadata> validWhileRelations = new LinkedList<RelationConstraintMetadata>();
     private LinkedList<RelationConstraintMetadata> inboundWhileRelations = new LinkedList<RelationConstraintMetadata>();
     private HashMap<Object, FunctionMetadata> functionMetadataMap = new HashMap<>();
-    private ArrayList<TransitionMetadata> possibleTransitionList = new ArrayList<>();
+    private ArrayList<TransitionMetadata> possibleLeavingTransitionList = new ArrayList<>();
+    private ArrayList<TransitionMetadata> possibleReachingTransitionList = new ArrayList<>();
     private ArrayList<FunctionMetadata> functionMetadataList = new ArrayList<>();
     private HashMap<Object, TransitionMetadata> possibleTransitionMap = new HashMap<>();
     private StateMetadata shortcutState;
@@ -120,8 +123,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     @Override
-    public TransitionMetadata[] getPossibleTransitions() {
-        return this.possibleTransitionList.toArray(new TransitionMetadata[0]);
+    public TransitionMetadata[] getPossibleLeavingTransitions() {
+        return this.possibleLeavingTransitionList.toArray(new TransitionMetadata[0]);
     }
 
     @Override
@@ -391,11 +394,13 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         Class<?>[] value = function.value();
         final LinkedList<StateMetadata> nextStates = new LinkedList<>();
         for ( Class<?> item : value ) {
-            nextStates.add(parent.getParent().getState(item));
+            StateMetaBuilder nextState = (StateMetaBuilder) parent.getParent().getState(item);
+            nextState.addPossibleReachingTransition(transition);
+            nextStates.add(nextState);
         }
         final FunctionMetadata functionMetadata = new FunctionMetadata(parent, transition, nextStates);
         this.functionMetadataList.add(functionMetadata);
-        this.possibleTransitionList.add(transition);
+        this.possibleLeavingTransitionList.add(transition);
         final Iterator<Object> iterator = transition.getKeySet().iterator();
         while ( iterator.hasNext() ) {
             final Object next = iterator.next();
@@ -741,5 +746,15 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     @Override
     protected boolean extendsSuperKeySet() {
         return true;
+    }
+
+    @Override
+    public void addPossibleReachingTransition(TransitionMetadata transition) {
+        this.possibleReachingTransitionList.add(transition);
+    }
+
+    @Override
+    public TransitionMetadata[] getPossibleReachingTransitions() {
+        return this.possibleReachingTransitionList.toArray(new TransitionMetadata[0]);
     }
 }

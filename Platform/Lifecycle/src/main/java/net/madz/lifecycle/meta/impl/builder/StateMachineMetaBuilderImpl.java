@@ -868,7 +868,9 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     private RelationMetadata findRelation(StateMachineMetadata stateMachineMetadata, Object relationKey) {
-        if ( null == stateMachineMetadata ) throw new IllegalStateException("Cannot find relation with Key: " + relationKey);
+        if ( null == stateMachineMetadata ) {
+            throw new IllegalStateException("Cannot find relation with Key: " + relationKey);
+        }
         RelationMetadata relationMetadata = stateMachineMetadata.getDeclaredRelationMetadata(relationKey);
         if ( null != relationMetadata ) {
             return relationMetadata;

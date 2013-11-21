@@ -1,6 +1,7 @@
 package net.madz.lifecycle.meta.impl.builder;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,7 +75,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
 
     protected void verifySuper(Class<?> metaClass) throws VerificationException {}
 
-    protected boolean hasOverrides(Class<?> metaClass) {
+    protected boolean hasOverrides(AnnotatedElement metaClass) {
         return null != metaClass.getAnnotation(LifecycleOverride.class);
     }
 

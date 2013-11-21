@@ -1,6 +1,6 @@
 package net.madz.lifecycle.syntax.lm.callback;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 
@@ -10,6 +10,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.States.S1_State_C;
+import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.Transitions.S1_Transition_X;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 
@@ -31,7 +32,8 @@ public class CallbackNegativeTests extends CallbackTestBase {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID, S1_State_C.class,
-                    NLM_With_PreStateChange_To_Possible_Next_State.class.getMethod("interceptStateChange", LifecycleInterceptor.class));
+                    NLM_With_PreStateChange_To_Possible_Next_State.class.getMethod("interceptStateChange", LifecycleInterceptor.class),
+                    S1.class.getName() + ".TransitionSet." + S1_Transition_X.class.getSimpleName());
             throw e;
         }
     }

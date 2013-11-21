@@ -3,6 +3,8 @@ package net.madz.bcel;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import net.madz.bcel.intercept.InterceptContext;
@@ -14,6 +16,7 @@ import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.InnerClass;
 import org.apache.bcel.classfile.InnerClasses;
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.LocalVariable;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ArrayType;
 import org.apache.bcel.generic.BasicType;
@@ -23,6 +26,7 @@ import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.ICONST;
 import org.apache.bcel.generic.InstructionConstants;
 import org.apache.bcel.generic.InstructionFactory;
+import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.LDC;
 import org.apache.bcel.generic.LDC_W;
@@ -65,6 +69,18 @@ public class MethodInterceptor {
             wrapMethodGen.setInstructionList(ilist);
             final String innerClassName = createInterceptMethodCode(classGen, anonymousInnerClassSeq, interceptingClass, interceptingMethod, ifact, ilist,
                     constantPoolGen, method);
+            
+            Map<Integer, InstructionHandle> handlesByPosition = new HashMap<Integer, InstructionHandle>();
+            for ( InstructionHandle handle : ilist.getInstructionHandles() ) {
+                handlesByPosition.put(handle.getPosition(), handle);
+            }
+            if ( method.getLocalVariableTable() != null ) {
+                wrapMethodGen.removeLocalVariables();
+                for ( LocalVariable local : method.getLocalVariableTable().getLocalVariableTable() ) {
+                    wrapMethodGen.addLocalVariable(local.getName(), Type.getType(local.getSignature()), local.getIndex(),
+                            handlesByPosition.get(local.getStartPC()), handlesByPosition.get(local.getStartPC() + local.getLength()));
+                }
+            }
             // finalize the constructed method
             wrapMethodGen.stripAttributes(true);
             wrapMethodGen.setMaxLocals();

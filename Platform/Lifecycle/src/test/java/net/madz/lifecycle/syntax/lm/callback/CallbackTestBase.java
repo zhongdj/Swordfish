@@ -174,7 +174,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
     @LifecycleMeta(S1.class)
     static class NLM_prestatechange_relation_invalid extends S1BaseLM {
 
-        @PreStateChange(to = S1.States.S1_State_A.class, relation = "s1", mappedBy = "s1")
+        @PreStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
             System.out.println("The relation is invalid.");
         }
@@ -198,7 +198,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
             return state;
         }
 
-        @PreStateChange(to = S2.States.S2_State_A.class, relation = "s1", mappedBy = "s1")
+        @PreStateChange(to = S2.States.S2_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
             System.out.println("The mappedBy is invalid.");
         }
@@ -206,7 +206,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
     @LifecycleMeta(S1.class)
     static class NLM_poststatechange_relation_invalid extends S1BaseLM {
 
-        @PostStateChange(to = S1.States.S1_State_A.class, relation = "s1", mappedBy = "s1")
+        @PostStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
             System.out.println("The relation is invalid.");
         }
@@ -216,7 +216,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
 
         private S1BaseLM s1;
 
-        @PostStateChange(to = S2.States.S2_State_A.class, relation = "s1", mappedBy = "s1")
+        @PostStateChange(to = S2.States.S2_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
             System.out.println("The mappedBy is invalid.");
         }

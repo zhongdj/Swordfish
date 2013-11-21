@@ -236,8 +236,9 @@ public interface SyntaxErrors {
      */
     public static final String LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR = "002-3601";
     /**
-     * @param {0} To state
-     * @param {1} Method
+     * @param {0} To state class
+     * @param {1} Call back Method
+     * @param {2} Transition Dotted Path
      */
     public static final String PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID = "002-3700";
     /**
@@ -273,7 +274,7 @@ public interface SyntaxErrors {
     /**
      * @param {0} mappedby
      * @param {1} Method class
-     * @param {2} Relation Class
+     * @param {2} Observerable Class
      */
     public static final String PRE_STATE_CHANGE_MAPPEDBY_INVALID = "002-3706";
     /**
@@ -285,7 +286,7 @@ public interface SyntaxErrors {
     /**
      * @param {0} mappedby
      * @param {1} Method class
-     * @param {2} Relation Class
+     * @param {2} Observerable Class
      */
     public static final String POST_STATE_CHANGE_MAPPEDBY_INVALID = "002-3708";
 }

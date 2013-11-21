@@ -64,7 +64,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class CallbackObjectBase extends ReactiveObject {
+    public static class CallbackObjectBase extends ReactiveObject {
 
         public CallbackObjectBase() {
             initialState(CallbackStateMachine.States.New.class.getSimpleName());
@@ -83,7 +83,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PreCallbackFromAnyToAny extends CallbackObjectBase {
+    public static class PreCallbackFromAnyToAny extends CallbackObjectBase {
 
         @PreStateChange
         public void interceptPreStateChange(LifecycleContext<PreCallbackFromAnyToAny, String> context) {
@@ -91,7 +91,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PreCallbackFromStartToAny extends CallbackObjectBase {
+    public static class PreCallbackFromStartToAny extends CallbackObjectBase {
 
         @PreStateChange(from = CallbackStateMachine.States.Started.class)
         public void interceptPreStateChange(LifecycleContext<PreCallbackFromStartToAny, String> context) {
@@ -99,7 +99,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PreCallbackFromAnyToStart extends CallbackObjectBase {
+    public static class PreCallbackFromAnyToStart extends CallbackObjectBase {
 
         @PreStateChange(to = CallbackStateMachine.States.Started.class)
         public void interceptPreStateChange(LifecycleContext<PreCallbackFromAnyToStart, String> context) {
@@ -107,7 +107,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PostCallbackFromAnyToAny extends CallbackObjectBase {
+    public static class PostCallbackFromAnyToAny extends CallbackObjectBase {
 
         @PostStateChange
         public void interceptPostStateChange(LifecycleContext<PostCallbackFromAnyToAny, String> context) {
@@ -115,7 +115,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PostCallbackFromAnyToStart extends CallbackObjectBase {
+    public static class PostCallbackFromAnyToStart extends CallbackObjectBase {
 
         @PostStateChange(to = CallbackStateMachine.States.Started.class)
         public void interceptPostStateChange(LifecycleContext<PostCallbackFromAnyToStart, String> context) {
@@ -123,7 +123,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         }
     }
     @LifecycleMeta(CallbackStateMachine.class)
-    static class PostCallbackFromStartToAny extends CallbackObjectBase {
+    public static class PostCallbackFromStartToAny extends CallbackObjectBase {
 
         @PostStateChange(from = CallbackStateMachine.States.Started.class)
         public void interceptPostStateChange(LifecycleContext<PostCallbackFromStartToAny, String> context) {
@@ -165,9 +165,9 @@ public class CallbackTestMetadata extends EngineTestBase {
                 BigDecimal getPayedAmount();
             }
         }
-        static class Utilities {
+        public static class Utilities {
 
-            static class PayableJudger implements ConditionalTransition<Payable> {
+            public static class PayableJudger implements ConditionalTransition<Payable> {
 
                 @Override
                 public Class<?> doConditionJudge(Payable t) {
@@ -239,7 +239,7 @@ public class CallbackTestMetadata extends EngineTestBase {
         public void post() {}
 
         @Transition(InvoiceStateMachineMeta.Transitions.Pay.class)
-        @PostStateChange(to = InvoiceItemStateMachineMeta.States.Paid.class, relation = "items", mappedBy = "parent")
+        @PostStateChange(to = InvoiceItemStateMachineMeta.States.Paid.class, observableName = "items", mappedBy = "parent")
         public synchronized void onItemPaied(LifecycleContext<InvoiceItem, String> context) {
             payedAmount = payedAmount.add(context.getTarget().getPayedAmount());
         }
@@ -313,8 +313,8 @@ public class CallbackTestMetadata extends EngineTestBase {
     public static class InvoiceItemNonRelationalCallback extends ReactiveObject {
 
         private int seq;
-        private BigDecimal amount;
-        private BigDecimal payedAmount;
+        private BigDecimal amount = new BigDecimal(0);
+        private BigDecimal payedAmount = new BigDecimal(0);
         private final InvoiceNonRelationalCallback parent;
 
         public InvoiceItemNonRelationalCallback(InvoiceNonRelationalCallback parent, BigDecimal amount) {

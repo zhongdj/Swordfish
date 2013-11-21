@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.madz.lifecycle.annotations.Null;
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PreStateChange {
@@ -15,7 +17,9 @@ public @interface PreStateChange {
 
     Class<?> to() default AnyState.class;
 
-    String relation() default NULL_STR;
+    String observableName() default NULL_STR;
+
+    Class<?> observableClass() default Null.class;
 
     String mappedBy() default NULL_STR;
 }

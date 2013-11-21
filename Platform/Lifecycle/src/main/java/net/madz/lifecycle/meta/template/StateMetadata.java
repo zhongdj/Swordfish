@@ -20,7 +20,9 @@ public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
     /* ////////////////////////////////////////////////////////////////// */
     /* ////////////////////////Transition Related /////////////////////// */
     /* ////////////////////////////////////////////////////////////////// */
-    TransitionMetadata[] getPossibleTransitions();
+    TransitionMetadata[] getPossibleLeavingTransitions();
+
+    TransitionMetadata[] getPossibleReachingTransitions();
 
     TransitionMetadata getTransition(Object transitionKey);
 

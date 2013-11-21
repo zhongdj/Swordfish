@@ -28,6 +28,10 @@ public class LifecycleCommonErrors {
      */
     public static final String VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT = "002-9002";
     public static final String BUNDLE = "lifecycle_common";
+    /**
+     * @param {0} Method object
+     */
+    public static final String CALLBACK_EXCEPTION_OCCOURRED = "002-9003";
 
     private LifecycleCommonErrors() {}
 }

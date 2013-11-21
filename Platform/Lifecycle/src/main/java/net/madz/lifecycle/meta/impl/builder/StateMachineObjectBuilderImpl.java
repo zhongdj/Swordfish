@@ -76,6 +76,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private RelationObject parentRelationObject;
     private LifecycleLockStrategry lifecycleLockStrategry;
     private StateConverter<S> stateConverter;
+    final ArrayList<CallbackObject> specificPreStateChangeCallbackObjects = new ArrayList<>();
+    final ArrayList<CallbackObject> specificPostStateChangeCallbackObjects = new ArrayList<>();
+    final ArrayList<CallbackObject> commonPreStateChangeCallbackObjects = new ArrayList<>();
+    final ArrayList<CallbackObject> commonPostStateChangeCallbackObjects = new ArrayList<>();
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
@@ -250,7 +254,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyCallbackMethods(Class<?> klass) throws VerificationException {
-        final CallbackMethodScanner scanner = new CallbackMethodScanner();
+        final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         scanMethodsOnClasses(new Class[] { klass }, failureSet, scanner);
         if ( failureSet.size() > 0 ) {
@@ -258,7 +262,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private final class CallbackMethodScanner implements MethodScanner {
+    private final class CallbackMethodVerificationScanner implements MethodScanner {
 
         @Override
         public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
@@ -285,7 +289,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         private void verifyPostStateChange(Method method, VerificationFailureSet failureSet, final PostStateChange postStateChange) {
             Class<?> fromStateClass = postStateChange.from();
             Class<?> toStateClass = postStateChange.to();
-            String relation = postStateChange.relation();
+            String relation = postStateChange.observableName();
             String mappedBy = postStateChange.mappedBy();
             if ( PostStateChange.NULL_STR.equals(relation) ) {
                 verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID);
@@ -296,12 +300,27 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         private void verifyPreStateChange(Method method, VerificationFailureSet failureSet, final PreStateChange preStateChange) {
             Class<?> fromStateClass = preStateChange.from();
             Class<?> toStateClass = preStateChange.to();
-            String relation = preStateChange.relation();
+            String relation = preStateChange.observableName();
             String mappedBy = preStateChange.mappedBy();
             if ( PreStateChange.NULL_STR.equals(relation) ) {
                 verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID);
                 verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID);
-            } else {}
+                if ( AnyState.class != toStateClass && null != getMetaType().getState(toStateClass) ) {
+                    verifyPreToStatePostEvaluate(method, failureSet, toStateClass, getMetaType());
+                }
+            } else {
+                // TODO
+            }
+        }
+
+        private void verifyPreToStatePostEvaluate(Method method, VerificationFailureSet failureSet, Class<?> toStateClass,
+                StateMachineMetadata stateMachineMetadata) {
+            for ( final TransitionMetadata transition : stateMachineMetadata.getState(toStateClass).getPossibleReachingTransitions() ) {
+                if ( transition.isConditional() && transition.postValidate() ) {
+                    failureSet.add(newVerificationFailure(getDottedPath(), SyntaxErrors.PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID, toStateClass,
+                            method, transition.getDottedPath()));
+                }
+            }
         }
 
         private void verifyStateWithoutRelation(final Method method, final VerificationFailureSet failureSet, final Class<?> stateClass, final String errorCode) {
@@ -411,7 +430,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         StateMetadata[] allStates = getMetaType().getAllStates();
         for ( StateMetadata state : allStates ) {
             for ( RelationConstraintMetadata relation : state.getValidWhiles() ) {
-                for ( TransitionMetadata transition : state.getPossibleTransitions() ) {
+                for ( TransitionMetadata transition : state.getPossibleLeavingTransitions() ) {
                     verifyRelationBeCovered(klass, relation, transition);
                 }
             }
@@ -426,7 +445,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private TransitionMetadata[] getTransitionsToState(StateMetadata state) {
         final ArrayList<TransitionMetadata> transitions = new ArrayList<TransitionMetadata>();
         for ( final StateMetadata stateMetadata : getMetaType().getAllStates() ) {
-            for ( final TransitionMetadata transitionMetadata : stateMetadata.getPossibleTransitions() ) {
+            for ( final TransitionMetadata transitionMetadata : stateMetadata.getPossibleLeavingTransitions() ) {
                 if ( isTransitionIn(state, transitionMetadata) ) {
                     transitions.add(transitionMetadata);
                 }
@@ -618,11 +637,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                     }
                     relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
                     addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
-                    try {
-                        getMetaType().getRegistry().loadStateMachineObject(method.getReturnType());
-                    } catch (VerificationException e) {
-                        failureSet.add(e);
-                    }
                 } catch (VerificationException e) {
                     failureSet.add(e);
                 }
@@ -1175,7 +1189,17 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         configureStateObjects(klass);
         configureRelationObject(klass);
         configureLifecycleLock(klass);
+        configureCallbacks(klass);
         return this;
+    }
+
+    private void configureCallbacks(Class<?> klass) throws VerificationException {
+        CallbackMethodConfigureScanner<S> scanner = new CallbackMethodConfigureScanner<S>(this, klass);
+        VerificationFailureSet failureSet = new VerificationFailureSet();
+        scanMethodsOnClasses(new Class[] { klass }, failureSet, scanner);
+        if ( failureSet.size() > 0 ) {
+            throw new VerificationException(failureSet);
+        }
     }
 
     @Override
@@ -1441,19 +1465,31 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void invokeCommonPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
-        // TODO Auto-generated method stub
+        for ( CallbackObject callbackObject : this.commonPreStateChangeCallbackObjects ) {
+            callbackObject.doCallback(callbackContext);
+        }
     }
 
     private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
-        // TODO Auto-generated method stub
+        for ( CallbackObject callbackObject : this.specificPreStateChangeCallbackObjects ) {
+            if ( callbackObject.matches(callbackContext) ) {
+                callbackObject.doCallback(callbackContext);
+            }
+        }
     }
 
     private void invokeCommonPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
-        // TODO Auto-generated method stub
+        for ( CallbackObject callbackObject : this.commonPostStateChangeCallbackObjects ) {
+            callbackObject.doCallback(callbackContext);
+        }
     }
 
     private void invokeSpecificPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
-        // TODO Auto-generated method stub
+        for ( CallbackObject callbackObject : this.specificPostStateChangeCallbackObjects ) {
+            if ( callbackObject.matches(callbackContext) ) {
+                callbackObject.doCallback(callbackContext);
+            }
+        }
     }
 
     private String evaluateToState(LifecycleContext<?, S> callbackContext) {
@@ -1477,5 +1513,35 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             fromState = String.valueOf(callbackContext.getFromState());
         }
         return fromState;
+    }
+
+    @Override
+    public RelationObject getRelationObject(Object primaryKey) {
+        return this.relationObjectsMap.get(primaryKey);
+    }
+
+    @Override
+    public RelationObject getParentRelationObject() {
+        return this.parentRelationObject;
+    }
+
+    @Override
+    public void addSpecificPreStateChangeCallbackObject(RelationalCallbackObject item) {
+        this.specificPreStateChangeCallbackObjects.add(item);
+    }
+
+    @Override
+    public void addCommonPreStateChangeCallbackObject(RelationalCallbackObject item) {
+        this.commonPreStateChangeCallbackObjects.add(item);
+    }
+
+    @Override
+    public void addSpecificPostStateChangeCallbackObject(RelationalCallbackObject item) {
+        this.specificPostStateChangeCallbackObjects.add(item);
+    }
+
+    @Override
+    public void addCommonPostStateChangeCallbackObject(RelationalCallbackObject item) {
+        this.commonPostStateChangeCallbackObjects.add(item);
     }
 }

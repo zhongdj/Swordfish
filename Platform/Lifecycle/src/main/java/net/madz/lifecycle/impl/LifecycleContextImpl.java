@@ -11,13 +11,16 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
 
     private final T target;
     private final S fromState;
+    private final String fromStateName;
     private final S toState;
+    private final String toStateName;
     private final Method transitionMethod;
     private final Object[] arguments;
 
     @SuppressWarnings("unchecked")
     public LifecycleContextImpl(InterceptContext<T> context, StateConverter<S> converter) {
         this.target = context.getTarget();
+        this.fromStateName = context.getFromState();
         if ( null != converter ) {
             this.fromState = converter.fromState(context.getFromState());
         } else {
@@ -32,6 +35,7 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
                 this.toState = (S) context.getToState();
             }
         }
+        this.toStateName = context.getToState();
         this.transitionMethod = context.getMethod();
         this.arguments = context.getArguments();
     }
@@ -65,5 +69,15 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
     public String toString() {
         return "LifecycleContextImpl [target=" + target + ", fromState=" + fromState + ", toState=" + toState + ", transitionMethod=" + transitionMethod
                 + ", arguments=" + Arrays.toString(arguments) + "]";
+    }
+
+    @Override
+    public String getFromStateName() {
+        return this.fromStateName;
+    }
+
+    @Override
+    public String getToStateName() {
+        return this.toStateName;
     }
 }
