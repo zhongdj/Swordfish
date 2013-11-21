@@ -36,7 +36,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
             switch (state) {
                 case "S1_A":
                     return 1;
-                case "S2_A":
+                case "S1_B":
                     return 2;
                 default:
                     throw new IllegalArgumentException();
@@ -136,7 +136,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
     static class PrivateStateFieldClass {
 
         @StateIndicator
-        private String state;
+        private String state = PS1.States.S1_A.class.getSimpleName();
 
         @Transition(S1_X.class)
         public void doX() {}
@@ -146,7 +146,7 @@ public class StateIndicatorMetadata extends BaseMetaDataTest {
 
         @StateIndicator
         @Converter(StateConverterImpl.class)
-        private Integer state;
+        private Integer state = 1;
 
         @Transition(S1_X.class)
         public void doX() {}
