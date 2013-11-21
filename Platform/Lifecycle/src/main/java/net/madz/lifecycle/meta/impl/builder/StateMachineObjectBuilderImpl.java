@@ -60,8 +60,8 @@ import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachineObject, StateMachineObject, StateMachineMetadata> implements
-        StateMachineObjectBuilder {
+public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMachineObject<S>, StateMachineObject<S>, StateMachineMetadata> implements
+        StateMachineObjectBuilder<S> {
 
     private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
     private final ArrayList<TransitionObject> transitionObjectList = new ArrayList<>();
@@ -69,16 +69,27 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
     private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
     private StateAccessor<String> stateAccessor;
-    private final HashMap<Object, StateObject> stateMap = new HashMap<>();
-    private final ArrayList<StateObject> stateList = new ArrayList<>();
+    private final HashMap<Object, StateObject<S>> stateMap = new HashMap<>();
+    private final ArrayList<StateObject<S>> stateList = new ArrayList<>();
     private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
     private final ArrayList<RelationObject> relationObjectList = new ArrayList<>();
     private RelationObject parentRelationObject;
     private LifecycleLockStrategry lifecycleLockStrategry;
+    private StateConverter<S> stateConverter;
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
         this.setMetaType(template);
+    }
+
+    @Override
+    public StateConverter<S> getStateConverter() {
+        return this.stateConverter;
+    }
+
+    @Override
+    public boolean isLockEnabled() {
+        return null != lifecycleLockStrategry;
     }
 
     @Override
@@ -172,7 +183,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     private void configureStateObjects(Class<?> klass) throws VerificationException {
         final StateMetadata[] allStates = getMetaType().getAllStates();
         for ( StateMetadata stateMetadata : allStates ) {
-            StateObjectBuilderImpl stateObject = new StateObjectBuilderImpl(this, stateMetadata);
+            StateObjectBuilderImpl<S> stateObject = new StateObjectBuilderImpl<S>(this, stateMetadata);
             stateObject.setRegistry(getRegistry());
             stateObject.build(klass, this);
             Iterator<Object> iterator = stateObject.getKeySet().iterator();
@@ -208,7 +219,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             this.stateAccessor = new PropertyAccessor<String>(getter, setter);
         } else {
             try {
-                final StateConverter<?> stateConverter = getter.getAnnotation(Converter.class).value().newInstance();
+                this.stateConverter = (StateConverter<S>) getter.getAnnotation(Converter.class).value().newInstance();
                 this.stateAccessor = new ConverterAccessor(stateConverter, new PropertyAccessor(getter, setter));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
@@ -222,7 +233,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
             this.stateAccessor = new FieldStateAccessor<String>(stateField);
         } else {
             try {
-                final StateConverter<?> stateConverter = stateField.getAnnotation(Converter.class).value().newInstance();
+                this.stateConverter = (StateConverter<S>) stateField.getAnnotation(Converter.class).value().newInstance();
                 this.stateAccessor = new ConverterAccessor(stateConverter, new FieldStateAccessor(stateField));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
@@ -260,7 +271,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
                 verifyPostStateChange(method, failureSet, postStateChange);
             }
             final Callbacks callbacks = method.getAnnotation(Callbacks.class);
-            if (null != callbacks) {
+            if ( null != callbacks ) {
                 for ( PreStateChange item : callbacks.preStateChange() ) {
                     verifyPreStateChange(method, failureSet, item);
                 }
@@ -296,8 +307,8 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         private void verifyStateWithoutRelation(final Method method, final VerificationFailureSet failureSet, final Class<?> stateClass, final String errorCode) {
             if ( AnyState.class != stateClass ) {
                 if ( null == getMetaType().getState(stateClass) ) {
-                    failureSet
-                            .add(newVerificationException(method.getDeclaringClass().getName() + "." + stateClass + "." + errorCode, errorCode, stateClass, method, getMetaType().getPrimaryKey()));
+                    failureSet.add(newVerificationException(method.getDeclaringClass().getName() + "." + stateClass + "." + errorCode, errorCode, stateClass,
+                            method, getMetaType().getPrimaryKey()));
                 }
             }
         }
@@ -580,9 +591,9 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
     private final class RelationGetterConfigureScanner implements MethodScanner {
 
-        final private StateMachineObject stateMachineObject;
+        final private StateMachineObject<S> stateMachineObject;
 
-        public RelationGetterConfigureScanner(StateMachineObject stateMachineObject) {
+        public RelationGetterConfigureScanner(StateMachineObject<S> stateMachineObject) {
             this.stateMachineObject = stateMachineObject;
         }
 
@@ -1143,18 +1154,19 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return this.transitionObjectMap.get(transitionKey);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public StateObject[] getStateSet() {
+    public StateObject<S>[] getStateSet() {
         return this.stateList.toArray(new StateObject[0]);
     }
 
     @Override
-    public StateObject getState(Object stateKey) {
+    public StateObject<S> getState(Object stateKey) {
         return stateMap.get(stateKey);
     }
 
     @Override
-    public StateMachineObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
+    public StateMachineObjectBuilder<S> build(Class<?> klass, StateMachineObject<S> parent) throws VerificationException {
         super.build(klass, parent);
         verifySyntax(klass);
         configureStateIndicatorAccessor(klass);
@@ -1189,7 +1201,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     @Override
     public String getNextState(Object target, Object transitionKey) {
         final String stateName = evaluateState(target);
-        final StateObject state = getState(stateName);
+        final StateObject<S> state = getState(stateName);
         final FunctionMetadata functionMetadata = state.getMetaType().getFunctionMetadata(transitionKey);
         if ( null == functionMetadata ) {
             throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey + " while searching function metadata from state: "
@@ -1256,7 +1268,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         final StateMetadata state = getMetaType().getState(evaluateState(target));
         final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
         final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
-        final StateObject stateObject = getState(state.getDottedPath());
+        final StateObject<S> stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
             stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
@@ -1362,8 +1374,9 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
         return relationObjectList.toArray(new RelationObject[0]);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public StateMachineObject getParentStateMachine(Object target) {
+    public StateMachineObject<S> getParentStateMachine(Object target) {
         if ( null == parentRelationObject ) {
             return null;
         } else {
@@ -1381,7 +1394,7 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public StateMachineObject getRelatedStateMachine(Object target, Object relativeKey) {
+    public StateMachineObject<?> getRelatedStateMachine(Object target, Object relativeKey) {
         final ReadAccessor<?> relationEvaluator = (ReadAccessor<?>) relationObjectsMap.get(relativeKey).getEvaluator();
         if ( null == relationEvaluator ) {
             throw new IllegalArgumentException("Cannot find relation with Key: " + relativeKey);
@@ -1400,46 +1413,69 @@ public class StateMachineObjectBuilderImpl extends ObjectBuilderBase<StateMachin
     }
 
     @Override
-    public void performPreStateChangeCallback(LifecycleContext<?, String> callbackContext) {
-        final String fromState = callbackContext.getFromState();
-        String toState = callbackContext.getToState();
+    public void performPreStateChangeCallback(LifecycleContext<?, S> callbackContext) {
+        final String fromState = evaluateFromState(callbackContext);
+        final String toState = evaluateToState(callbackContext);
         if ( null != toState ) {
             invokeSpecificPreStateChangeCallbacks(callbackContext);
         }
-        final StateObject fromStateObject = getState(fromState);
+        final StateObject<S> fromStateObject = getState(fromState);
         fromStateObject.invokeFromPreStateChangeCallbacks(callbackContext);
         if ( null != toState ) {
-            final StateObject toStateObject = getState(toState);
+            final StateObject<S> toStateObject = getState(toState);
             toStateObject.invokeToPreStateChangeCallbacks(callbackContext);
         }
         invokeCommonPreStateChangeCallbacks(callbackContext);
     }
 
     @Override
-    public void performPostStateChangeCallback(LifecycleContext<?, String> callbackContext) {
-        final String fromState = callbackContext.getFromState();
-        String toState = callbackContext.getToState();
+    public void performPostStateChangeCallback(LifecycleContext<?, S> callbackContext) {
+        final String fromState = evaluateFromState(callbackContext);
+        final String toState = evaluateToState(callbackContext);
         invokeSpecificPostStateChangeCallbacks(callbackContext);
-        final StateObject fromStateObject = getState(fromState);
+        final StateObject<S> fromStateObject = getState(fromState);
         fromStateObject.invokeFromPostStateChangeCallbacks(callbackContext);
-        final StateObject toStateObject = getState(toState);
+        final StateObject<S> toStateObject = getState(toState);
         toStateObject.invokeToPostStateChangeCallbacks(callbackContext);
         invokeCommonPostStateChangeCallbacks(callbackContext);
     }
 
-    private void invokeCommonPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+    private void invokeCommonPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         // TODO Auto-generated method stub
     }
 
-    private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+    private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         // TODO Auto-generated method stub
     }
 
-    private void invokeCommonPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+    private void invokeCommonPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         // TODO Auto-generated method stub
     }
 
-    private void invokeSpecificPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {
+    private void invokeSpecificPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         // TODO Auto-generated method stub
+    }
+
+    private String evaluateToState(LifecycleContext<?, S> callbackContext) {
+        if ( null == callbackContext.getToState() ) {
+            return null;
+        }
+        final String toState;
+        if ( null != this.stateConverter ) {
+            toState = stateConverter.toState(callbackContext.getToState());
+        } else {
+            toState = String.valueOf(callbackContext.getToState());
+        }
+        return toState;
+    }
+
+    private String evaluateFromState(LifecycleContext<?, S> callbackContext) {
+        final String fromState;
+        if ( null != this.stateConverter ) {
+            fromState = stateConverter.toState(callbackContext.getFromState());
+        } else {
+            fromState = String.valueOf(callbackContext.getFromState());
+        }
+        return fromState;
     }
 }

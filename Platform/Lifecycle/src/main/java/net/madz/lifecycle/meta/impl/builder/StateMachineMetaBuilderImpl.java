@@ -143,10 +143,10 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     @Override
-    public StateMachineObject newInstance(Class<?> clazz) throws VerificationException {
-        final StateMachineObjectBuilder builder = new StateMachineObjectBuilderImpl(this, clazz.getName());
+    public StateMachineObject<?> newInstance(Class<?> clazz) throws VerificationException {
+        final StateMachineObjectBuilder<?> builder = new StateMachineObjectBuilderImpl<>(this, clazz.getName());
         builder.setRegistry(registry);
-        return builder.build(clazz, null).getMetaData();
+        return (StateMachineObject<?>) builder.build(clazz, null).getMetaData();
     }
 
     @Override

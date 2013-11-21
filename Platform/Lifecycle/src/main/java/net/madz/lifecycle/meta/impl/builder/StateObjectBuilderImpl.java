@@ -18,9 +18,9 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
-public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, StateMachineObject, StateMetadata> implements StateObjectBuilder {
+public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>, StateMachineObject<S>, StateMetadata> implements StateObjectBuilder<S> {
 
-    protected StateObjectBuilderImpl(StateMachineObjectBuilder parent, StateMetadata stateMetadata) {
+    protected StateObjectBuilderImpl(StateMachineObjectBuilder<S> parent, StateMetadata stateMetadata) {
         super(parent, "StateSet." + stateMetadata.getDottedPath().getName());
         this.setMetaType(stateMetadata);
     }
@@ -29,7 +29,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     public void verifyMetaData(VerificationFailureSet verificationSet) {}
 
     @Override
-    public StateObjectBuilder build(Class<?> klass, StateMachineObject parent) throws VerificationException {
+    public StateObjectBuilder<S> build(Class<?> klass, StateMachineObject<S> parent) throws VerificationException {
         super.build(klass, parent);
         return this;
     }
@@ -37,7 +37,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     @Override
     public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, final Object relatedTarget, UnlockableStack stack) {
         try {
-            final StateMachineObject relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            final StateMachineObject<?> relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
             lockRelatedObject(relatedTarget, stack, relatedStateMachineObject);
             final String relatedStateName = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean found = false;
@@ -66,8 +66,8 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
         }
     }
 
-    private void lockRelatedObject(final Object relatedTarget, UnlockableStack stack, final StateMachineObject relatedStateMachineObject) {
-        if ( !isLockEnabled(relatedStateMachineObject) ) {
+    private void lockRelatedObject(final Object relatedTarget, UnlockableStack stack, final StateMachineObject<?> relatedStateMachineObject) {
+        if ( !relatedStateMachineObject.isLockEnabled() ) {
             return;
         }
         final LifecycleLockStrategry lifecycleLockStrategy = relatedStateMachineObject.getLifecycleLockStrategy();
@@ -81,17 +81,13 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
         });
     }
 
-    private boolean isLockEnabled(StateMachineObject stateMachine) {
-        return null != stateMachine.getLifecycleLockStrategy();
-    }
-
     @Override
     public void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relationMetadataArray,
             Object relatedTarget, UnlockableStack stack) {
         try {
-            final StateMachineObject relatedStateMachineInst = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
-            lockRelatedObject(relatedTarget, stack, relatedStateMachineInst);
-            final String relatedEvaluateState = relatedStateMachineInst.evaluateState(relatedTarget);
+            final StateMachineObject<?> relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            lockRelatedObject(relatedTarget, stack, relatedStateMachineObject);
+            final String relatedEvaluateState = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean find = false;
             for ( RelationConstraintMetadata relationMetadata : relationMetadataArray ) {
                 for ( StateMetadata stateMetadata : relationMetadata.getOnStates() ) {
@@ -111,7 +107,7 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
                 throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VIOLATE_INBOUND_WHILE_RELATION_CONSTRAINT,
                         transitionKey, nextState, target, relatedTarget, relatedEvaluateState, Arrays.toString(validRelationStates.toArray(new String[0])));
             } else {
-                relatedStateMachineInst.validateValidWhiles(relatedTarget, stack);
+                relatedStateMachineObject.validateValidWhiles(relatedTarget, stack);
             }
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
@@ -119,14 +115,14 @@ public class StateObjectBuilderImpl extends ObjectBuilderBase<StateObject, State
     }
 
     @Override
-    public void invokeFromPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+    public void invokeFromPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {}
 
     @Override
-    public void invokeToPreStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+    public void invokeToPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {}
 
     @Override
-    public void invokeFromPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+    public void invokeFromPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {}
 
     @Override
-    public void invokeToPostStateChangeCallbacks(LifecycleContext<?, String> callbackContext) {}
+    public void invokeToPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {}
 }

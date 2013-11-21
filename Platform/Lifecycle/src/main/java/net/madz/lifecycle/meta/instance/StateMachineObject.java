@@ -12,7 +12,7 @@ import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 
-public interface StateMachineObject extends MetaObject<StateMachineObject, StateMachineMetadata> {
+public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>, StateMachineMetadata> {
 
     TransitionObject[] getTransitionSet();
 
@@ -20,9 +20,9 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     TransitionObject getTransition(Object transitionKey);
 
-    StateObject[] getStateSet();
+    StateObject<S>[] getStateSet();
 
-    StateObject getState(Object stateKey);
+    StateObject<S> getState(Object stateKey);
 
     StateAccessor<String> getStateAccessor();
 
@@ -197,13 +197,17 @@ public interface StateMachineObject extends MetaObject<StateMachineObject, State
 
     RelationObject[] evaluateRelatives(Object target);
 
-    StateMachineObject getParentStateMachine(Object target);
+    StateMachineObject<S> getParentStateMachine(Object target);
 
-    StateMachineObject getRelatedStateMachine(Object target, Object relativeKey);
+    StateMachineObject<?> getRelatedStateMachine(Object target, Object relativeKey);
 
     void validateValidWhiles(Object target, UnlockableStack stack);
 
-    void performPreStateChangeCallback(LifecycleContext<?, String> callbackContext);
+    void performPreStateChangeCallback(LifecycleContext<?, S> callbackContext);
 
-    void performPostStateChangeCallback(LifecycleContext<?, String> callbackContext);
+    void performPostStateChangeCallback(LifecycleContext<?, S> callbackContext);
+
+    StateConverter<S> getStateConverter();
+
+    boolean isLockEnabled();
 }
