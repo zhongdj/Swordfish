@@ -47,6 +47,9 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
             }
         }
         new CorrectRegistry();
+        
+        PrivateStateFieldConverterClass o = new PrivateStateFieldConverterClass();
+        o.doX();
     }
 
     @Test
