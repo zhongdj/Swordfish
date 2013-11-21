@@ -19,7 +19,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
-    private static synchronized StateMachineObject lookupStateMachine(InterceptContext<?> context) {
+    private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?> context) {
         try {
             return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getTarget().getClass());
         } catch (VerificationException e) {
@@ -43,7 +43,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     @Override
     protected void preExec(InterceptContext<V> context) {
         super.preExec(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context);
+        final StateMachineObject<?> stateMachine = lookupStateMachine(context);
         if ( isLockEnabled(stateMachine) ) {
             final LifecycleLockStrategry lock = stateMachine.getLifecycleLockStrategy();
             lock.lockWrite(context.getTarget());
@@ -81,7 +81,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     @Override
     protected void postExec(InterceptContext<V> context) {
         super.postExec(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context);
+        final StateMachineObject<?> stateMachine = lookupStateMachine(context);
         try {
             // 5. Validate in-bound Relation constraint if next state is
             // predictable after method invocation.
@@ -101,7 +101,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
             }
             // 7. Callback after state change
             if ( logger.isLoggable(Level.FINE) ) {
-                logger.fine("\tStep 7. Start Callback after state change.");
+                logger.fine("\tStep 7. Start Callback after state change from : " + context.getFromState() + " => to : " + context.getToState());
             }
             performCallbacksAfterStateChange(stateMachine, context);
             context.setSuccess(true);
@@ -135,9 +135,15 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         super.cleanup(context);
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....LifecycleInterceptor is doing cleanup ...");
+            if ( !context.isSuccess() ) {
+                String toStateString = null == context.getToState() ? "(Had Not Been Evaluated)" : context.getToState();
+                logger.severe("ReactiveObject: [" + context.getTarget() + "] was failed to transit from state: [" + context.getFromState() + "] to state: ["
+                        + toStateString + "] with following error: ");
+                logger.severe(context.getFailureCause().getLocalizedMessage());
+            }
         }
         unlockRelationObjects(context);
-        final StateMachineObject stateMachine = lookupStateMachine(context);
+        final StateMachineObject<?> stateMachine = lookupStateMachine(context);
         if ( !context.isSuccess() && isLockEnabled(stateMachine) ) {
             final LifecycleLockStrategry lockStrategry = stateMachine.getLifecycleLockStrategy();
             if ( null != lockStrategry ) {
@@ -146,32 +152,33 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
-    private void fireLifecycleEvents(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void fireLifecycleEvents(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         final LifecycleEventHandler eventHandler = AbsStateMachineRegistry.getInstance().getLifecycleEventHandler();
         if ( null != eventHandler ) {
             eventHandler.onEvent(new LifecycleEventImpl(context));
         }
     }
 
-    private boolean isLockEnabled(StateMachineObject stateMachine) {
+    private boolean isLockEnabled(StateMachineObject<?> stateMachine) {
         return null != stateMachine.getLifecycleLockStrategy();
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
-        stateMachine.performPostStateChangeCallback(new LifecycleContextImpl<V>(context));
+        stateMachine.performPostStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
     }
 
-    private void setNextState(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void setNextState(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         final String stateName = stateMachine.getNextState(context.getTarget(), context.getTransitionKey());
         stateMachine.setTargetState(context.getTarget(), stateName);
         context.setToState(stateName);
     }
 
-    private void validateNextStateInboundWhile(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void validateNextStateInboundWhile(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         stateMachine.validateInboundWhiles(context);
     }
 
-    private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         if ( hasOnlyOneStateCandidate(stateMachine, context) ) {
             return true;
         } else if ( canEvaluateConditionBeforeTransition(stateMachine, context) ) {
@@ -180,11 +187,11 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         return false;
     }
 
-    private boolean canEvaluateConditionBeforeTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private boolean canEvaluateConditionBeforeTransition(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         return stateMachine.evaluateConditionBeforeTransition(context.getTransitionKey());
     }
 
-    private boolean hasOnlyOneStateCandidate(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private boolean hasOnlyOneStateCandidate(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         final String stateName = stateMachine.evaluateState(context.getTarget());
         final StateMetadata state = stateMachine.getMetaType().getState(stateName);
         if ( state.hasMultipleStateCandidatesOn(context.getTransitionKey()) ) {
@@ -194,11 +201,12 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
-        stateMachine.performPreStateChangeCallback(new LifecycleContextImpl<V>(context));
+        stateMachine.performPreStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
     }
 
-    private void validateTransition(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void validateTransition(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         StateMetadata stateMetadata = stateMachine.getMetaType().getState(context.getFromState());
         if ( !stateMetadata.isTransitionValid(context.getTransitionKey()) ) {
             throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTransitionKey(),
@@ -210,7 +218,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
-    private void validateStateValidWhiles(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void validateStateValidWhiles(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
         stateMachine.validateValidWhiles(context);
     }
 }
