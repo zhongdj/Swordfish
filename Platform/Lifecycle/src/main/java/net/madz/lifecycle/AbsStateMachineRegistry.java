@@ -90,7 +90,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
      * or simple name, or class full name
      */
     protected final HashMap<Object, StateMachineMetadata> typeMap = new HashMap<>();
-    protected final HashMap<Object, StateMachineObject> instanceMap = new HashMap<>();
+    protected final HashMap<Object, StateMachineObject<?>> instanceMap = new HashMap<>();
     private final LifecycleRegistry lifecycleRegistry;
     private final StateMachineBuilder builderMeta;
     private LifecycleEventHandler lifecycleEventHandler;
@@ -162,7 +162,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
                 return;
             }
             if ( null == getStateMachineInst(clazz) ) {
-                StateMachineObject stateMachineInstance = metaData.newInstance(clazz);
+                StateMachineObject<?> stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
             }
@@ -176,7 +176,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return null != this.typeMap.get(clazz.getName());
     }
 
-    public synchronized void addInstance(Class<?> clazz, StateMachineObject stateMachine) {
+    public synchronized void addInstance(Class<?> clazz, StateMachineObject<?> stateMachine) {
         instanceMap.put(clazz, stateMachine);
         instanceMap.put(clazz.getName(), stateMachine);
     }
@@ -208,7 +208,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return Collections.unmodifiableMap(this.typeMap);
     }
 
-    public synchronized Map<Object, StateMachineObject> getStateMachineInstances() {
+    public synchronized Map<Object, StateMachineObject<?>> getStateMachineInstances() {
         return Collections.unmodifiableMap(this.instanceMap);
     }
 
@@ -216,7 +216,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return this.typeMap.get(key);
     }
 
-    public synchronized StateMachineObject getStateMachineInst(Object key) {
+    public synchronized StateMachineObject<?> getStateMachineInst(Object key) {
         return this.instanceMap.get(key);
     }
 
@@ -256,8 +256,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     }
 
     @Override
-    public StateMachineObject loadStateMachineObject(Class<?> stateMachineObjectClass) throws VerificationException {
-        final StateMachineObject stateMachineObject = getStateMachineInst(stateMachineObjectClass);
+    public StateMachineObject<?> loadStateMachineObject(Class<?> stateMachineObjectClass) throws VerificationException {
+        final StateMachineObject<?> stateMachineObject = getStateMachineInst(stateMachineObjectClass);
         if ( null != stateMachineObject ) {
             return stateMachineObject;
         } else {

@@ -1406,7 +1406,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             final Object parentObject = parentRelationObject.getEvaluator().read(target);
             if ( null != parentObject ) {
                 try {
-                    return registry.loadStateMachineObject(parentObject.getClass());
+                    return (StateMachineObject<S>) registry.loadStateMachineObject(parentObject.getClass());
                 } catch (VerificationException e) {
                     throw new IllegalStateException(e);
                 }

@@ -23,10 +23,10 @@ import net.madz.verification.VerificationFailureSet;
 
 public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>, StateMachineObject<S>, StateMetadata> implements StateObjectBuilder<S> {
 
-    private HashMap<String, List<CallbackObject>> preFromStateChangeCallbacksMap = new HashMap<>();
-    private HashMap<String, List<CallbackObject>> preToStateChangeCallbacksMap = new HashMap<>();
-    private HashMap<String, List<CallbackObject>> postFromStateChangeCallbacksMap = new HashMap<>();
-    private HashMap<String, List<CallbackObject>> postToStateChangeCallbacksMap = new HashMap<>();
+    private final HashMap<String, List<CallbackObject>> preFromStateChangeCallbacksMap = new HashMap<>();
+    private final HashMap<String, List<CallbackObject>> preToStateChangeCallbacksMap = new HashMap<>();
+    private final HashMap<String, List<CallbackObject>> postFromStateChangeCallbacksMap = new HashMap<>();
+    private final HashMap<String, List<CallbackObject>> postToStateChangeCallbacksMap = new HashMap<>();
 
     protected StateObjectBuilderImpl(StateMachineObjectBuilder<S> parent, StateMetadata stateMetadata) {
         super(parent, "StateSet." + stateMetadata.getDottedPath().getName());

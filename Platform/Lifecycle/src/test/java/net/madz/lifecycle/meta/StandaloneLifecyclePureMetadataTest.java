@@ -42,7 +42,7 @@ import static org.junit.Assert.fail;
 public class StandaloneLifecyclePureMetadataTest {
 
     private static StateMachineMetadata machineMetadata;
-    private static StateMachineObject stateMachineInst;
+    private static StateMachineObject<?> stateMachineInst;
     private static StateMachineRegistry registry;
 
     @LifecycleRegistry(IServiceOrder.class)
@@ -67,7 +67,7 @@ public class StandaloneLifecyclePureMetadataTest {
     @Test
     public void testRegistry() {
         final Map<Object, StateMachineMetadata> types = registry.getStateMachineTypes();
-        final Map<Object, StateMachineObject> instances = registry.getStateMachineInstances();
+        final Map<Object, StateMachineObject<?>> instances = registry.getStateMachineInstances();
         // Check Sizes
         {
             assertTrue(types.size() > 0);
@@ -284,8 +284,8 @@ public class StandaloneLifecyclePureMetadataTest {
     // //////////////////////////////////////////////////////////////////
     @Test
     public void testStateInstancesSummary() throws Exception {
-        final StateMachineObject i = stateMachineInst;
-        final StateObject[] stateSet = i.getStateSet();
+        final StateMachineObject<?> i = stateMachineInst;
+        final StateObject<?>[] stateSet = i.getStateSet();
         assertEquals(5, stateSet.length);
         // Class Key Valdiation
         assertNotNull(i.getState(Created.class));
@@ -319,7 +319,7 @@ public class StandaloneLifecyclePureMetadataTest {
         fail("Not implement Yet.");
     }
 
-    private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass, final StateMachineObject stateMachineInst,
+    private void validateTranitionMethod(Class<IServiceOrder> lifecycleContainerClass, final StateMachineObject<?> stateMachineInst,
             final Class<?> transitionContainerClass, final String expectMethodName, final Class<?>... argTypes) throws NoSuchMethodException {
         assertTrue(stateMachineInst.hasTransition(transitionContainerClass));
         final TransitionObject transition = stateMachineInst.getTransition(transitionContainerClass);

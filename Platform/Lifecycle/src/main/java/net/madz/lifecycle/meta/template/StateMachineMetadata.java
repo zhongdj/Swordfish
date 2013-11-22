@@ -87,7 +87,7 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
      *         part is concreted by the clazz param.
      * @throws VerificationException
      */
-    StateMachineObject newInstance(Class<?> clazz) throws VerificationException;
+    StateMachineObject<?> newInstance(Class<?> clazz) throws VerificationException;
 
     /* //////////////////////////////////////////////////// */
     /* //////// Methods For Composite State Machine /////// */
