@@ -137,7 +137,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 if ( null == field.getAnnotation(Relation.class) ) {
                     continue;
                 }
-                getMetaType().getRegistry().loadStateMachineObject(field.getType());
                 final Object relationKey = getRelationKey(field);
                 final RelationMetadata relationMetadata = getMetaType().getRelationMetadata(relationKey);
                 if ( extendedRelationMetadata.contains(relationMetadata) ) {
@@ -309,7 +308,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                     verifyPreToStatePostEvaluate(method, failureSet, toStateClass, getMetaType());
                 }
             } else {
-                // TODO
+                
             }
         }
 
