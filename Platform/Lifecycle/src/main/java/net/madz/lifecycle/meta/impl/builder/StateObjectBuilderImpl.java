@@ -12,7 +12,6 @@ import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
-import net.madz.lifecycle.annotations.callback.AnyState;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateObjectBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
