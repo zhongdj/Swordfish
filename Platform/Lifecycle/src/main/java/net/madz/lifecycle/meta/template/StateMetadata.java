@@ -6,6 +6,16 @@ import net.madz.lifecycle.meta.instance.FunctionMetadata;
 
 public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
 
+    public static enum StateTypeEnum {
+        Running,
+        Waiting,
+        Stopped,
+        Corrupted,
+        Common
+    }
+
+    StateTypeEnum getType();
+
     /* ////////////////////////////////////////////////////////////////// */
     /* //////////////////////////Basic Properties /////////////////////// */
     /* ////////////////////////////////////////////////////////////////// */
@@ -78,4 +88,6 @@ public interface StateMetadata extends Recoverable, MetaType<StateMetadata> {
     RelationConstraintMetadata[] getDeclaredValidWhiles();
 
     RelationConstraintMetadata[] getInboundWhiles();
+
+    void setType(StateTypeEnum type);
 }

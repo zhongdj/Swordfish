@@ -18,9 +18,13 @@ import net.madz.lifecycle.annotations.relation.InboundWhile;
 import net.madz.lifecycle.annotations.relation.InboundWhiles;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.relation.ValidWhiles;
+import net.madz.lifecycle.annotations.state.Corrupted;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.Running;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.annotations.state.Stopped;
+import net.madz.lifecycle.annotations.state.Waiting;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
@@ -48,57 +52,50 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     private ArrayList<FunctionMetadata> functionMetadataList = new ArrayList<>();
     private HashMap<Object, TransitionMetadata> possibleTransitionMap = new HashMap<>();
     private StateMetadata shortcutState;
-    private boolean corrupted;
+    private StateTypeEnum type;
+    private TransitionMetadata corruptTransition;
+    private TransitionMetadata recoverTransition;
+    private TransitionMetadata redoTransition;
 
     protected StateMetaBuilderImpl(StateMachineMetaBuilder parent, String name) {
         super(parent, "StateSet." + name);
     }
 
     @Override
-    public void verifyMetaData(VerificationFailureSet verificationSet) {
-        // TODO Auto-generated method stub
-    }
+    public void verifyMetaData(VerificationFailureSet verificationSet) {}
 
     @Override
     public boolean hasRedoTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != redoTransition;
     }
 
     @Override
     public TransitionMetadata getRedoTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return redoTransition;
     }
 
     @Override
     public boolean hasRecoverTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != recoverTransition;
     }
 
     @Override
     public TransitionMetadata getRecoverTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return recoverTransition;
     }
 
     @Override
     public boolean hasCorruptTransition() {
-        // TODO Auto-generated method stub
-        return false;
+        return null != corruptTransition;
     }
 
     @Override
     public TransitionMetadata getCorruptTransition() {
-        // TODO Auto-generated method stub
-        return null;
+        return corruptTransition;
     }
 
     @Override
-    public void dump(Dumper dumper) {
-        // TODO Auto-generated method stub
-    }
+    public void dump(Dumper dumper) {}
 
     @Override
     public StateMachineMetadata getStateMachine() {
@@ -291,6 +288,18 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
                 this.end = true;
             }
         }
+        if ( null != clazz.getAnnotation(Corrupted.class) ) {
+            setType(StateTypeEnum.Corrupted);
+        }
+        if ( null != clazz.getAnnotation(Running.class) ) {
+            setType(StateTypeEnum.Running);
+        }
+        if ( null != clazz.getAnnotation(Stopped.class) ) {
+            setType(StateTypeEnum.Stopped);
+        }
+        if ( null != clazz.getAnnotation(Waiting.class) ) {
+            setType(StateTypeEnum.Waiting);
+        }
     }
 
     private void configureShortcutState(Class<?> clazz, StateMachineMetadata parent) {
@@ -404,6 +413,21 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             final Object next = iterator.next();
             this.functionMetadataMap.put(next, functionMetadata);
             this.possibleTransitionMap.put(next, transition);
+        }
+        switch (transition.getType()) {
+            case Corrupt:
+                this.corruptTransition = transition;
+                break;
+            case Recover:
+                this.recoverTransition = transition;
+                break;
+            case Redo:
+                this.redoTransition = transition;
+                break;
+            case Common:
+            case Fail:
+            case Other:
+                break;
         }
     }
 
@@ -754,5 +778,15 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     @Override
     public TransitionMetadata[] getPossibleReachingTransitions() {
         return this.possibleReachingTransitionList.toArray(new TransitionMetadata[0]);
+    }
+
+    @Override
+    public StateTypeEnum getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(StateTypeEnum type) {
+        this.type = type;
     }
 }

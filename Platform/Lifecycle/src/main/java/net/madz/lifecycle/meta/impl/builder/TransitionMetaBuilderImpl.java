@@ -11,6 +11,7 @@ import net.madz.lifecycle.annotations.action.Corrupt;
 import net.madz.lifecycle.annotations.action.Fail;
 import net.madz.lifecycle.annotations.action.Recover;
 import net.madz.lifecycle.annotations.action.Redo;
+import net.madz.lifecycle.annotations.action.Timeout;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
@@ -24,6 +25,7 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
     private Class<?> conditionClass;
     private Class<? extends ConditionalTransition<?>> judgerClass;
     private boolean postValidate;
+    private long timeout;
 
     protected TransitionMetaBuilderImpl(StateMachineMetadata parent, String name) {
         super(parent, "TransitionSet." + name);
@@ -35,13 +37,19 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
     @Override
     public TransitionMetaBuilder build(Class<?> clazz, StateMachineMetadata parent) throws VerificationException {
         super.build(clazz, parent);
-        configureSuper(clazz, parent);
+        configureSuper(clazz);
         configureCondition(clazz);
         configureType(clazz);
+        configureTimeout(clazz);
         return this;
     }
 
-    private void configureSuper(Class<?> clazz, StateMachineMetadata parent) {}
+    private void configureTimeout(Class<?> clazz) {
+        final Timeout timeout = clazz.getAnnotation(Timeout.class);
+        if ( null != timeout ) {
+            this.timeout = timeout.value();
+        }
+    }
 
     private void configureType(Class<?> clazz) {
         if ( null != clazz.getAnnotation(Corrupt.class) ) {
@@ -103,14 +111,11 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
 
     @Override
     public long getTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.timeout;
     }
 
     @Override
-    public void dump(Dumper dumper) {
-        // TODO Auto-generated method stub
-    }
+    public void dump(Dumper dumper) {}
 
     @Override
     public boolean isConditional() {
