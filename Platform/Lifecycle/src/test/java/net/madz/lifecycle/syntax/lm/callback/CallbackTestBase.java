@@ -118,7 +118,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_With_PreStateChange_To_Possible_Next_State extends S1BaseLM {
+    static class NLM_With_PreStateChange_To_Possible_Next_State_Non_Relational extends S1BaseLM {
 
         /***
          * prestatechange
@@ -135,39 +135,39 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
          * ???
          */
         @PreStateChange(to = S1_State_C.class)
-        public void interceptStateChange(LifecycleInterceptor<NLM_With_PreStateChange_To_Possible_Next_State> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_With_PreStateChange_To_Possible_Next_State_Non_Relational> context) {
             System.out.println("The callback method will not be invoked.");
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_prestatechange_from_state_invalid extends S1BaseLM {
+    static class NLM_prestatechange_from_state_invalid_non_relational extends S1BaseLM {
 
         @PreStateChange(from = S2.States.S2_State_A.class)
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_from_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_from_state_invalid_non_relational> context) {
             System.out.println("The from state is invalid.");
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_prestatechange_to_state_invalid extends S1BaseLM {
+    static class NLM_prestatechange_to_state_invalid_non_relational extends S1BaseLM {
 
         @PreStateChange(to = S2.States.S2_State_A.class)
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
             System.out.println("The to state is invalid.");
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_poststatechange_from_state_invalid extends S1BaseLM {
+    static class NLM_poststatechange_from_state_invalid_non_relational extends S1BaseLM {
 
         @PostStateChange(from = S2.States.S2_State_A.class)
-        public void interceptStateChange(LifecycleInterceptor<NLM_poststatechange_from_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_poststatechange_from_state_invalid_non_relational> context) {
             System.out.println("The from state is invalid.");
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_poststatechange_to_state_invalid extends S1BaseLM {
+    static class NLM_poststatechange_to_state_invalid_non_relational extends S1BaseLM {
 
         @PostStateChange(to = S2.States.S2_State_A.class)
-        public void interceptStateChange(LifecycleInterceptor<NLM_poststatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_poststatechange_to_state_invalid_non_relational> context) {
             System.out.println("The to state is invalid.");
         }
     }
@@ -175,7 +175,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
     static class NLM_prestatechange_relation_invalid extends S1BaseLM {
 
         @PreStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
             System.out.println("The relation is invalid.");
         }
     }
@@ -199,7 +199,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         }
 
         @PreStateChange(to = S2.States.S2_State_A.class, observableName = "s1", mappedBy = "s1")
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
             System.out.println("The mappedBy is invalid.");
         }
     }
@@ -207,7 +207,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
     static class NLM_poststatechange_relation_invalid extends S1BaseLM {
 
         @PostStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
             System.out.println("The relation is invalid.");
         }
     }
@@ -217,7 +217,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         private S1BaseLM s1;
 
         @PostStateChange(to = S2.States.S2_State_A.class, observableName = "s1", mappedBy = "s1")
-        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid> context) {
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
             System.out.println("The mappedBy is invalid.");
         }
     }
