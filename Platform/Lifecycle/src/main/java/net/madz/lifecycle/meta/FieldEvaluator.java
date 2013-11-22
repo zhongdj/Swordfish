@@ -2,8 +2,6 @@ package net.madz.lifecycle.meta;
 
 import java.lang.reflect.Field;
 
-import net.madz.lifecycle.meta.MetaObject.ReadAccessor;
-
 public final class FieldEvaluator<T> implements MetaObject.ReadAccessor<T> {
 
     private final Field objField;
