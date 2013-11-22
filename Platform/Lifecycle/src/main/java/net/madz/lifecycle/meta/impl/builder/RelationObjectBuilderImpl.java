@@ -3,6 +3,8 @@ package net.madz.lifecycle.meta.impl.builder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import net.madz.lifecycle.meta.FieldEvaluator;
+import net.madz.lifecycle.meta.PropertyEvaluator;
 import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationObjectBuilder;
 import net.madz.lifecycle.meta.instance.RelationObject;
