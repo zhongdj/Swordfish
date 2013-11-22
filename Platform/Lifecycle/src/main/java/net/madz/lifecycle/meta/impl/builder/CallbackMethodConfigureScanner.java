@@ -29,9 +29,6 @@ import net.madz.verification.VerificationFailureSet;
 
 final class CallbackMethodConfigureScanner<S> implements MethodScanner {
 
-    /**
-     * 
-     */
     private final StateMachineObjectBuilderImpl<S> stateMachineObjectBuilderImpl;
     private final Class<?> klass;
     private final HashSet<String> lifecycleOverridenCallbackDefinitionSet = new HashSet<>();
@@ -86,22 +83,21 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
                         SyntaxErrors.POST_STATE_CHANGE_RELATION_INVALID, relation, method, klass);
             }
             final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(observableClass);
-            String convertRelationKey = convertRelationKey(observableClass, mappedBy);
+            final String convertRelationKey = convertRelationKey(observableClass, mappedBy);
             if ( null == convertRelationKey ) {
                 throw this.stateMachineObjectBuilderImpl.newVerificationException(callBackEventSourceContainer.getDottedPath(),
                         SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, observableClass);
             }
-            ReadAccessor<?> accessor = null;
-            accessor = evaluateAccessor(mappedBy, observableClass);
+            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, observableClass);
             configurePostStateChangeCallbackObjectsWithRelational(method, from, to, callBackEventSourceContainer, accessor);
         }
     }
 
-    private String convertRelationKey(Class<?> klz, String mappedBy) {
+    private String convertRelationKey(Class<?> klass, String mappedBy) {
         Field observerField = null;
-        for ( Class<?> clz = klz; clz != Object.class; clz = clz.getSuperclass() ) {
+        for ( Class<?> clazz = klass; clazz != Object.class; clazz = clazz.getSuperclass() ) {
             try {
-                observerField = clz.getDeclaredField(mappedBy);
+                observerField = clazz.getDeclaredField(mappedBy);
                 break;
             } catch (NoSuchFieldException | SecurityException e) {
                 continue;
@@ -116,7 +112,7 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
             }
         }
         Method observerMethod = null;
-        for ( Class<?> clz = klz; clz != Object.class; clz = clz.getSuperclass() ) {
+        for ( Class<?> clz = klass; clz != Object.class; clz = clz.getSuperclass() ) {
             try {
                 observerMethod = clz.getDeclaredMethod("get" + StringUtil.toUppercaseFirstCharacter(mappedBy));
                 break;

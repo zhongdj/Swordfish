@@ -132,8 +132,8 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return;
         }
         final ArrayList<RelationMetadata> extendedRelationMetadata = new ArrayList<>();
-        for ( Class<?> clz = klass; clz != Object.class; clz = clz.getSuperclass() ) {
-            for ( Field field : clz.getDeclaredFields() ) {
+        for ( Class<?> clazz = klass; clazz != Object.class; clazz = clazz.getSuperclass() ) {
+            for ( Field field : clazz.getDeclaredFields() ) {
                 if ( null == field.getAnnotation(Relation.class) ) {
                     continue;
                 }
