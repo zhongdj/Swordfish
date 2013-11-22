@@ -16,12 +16,13 @@ import net.madz.lifecycle.annotations.callback.Callbacks;
 import net.madz.lifecycle.annotations.callback.PostStateChange;
 import net.madz.lifecycle.annotations.callback.PreStateChange;
 import net.madz.lifecycle.annotations.relation.Relation;
+import net.madz.lifecycle.meta.FieldEvaluator;
 import net.madz.lifecycle.meta.MetaObject.ReadAccessor;
+import net.madz.lifecycle.meta.PropertyEvaluator;
 import net.madz.lifecycle.meta.impl.builder.ObjectBuilderBase.MethodScanner;
-import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
-import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
@@ -51,11 +52,11 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
         try {
             final Callbacks callbacks = method.getAnnotation(Callbacks.class);
             if ( null != callbacks ) {
-                configureCallbacks(method, callbacks);
+                configureCallbacks(method, callbacks, failureSet);
             }
             final PreStateChange preStateChange = method.getAnnotation(PreStateChange.class);
             if ( null != preStateChange ) {
-                configurePreStateChange(method, preStateChange);
+                configurePreStateChange(method, preStateChange, failureSet);
             }
             final PostStateChange postStateChange = method.getAnnotation(PostStateChange.class);
             if ( null != postStateChange ) {
@@ -91,7 +92,7 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
                         SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, observableClass);
             }
             ReadAccessor<?> accessor = null;
-            accessor = evaluateAccessor(convertRelationKey, callBackEventSourceContainer);
+            accessor = evaluateAccessor(mappedBy, observableClass);
             configurePostStateChangeCallbackObjectsWithRelational(method, from, to, callBackEventSourceContainer, accessor);
         }
     }
@@ -136,7 +137,7 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
         return null;
     }
 
-    private void configurePreStateChange(Method method, PreStateChange preStateChange) throws VerificationException {
+    private void configurePreStateChange(Method method, PreStateChange preStateChange, VerificationFailureSet failureSet) throws VerificationException {
         final Class<?> from = preStateChange.from();
         final Class<?> to = preStateChange.to();
         final String relation = preStateChange.observableName();
@@ -151,14 +152,54 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
                         SyntaxErrors.PRE_STATE_CHANGE_RELATION_INVALID, relation, method, klass);
             }
             final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(observableClass);
+            if ( AnyState.class != to ) {
+                verifyPreToStatePostEvaluate(method, failureSet, to, callBackEventSourceContainer.getMetaType());
+            }
             String convertRelationKey = convertRelationKey(observableClass, mappedBy);
             if ( null == convertRelationKey ) {
                 throw this.stateMachineObjectBuilderImpl.newVerificationException(callBackEventSourceContainer.getDottedPath(),
                         SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, observableClass);
             }
-            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, callBackEventSourceContainer);
+            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, observableClass);
             configurePreStateChangeRelationalCallbackObjects(method, from, to, callBackEventSourceContainer, accessor);
         }
+    }
+
+    private void verifyPreToStatePostEvaluate(Method method, VerificationFailureSet failureSet, Class<?> toStateClass, StateMachineMetadata stateMachineMetadata) {
+        for ( final TransitionMetadata transition : stateMachineMetadata.getState(toStateClass).getPossibleReachingTransitions() ) {
+            if ( transition.isConditional() && transition.postValidate() ) {
+                failureSet.add(this.stateMachineObjectBuilderImpl.newVerificationFailure(stateMachineMetadata.getDottedPath(),
+                        SyntaxErrors.PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID, toStateClass, method, transition.getDottedPath()));
+            }
+        }
+    }
+
+    private ReadAccessor<?> evaluateAccessor(String mappedBy, Class<?> observableClass) {
+        Field observerField = null;
+        for ( Class<?> klz = observableClass; klz != Object.class; klz = klz.getSuperclass() ) {
+            try {
+                observerField = klz.getDeclaredField(mappedBy);
+                break;
+            } catch (NoSuchFieldException | SecurityException e) {
+                continue;
+            }
+        }
+        if ( observerField != null ) {
+            return new FieldEvaluator<>(observerField);
+        }
+        Method getter = null;
+        for ( Class<?> klz = observableClass; klz != Object.class; klz = klz.getSuperclass() ) {
+            try {
+                getter = klz.getDeclaredMethod("get" + StringUtil.toUppercaseFirstCharacter(mappedBy));
+                break;
+            } catch (NoSuchMethodException | SecurityException e) {
+                continue;
+            }
+        }
+        if ( null != getter ) {
+            return new PropertyEvaluator<>(getter);
+        }
+        return null;
     }
 
     private void configurePreStateChangeRelationalCallbackObjects(Method method, Class<?> from, Class<?> to,
@@ -195,14 +236,6 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
             item = new RelationalCallbackObject(AnyState.class.getSimpleName(), AnyState.class.getSimpleName(), method, accessor);
             callBackEventSourceContainer.addCommonPostStateChangeCallbackObject(item);
         }
-    }
-
-    private ReadAccessor<?> evaluateAccessor(String relationKey, final StateMachineObject<?> callBackEventSourceContainer) {
-        final StateMachineMetadata callBackEventSourceStateMachineMetadat = (StateMachineMetadata) callBackEventSourceContainer.getMetaType();
-        final RelationMetadata mappedByRelationMetadata = callBackEventSourceStateMachineMetadat.getRelationMetadata(relationKey);
-        final RelationObject relationObject = callBackEventSourceContainer.getRelationObject(mappedByRelationMetadata.getPrimaryKey());
-        ReadAccessor<?> accessor = relationObject.getEvaluator();
-        return accessor;
     }
 
     private Class<?> getRelationObjectClass(Class<?> klass, String relation) {
@@ -281,10 +314,10 @@ final class CallbackMethodConfigureScanner<S> implements MethodScanner {
         }
     }
 
-    private void configureCallbacks(Method method, Callbacks callbacks) throws VerificationException {
+    private void configureCallbacks(Method method, Callbacks callbacks, VerificationFailureSet failureSet) throws VerificationException {
         final PreStateChange[] preStateChange = callbacks.preStateChange();
         for ( final PreStateChange item : preStateChange ) {
-            configurePreStateChange(method, item);
+            configurePreStateChange(method, item, failureSet);
         }
         final PostStateChange[] postStateChange = callbacks.postStateChange();
         for ( final PostStateChange item : postStateChange ) {
