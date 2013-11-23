@@ -32,6 +32,7 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.callback.AnyState;
+import net.madz.lifecycle.annotations.callback.CallbackConsts;
 import net.madz.lifecycle.annotations.callback.Callbacks;
 import net.madz.lifecycle.annotations.callback.PostStateChange;
 import net.madz.lifecycle.annotations.callback.PreStateChange;
@@ -289,25 +290,27 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             Class<?> fromStateClass = postStateChange.from();
             Class<?> toStateClass = postStateChange.to();
             String relation = postStateChange.observableName();
-            String mappedBy = postStateChange.mappedBy();
-            if ( PostStateChange.NULL_STR.equals(relation) ) {
+            if ( CallbackConsts.NULL_STR.equals(relation) ) {
                 verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID);
                 verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID);
-            } else {}
+            } else {
+                // Relational Syntax verification is done in build stage.
+            }
         }
 
         private void verifyPreStateChange(Method method, VerificationFailureSet failureSet, final PreStateChange preStateChange) {
             Class<?> fromStateClass = preStateChange.from();
             Class<?> toStateClass = preStateChange.to();
             String relation = preStateChange.observableName();
-            String mappedBy = preStateChange.mappedBy();
-            if ( PreStateChange.NULL_STR.equals(relation) ) {
+            if ( CallbackConsts.NULL_STR.equals(relation) ) {
                 verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID);
                 verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID);
                 if ( AnyState.class != toStateClass && null != getMetaType().getState(toStateClass) ) {
                     verifyPreToStatePostEvaluate(method, failureSet, toStateClass, getMetaType());
                 }
-            } else {}
+            } else {
+                // Relational Syntax verification is done in build stage.
+            }
         }
 
         private void verifyPreToStatePostEvaluate(Method method, VerificationFailureSet failureSet, Class<?> toStateClass,

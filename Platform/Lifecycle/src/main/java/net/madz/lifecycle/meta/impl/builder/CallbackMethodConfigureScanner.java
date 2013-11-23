@@ -12,6 +12,7 @@ import java.util.HashSet;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.callback.AnyState;
+import net.madz.lifecycle.annotations.callback.CallbackConsts;
 import net.madz.lifecycle.annotations.callback.Callbacks;
 import net.madz.lifecycle.annotations.callback.PostStateChange;
 import net.madz.lifecycle.annotations.callback.PreStateChange;
@@ -86,18 +87,30 @@ final class CallbackMethodConfigureScanner<S> {
     private void configurePreStateChange(final Method method, final PreStateChange preStateChange) throws VerificationException {
         final Class<?> from = preStateChange.from();
         final Class<?> to = preStateChange.to();
-        final String relation = preStateChange.observableName();
+        final String observableName = preStateChange.observableName();
         final String mappedBy = preStateChange.mappedBy();
-        if ( PreStateChange.NULL_STR.equals(relation) ) {
+        final Class<?> observableClass = preStateChange.observableClass();
+        if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
             configurePreStateChangeNonRelationalCallbackObjects(method, from, to, this.stateMachineObjectBuilderImpl.specificPreStateChangeCallbackObjects,
                     this.stateMachineObjectBuilderImpl.commonPreStateChangeCallbackObjects);
         } else {
-            final Class<?> observableClass = getRelationObjectClass(klass, relation);
-            if ( null == observableClass ) {
-                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
-                        SyntaxErrors.PRE_STATE_CHANGE_RELATION_INVALID, relation, method, klass);
+            Class<?> actualObservableClass = null;
+            if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
+                verifyObservableClass(method, observableClass, SyntaxErrors.PRE_STATE_CHANGE_OBSERVABLE_CLASS_INVALID);
+                final Class<?> observableClassViaObservaleName = verifyObservableName(method, observableName, SyntaxErrors.PRE_STATE_CHANGE_RELATION_INVALID);
+                if ( !observableClass.isAssignableFrom(observableClassViaObservaleName) ) {
+                    throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
+                            SyntaxErrors.PRE_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS, observableName, observableClass, method);
+                }
+                actualObservableClass = observableClass;
+            } else if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
+                verifyObservableClass(method, observableClass, SyntaxErrors.PRE_STATE_CHANGE_OBSERVABLE_CLASS_INVALID);
+                actualObservableClass = observableClass;
+            } else if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
+                actualObservableClass = verifyObservableName(method, observableName, SyntaxErrors.PRE_STATE_CHANGE_RELATION_INVALID);
             }
-            final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(observableClass);
+            final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(
+                    actualObservableClass);
             if ( AnyState.class != to ) {
                 verifyPreToState(method, to, callBackEventSourceContainer.getMetaType());
                 verifyPreToStatePostEvaluate(method, to, callBackEventSourceContainer.getMetaType());
@@ -105,12 +118,16 @@ final class CallbackMethodConfigureScanner<S> {
             if ( AnyState.class != from ) {
                 verifyPreFromState(method, from, callBackEventSourceContainer.getMetaType());
             }
-            final String convertRelationKey = convertRelationKey(observableClass, mappedBy);
+            if ( null == mappedBy || CallbackConsts.NULL_STR.equalsIgnoreCase(mappedBy) ) {
+                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
+                        SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, actualObservableClass);
+            }
+            final String convertRelationKey = convertRelationKey(actualObservableClass, mappedBy);
             if ( null == convertRelationKey ) {
                 throw this.stateMachineObjectBuilderImpl.newVerificationException(callBackEventSourceContainer.getDottedPath(),
-                        SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, observableClass);
+                        SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, actualObservableClass);
             }
-            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, observableClass);
+            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, actualObservableClass);
             configurePreStateChangeRelationalCallbackObjects(method, from, to, callBackEventSourceContainer, accessor);
         }
     }
@@ -118,22 +135,38 @@ final class CallbackMethodConfigureScanner<S> {
     private void configurePostStateChange(Method method, PostStateChange postStateChange) throws VerificationException {
         final Class<?> from = postStateChange.from();
         final Class<?> to = postStateChange.to();
-        final String relation = postStateChange.observableName();
+        final String observableName = postStateChange.observableName();
         final String mappedBy = postStateChange.mappedBy();
-        if ( PostStateChange.NULL_STR.equals(relation) ) {
+        final Class<?> observableClass = postStateChange.observableClass();
+        if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
             configurePostStateChangeNonRelationalCallbackObjects(method, from, to, this.stateMachineObjectBuilderImpl.specificPostStateChangeCallbackObjects,
                     this.stateMachineObjectBuilderImpl.commonPostStateChangeCallbackObjects);
         } else {
-            final Class<?> observableClass = getRelationObjectClass(klass, relation);
-            if ( null == observableClass ) {
-                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
-                        SyntaxErrors.POST_STATE_CHANGE_RELATION_INVALID, relation, method, klass);
+            Class<?> actualObservableClass = null;
+            if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
+                verifyObservableClass(method, observableClass, SyntaxErrors.POST_STATE_CHANGE_OBSERVABLE_CLASS_INVALID);
+                final Class<?> observableClassViaObservaleName = verifyObservableName(method, observableName, SyntaxErrors.POST_STATE_CHANGE_RELATION_INVALID);
+                if ( !observableClass.isAssignableFrom(observableClassViaObservaleName) ) {
+                    throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
+                            SyntaxErrors.POST_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS, observableName, observableClass, method);
+                }
+                actualObservableClass = observableClass;
+            } else if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
+                verifyObservableClass(method, observableClass, SyntaxErrors.POST_STATE_CHANGE_OBSERVABLE_CLASS_INVALID);
+                actualObservableClass = observableClass;
+            } else if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
+                actualObservableClass = verifyObservableName(method, observableName, SyntaxErrors.POST_STATE_CHANGE_RELATION_INVALID);
             }
-            final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(observableClass);
-            final String convertRelationKey = convertRelationKey(observableClass, mappedBy);
+            final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(
+                    actualObservableClass);
+            if ( null == mappedBy || CallbackConsts.NULL_STR.equalsIgnoreCase(mappedBy) ) {
+                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
+                        SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, actualObservableClass);
+            }
+            final String convertRelationKey = convertRelationKey(actualObservableClass, mappedBy);
             if ( null == convertRelationKey ) {
                 throw this.stateMachineObjectBuilderImpl.newVerificationException(callBackEventSourceContainer.getDottedPath(),
-                        SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, observableClass);
+                        SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, actualObservableClass);
             }
             if ( AnyState.class != from ) {
                 verifyPostFromState(method, from, callBackEventSourceContainer.getMetaType());
@@ -141,8 +174,33 @@ final class CallbackMethodConfigureScanner<S> {
             if ( AnyState.class != to ) {
                 verifyPostToState(method, to, callBackEventSourceContainer.getMetaType());
             }
-            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, observableClass);
+            if ( null == mappedBy || CallbackConsts.NULL_STR.equalsIgnoreCase(mappedBy) ) {
+                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(),
+                        SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, mappedBy, method, actualObservableClass);
+            }
+            final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, actualObservableClass);
             configurePostStateChangeCallbackObjectsWithRelational(method, from, to, callBackEventSourceContainer, accessor);
+        }
+    }
+
+    private Class<?> verifyObservableName(Method method, final String observableName, String errorCode) throws VerificationException {
+        Class<?> actualObservableClass;
+        actualObservableClass = evaluateObservableClass(klass, observableName);
+        if ( null == actualObservableClass ) {
+            throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(), errorCode, observableName,
+                    method, klass);
+        }
+        return actualObservableClass;
+    }
+
+    private void verifyObservableClass(Method method, final Class<?> observableClass, String errorCode) throws VerificationException {
+        try {
+            this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(observableClass);
+        } catch (VerificationException e) {
+            if ( e.getVerificationFailureSet().iterator().next().getErrorCode().equals(SyntaxErrors.REGISTERED_META_ERROR) ) {
+                throw this.stateMachineObjectBuilderImpl.newVerificationException(this.stateMachineObjectBuilderImpl.getDottedPath(), errorCode,
+                        observableClass, method);
+            }
         }
     }
 
@@ -287,11 +345,11 @@ final class CallbackMethodConfigureScanner<S> {
         }
     }
 
-    private Class<?> getRelationObjectClass(Class<?> klass, String relation) {
+    private Class<?> evaluateObservableClass(Class<?> klass, String observableName) {
         Field declaredField = null;
         for ( Class<?> clazz = klass; clazz != Object.class; clazz = clazz.getSuperclass() ) {
             try {
-                declaredField = clazz.getDeclaredField(relation);
+                declaredField = clazz.getDeclaredField(observableName);
                 break;
             } catch (NoSuchFieldException | SecurityException e) {
                 continue;
@@ -308,7 +366,7 @@ final class CallbackMethodConfigureScanner<S> {
         Method relatedMethod = null;
         for ( Class<?> clazz = klass; clazz != Object.class; clazz = clazz.getSuperclass() ) {
             try {
-                relatedMethod = clazz.getDeclaredMethod("get" + StringUtil.toUppercaseFirstCharacter(relation));
+                relatedMethod = clazz.getDeclaredMethod("get" + StringUtil.toUppercaseFirstCharacter(observableName));
                 break;
             } catch (NoSuchMethodException | SecurityException e) {
                 continue;

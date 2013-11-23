@@ -11,15 +11,13 @@ import net.madz.lifecycle.annotations.Null;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PreStateChange {
 
-    public static final String NULL_STR = "$null$";
-
     Class<?> from() default AnyState.class;
 
     Class<?> to() default AnyState.class;
 
-    String observableName() default NULL_STR;
+    String observableName() default CallbackConsts.NULL_STR;
 
     Class<?> observableClass() default Null.class;
 
-    String mappedBy() default NULL_STR;
+    String mappedBy() default CallbackConsts.NULL_STR;
 }

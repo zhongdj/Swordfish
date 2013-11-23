@@ -9,7 +9,6 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1;
 import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.States.S1_State_C;
 import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.Transitions.S1_Transition_X;
 import net.madz.verification.VerificationException;
@@ -215,7 +214,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_prestatechange_mappedby_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void test_prestatechange_mappedby_invalid_mappedby_cannot_be_found() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_prestatechange_mappedby_invalid.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -230,7 +229,22 @@ public class CallbackNegativeTests extends CallbackTestBase {
             throw e;
         }
     }
+    @Test(expected = VerificationException.class)
+    public void test_prestatechange_mappedby_invalid_mappedby_is_null() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_prestatechange_mappedby_is_null.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
 
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID, "",
+                    NLM_prestatechange_mappedby_is_null.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S1BaseLM.class);
+            throw e;
+        }
+    }
     @Test(expected = VerificationException.class)
     public void test_poststatechange_relation_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_poststatechange_relation_invalid.class)
@@ -250,7 +264,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_poststatechange_mappedby_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void test_poststatechange_mappedby_invalid_mappedby_cannot_found() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_poststatechange_mappedby_invalid.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -262,6 +276,22 @@ public class CallbackNegativeTests extends CallbackTestBase {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, "s1",
                     NLM_poststatechange_mappedby_invalid.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S1BaseLM.class);
+            throw e;
+        }
+    }
+    @Test(expected = VerificationException.class)
+    public void test_poststatechange_mappedby_invalid_mappedby_is_null() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_poststatechange_mappedby_is_null.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_MAPPEDBY_INVALID, "",
+                    NLM_poststatechange_mappedby_is_null.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S1BaseLM.class);
             throw e;
         }
     }

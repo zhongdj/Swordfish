@@ -207,6 +207,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
             System.out.println("The mappedBy is invalid.");
         }
     }
+    
     @LifecycleMeta(S1.class)
     static class NLM_poststatechange_relation_invalid extends S1BaseLM {
 
@@ -479,6 +480,54 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
                 mappedBy = "s1")
         public void interceptStateChange(LifecycleInterceptor<NLM_With_PreStateChange_To_State_Invalid_Specified_ObservableClass_Relational> context) {
             System.out.println("The callback method will not be invoked.");
+        }
+    }
+    @LifecycleMeta(S2.class)
+    static class NLM_prestatechange_mappedby_is_null {
+
+        @Relation(S2.Relations.S1Relation.class)
+        private S1BaseLM s1;
+        @StateIndicator
+        private String state;
+
+        public NLM_prestatechange_mappedby_is_null() {
+            state = S2.States.S2_State_A.class.getSimpleName();
+        }
+
+        @Transition
+        public void move() {}
+
+        public String getState() {
+            return state;
+        }
+
+        @PreStateChange(to = S1.States.S1_State_D.class, observableName = "s1", mappedBy = "")
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
+            System.out.println("The mappedBy is invalid.");
+        }
+    }
+    @LifecycleMeta(S2.class)
+    static class NLM_poststatechange_mappedby_is_null {
+
+        @Relation(S2.Relations.S1Relation.class)
+        private S1BaseLM s1;
+        @StateIndicator
+        private String state;
+
+        public NLM_poststatechange_mappedby_is_null() {
+            state = S2.States.S2_State_A.class.getSimpleName();
+        }
+
+        @Transition
+        public void move() {}
+
+        public String getState() {
+            return state;
+        }
+
+        @PostStateChange(to = S1.States.S1_State_D.class, observableName = "s1", mappedBy = "")
+        public void interceptStateChange(LifecycleInterceptor<NLM_prestatechange_to_state_invalid_non_relational> context) {
+            System.out.println("The mappedBy is invalid.");
         }
     }
 }
