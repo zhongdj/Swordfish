@@ -289,4 +289,26 @@ public interface SyntaxErrors {
      * @param {2} Observerable Class
      */
     public static final String POST_STATE_CHANGE_MAPPEDBY_INVALID = "002-3708";
+    /**
+     * @param {0} observable name
+     * @param {1} observable class
+     * @param {2} Method class
+     */
+    public static final String POST_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS = "002-3709";
+    /**
+     * @param {0} observable class
+     * @param {1} Method class
+     */
+    public static final String POST_STATE_CHANGE_OBSERVABLE_CLASS_INVALID = "002-3710";
+    /**
+     * @param {0} observable class
+     * @param {1} Method class
+     */
+    public static final String PRE_STATE_CHANGE_OBSERVABLE_CLASS_INVALID = "002-3711";
+    /**
+     * @param {0} observable name
+     * @param {1} observable class
+     * @param {2} Method class
+     */
+    public static final String PRE_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS = "002-3712";
 }
