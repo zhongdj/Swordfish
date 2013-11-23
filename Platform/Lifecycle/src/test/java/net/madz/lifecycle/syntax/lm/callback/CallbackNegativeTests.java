@@ -9,6 +9,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
+import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1;
 import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.States.S1_State_C;
 import net.madz.lifecycle.syntax.lm.callback.CallbackTestBase.S1.Transitions.S1_Transition_X;
 import net.madz.verification.VerificationException;
@@ -282,6 +283,159 @@ public class CallbackNegativeTests extends CallbackTestBase {
                     NLM_With_CallBacksWithInvalidStates.class.getMethod("interceptStates", LifecycleInterceptor.class), S1.class);
             assertFailure(iterator.next(), SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID, S2.States.S2_State_A.class,
                     NLM_With_CallBacksWithInvalidStates.class.getMethod("interceptStates", LifecycleInterceptor.class), S1.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PostStateChange_ObservableName_Mistmatch_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PostStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS, "s3",
+                    NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable.class,
+                    NLM_With_PostStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), NLM_With_PostStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PostStateChange_ObservableClass_Invalid_Relational() throws NoSuchMethodException, SecurityException, VerificationException {
+        @LifecycleRegistry(NLM_With_PostStateChange_ObservableClass_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_OBSERVABLE_CLASS_INVALID, NonLifecycleClass.class,
+                    NLM_With_PostStateChange_ObservableClass_Invalid_Relational.class.getDeclaredMethod("interceptStateChange", LifecycleInterceptor.class),
+                    NLM_With_PostStateChange_ObservableClass_Invalid_Relational.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PostStateChange_From_State_Invalid_Specified_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PostStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID, S1.States.S1_State_A.class,
+                    NLM_With_PostStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), S3.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PostStateChange_To_State_Invalid_Specified_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PostStateChange_To_State_Invalid_Specified_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID, S1.States.S1_State_D.class,
+                    NLM_With_PostStateChange_To_State_Invalid_Specified_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), S3.class);
+            throw e;
+        }
+    }
+
+    // ///////////////////////////////
+    @Test(expected = VerificationException.class)
+    public void test_PreStateChange_ObservableName_Mistmatch_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PreStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS, "s3",
+                    NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable.class,
+                    NLM_With_PreStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), NLM_With_PreStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PreStateChange_ObservableClass_Invalid_Relational() throws NoSuchMethodException, SecurityException, VerificationException {
+        @LifecycleRegistry(NLM_With_PreStateChange_ObservableClass_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_OBSERVABLE_CLASS_INVALID, NonLifecycleClass.class,
+                    NLM_With_PreStateChange_ObservableClass_Invalid_Relational.class.getDeclaredMethod("interceptStateChange", LifecycleInterceptor.class),
+                    NLM_With_PreStateChange_ObservableClass_Invalid_Relational.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PreStateChange_From_State_Invalid_Specified_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PreStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID, S1.States.S1_State_A.class,
+                    NLM_With_PreStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), S3.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_PreStateChange_To_State_Invalid_Specified_ObservableClass_Relational() throws NoSuchMethodException, SecurityException,
+            VerificationException {
+        @LifecycleRegistry(NLM_With_PreStateChange_To_State_Invalid_Specified_ObservableClass_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID, S1.States.S1_State_D.class,
+                    NLM_With_PreStateChange_To_State_Invalid_Specified_ObservableClass_Relational.class.getDeclaredMethod("interceptStateChange",
+                            LifecycleInterceptor.class), S3.class);
             throw e;
         }
     }
