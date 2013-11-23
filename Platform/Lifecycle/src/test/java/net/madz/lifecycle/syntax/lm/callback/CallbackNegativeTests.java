@@ -77,6 +77,23 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
+    public void test_prestatechange_from_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_With_PreStateChange_From_State_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID, S1.States.S1_State_A.class,
+                    NLM_With_PreStateChange_From_State_Invalid_Relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S3.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
     public void test_prestatechange_to_state_invalid_non_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_prestatechange_to_state_invalid_non_relational.class)
         @StateMachineBuilder
@@ -89,6 +106,23 @@ public class CallbackNegativeTests extends CallbackTestBase {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID, S2.States.S2_State_A.class,
                     NLM_prestatechange_to_state_invalid_non_relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S1.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_prestatechange_to_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_With_PreStateChange_To_State_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID, S1.States.S1_State_D.class,
+                    NLM_With_PreStateChange_To_State_Invalid_Relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S3.class);
             throw e;
         }
     }
@@ -111,6 +145,23 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
+    public void test_poststatechange_from_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_With_PostStateChange_From_State_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID, S1.States.S1_State_A.class,
+                    NLM_With_PostStateChange_From_State_Invalid_Relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S3.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
     public void test_poststatechange_to_state_invalid_non_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_poststatechange_to_state_invalid_non_relational.class)
         @StateMachineBuilder
@@ -123,6 +174,23 @@ public class CallbackNegativeTests extends CallbackTestBase {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID, S2.States.S2_State_A.class,
                     NLM_poststatechange_to_state_invalid_non_relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S1.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_poststatechange_to_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+        @LifecycleRegistry(NLM_With_PostStateChange_To_State_Invalid_Relational.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID, S1.States.S1_State_D.class,
+                    NLM_With_PostStateChange_To_State_Invalid_Relational.class.getMethod("interceptStateChange", LifecycleInterceptor.class), S3.class);
             throw e;
         }
     }

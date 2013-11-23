@@ -297,6 +297,10 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
 
         private NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable s3;
 
+        public NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable getS3() {
+            return s3;
+        }
+
         /***
          * prestatechange
          * conditional
@@ -340,6 +344,62 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         @Condition(S3.Conditions.S3_Condition_A.class)
         public S3_Condition_A getS3Condition_A() {
             return this;
+        }
+    }
+    @LifecycleMeta(S1.class)
+    public static class NLM_With_PreStateChange_From_State_Invalid_Relational extends S1BaseLM {
+
+        private NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable s3;
+
+        public NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable getS3() {
+            return s3;
+        }
+
+        @PreStateChange(from = S1.States.S1_State_A.class, observableName = "s3", mappedBy = "s1")
+        public void interceptStateChange(LifecycleInterceptor<NLM_With_PreStateChange_From_State_Invalid_Relational> context) {
+            System.out.println("The callback method will not be invoked.");
+        }
+    }
+    @LifecycleMeta(S1.class)
+    public static class NLM_With_PreStateChange_To_State_Invalid_Relational extends S1BaseLM {
+
+        private NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable s3;
+
+        public NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable getS3() {
+            return s3;
+        }
+
+        @PreStateChange(to = S1.States.S1_State_D.class, observableName = "s3", mappedBy = "s1")
+        public void interceptStateChange(LifecycleInterceptor<NLM_With_PreStateChange_To_State_Invalid_Relational> context) {
+            System.out.println("The callback method will not be invoked.");
+        }
+    }
+    @LifecycleMeta(S1.class)
+    public static class NLM_With_PostStateChange_From_State_Invalid_Relational extends S1BaseLM {
+
+        private NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable s3;
+
+        public NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable getS3() {
+            return s3;
+        }
+
+        @PostStateChange(from = S1.States.S1_State_A.class, observableName = "s3", mappedBy = "s1")
+        public void interceptStateChange(LifecycleInterceptor<NLM_With_PostStateChange_From_State_Invalid_Relational> context) {
+            System.out.println("The callback method will not be invoked.");
+        }
+    }
+    @LifecycleMeta(S1.class)
+    public static class NLM_With_PostStateChange_To_State_Invalid_Relational extends S1BaseLM {
+
+        private NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable s3;
+
+        public NLM_With_PreStateChange_To_Possible_Next_State_Relational_Observable getS3() {
+            return s3;
+        }
+
+        @PostStateChange(to = S1.States.S1_State_D.class, observableName = "s3", mappedBy = "s1")
+        public void interceptStateChange(LifecycleInterceptor<NLM_With_PostStateChange_To_State_Invalid_Relational> context) {
+            System.out.println("The callback method will not be invoked.");
         }
     }
 }
