@@ -8,6 +8,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.madz.scheduling.sessions.OperationBean;
+import net.madz.test.annotations.FreeTrialTenant;
 
 import org.glassfish.embeddable.CommandResult;
 import org.glassfish.embeddable.CommandRunner;
@@ -22,20 +23,19 @@ import org.junit.BeforeClass;
 public class OperationBeanTestBase {
 
     protected static OperationBean bean;
-
     private static String EJB_MODULE_NAME = "scheduling";
-
     private static String APP_NAME = "scheduling-app";
 
     @BeforeClass
-    public static void setup() throws NamingException, GlassFishException, IOException {
+    public static void setup() throws Exception {
         startGlassfish(APP_NAME, EJB_MODULE_NAME);
+        com.sun.enterprise.security.ee.auth.login.ProgrammaticLogin login = new com.sun.enterprise.security.ee.auth.login.ProgrammaticLogin();
+        login.login(FreeTrialTenant.ScriptProcessor.getUsername(), FreeTrialTenant.ScriptProcessor.getPassword().toCharArray(), "MadzRealm", true);
         InitialContext context = new InitialContext();
         bean = (OperationBean) context.lookup("java:global/" + APP_NAME + "/" + EJB_MODULE_NAME + "/OperationBean");
     }
 
-    protected static void cleanup() {
-    }
+    protected static void cleanup() {}
 
     @AfterClass
     public static void tearDown() throws GlassFishException {
@@ -47,11 +47,8 @@ public class OperationBeanTestBase {
     }
 
     protected static File basedir = null;
-
     protected static GlassFish glassfish;
-
     protected static String appName;
-
     protected static Deployer deployer;
 
     protected static void addShutdownHook(final GlassFish gf) {
@@ -62,25 +59,20 @@ public class OperationBeanTestBase {
                     if ( gf != null ) {
                         gf.dispose();
                     }
-                } catch (Exception ex) {
-                }
+                } catch (Exception ex) {}
             }
         });
     }
 
-    private static void startGlassfish(String appName, String moduleName) throws GlassFishException, IOException,
-            NamingException {
+    private static void startGlassfish(String appName, String moduleName) throws GlassFishException, IOException, NamingException {
         glassfish = GlassFishRuntime.bootstrap().newGlassFish();
         final URI uri = createScatteredArchive(appName, moduleName + ".jar");
         addShutdownHook(glassfish);
         glassfish.start();
         final CommandRunner cr = glassfish.getCommandRunner();
-        CommandResult result = cr
-                .run("create-jdbc-connection-pool",
-                        "--datasourceclassname=com.mysql.jdbc.jdbc2.optional.MysqlDataSource",
-                        "--restype=javax.sql.DataSource",
-                        "--property=Url=jdbc\\:mysql\\://dbserver\\:3306/crmp?zeroDateTimeBehavior\\=convertToNull:User=root:Password=1q2w3e4r5t",
-                        "crmp_pool");
+        CommandResult result = cr.run("create-jdbc-connection-pool", "--datasourceclassname=com.mysql.jdbc.jdbc2.optional.MysqlDataSource",
+                "--restype=javax.sql.DataSource",
+                "--property=Url=jdbc\\:mysql\\://dbserver\\:3306/crmp?zeroDateTimeBehavior\\=convertToNull:User=root:Password=1q2w3e4r5t", "crmp_pool");
         System.out.println(result.getOutput());
         result = cr.run("create-jdbc-resource", "--connectionpoolid=crmp_pool", "jdbc/crmp");
         System.out.println(result.getOutput());

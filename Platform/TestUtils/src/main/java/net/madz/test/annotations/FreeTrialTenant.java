@@ -38,7 +38,6 @@ import com.eclipsesource.restfuse.internal.InternalRequest;
 public @interface FreeTrialTenant {
 
     public static final String USER = "test.polaris.metadata";
-
     public static final String PASS = "1q2w3e4r5t";
 
     String username() default USER;
@@ -54,7 +53,6 @@ public @interface FreeTrialTenant {
     public static class ScriptProcessor extends AbsScriptEngine<FreeTrialTenant> {
 
         private static final ThreadLocal<String> username = new ThreadLocal<String>();
-
         private static final ThreadLocal<String> password = new ThreadLocal<String>();
 
         @Override
@@ -98,7 +96,7 @@ public @interface FreeTrialTenant {
                 request.setContent(new ByteArrayInputStream(content.getBytes()));
                 Response response = request.post();
                 {
-                    debug("Server responsed with: ");
+                    debug("Server responsed with: " + response.getStatus());
                     increaseIndent();
                     debug(response.getBody());
                     decreaseIndent();

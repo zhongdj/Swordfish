@@ -10,5 +10,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>SchedulingRS</module>
+    <module>SchedulingRS-API-Test</module>
   </modules>
 </project>

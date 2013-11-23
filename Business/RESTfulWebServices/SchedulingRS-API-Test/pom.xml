@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.madz</groupId>
+		<artifactId>RESTfulWebServices</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>SchedulingRS-API-Test</artifactId>
+
+	<repositories>
+
+		<!-- See above -->
+		<repository>
+			<id>EclipseLink</id>
+			<url>${eclipselink.maven.repo.url}</url>
+		</repository>
+
+		<repository>
+			<id>glassfish-repository</id>
+			<name>Java.net Repository for Glassfish</name>
+			<url>${glassfish.maven.repo.url}</url>
+		</repository>
+
+		<!-- Alternative to the java.net repository -->
+		<!--repository> <id>glassfish</id> <name>Glassfish</name> <url>https://repository.jboss.org/nexus/content/repositories/glassfish</url> 
+			</repository -->
+		<repository>
+			<url>http://download.eclipse.org/rt/eclipselink/maven.repo/</url>
+			<id>eclipselink</id>
+			<layout>default</layout>
+			<name>Repository for library EclipseLink (JPA 2.1)</name>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>${eclipselink.persistence.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Scheduling</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>TestUtils</artifactId>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.restfuse</groupId>
+			<artifactId>com.eclipsesource.restfuse</artifactId>
+			<version>${restfuse.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.madz</groupId>
+			<artifactId>Archive</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>ear</type>
+		</dependency>
+	</dependencies>
+</project>
