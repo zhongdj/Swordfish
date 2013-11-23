@@ -307,9 +307,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 if ( AnyState.class != toStateClass && null != getMetaType().getState(toStateClass) ) {
                     verifyPreToStatePostEvaluate(method, failureSet, toStateClass, getMetaType());
                 }
-            } else {
-                
-            }
+            } else {}
         }
 
         private void verifyPreToStatePostEvaluate(Method method, VerificationFailureSet failureSet, Class<?> toStateClass,
@@ -1193,12 +1191,8 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureCallbacks(Class<?> klass) throws VerificationException {
-        CallbackMethodConfigureScanner<S> scanner = new CallbackMethodConfigureScanner<S>(this, klass);
-        VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class[] { klass }, failureSet, scanner);
-        if ( failureSet.size() > 0 ) {
-            throw new VerificationException(failureSet);
-        }
+        final CallbackMethodConfigureScanner<S> scanner = new CallbackMethodConfigureScanner<S>(this, klass);
+        scanner.scanMethod();
     }
 
     @Override
