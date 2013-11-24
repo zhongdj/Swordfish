@@ -3,8 +3,6 @@ package net.madz.lifecycle.meta;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import net.madz.lifecycle.meta.MetaObject.ReadAccessor;
-
 public final class PropertyEvaluator<T> implements MetaObject.ReadAccessor<T> {
 
     private final Method getter;

@@ -30,8 +30,6 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ReducePower;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.Transitions.ShutDown;
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycle.States.ServiceAvailable;
-import net.madz.lifecycle.engine.EngineTestBase.BaseServiceProvider;
-import net.madz.lifecycle.engine.EngineTestBase.ReactiveObject;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
