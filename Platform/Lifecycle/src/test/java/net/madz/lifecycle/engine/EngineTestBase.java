@@ -2,9 +2,15 @@ package net.madz.lifecycle.engine;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.LogManager;
+
+import org.junit.BeforeClass;
 
 import net.madz.bcel.intercept.DefaultStateMachineRegistry;
 import net.madz.bcel.intercept.LifecycleInterceptor;
@@ -22,7 +28,10 @@ import net.madz.utils.BundleUtils;
 import net.madz.verification.VerificationException;
 
 public class EngineTestBase extends ConsoleLoggingTestBase {
-
+    @BeforeClass
+    public static void setLogLevel() throws SecurityException, FileNotFoundException, IOException {
+        LogManager.getLogManager().readConfiguration(new FileInputStream("target/test-classes/lifecycle_logging.properties"));
+    }
     public abstract static class ReactiveObject {
 
         @StateIndicator
