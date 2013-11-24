@@ -193,6 +193,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -265,6 +266,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -314,6 +316,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         @Relation(S5_B_R1.class)
         PLM_R1_S r1_S = null;
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -392,6 +395,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -416,6 +420,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -443,6 +448,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -470,6 +476,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -487,6 +494,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return state;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }
@@ -519,6 +527,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             return null;
         }
 
+        @SuppressWarnings("unused")
         private void setState(String state) {
             this.state = state;
         }

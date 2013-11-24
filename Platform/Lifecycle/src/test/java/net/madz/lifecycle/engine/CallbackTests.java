@@ -113,7 +113,7 @@ public class CallbackTests extends CallbackTestMetadata {
 
     @Test
     public void test_order_object_callback_definition () {
-        final OrderObject order = new OrderObject();
+        final OrderObject<?> order = new OrderObject<>();
         assertEquals(0, order.getCount());
         order.pay();
         assertEquals(1, order.getCount());

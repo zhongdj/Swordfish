@@ -8,6 +8,7 @@ import org.junit.runners.model.InitializationError;
 
 public class InternalHttpUnitRunner extends HttpUnitRunner {
 
+    @SuppressWarnings("unused")
     private TestContext externalContext;
 
     public InternalHttpUnitRunner(Class<?> klass) throws InitializationError {
@@ -24,6 +25,7 @@ public class InternalHttpUnitRunner extends HttpUnitRunner {
         return getTestClass().getJavaClass().newInstance();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
         validateNoNonStaticInnerClass(errors);

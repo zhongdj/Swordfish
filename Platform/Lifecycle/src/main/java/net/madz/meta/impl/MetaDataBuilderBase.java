@@ -176,6 +176,7 @@ public abstract class MetaDataBuilderBase<SELF extends MetaData, PARENT extends 
         return result;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object obj) {
         if ( this == obj ) return true;

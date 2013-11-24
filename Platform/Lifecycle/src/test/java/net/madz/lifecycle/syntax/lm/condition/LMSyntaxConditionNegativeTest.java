@@ -23,7 +23,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_CONDITION_REFERENCE_INVALID,
-                    NLM_1.class.getMethod("getConditionA", null), S1.Transitions.S1_Transition_X.class);
+                    NLM_1.class.getMethod("getConditionA"), S1.Transitions.S1_Transition_X.class);
             throw e;
         }
     }
@@ -74,7 +74,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
-                    ConditionObjectDoesNotImplementConditionClass.class.getMethod("getConditionA", null), S1_Condition_A.class);
+                    ConditionObjectDoesNotImplementConditionClass.class.getMethod("getConditionA"), S1_Condition_A.class);
             throw e;
         }
     }
