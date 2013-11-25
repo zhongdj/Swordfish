@@ -8,6 +8,7 @@ import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
+import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.impl.LifecycleContextImpl;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
@@ -15,19 +16,30 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.verification.VerificationException;
 
-public class LifecycleInterceptor<V> extends Interceptor<V> {
+public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
-    private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?> context) {
+    private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?, ?> context) {
         try {
             return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getTarget().getClass());
         } catch (VerificationException e) {
-            throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+            logger.warning(e.getMessage());
+            if ( e.getVerificationFailureSet().size() == 1
+                    && SyntaxErrors.REGISTERED_META_ERROR.equals(e.getVerificationFailureSet().iterator().next().getErrorCode())
+                    && context.getKlass() != context.getTarget().getClass() ) {
+                try {
+                    return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getKlass());
+                } catch (VerificationException e1) {
+                    throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e1);
+                }
+            } else {
+                throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+            }
         }
     }
 
-    public LifecycleInterceptor(Interceptor<V> next) {
+    public LifecycleInterceptor(Interceptor<V, R> next) {
         super(next);
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....instantiating LifecycleInterceptor");
@@ -35,13 +47,13 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @Override
-    protected void handleException(InterceptContext<V> context, Throwable e) {
+    protected void handleException(InterceptContext<V, R> context, Throwable e) {
         context.setFailureCause(e);
         super.handleException(context, e);
     }
 
     @Override
-    protected void preExec(InterceptContext<V> context) {
+    protected void preExec(InterceptContext<V, R> context) {
         super.preExec(context);
         final StateMachineObject<?> stateMachine = lookupStateMachine(context);
         if ( isLockEnabled(stateMachine) ) {
@@ -79,7 +91,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @Override
-    protected void postExec(InterceptContext<V> context) {
+    protected void postExec(InterceptContext<V, R> context) {
         super.postExec(context);
         final StateMachineObject<?> stateMachine = lookupStateMachine(context);
         try {
@@ -131,7 +143,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @Override
-    protected void cleanup(InterceptContext<V> context) {
+    protected void cleanup(InterceptContext<V, R> context) {
         super.cleanup(context);
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....LifecycleInterceptor is doing cleanup ...");
@@ -152,7 +164,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
-    private void fireLifecycleEvents(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private void fireLifecycleEvents(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         final LifecycleEventHandler eventHandler = AbsStateMachineRegistry.getInstance().getLifecycleEventHandler();
         if ( null != eventHandler ) {
             eventHandler.onEvent(new LifecycleEventImpl(context));
@@ -164,21 +176,21 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V, R> context) {
         stateMachine.performPostStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
     }
 
-    private void setNextState(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private void setNextState(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         final String stateName = stateMachine.getNextState(context.getTarget(), context.getTransitionKey());
         stateMachine.setTargetState(context.getTarget(), stateName);
         context.setToState(stateName);
     }
 
-    private void validateNextStateInboundWhile(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private void validateNextStateInboundWhile(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         stateMachine.validateInboundWhiles(context);
     }
 
-    private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private boolean nextStateCanBeEvaluatedBeforeTranstion(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         if ( hasOnlyOneStateCandidate(stateMachine, context) ) {
             return true;
         } else if ( canEvaluateConditionBeforeTransition(stateMachine, context) ) {
@@ -187,11 +199,11 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         return false;
     }
 
-    private boolean canEvaluateConditionBeforeTransition(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private boolean canEvaluateConditionBeforeTransition(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         return stateMachine.evaluateConditionBeforeTransition(context.getTransitionKey());
     }
 
-    private boolean hasOnlyOneStateCandidate(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private boolean hasOnlyOneStateCandidate(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         final String stateName = stateMachine.evaluateState(context.getTarget());
         final StateMetadata state = stateMachine.getMetaType().getState(stateName);
         if ( state.hasMultipleStateCandidatesOn(context.getTransitionKey()) ) {
@@ -202,11 +214,11 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V> context) {
+    private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V, R> context) {
         stateMachine.performPreStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
     }
 
-    private void validateTransition(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private void validateTransition(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         StateMetadata stateMetadata = stateMachine.getMetaType().getState(context.getFromState());
         if ( !stateMetadata.isTransitionValid(context.getTransitionKey()) ) {
             throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, context.getTransitionKey(),
@@ -218,7 +230,7 @@ public class LifecycleInterceptor<V> extends Interceptor<V> {
         }
     }
 
-    private void validateStateValidWhiles(StateMachineObject<?> stateMachine, InterceptContext<V> context) {
+    private void validateStateValidWhiles(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         stateMachine.validateValidWhiles(context);
     }
 }

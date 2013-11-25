@@ -1,7 +1,10 @@
 package net.madz.lifecycle.engine;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
+import net.madz.bcel.intercept.InterceptContext;
+import net.madz.bcel.intercept.InterceptorController;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -32,6 +35,9 @@ import net.madz.lifecycle.engine.CoreFuntionTestMetadata.PowerLifecycleMetadata.
 import net.madz.lifecycle.engine.CoreFuntionTestMetadata.ServiceProviderLifecycle.States.ServiceAvailable;
 import net.madz.verification.VerificationException;
 
+import org.apache.bcel.Repository;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.util.BCELifier;
 import org.junit.BeforeClass;
 
 /**
@@ -189,8 +195,29 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             initialState(Draft.class.getSimpleName());
         }
 
+        // @Transition
+        // public int activate() {
+        // InterceptorController<Customer, Integer> a = new
+        // InterceptorController<>();
+        // InterceptContext<Customer, Integer> c = new
+        // InterceptContext<>(Customer.class, this, "activate", new Class[0],
+        // new Object[0]);
+        // return a.exec(c, new Callable<Integer>() {
+        //
+        // @Override
+        // public Integer call() throws Exception {
+        // return activate$Impl();
+        // }
+        // }).intValue();
+        // }
+        //
+        // public int activate$Impl() {
+        // return 5;
+        // }
         @Transition
-        public void activate() {}
+        public Customer activate() {
+            return new Customer();
+        }
 
         @Transition
         public void suspend() {}
@@ -201,6 +228,13 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @Transition
         public void cancel() {}
     }
+
+    public static void main(String[] args) throws Throwable {
+        final JavaClass outerClass = Repository.lookupClass(Customer.class);
+        BCELifier fier = new BCELifier(outerClass, System.out);
+        fier.start();
+    }
+
     @StateMachine
     protected static interface InternetServiceLifecycleMeta {
 
@@ -733,7 +767,7 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
     @LifecycleMeta(InternetTVServiceLifecycle.class)
     public static class InternetTVServiceWithRelationOnFields extends BaseServiceWithRelationOnFields<InternetTVServiceProvider> {
 
-        public InternetTVServiceWithRelationOnFields(Customer customer,InternetTVServiceProvider provider ) {
+        public InternetTVServiceWithRelationOnFields(Customer customer, InternetTVServiceProvider provider) {
             super(customer);
             this.provider = provider;
         }

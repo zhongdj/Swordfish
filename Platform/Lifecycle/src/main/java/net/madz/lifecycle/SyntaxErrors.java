@@ -77,6 +77,12 @@ public interface SyntaxErrors {
      * @param {2} juder class
      */
     public static final String TRANSITION_CONDITIONAL_CONDITION_NOT_MATCH_JUDGER = "002-2503";
+    
+    /**
+     * @param {0} Transition class
+     * @param {1} Transition class' super class or interface
+     */
+    public static final String TRANSITION_EXTENDS_NON_TRANSITION = "002-2504";
     // State's Function
     public static final String FUNCTION_INVALID_TRANSITION_REFERENCE = "002-2610";
     public static final String FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION = "002-2611";
@@ -311,4 +317,5 @@ public interface SyntaxErrors {
      * @param {2} Method class
      */
     public static final String PRE_STATE_CHANGE_OBSERVABLE_NAME_MISMATCH_OBSERVABLE_CLASS = "002-3712";
+    
 }

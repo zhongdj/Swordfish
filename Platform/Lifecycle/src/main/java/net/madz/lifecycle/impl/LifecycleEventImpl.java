@@ -14,7 +14,7 @@ public class LifecycleEventImpl implements LifecycleEvent {
     private final long startTime;
     private final long endTime;
 
-    public LifecycleEventImpl(InterceptContext<?> context) {
+    public LifecycleEventImpl(InterceptContext<?, ?> context) {
         this.reactiveObject = context.getTarget();
         this.fromState = context.getFromState();
         this.toState = context.getToState();

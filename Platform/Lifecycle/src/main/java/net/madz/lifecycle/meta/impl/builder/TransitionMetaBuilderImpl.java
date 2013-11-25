@@ -138,10 +138,14 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
     }
 
     @Override
-    protected TransitionMetadata findSuper(Class<?> metaClass) throws VerificationException {
-        if ( !parent.hasSuper() ) {
-            throw new IllegalStateException("No super transition expected.");
+    protected void verifySuper(Class<?> metaClass) throws VerificationException {
+        if (!parent.hasSuper()) {
+            throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_EXTENDS_NON_TRANSITION, metaClass, getSuperMetaClass(metaClass));
         }
+    }
+
+    @Override
+    protected TransitionMetadata findSuper(Class<?> metaClass) throws VerificationException {
         return parent.getSuper().getTransition(metaClass);
     }
 

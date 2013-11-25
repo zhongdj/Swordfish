@@ -109,7 +109,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     private synchronized void registerStateMachines() throws VerificationException {
         if ( null == lifecycleRegistry || null == builderMeta ) {
             throw new NullPointerException(
-                    "A subclass of AbstractStateMachineRegistry must have both @LifecycleRegistry and @StateMachineMetadataBuilder annotated on Type.");
+                    "A subclass of AbstractStateMachineRegistry must have both @LifecycleRegistry and @StateMachineBuilder annotated on Type: " + getClass());
         }
         final Class<?>[] toRegister = lifecycleRegistry.value();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
@@ -144,15 +144,15 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
                         SyntaxErrors.LIFECYCLE_EVENT_HANDLER_MUST_HAVE_NO_ARG_CONSTRUCTOR, errorMessage));
             }
         } else if ( null != clazz.getAnnotation(StateMachine.class) ) {
-            if ( isRegistered(clazz) ) {
+            if ( isMetaTypeRegistered(clazz) ) {
                 return;
             }
-            createStateMachineMetaBuilder(clazz, null, failureSet);
+            createStateMachineMetadata(clazz, null, failureSet);
         } else if ( null != clazz.getAnnotation(LifecycleMeta.class) ) {
             final Class<?> stateMachineClass = clazz.getAnnotation(LifecycleMeta.class).value();
             final StateMachineMetadata metaData;
-            if ( !isRegistered(stateMachineClass) ) {
-                metaData = createStateMachineMetaBuilder(stateMachineClass, null, failureSet);
+            if ( !isMetaTypeRegistered(stateMachineClass) ) {
+                metaData = createStateMachineMetadata(stateMachineClass, null, failureSet);
             } else {
                 metaData = loadStateMachineMetadata(stateMachineClass);
             }
@@ -161,7 +161,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
                 // null.
                 return;
             }
-            if ( null == getStateMachineInst(clazz) ) {
+            if ( null == getStateMachineObject(clazz) ) {
                 StateMachineObject<?> stateMachineInstance = metaData.newInstance(clazz);
                 stateMachineInstance.verifyMetaData(failureSet);
                 addInstance(clazz, stateMachineInstance);
@@ -172,8 +172,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         }
     }
 
-    private boolean isRegistered(Class<?> clazz) {
-        return null != this.typeMap.get(clazz.getName());
+    private boolean isMetaTypeRegistered(Class<?> clazz) {
+        return null != getStateMachineMeta(clazz);
     }
 
     public synchronized void addInstance(Class<?> clazz, StateMachineObject<?> stateMachine) {
@@ -184,9 +184,6 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     public synchronized void addTemplate(final StateMachineMetadata metaData) {
         for ( Object key : metaData.getKeySet() ) {
             StateMachineMetadata existedStateMachine = typeMap.get(key);
-            if ( typeMap.containsKey(key) && null == existedStateMachine ) {
-                typeMap.remove(key);
-            }
             if ( typeMap.containsKey(key) && existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
                 throw new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
                         + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
@@ -216,11 +213,11 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return this.typeMap.get(key);
     }
 
-    public synchronized StateMachineObject<?> getStateMachineInst(Object key) {
+    public synchronized StateMachineObject<?> getStateMachineObject(Object key) {
         return this.instanceMap.get(key);
     }
 
-    private StateMachineMetadata createStateMachineMetaBuilder(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine,
+    private StateMachineMetadata createStateMachineMetadata(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine,
             VerificationFailureSet failureSet) throws VerificationException {
         StateMachineMetaBuilder metaBuilder = null;
         try {
@@ -257,12 +254,12 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
 
     @Override
     public StateMachineObject<?> loadStateMachineObject(Class<?> stateMachineObjectClass) throws VerificationException {
-        final StateMachineObject<?> stateMachineObject = getStateMachineInst(stateMachineObjectClass);
+        final StateMachineObject<?> stateMachineObject = getStateMachineObject(stateMachineObjectClass);
         if ( null != stateMachineObject ) {
             return stateMachineObject;
         } else {
             registerLifecycleMeta(stateMachineObjectClass);
-            return getStateMachineInst(stateMachineObjectClass);
+            return getStateMachineObject(stateMachineObjectClass);
         }
     }
 
@@ -270,7 +267,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine) throws VerificationException {
         StateMachineMetadata stateMachineMeta = getStateMachineMeta(stateMachineClass);
         if ( null != stateMachineMeta ) return stateMachineMeta;
-        return createStateMachineMetaBuilder(stateMachineClass, owningStateMachine, null);
+        return createStateMachineMetadata(stateMachineClass, owningStateMachine, null);
     }
 
     private StateMachineMetaBuilder createCompositeBuilder(Class<?> stateMachineClass, StateMachineMetadata owningStateMachine) throws VerificationException {

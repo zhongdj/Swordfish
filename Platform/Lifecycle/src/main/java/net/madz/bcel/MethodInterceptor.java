@@ -1,7 +1,5 @@
 package net.madz.bcel;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +10,8 @@ import net.madz.bcel.intercept.InterceptorController;
 
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Attribute;
-import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.InnerClass;
 import org.apache.bcel.classfile.InnerClasses;
-import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.LocalVariable;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ArrayType;
@@ -33,6 +29,7 @@ import org.apache.bcel.generic.LDC_W;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUSH;
+import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
 
 public class MethodInterceptor {
@@ -69,7 +66,6 @@ public class MethodInterceptor {
             wrapMethodGen.setInstructionList(ilist);
             final String innerClassName = createInterceptMethodCode(classGen, anonymousInnerClassSeq, interceptingClass, interceptingMethod, ifact, ilist,
                     constantPoolGen, method);
-            
             Map<Integer, InstructionHandle> handlesByPosition = new HashMap<Integer, InstructionHandle>();
             for ( InstructionHandle handle : ilist.getInstructionHandles() ) {
                 handlesByPosition.put(handle.getPosition(), handle);
@@ -210,8 +206,45 @@ public class MethodInterceptor {
         ilist.append(ifact.createInvoke(InterceptorController.class.getName(), "exec", Type.OBJECT,
                 new Type[] { new ObjectType(InterceptContext.class.getName()), new ObjectType(Callable.class.getName()) }, Constants.INVOKEVIRTUAL));
         // Step 5.
-        ilist.append(InstructionConstants.POP);
-        ilist.append(InstructionConstants.RETURN);
+        if ( originalMethod.getReturnType().getType() == Type.VOID.getType() ) {
+            ilist.append(InstructionConstants.POP);
+            ilist.append(InstructionConstants.RETURN);
+        } else if ( originalMethod.getReturnType().getType() == Type.OBJECT.getType() ) {
+            ilist.append(ifact.createCheckCast((ReferenceType) originalMethod.getReturnType()));
+            ilist.append(InstructionFactory.createReturn(Type.OBJECT));
+        } else if ( originalMethod.getReturnType().getType() == Type.INT.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Integer")));
+            ilist.append(ifact.createInvoke("java.lang.Integer", "intValue", Type.INT, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.INT));
+        } else if ( originalMethod.getReturnType().getType() == Type.LONG.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Long")));
+            ilist.append(ifact.createInvoke("java.lang.Long", "longValue", Type.LONG, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.LONG));
+        } else if ( originalMethod.getReturnType().getType() == Type.FLOAT.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Float")));
+            ilist.append(ifact.createInvoke("java.lang.Float", "floatValue", Type.FLOAT, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.FLOAT));
+        } else if ( originalMethod.getReturnType().getType() == Type.DOUBLE.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Double")));
+            ilist.append(ifact.createInvoke("java.lang.Double", "doubleValue", Type.DOUBLE, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.DOUBLE));
+        } else if ( originalMethod.getReturnType().getType() == Type.BYTE.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Byte")));
+            ilist.append(ifact.createInvoke("java.lang.Byte", "byteValue", Type.BYTE, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.BYTE));
+        } else if ( originalMethod.getReturnType().getType() == Type.SHORT.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Short")));
+            ilist.append(ifact.createInvoke("java.lang.Short", "shortValue", Type.SHORT, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.SHORT));
+        } else if ( originalMethod.getReturnType().getType() == Type.BOOLEAN.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Boolean")));
+            ilist.append(ifact.createInvoke("java.lang.Boolean", "booleanValue", Type.BOOLEAN, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.BOOLEAN));
+        } else if ( originalMethod.getReturnType().getType() == Type.CHAR.getType() ) {
+            ilist.append(ifact.createCheckCast(new ObjectType("java.lang.Character")));
+            ilist.append(ifact.createInvoke("java.lang.Character", "charValue", Type.CHAR, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+            ilist.append(InstructionFactory.createReturn(Type.CHAR));
+        }
         return innerClassName;
     }
 
@@ -335,49 +368,52 @@ public class MethodInterceptor {
         } else if ( type instanceof ArrayType ) {}
         throw new UnsupportedOperationException();
     }
-
-    public static void main(String[] argv) throws Throwable {
-        if ( argv.length == 2 && argv[0].endsWith(".class") ) {
-            try {
-                JavaClass jclas = new ClassParser(argv[0]).parse();
-                ClassGen cgen = new ClassGen(jclas);
-                Method[] methods = jclas.getMethods();
-                int index;
-                for ( index = 0; index < methods.length; index++ ) {
-                    if ( methods[index].getName().equals(argv[1]) ) {
-                        break;
-                    }
-                }
-                if ( index < methods.length ) {
-                    int innerClassSeq = 1;
-                    Attribute[] attributes = cgen.getAttributes();
-                    for ( Attribute attribute : attributes ) {
-                        if ( attribute instanceof InnerClasses ) {
-                            InnerClasses icAttr = (InnerClasses) attribute;
-                            innerClassSeq += icAttr.getInnerClasses().length;
-                        }
-                    }
-                    Method interceptingMethod = methods[index];
-                    doGenerateAll(cgen, innerClassSeq, interceptingMethod);
-                    FileOutputStream fos = new FileOutputStream(argv[0]);
-                    cgen.getJavaClass().dump(fos);
-                    fos.close();
-                } else {
-                    System.err.println("Method " + argv[1] + " not found in " + argv[0]);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace(System.err);
-            }
-        } else {
-            System.out.println("Usage: BCELMethodInterceptor class-file method-name");
-        }
-    }
-
-    private static void doGenerateAll(ClassGen cgen, int innerClassSeq, Method interceptingMethod) throws Throwable {
-        JavaAnonymousInnerClass c = new JavaAnonymousInnerClass(cgen.getClassName(), interceptingMethod.getName(), interceptingMethod.getArgumentTypes(),
-                innerClassSeq, Object.class.getName(), new Type[0], java.util.concurrent.Callable.class.getName(), new Type[] { new ObjectType(
-                        Void.class.getName()) }, null);
-        c.doGenerate();
-        MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);
-    }
+    // public static void main(String[] argv) throws Throwable {
+    // if ( argv.length == 2 && argv[0].endsWith(".class") ) {
+    // try {
+    // JavaClass jclas = new ClassParser(argv[0]).parse();
+    // ClassGen cgen = new ClassGen(jclas);
+    // Method[] methods = jclas.getMethods();
+    // int index;
+    // for ( index = 0; index < methods.length; index++ ) {
+    // if ( methods[index].getName().equals(argv[1]) ) {
+    // break;
+    // }
+    // }
+    // if ( index < methods.length ) {
+    // int innerClassSeq = 1;
+    // Attribute[] attributes = cgen.getAttributes();
+    // for ( Attribute attribute : attributes ) {
+    // if ( attribute instanceof InnerClasses ) {
+    // InnerClasses icAttr = (InnerClasses) attribute;
+    // innerClassSeq += icAttr.getInnerClasses().length;
+    // }
+    // }
+    // Method interceptingMethod = methods[index];
+    // doGenerateAll(cgen, innerClassSeq, interceptingMethod);
+    // FileOutputStream fos = new FileOutputStream(argv[0]);
+    // cgen.getJavaClass().dump(fos);
+    // fos.close();
+    // } else {
+    // System.err.println("Method " + argv[1] + " not found in " + argv[0]);
+    // }
+    // } catch (IOException ex) {
+    // ex.printStackTrace(System.err);
+    // }
+    // } else {
+    // System.out.println("Usage: BCELMethodInterceptor class-file method-name");
+    // }
+    // }
+    // private static void doGenerateAll(ClassGen cgen, int innerClassSeq,
+    // Method interceptingMethod) throws Throwable {
+    // JavaAnonymousInnerClass c = new
+    // JavaAnonymousInnerClass(cgen.getClassName(),
+    // interceptingMethod.getName(), interceptingMethod.getArgumentTypes(),
+    // innerClassSeq, Object.class.getName(), new Type[0],
+    // java.util.concurrent.Callable.class.getName(), new Type[] { new
+    // ObjectType(
+    // Void.class.getName()) }, null);
+    // c.doGenerate();
+    // MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);
+    // }
 }

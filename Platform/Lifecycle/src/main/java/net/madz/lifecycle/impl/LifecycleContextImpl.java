@@ -18,7 +18,7 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
     private final Object[] arguments;
 
     @SuppressWarnings("unchecked")
-    public LifecycleContextImpl(InterceptContext<T> context, StateConverter<S> converter) {
+    public LifecycleContextImpl(InterceptContext<T, ?> context, StateConverter<S> converter) {
         this.target = context.getTarget();
         this.fromStateName = context.getFromState();
         if ( null != converter ) {

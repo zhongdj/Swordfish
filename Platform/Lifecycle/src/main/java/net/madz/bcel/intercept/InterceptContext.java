@@ -11,7 +11,7 @@ import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.util.StringUtil;
 
-public class InterceptContext<V> implements UnlockableStack {
+public class InterceptContext<V, R> implements UnlockableStack {
 
     private static Logger logger = Logger.getLogger("Lifecycle Framework");
     private final Annotation[] annotation;
@@ -129,8 +129,8 @@ public class InterceptContext<V> implements UnlockableStack {
         }
     }
 
-    public Interceptor<V> createInterceptorChain() {
-        return new LifecycleInterceptor<V>(new CallableInterceptor<V>());
+    public Interceptor<V, R> createInterceptorChain() {
+        return new LifecycleInterceptor<V, R>(new CallableInterceptor<V, R>());
     }
 
     protected Method findMethod(Class<?> klass, String methodName, Class<?>[] classes) {

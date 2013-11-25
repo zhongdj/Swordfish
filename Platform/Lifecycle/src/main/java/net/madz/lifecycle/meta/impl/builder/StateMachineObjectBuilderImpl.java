@@ -1182,6 +1182,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @Override
     public StateMachineObjectBuilder<S> build(Class<?> klass, StateMachineObject<S> parent) throws VerificationException {
         super.build(klass, parent);
+        addKey(klass);
         verifySyntax(klass);
         configureStateIndicatorAccessor(klass);
         configureConditions(klass);
@@ -1276,7 +1277,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void validateValidWhiles(final InterceptContext<?> context) {
+    public void validateValidWhiles(final InterceptContext<?, ?> context) {
         // final HashMap<Class<?>, Object> relationsInMethodParameters =
         // evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
@@ -1306,7 +1307,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         return null;
     }
 
-    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext<?> context) {
+    private HashMap<Class<?>, Object> evaluatorRelationsInMethodParameters(InterceptContext<?, ?> context) {
         final Object[] arguments = context.getArguments();
         final Method method = context.getMethod();
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -1332,7 +1333,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void validateInboundWhiles(InterceptContext<?> context) {
+    public void validateInboundWhiles(InterceptContext<?,?> context) {
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();

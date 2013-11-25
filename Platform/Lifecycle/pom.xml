@@ -12,7 +12,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>13.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.bcel.Constants;
-import org.apache.bcel.Repository;
 import org.apache.bcel.classfile.Field;
 import org.apache.bcel.classfile.InnerClass;
 import org.apache.bcel.classfile.InnerClasses;
@@ -20,6 +19,7 @@ import org.apache.bcel.classfile.Unknown;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.FieldGen;
+import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionConstants;
 import org.apache.bcel.generic.InstructionFactory;
 import org.apache.bcel.generic.InstructionList;
@@ -28,6 +28,8 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.ReturnInstruction;
 import org.apache.bcel.generic.Type;
+import org.apache.bcel.util.ClassPath;
+import org.apache.bcel.util.SyntheticRepository;
 import org.apache.bcel.verifier.statics.StringRepresentation;
 
 public class JavaAnonymousInnerClass {
@@ -163,12 +165,14 @@ public class JavaAnonymousInnerClass {
         createBridgeCall(cgen);
     }
 
-    private void createBridgeCall(ClassGen cgen) {
+    private void createBridgeCall(ClassGen cgen) throws ClassNotFoundException {
         InstructionFactory ifact = new InstructionFactory(cgen);
         InstructionList iList = new InstructionList();
         final LocalVariableInstruction start = InstructionConstants.ALOAD_0;
         iList.append(start);
-        iList.append(ifact.createInvoke(thisClassName, "call", new ObjectType("java.lang.Void"), Type.NO_ARGS, Constants.INVOKEVIRTUAL));
+        final Type returnType = lookupEnclosingMethodReturnType();
+        final Type wrappedReturnType = convertWrappedReturnType(returnType);
+        iList.append(ifact.createInvoke(thisClassName, "call", wrappedReturnType, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
         ReturnInstruction end = InstructionConstants.ARETURN;
         iList.append(end);
         final MethodGen callMethodGen = new MethodGen(4161, new ObjectType("java.lang.Object"), Type.NO_ARGS, new String[] {}, "call", thisClassName, iList,
@@ -193,13 +197,76 @@ public class JavaAnonymousInnerClass {
         final Type returnType = lookupEnclosingMethodReturnType();
         final Type[] argTypes = lookupEnclosingMethodArgType();
         iList.append(ifact.createInvoke(outerClassName, enclosingMethodName + POSTFIX, returnType, argTypes, Constants.INVOKEVIRTUAL));
-        iList.append(InstructionConstants.ACONST_NULL);
-        iList.append(InstructionConstants.ARETURN);
-        final MethodGen callMethodGen = new MethodGen(1, new ObjectType("java.lang.Void"), Type.NO_ARGS, new String[] {}, "call", thisClassName, iList,
-                cgen.getConstantPool());
+        final Instruction valueOfInstruction = createValueOf(ifact, returnType);
+        if ( null != valueOfInstruction ) {
+            iList.append(valueOfInstruction);
+        }
+        final Type wrappedReturnType = convertWrappedReturnType(returnType);
+        iList.append(InstructionFactory.createReturn(Type.OBJECT));
+        final MethodGen callMethodGen = new MethodGen(1, wrappedReturnType, Type.NO_ARGS, new String[] {}, "call", thisClassName, iList, cgen.getConstantPool());
         callMethodGen.addException("java.lang.Exception");
         addMethod(cgen, callMethodGen);
         iList.dispose();
+    }
+
+    private Instruction createValueOf(final InstructionFactory ifact, final Type returnType) {
+        final Instruction valueOfInstruction;
+        if ( returnType.getType() == Constants.T_VOID ) {
+            valueOfInstruction = InstructionConstants.ACONST_NULL;
+        } else if ( returnType.getType() == Type.INT.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Integer.class.getName(), "valueOf", new ObjectType(Integer.class.getName()), new Type[] { Type.INT },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.LONG.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Long.class.getName(), "valueOf", new ObjectType(Long.class.getName()), new Type[] { Type.LONG },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.FLOAT.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Float.class.getName(), "valueOf", new ObjectType(Float.class.getName()), new Type[] { Type.FLOAT },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.DOUBLE.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Double.class.getName(), "valueOf", new ObjectType(Double.class.getName()), new Type[] { Type.DOUBLE },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.BYTE.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Byte.class.getName(), "valueOf", new ObjectType(Byte.class.getName()), new Type[] { Type.BYTE },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.SHORT.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Short.class.getName(), "valueOf", new ObjectType(Short.class.getName()), new Type[] { Type.SHORT },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.CHAR.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Character.class.getName(), "valueOf", new ObjectType(Character.class.getName()), new Type[] { Type.CHAR },
+                    Constants.INVOKESTATIC);
+        } else if ( returnType.getType() == Type.BOOLEAN.getType() ) {
+            valueOfInstruction = ifact.createInvoke(Boolean.class.getName(), "valueOf", new ObjectType(Boolean.class.getName()), new Type[] { Type.BOOLEAN },
+                    Constants.INVOKESTATIC);
+        } else {
+            valueOfInstruction = null;
+        }
+        return valueOfInstruction;
+    }
+
+    private Type convertWrappedReturnType(final Type returnType) {
+        final Type wrappedReturnType;
+        if ( returnType.getType() == Constants.T_VOID ) {
+            wrappedReturnType = new ObjectType("java.lang.Void");
+        } else if ( returnType.getType() == Type.INT.getType() ) {
+            wrappedReturnType = new ObjectType(Integer.class.getName());
+        } else if ( returnType.getType() == Type.LONG.getType() ) {
+            wrappedReturnType = new ObjectType(Long.class.getName());
+        } else if ( returnType.getType() == Type.FLOAT.getType() ) {
+            wrappedReturnType = new ObjectType(Float.class.getName());
+        } else if ( returnType.getType() == Type.DOUBLE.getType() ) {
+            wrappedReturnType = new ObjectType(Double.class.getName());
+        } else if ( returnType.getType() == Type.BYTE.getType() ) {
+            wrappedReturnType = new ObjectType(Byte.class.getName());
+        } else if ( returnType.getType() == Type.SHORT.getType() ) {
+            wrappedReturnType = new ObjectType(Short.class.getName());
+        } else if ( returnType.getType() == Type.CHAR.getType() ) {
+            wrappedReturnType = new ObjectType(Character.class.getName());
+        } else if ( returnType.getType() == Type.BOOLEAN.getType() ) {
+            wrappedReturnType = new ObjectType(Boolean.class.getName());
+        } else {
+            wrappedReturnType = returnType;
+        }
+        return wrappedReturnType;
     }
 
     private void doGenerateConstructor(ClassGen cgen) throws Throwable {
@@ -361,7 +428,7 @@ public class JavaAnonymousInnerClass {
     }
 
     private List<LocalVariable> lookupEnclosingMethodArgumentVariables() throws ClassNotFoundException {
-        final JavaClass outerClass = Repository.lookupClass(this.outerClassName);
+        final JavaClass outerClass = lookupOuterClass();
         for ( Method method : outerClass.getMethods() ) {
             if ( !enclosingMethodName.equals(method.getName()) ) {
                 continue;
@@ -390,7 +457,7 @@ public class JavaAnonymousInnerClass {
     }
 
     private Type lookupEnclosingMethodReturnType() throws ClassNotFoundException {
-        final JavaClass outerClass = Repository.lookupClass(this.outerClassName);
+        final JavaClass outerClass = lookupOuterClass();
         for ( Method method : outerClass.getMethods() ) {
             if ( !enclosingMethodName.equals(method.getName()) ) {
                 continue;
@@ -403,8 +470,14 @@ public class JavaAnonymousInnerClass {
         throw new IllegalStateException("Cannot find enclosingMethod: " + enclosingMethodName);
     }
 
+    private JavaClass lookupOuterClass() throws ClassNotFoundException {
+        return SyntheticRepository.getInstance(new ClassPath(location)).loadClass(this.outerClassName);
+        // lookupClass(classLoader.loadClass(this.outerClassName.replaceAll("\\/",
+        // ".")));
+    }
+
     private Type[] lookupEnclosingMethodArgType() throws ClassNotFoundException {
-        final JavaClass outerClass = Repository.lookupClass(this.outerClassName);
+        final JavaClass outerClass = lookupOuterClass();
         for ( Method method : outerClass.getMethods() ) {
             if ( !enclosingMethodName.equals(method.getName()) ) {
                 continue;

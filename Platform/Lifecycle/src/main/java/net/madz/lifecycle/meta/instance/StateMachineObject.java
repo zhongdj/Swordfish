@@ -133,9 +133,9 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     String getNextState(Object target, Object transtionKey);
 
-    void validateValidWhiles(final InterceptContext<?> context);
+    void validateValidWhiles(final InterceptContext<?, ?> context);
 
-    void validateInboundWhiles(final InterceptContext<?> context);
+    void validateInboundWhiles(final InterceptContext<?, ?> context);
 
     boolean evaluateConditionBeforeTransition(Object transtionKey);
 

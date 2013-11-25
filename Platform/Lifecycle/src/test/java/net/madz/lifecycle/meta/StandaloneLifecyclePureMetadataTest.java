@@ -58,7 +58,7 @@ public class StandaloneLifecyclePureMetadataTest {
     public static void setup() throws VerificationException {
         registry = new StateMachineRegistry();
         machineMetadata = registry.getStateMachineMeta(ServiceableLifecycleMeta.class);
-        stateMachineInst = registry.getStateMachineInst(IServiceOrder.class);
+        stateMachineInst = registry.getStateMachineObject(IServiceOrder.class);
     }
 
     // /////////////////////////////////////////////////////////////////

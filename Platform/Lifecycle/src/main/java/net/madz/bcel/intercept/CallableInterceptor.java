@@ -4,12 +4,12 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CallableInterceptor<V> extends Interceptor<V> {
+public class CallableInterceptor<V ,R> extends Interceptor<V, R> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
     @Override
-    public V intercept(InterceptContext<V> context, Callable<V> callable) {
+    public R intercept(InterceptContext<V, R> context, Callable<R> callable) {
         try {
             if ( logger.isLoggable(Level.FINE) ) {
                 logger.fine("intercepting with: " + getClass().getName() + " @intercept");

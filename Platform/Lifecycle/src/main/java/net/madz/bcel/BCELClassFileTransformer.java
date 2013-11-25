@@ -28,7 +28,7 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
     private static final Logger log = Logger.getLogger("Lifecycle Framework Byte Code Transformer");
     public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/") + ";";
     public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L" + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
-    private String[] ignoredPackages = new String[] { "java.", "javax.", "sun." };
+    private String[] ignoredPackages = new String[] { "java.", "javax.", "sun.", "org." };
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer)
