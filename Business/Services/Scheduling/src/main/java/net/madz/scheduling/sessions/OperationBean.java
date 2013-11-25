@@ -25,10 +25,7 @@ import net.madz.binding.TransferObjectFactory;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.core.exceptions.AppServiceException;
 import net.madz.core.exceptions.BONotFoundException;
-import net.madz.scheduling.biz.IConcreteTruckResource;
-import net.madz.scheduling.biz.IMixingPlantResource;
 import net.madz.scheduling.biz.IServiceOrder;
-import net.madz.scheduling.biz.IServiceSummaryPlan;
 import net.madz.scheduling.entities.ConcreteTruck;
 import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.entities.MixingPlant;
@@ -60,31 +57,68 @@ public class OperationBean extends MultitenancyBean {
         return result;
     }
 
-    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId,
-            Long concreteTruckResourceId, double volume) throws AppServiceException {
+    // public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long
+    // mixingPlantResourceId,
+    // Long concreteTruckResourceId, double volume) throws AppServiceException {
+    // EntityManager em = em();
+    // try {
+    // final IServiceSummaryPlan summaryPlan =
+    // em.find(IServiceSummaryPlan.class, summaryPlanId);
+    // if ( null == summaryPlan ) {
+    // throw new BONotFoundException(OperationBean.class, SCHEDULING,
+    // ErrorCodes.SUMMARY_PLAN_ID_INVALID);
+    // }
+    // final IMixingPlantResource plantResource =
+    // em.find(IMixingPlantResource.class, mixingPlantResourceId);
+    // if ( null == plantResource ) {
+    // throw new BONotFoundException(OperationBean.class, SCHEDULING,
+    // ErrorCodes.MIXING_PLANT_RESOURCE_ID_INVALID);
+    // }
+    // final IConcreteTruckResource truckResource =
+    // em.find(IConcreteTruckResource.class, concreteTruckResourceId);
+    // if ( null == truckResource ) {
+    // throw new BONotFoundException(OperationBean.class, SCHEDULING,
+    // ErrorCodes.TRUCK_RESOURCE_ID_INVALID);
+    // }
+    // final IServiceOrder serviceOrderBO =
+    // summaryPlan.createServiceOrder(plantResource, truckResource, volume);
+    // serviceOrderBO.persist(em);
+    // try {
+    // return TransferObjectFactory.createTransferObject(ServiceOrderTO.class,
+    // serviceOrderBO.get());
+    // } catch (Exception e) {
+    // logger.log(Level.SEVERE, "TOBindingError", e);
+    // throw new AppServiceException(OperationBean.class, SCHEDULING,
+    // SCHEDULING,
+    // ErrorCodes.SERVER_INTENAL_ERROR, e);
+    // }
+    // } finally {
+    // em.close();
+    // }
+    // }
+    public ServiceOrderTO allocateResourceTo(Long summaryPlanId, Long mixingPlantResourceId, Long concreteTruckResourceId, double volume)
+            throws AppServiceException {
         EntityManager em = em();
         try {
-            final IServiceSummaryPlan summaryPlan = em.find(IServiceSummaryPlan.class, summaryPlanId);
+            final ServiceSummaryPlan summaryPlan = em.find(ServiceSummaryPlan.class, summaryPlanId);
             if ( null == summaryPlan ) {
                 throw new BONotFoundException(OperationBean.class, SCHEDULING, ErrorCodes.SUMMARY_PLAN_ID_INVALID);
             }
-            final IMixingPlantResource plantResource = em.find(IMixingPlantResource.class, mixingPlantResourceId);
+            final MixingPlantResource plantResource = em.find(MixingPlantResource.class, mixingPlantResourceId);
             if ( null == plantResource ) {
-                throw new BONotFoundException(OperationBean.class, SCHEDULING,
-                        ErrorCodes.MIXING_PLANT_RESOURCE_ID_INVALID);
+                throw new BONotFoundException(OperationBean.class, SCHEDULING, ErrorCodes.MIXING_PLANT_RESOURCE_ID_INVALID);
             }
-            final IConcreteTruckResource truckResource = em.find(IConcreteTruckResource.class, concreteTruckResourceId);
+            final ConcreteTruckResource truckResource = em.find(ConcreteTruckResource.class, concreteTruckResourceId);
             if ( null == truckResource ) {
                 throw new BONotFoundException(OperationBean.class, SCHEDULING, ErrorCodes.TRUCK_RESOURCE_ID_INVALID);
             }
-            final IServiceOrder serviceOrderBO = summaryPlan.createServiceOrder(plantResource, truckResource, volume);
-            serviceOrderBO.persist(em);
+            final IServiceOrder serviceOrder = summaryPlan.createServiceOrder(plantResource, truckResource, volume);
+            em.persist(serviceOrder);
             try {
-                return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrderBO.get());
+                return TransferObjectFactory.createTransferObject(ServiceOrderTO.class, serviceOrder);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
-                throw new AppServiceException(OperationBean.class, SCHEDULING, SCHEDULING,
-                        ErrorCodes.SERVER_INTENAL_ERROR, e);
+                throw new AppServiceException(OperationBean.class, SCHEDULING, SCHEDULING, ErrorCodes.SERVER_INTENAL_ERROR, e);
             }
         } finally {
             em.close();
@@ -95,22 +129,19 @@ public class OperationBean extends MultitenancyBean {
         return listMyPartsInConstructing();
     }
 
-    public CreateMixingPlantResourceResponse createPlantResource(CreateMixingPlantResourceRequest request)
-            throws AppServiceException {
+    public CreateMixingPlantResourceResponse createPlantResource(CreateMixingPlantResourceRequest request) throws AppServiceException {
         EntityManager em = em();
         final String mixingPlantName = request.getMixingPlantName();
         final String operatorName = request.getOperatorName();
         try {
             if ( null == mixingPlantName || 0 >= mixingPlantName.trim().length() ) {
-                throw new NullPointerException(
-                        "MixingPlant resource information is incomplete, you must specify a name for a mixing plant resource");
+                throw new NullPointerException("MixingPlant resource information is incomplete, you must specify a name for a mixing plant resource");
             }
             if ( null == operatorName || 0 >= operatorName.trim().length() ) {
                 throw new NullPointerException("operator name is null.");
             }
             try {
-                Query query = em.createNamedQuery("MixingPlantResource.findByPlantName").setParameter(
-                        "mixingPlantName", mixingPlantName);
+                Query query = em.createNamedQuery("MixingPlantResource.findByPlantName").setParameter("mixingPlantName", mixingPlantName);
                 MixingPlantResource result = (net.madz.scheduling.entities.MixingPlantResource) query.getSingleResult();
                 if ( null != result ) {
                     throw new IllegalStateException(
@@ -124,8 +155,7 @@ public class OperationBean extends MultitenancyBean {
                 Query query = em.createNamedQuery("User.findByUsername").setParameter("username", operatorName);
                 operator = (User) query.getSingleResult();
             } catch (NoResultException e) {
-                throw new IllegalStateException(
-                        "Operator name is not valid.  Please specify an existing operator name. ");
+                throw new IllegalStateException("Operator name is not valid.  Please specify an existing operator name. ");
             }
             MixingPlantResource plantResource = new MixingPlantResource();
             User user = UserSession.getUserSession().getUser();
@@ -139,8 +169,7 @@ public class OperationBean extends MultitenancyBean {
             plantResource.setMixingPlant(mixingPlant);
             em.persist(plantResource);
             try {
-                return TransferObjectFactory.createTransferObject(CreateMixingPlantResourceResponse.class,
-                        plantResource);
+                return TransferObjectFactory.createTransferObject(CreateMixingPlantResourceResponse.class, plantResource);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }
@@ -150,8 +179,7 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto)
-            throws AppServiceException {
+    public CreateConcreteTruckResourceResponse createConcreteTruckResource(CreateConcreteTruckResourceRequest cto) throws AppServiceException {
         EntityManager em = em();
         try {
             if ( null == cto.getLicencePlateNumber() ) {
@@ -162,13 +190,11 @@ public class OperationBean extends MultitenancyBean {
                 throw new IllegalStateException(
                         "ConcreteTruck resource information is incomplete, you must specify ratedCapacity for a ConcreteTruck resource.");
             }
-            Query query = em.createNamedQuery("ConcreteTruck.findByLicencePlateNumber").setParameter(
-                    "licencePlateNumber", cto.getLicencePlateNumber());
+            Query query = em.createNamedQuery("ConcreteTruck.findByLicencePlateNumber").setParameter("licencePlateNumber", cto.getLicencePlateNumber());
             try {
                 Object singleResult = query.getSingleResult();
                 if ( null != singleResult ) {
-                    throw new IllegalStateException(
-                            "licencePlateNumber already exists.  Please specify an unused licencePlateNumber.");
+                    throw new IllegalStateException("licencePlateNumber already exists.  Please specify an unused licencePlateNumber.");
                 }
             } catch (NoResultException expected) {
                 // Ignored
@@ -189,8 +215,7 @@ public class OperationBean extends MultitenancyBean {
             ctr.setCreatedOn(new Date());
             em.persist(ctr);
             try {
-                final CreateConcreteTruckResourceResponse result = TransferObjectFactory.createTransferObject(
-                        CreateConcreteTruckResourceResponse.class, ctr);
+                final CreateConcreteTruckResourceResponse result = TransferObjectFactory.createTransferObject(CreateConcreteTruckResourceResponse.class, ctr);
                 return result;
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
@@ -201,26 +226,25 @@ public class OperationBean extends MultitenancyBean {
         }
     }
 
-    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sspr)
-            throws AppServiceException {
+    public CreateServiceSummaryPlanResponse createServiceSummaryPlan(CreateServiceSummaryPlanRequest sspr) throws AppServiceException {
         EntityManager em = em();
         try {
-            ServiceSummaryPlan ssp = new ServiceSummaryPlan();
+            ServiceSummaryPlan summaryPlan = new ServiceSummaryPlan();
             User user = UserSession.getUserSession().getUser();
-            ssp.setCreatedBy(user);
-            ssp.setUpdatedBy(user);
-            ssp.setUpdatedOn(new Date());
-            ssp.setTotalVolume(sspr.getTotalVolume());
+            summaryPlan.setCreatedBy(user);
+            summaryPlan.setUpdatedBy(user);
+            summaryPlan.setUpdatedOn(new Date());
+            summaryPlan.setTotalVolume(sspr.getTotalVolume());
             PouringPartSpec spec = null;
             try {
                 spec = em.find(PouringPartSpec.class, sspr.getSpecId());
             } catch (NoResultException ex) {
                 throw new NullPointerException("PouringPartSpec id is invalid, you must specify a valid spec id.");
             }
-            ssp.setSpec(spec);
-            em.persist(ssp);
+            summaryPlan.setSpec(spec);
+            em.persist(summaryPlan);
             try {
-                return TransferObjectFactory.createTransferObject(CreateServiceSummaryPlanResponse.class, ssp);
+                return TransferObjectFactory.createTransferObject(CreateServiceSummaryPlanResponse.class, summaryPlan);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "TOBindingError", e);
             }

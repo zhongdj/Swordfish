@@ -45,7 +45,7 @@ public class AbstractBO<T extends AbstractBaseEntity> implements IBizObject<T> {
     public void remove(EntityManager em) {
         em.remove(entity);
     }
-    
+
     public void setEJBContext(EJBContext context) {
         this.context = context;
     }

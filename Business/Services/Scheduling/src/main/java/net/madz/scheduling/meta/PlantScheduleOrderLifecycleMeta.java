@@ -17,8 +17,8 @@ public interface PlantScheduleOrderLifecycleMeta extends OrderLifecycleMeta {
     @StateSet
     public static class States extends OrderLifecycleMeta.States {
 
-        @InboundWhile(on = { ServiceOrderLifecycleMeta.States.Created.class }, relation = ServiceOrder.class)
-        public static class Created extends OrderLifecycleMeta.States.Created {}
+        @InboundWhile(on = { ServiceOrderLifecycleMeta.States.Ongoing.class }, relation = ServiceOrder.class)
+        public static class Created extends OrderLifecycleMeta.States.Draft {}
 
         @InboundWhile(on = { ServiceOrderLifecycleMeta.States.Ongoing.class }, relation = ServiceOrder.class)
         @Function(transition = Finish.class, value = { Finished.class })

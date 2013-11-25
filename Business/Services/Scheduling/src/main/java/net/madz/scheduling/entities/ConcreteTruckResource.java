@@ -14,9 +14,15 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import net.madz.authorization.entities.MultiTenancyEntity;
+import net.madz.lifecycle.annotations.LifecycleMeta;
+import net.madz.lifecycle.annotations.StateIndicator;
+import net.madz.lifecycle.annotations.Transition;
+import net.madz.scheduling.biz.IVehicleScheduleOrder;
+import net.madz.scheduling.meta.ConcreteTruckResourceLifecycleMeta;
 
 @Entity
 @Table(name = "concrete_truck_resource")
+@LifecycleMeta(value = ConcreteTruckResourceLifecycleMeta.class)
 public class ConcreteTruckResource extends MultiTenancyEntity {
 
     private static final long serialVersionUID = 1366415739718240376L;
@@ -24,11 +30,13 @@ public class ConcreteTruckResource extends MultiTenancyEntity {
     @JoinColumns({ @JoinColumn(name = "TENANT_ID", nullable = false, insertable = false, updatable = false, referencedColumnName = "TENANT_ID"),
             @JoinColumn(name = "CONCRETE_TRUCK_ID", nullable = false, insertable = true, updatable = false, referencedColumnName = "ID") })
     private ConcreteTruck concreteTruck;
-    @OneToMany(mappedBy = "truckResource")
-    private List<ServiceOrder> serviceOrders = new LinkedList<ServiceOrder>();
-    private String state;
+    @OneToMany(targetEntity = ServiceOrder.class, mappedBy = "truckResource")
+    private List<IVehicleScheduleOrder> incompleteScheduleOrders = new LinkedList<>();
     @Column(name = "Confirmed_Date")
     private Timestamp confirmedDate;
+    @StateIndicator
+    @Column(name = "STATE")
+    private String state = ConcreteTruckResourceLifecycleMeta.States.Idle.class.getSimpleName();
 
     public ConcreteTruck getConcreteTruck() {
         return concreteTruck;
@@ -38,21 +46,8 @@ public class ConcreteTruckResource extends MultiTenancyEntity {
         this.concreteTruck = concreteTruck;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    @SuppressWarnings("unused")
-    private void setState(String state) {
-        this.state = state;
-    }
-
-    public List<ServiceOrder> getServiceOrders() {
-        return serviceOrders;
-    }
-
-    public void setServiceOrders(List<ServiceOrder> serviceOrders) {
-        this.serviceOrders = serviceOrders;
+    public List<IVehicleScheduleOrder> getScheduleOrdersQueue() {
+        return incompleteScheduleOrders;
     }
 
     public Timestamp getConfirmedDate() {
@@ -61,5 +56,24 @@ public class ConcreteTruckResource extends MultiTenancyEntity {
 
     public void setConfirmedDate(Timestamp confirmedDate) {
         this.confirmedDate = confirmedDate;
+    }
+
+    @Transition(ConcreteTruckResourceLifecycleMeta.Transitions.Assign.class)
+    public void assignOrder(IVehicleScheduleOrder serviceOrder) {
+        this.incompleteScheduleOrders.add(serviceOrder);
+        //return incompleteScheduleOrders.size();
+    }
+
+    @Transition(ConcreteTruckResourceLifecycleMeta.Transitions.Release.class)
+    public void finishOrder() {
+        this.incompleteScheduleOrders.remove(0);
+    }
+
+    @Transition(ConcreteTruckResourceLifecycleMeta.Transitions.Detach.class)
+    public void detach() {}
+
+    @StateIndicator
+    public String getState() {
+        return this.state;
     }
 }

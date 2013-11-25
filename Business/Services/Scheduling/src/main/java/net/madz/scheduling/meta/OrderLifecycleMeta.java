@@ -20,33 +20,20 @@ public interface OrderLifecycleMeta {
         @Initial
         @Functions(
                 value = { @Function(transition = Start.class, value = { Ongoing.class }), @Function(transition = Cancel.class, value = { Cancelled.class }) })
-        public static class Created {
-        }
-
+        public static class Draft {}
         @Functions(value = { @Function(transition = Finish.class, value = { Finished.class }),
                 @Function(transition = Cancel.class, value = { Cancelled.class }) })
-        public static class Ongoing {
-        }
-
+        public static class Ongoing {}
         @End
-        public static class Finished {
-        }
-
+        public static class Finished {}
         @End
-        public static class Cancelled {
-        }
+        public static class Cancelled {}
     }
-
     @TransitionSet
     public static class Transitions {
 
-        public static class Start {
-        }
-
-        public static class Finish {
-        }
-
-        public static class Cancel {
-        }
+        public static class Start {}
+        public static class Finish {}
+        public static class Cancel {}
     }
 }

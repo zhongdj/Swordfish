@@ -2,19 +2,15 @@ package net.madz.scheduling.biz;
 
 import java.util.Date;
 
-import net.madz.core.biz.BOProxy;
-import net.madz.core.biz.IBizObject;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.scheduling.biz.impl.ServiceOrderBO;
-import net.madz.scheduling.entities.ServiceOrder;
 import net.madz.scheduling.meta.PlantScheduleOrderLifecycleMeta;
 
-//@StateMachine(states = @StateSet(States.class), transitions = @TransitionSet(Transitions.class))
-@BOProxy(ServiceOrderBO.class)
 @LifecycleMeta(value = PlantScheduleOrderLifecycleMeta.class)
-public interface IPlantScheduleOrder extends IBizObject<ServiceOrder> {
+public interface IPlantScheduleOrder {
+
+    long getId();
 
     /* NON-TRANSITION Methods */
     String getPlantName();
@@ -24,8 +20,6 @@ public interface IPlantScheduleOrder extends IBizObject<ServiceOrder> {
     Date getProductionFinishedOn();
 
     Date getCreatedOn();
-
-    String getCreatedBy();
 
     /** Transition methods **/
     @Transition(PlantScheduleOrderLifecycleMeta.Transitions.Start.class)

@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Version;
 
 import net.madz.core.annotations.EntityAnnotationProcessor;
 import net.madz.core.annotations.ExtendEntityAnnotationProcessor;
@@ -32,6 +33,8 @@ public abstract class AbstractBaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     protected long id;
+    @Version
+    protected long version;
 
     public long getId() {
         return id;
