@@ -162,7 +162,10 @@ public class JavaAnonymousInnerClass {
 
     private void doGenerateMethods(ClassGen cgen) throws ClassNotFoundException {
         createCall(cgen);
-        createBridgeCall(cgen);
+        final Type returnType = lookupEnclosingMethodReturnType();
+        if ( !returnType.equals(new ObjectType(Object.class.getName())) ) {
+            createBridgeCall(cgen);
+        }
     }
 
     private void createBridgeCall(ClassGen cgen) throws ClassNotFoundException {
