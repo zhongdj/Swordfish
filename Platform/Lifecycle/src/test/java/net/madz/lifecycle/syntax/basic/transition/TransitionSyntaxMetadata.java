@@ -1,5 +1,7 @@
 package net.madz.lifecycle.syntax.basic.transition;
 
+import java.io.Serializable;
+
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
@@ -56,6 +58,68 @@ public class TransitionSyntaxMetadata extends BaseMetaDataTest {
                     return S1_State_C.class;
                 }
             }
+        }
+    }
+    @StateMachine
+    public static interface NegativeOrder {
+
+        @StateSet
+        public static interface States {
+
+            @Initial
+            @Function(transition = NegativeOrder.Transitions.Pay.class, value = { Paid.class })
+            public static interface New {}
+            @Function(transition = NegativeOrder.Transitions.Deliver.class, value = { Delivered.class })
+            public static interface Paid {}
+            @End
+            public static interface Delivered {}
+        }
+        @TransitionSet
+        public static interface Transitions {
+
+            public static interface Pay extends Serializable {}
+            public static interface Deliver {}
+        }
+    }
+    @StateMachine
+    public static interface Order {
+
+        @StateSet
+        public static interface States {
+
+            @Initial
+            @Function(transition = Order.Transitions.Pay.class, value = { Paid.class })
+            public static interface New {}
+            @Function(transition = Order.Transitions.Deliver.class, value = { Delivered.class })
+            public static interface Paid {}
+            @End
+            public static interface Delivered {}
+        }
+        @TransitionSet
+        public static interface Transitions {
+
+            public static interface Pay {}
+            public static interface Deliver {}
+        }
+    }
+    @StateMachine
+    public static interface NegativeBigProductOrder extends Order {
+
+        @StateSet
+        public static interface States extends Order.States {
+
+            @Initial
+            @Function(transition = NegativeBigProductOrder.Transitions.Pay.class, value = { States.Paid.class })
+            public static interface New {}
+            @Function(transition = NegativeBigProductOrder.Transitions.Deliver.class, value = { States.Delivered.class })
+            public static interface Paid {}
+            @End
+            public static interface Delivered {}
+        }
+        @TransitionSet
+        public static interface Transitions extends Order.Transitions {
+
+            public static interface Pay extends NegativeOrder.Transitions.Pay {}
         }
     }
 }
