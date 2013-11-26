@@ -34,6 +34,7 @@ public abstract class Interceptor<V, R> {
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("intercepting with:" + getClass().getName() + " @handleException");
         }
+        logger.log(Level.SEVERE, e.getMessage(), e);
         if ( e instanceof RuntimeException ) {
             throw (RuntimeException) e;
         } else {

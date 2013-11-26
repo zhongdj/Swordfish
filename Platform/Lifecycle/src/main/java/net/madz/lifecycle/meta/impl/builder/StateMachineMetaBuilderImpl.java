@@ -12,6 +12,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
+import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.StateMachine;
 import net.madz.lifecycle.annotations.StateSet;
 import net.madz.lifecycle.annotations.TransitionSet;
@@ -282,6 +283,8 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
         if ( null != superMetadataClass.getAnnotation(End.class) ) {
             return true;
         } else if ( null != superMetadataClass.getAnnotation(Function.class) ) {
+            return true;
+        } else if ( null != superMetadataClass.getAnnotation(Functions.class) ) {
             return true;
         }
         return false;
@@ -604,7 +607,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     protected void verifySuper(Class<?> clazz) throws VerificationException {
         if ( !clazz.isInterface() && null != clazz.getSuperclass() ) {
             final Class<?> superclass = clazz.getSuperclass();
-            if ( !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
+            if ( !isComposite() && !Object.class.equals(superclass) && null == superclass.getAnnotation(StateMachine.class) ) {
                 throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, superclass);
             }
         } else if ( clazz.isInterface() && clazz.getInterfaces().length > 0 ) {
@@ -615,7 +618,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
             if ( isComposite() ) {
                 //
             } else if ( null == clz.getAnnotation(StateMachine.class) ) {
-                throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, new Object[] { clz.getName() });
+                throw newVerificationException(clazz.getName(), SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, clz);
             }
         }
     }
@@ -838,7 +841,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
 
     @Override
     protected StateMachineMetadata findSuper(Class<?> metaClass) throws VerificationException {
-        return registry.loadStateMachineMetadata(metaClass, null);
+        return registry.loadStateMachineMetadata(metaClass);
     }
 
     @Override

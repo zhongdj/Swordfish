@@ -1,5 +1,7 @@
 package net.madz.bcel.intercept;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,12 +10,15 @@ import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
-import net.madz.lifecycle.SyntaxErrors;
+import net.madz.lifecycle.annotations.Null;
+import net.madz.lifecycle.annotations.ReactiveObject;
+import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.impl.LifecycleContextImpl;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
+import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 
 public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
@@ -22,21 +27,55 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?, ?> context) {
         try {
-            return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getTarget().getClass());
+            return AbsStateMachineRegistry.getInstance().loadStateMachineObject(extractLifecycleMetaClass(context));
         } catch (VerificationException e) {
-            logger.warning(e.getMessage());
-            if ( e.getVerificationFailureSet().size() == 1
-                    && SyntaxErrors.REGISTERED_META_ERROR.equals(e.getVerificationFailureSet().iterator().next().getErrorCode())
-                    && context.getKlass() != context.getTarget().getClass() ) {
-                try {
-                    return AbsStateMachineRegistry.getInstance().loadStateMachineObject(context.getKlass());
-                } catch (VerificationException e1) {
-                    throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e1);
+            throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+        }
+    }
+
+    private static Class<? extends Object> extractLifecycleMetaClass(InterceptContext<?, ?> context) {
+        if ( null != context.getTarget().getClass().getAnnotation(ReactiveObject.class) ) {
+            Method method = context.getMethod();
+            Object target = context.getTarget();
+            Class<?> lifecycleMetaClass = findLifecycleMetaClass(target.getClass(), method);
+            return lifecycleMetaClass;
+        } else {
+            return context.getTarget().getClass();
+        }
+    }
+
+    private static Class<?> findLifecycleMetaClass(final Class<?> implClass, final Method method) {
+        final Transition transition = method.getAnnotation(Transition.class);
+        if ( Null.class == transition.value() ) {
+            throw new IllegalStateException("With @ReactiveObject, transition.value has to be explicitly specified.");
+        } else {
+            return scanMethodsOnClasses(implClass.getInterfaces(), method);
+        }
+    }
+
+    public static Class<?> scanMethodsOnClasses(Class<?>[] klasses, final Method method) {
+        if ( 0 == klasses.length ) throw new IllegalArgumentException();
+        final ArrayList<Class<?>> superclasses = new ArrayList<Class<?>>();
+        for ( final Class<?> klass : klasses ) {
+            if ( klass == Object.class ) continue;
+            try {
+                Method tmpMethod = klass.getMethod(method.getName(), method.getParameterTypes());
+                final Transition transition = method.getAnnotation(Transition.class);
+                final Transition tmpTransition = tmpMethod.getAnnotation(Transition.class);
+                if ( transition.value() == tmpTransition.value()
+                        || ( tmpTransition.value() == Null.class && transition.value().getSimpleName()
+                                .equalsIgnoreCase(StringUtil.toUppercaseFirstCharacter(method.getName())) ) ) {
+                    return klass;
                 }
-            } else {
-                throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+            } catch (NoSuchMethodException e) {}
+            if ( null != klass.getSuperclass() && Object.class != klass ) {
+                superclasses.add(klass.getSuperclass());
+            }
+            for ( Class<?> interfaze : klass.getInterfaces() ) {
+                superclasses.add(interfaze);
             }
         }
+        return scanMethodsOnClasses(superclasses.toArray(new Class<?>[superclasses.size()]), method);
     }
 
     public LifecycleInterceptor(Interceptor<V, R> next) {

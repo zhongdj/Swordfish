@@ -172,8 +172,8 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         }
     }
 
-    private boolean isMetaTypeRegistered(Class<?> clazz) {
-        return null != getStateMachineMeta(clazz);
+    private boolean isMetaTypeRegistered(Object key) {
+        return null != getStateMachineMeta(key);
     }
 
     public synchronized void addInstance(Class<?> clazz, StateMachineObject<?> stateMachine) {
@@ -183,12 +183,17 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
 
     public synchronized void addTemplate(final StateMachineMetadata metaData) {
         for ( Object key : metaData.getKeySet() ) {
-            StateMachineMetadata existedStateMachine = typeMap.get(key);
-            if ( typeMap.containsKey(key) && existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
-                throw new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
-                        + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
+            StateMachineMetadata existedStateMachine = getStateMachineMeta(key);
+            if ( isMetaTypeRegistered(key) ) {
+                if ( !existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
+                    new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
+                            + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
+                } else {
+                    continue;
+                }
+            } else {
+                typeMap.put(key, metaData);
             }
-            typeMap.put(key, metaData);
         }
     }
 
@@ -248,6 +253,7 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
         return null;
     }
 
+    @Override
     public StateMachineMetadata loadStateMachineMetadata(Class<?> stateMachineClass) throws VerificationException {
         return loadStateMachineMetadata(stateMachineClass, null);
     }

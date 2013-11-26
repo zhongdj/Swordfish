@@ -218,7 +218,13 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void configurePropertyAccessor(Class<?> klass, Method getter) {
         final String setterName = convertSetterName(getter.getName(), getter.getReturnType());
-        final Method setter = findMethod(klass, setterName, getter.getReturnType());
+        final Setter setter;
+        if ( klass.isInterface() ) {
+            setter = new LazySetterImpl<>(getter);
+        } else {
+            final Method setterMethod = findMethod(klass, setterName, getter.getReturnType());
+            setter = new EagerSetterImpl<>(setterMethod);
+        }
         if ( String.class.equals(getter.getReturnType()) ) {
             this.stateAccessor = new PropertyAccessor<String>(getter, setter);
         } else {
@@ -1333,7 +1339,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void validateInboundWhiles(InterceptContext<?,?> context) {
+    public void validateInboundWhiles(InterceptContext<?, ?> context) {
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();

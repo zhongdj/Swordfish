@@ -77,9 +77,9 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
     public final static class PropertyAccessor<T> implements StateAccessor<T> {
 
         private final Method getter;
-        private final Method setter;
+        private final Setter setter;
 
-        public PropertyAccessor(Method getter, Method setter) {
+        public PropertyAccessor(Method getter, Setter setter) {
             this.getter = getter;
             this.setter = setter;
         }
@@ -96,6 +96,31 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
         @Override
         public void write(Object reactiveObject, T state) {
+            // try {
+            // setter.setAccessible(true);
+            setter.invoke(reactiveObject, state);
+            // } catch (IllegalAccessException | IllegalArgumentException |
+            // InvocationTargetException e) {
+            // throw new IllegalStateException(e);
+            // } finally {
+            // setter.setAccessible(false);
+            // }
+        }
+    }
+    public static interface Setter<T> {
+
+        void invoke(Object reactiveObject, T state);
+    }
+    public static class EagerSetterImpl<T> implements Setter<T> {
+
+        private final Method setter;
+
+        public EagerSetterImpl(Method setter) {
+            this.setter = setter;
+        }
+
+        @Override
+        public void invoke(Object reactiveObject, T state) {
             try {
                 setter.setAccessible(true);
                 setter.invoke(reactiveObject, state);
@@ -104,6 +129,51 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
             } finally {
                 setter.setAccessible(false);
             }
+        }
+    }
+    public static class LazySetterImpl<T> implements Setter<T> {
+
+        private final Method getter;
+        private volatile Method setterMethod;
+
+        public LazySetterImpl(Method getter) {
+            this.getter = getter;
+        }
+
+        @Override
+        public void invoke(Object reactiveObject, T state) {
+            if ( null == setterMethod ) {
+                synchronized (this) {
+                    if ( null == setterMethod ) {
+                        setterMethod = findSetter(reactiveObject);
+                    }
+                }
+            }
+            try {
+                setterMethod.setAccessible(true);
+                setterMethod.invoke(reactiveObject, state);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new IllegalStateException(e);
+            } finally {
+                setterMethod.setAccessible(false);
+            }
+        }
+
+        private Method findSetter(Object reactiveObject) {
+            final String setterName = "set" + getter.getName().substring(3);
+            Method setter = null;
+            for ( Class<?> rawClass = reactiveObject.getClass(); null == setter && rawClass != Object.class; rawClass = rawClass.getSuperclass() ) {
+                try {
+                    setter = rawClass.getDeclaredMethod(setterName, getter.getReturnType());
+                    break;
+                } catch (NoSuchMethodException | SecurityException e) {
+                    continue;
+                }
+            }
+            if ( null == setter ) {
+                throw new IllegalStateException("state setter method: " + setterName + " Cannot be found through class: " + reactiveObject.getClass());
+            }
+            return setter;
         }
     }
     public final static class ConverterAccessor<T> implements StateAccessor<String> {

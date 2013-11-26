@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CallableInterceptor<V ,R> extends Interceptor<V, R> {
+public class CallableInterceptor<V, R> extends Interceptor<V, R> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
@@ -16,6 +16,7 @@ public class CallableInterceptor<V ,R> extends Interceptor<V, R> {
             }
             return callable.call();
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
             if ( e instanceof RuntimeException ) {
                 throw (RuntimeException) e;
             } else {

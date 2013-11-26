@@ -50,7 +50,7 @@ public abstract class ObjectBuilderBase<SELF extends MetaObject<SELF, TYPE>, PAR
         return this;
     }
 
-    protected void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet, final MethodScanner scanner) {
+    public static void scanMethodsOnClasses(Class<?>[] klasses, final VerificationFailureSet failureSet, final MethodScanner scanner) {
         if ( 0 == klasses.length ) return;
         final ArrayList<Class<?>> superclasses = new ArrayList<Class<?>>();
         for ( Class<?> klass : klasses ) {

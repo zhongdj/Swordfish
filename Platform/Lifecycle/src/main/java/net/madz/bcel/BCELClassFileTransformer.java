@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.madz.lifecycle.annotations.LifecycleMeta;
+import net.madz.lifecycle.annotations.ReactiveObject;
 import net.madz.lifecycle.annotations.Transition;
 
 import org.apache.bcel.classfile.AnnotationEntry;
@@ -28,6 +29,7 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
     private static final Logger log = Logger.getLogger("Lifecycle Framework Byte Code Transformer");
     public static final String TRANSITION_ANNOTATION_TYPE = "L" + Transition.class.getName().replaceAll("\\.", "/") + ";";
     public static final String LIFECYLEMETA_ANNOTATION_TYPE = "L" + LifecycleMeta.class.getName().replaceAll("\\.", "/") + ";";
+    public static final String REACTIVE_ANNOTATION_TYPE = "L" + ReactiveObject.class.getName().replaceAll("\\.", "/") + ";";
     private String[] ignoredPackages = new String[] { "java.", "javax.", "sun.", "org." };
 
     @Override
@@ -91,6 +93,8 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
         boolean foundLifecycleMeta = false;
         for ( final AnnotationEntry annotationEntry : annotationEntries ) {
             if ( LIFECYLEMETA_ANNOTATION_TYPE.equals(annotationEntry.getAnnotationType()) ) {
+                foundLifecycleMeta = true;
+            } else if ( REACTIVE_ANNOTATION_TYPE.equals(annotationEntry.getAnnotationType()) ) {
                 foundLifecycleMeta = true;
             }
         }
