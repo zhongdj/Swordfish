@@ -117,13 +117,18 @@ public class ServiceSummaryPlan extends OrderBase implements VolumeMeasurable {
 
     @Transition(CreateServiceOrder.class)
     public IServiceOrder createServiceOrder(MixingPlantResource plantResource, ConcreteTruckResource truckResource, double volume) {
+        IServiceOrder order = createServiceOrder();
+        order.configureResources(this, plantResource, truckResource, volume);
+        return order;
+    }
+
+    private IServiceOrder createServiceOrder() {
         final ServiceOrder serviceOrder = new ServiceOrder();
         serviceOrder.setCreatedBy(UserSession.getUserSession().getUser());
         final Date time = new Date();
         serviceOrder.setCreatedOn(time);
         serviceOrder.setUpdatedBy(UserSession.getUserSession().getUser());
         serviceOrder.setUpdatedOn(time);
-        serviceOrder.configureResources(this, plantResource, truckResource, volume);
         return serviceOrder;
     }
 

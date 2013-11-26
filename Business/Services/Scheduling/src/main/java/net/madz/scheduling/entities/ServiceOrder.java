@@ -17,7 +17,9 @@ import net.madz.common.entities.Additive;
 import net.madz.common.entities.Address;
 import net.madz.contract.spec.entities.PouringPartSpec;
 import net.madz.customer.entities.Contact;
+import net.madz.lifecycle.annotations.ReactiveObject;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.scheduling.biz.IPlantScheduleOrder;
 import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;
@@ -27,6 +29,7 @@ import net.madz.scheduling.meta.VehicleScheduleOrderLifecycleMeta;
 
 @Entity
 @Table(name = "service_order")
+@ReactiveObject
 public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantScheduleOrder, IVehicleScheduleOrder {
 
     private static final long serialVersionUID = -6118079224654228286L;
@@ -81,10 +84,18 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     private String plantScheduleOrderState = PlantScheduleOrderLifecycleMeta.States.Created.class.getSimpleName();
     @Column(name = "SERVICE_ORDER_STATE", nullable = false, updatable = true)
     private String state = ServiceOrderLifecycleMeta.States.Draft.class.getSimpleName();
+    @Column(name = "PLANT_CANCELED_ON", nullable = true, updatable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date plantCanceledOn;
 
     @Override
     public String getState() {
         return state;
+    }
+
+    @SuppressWarnings("unused")
+    private void setState(String state) {
+        this.state = state;
     }
 
     public PouringPartSpec getSpec() {
@@ -108,7 +119,9 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     }
 
     @Transition(ServiceOrderLifecycleMeta.Transitions.Start.class)
-    public void configureResources(ServiceSummaryPlan serviceSummaryPlan, MixingPlantResource plantResource, ConcreteTruckResource truckResource, double volume) {
+    public void configureResources(@Relation(ServiceOrderLifecycleMeta.Relations.SummaryPlan.class) ServiceSummaryPlan serviceSummaryPlan,
+            @Relation(ServiceOrderLifecycleMeta.Relations.PlantResource.class) MixingPlantResource plantResource,
+            @Relation(ServiceOrderLifecycleMeta.Relations.ConcreteTruckResource.class) ConcreteTruckResource truckResource, double volume) {
         {
             this.setSummaryPlan(serviceSummaryPlan);
             this.spec = summaryPlan.getSpec();
@@ -218,6 +231,11 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
         return this.vehicleScheduleOrderState;
     }
 
+    @SuppressWarnings("unused")
+    private void setVehicleScheduleOrderState(String state) {
+        this.vehicleScheduleOrderState = state;
+    }
+
     @Override
     public String getPlantName() {
         return this.mixingPlantResource.getMixingPlant().getName();
@@ -247,4 +265,28 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     public String getPlantScheduleOrderState() {
         return this.plantScheduleOrderState;
     }
+
+    @SuppressWarnings("unused")
+    private void setPlantScheduleOrderState(String state) {
+        this.plantScheduleOrderState = state;
+    }
+
+    @Override
+    @Transition(PlantScheduleOrderLifecycleMeta.Transitions.Cancel.class)
+    public void cancelPlantOrder() {
+        this.plantCanceledOn = new Date();
+    }
+
+    @Override
+    public IServiceOrder getServiceOrder() {
+        return this;
+    }
+
+    @Override
+    public ConcreteTruckResource getConcreteTruckResource() {
+        return this.truckResource;
+    }
+
+    @Override
+    public void doFinishVehicalOrder() {}
 }

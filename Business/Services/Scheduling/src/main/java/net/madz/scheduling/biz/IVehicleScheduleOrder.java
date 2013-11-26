@@ -7,6 +7,8 @@ import net.madz.customer.entities.Contact;
 import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
+import net.madz.lifecycle.annotations.relation.Relation;
+import net.madz.scheduling.entities.ConcreteTruckResource;
 import net.madz.scheduling.meta.VehicleScheduleOrderLifecycleMeta;
 
 @LifecycleMeta(value = VehicleScheduleOrderLifecycleMeta.class)
@@ -39,18 +41,27 @@ public interface IVehicleScheduleOrder {
     @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Start.class)
     void doLoad();
 
-    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.DoTransport.class)
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoTransport.class)
     void doTransport();
 
-    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.DoConstruct.class)
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoConstruct.class)
     void doConstruct();
 
-    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Finish.class)
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoFinish.class)
     void doComplete();
+
+    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Finish.class)
+    void doFinishVehicalOrder();
 
     @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Cancel.class)
     void doAbortOnVehicleScheduleOrder();
 
     @StateIndicator
     String getVehicleScheduleOrderState();
+
+    @Relation(VehicleScheduleOrderLifecycleMeta.Relations.ServiceOrder.class)
+    IServiceOrder getServiceOrder();
+
+    @Relation(VehicleScheduleOrderLifecycleMeta.Relations.ConcreteTruckResource.class)
+    ConcreteTruckResource getConcreteTruckResource();
 }
