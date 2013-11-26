@@ -139,8 +139,13 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
 
     @Override
     protected void verifySuper(Class<?> metaClass) throws VerificationException {
-        if (!parent.hasSuper()) {
-            throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_EXTENDS_NON_TRANSITION, metaClass, getSuperMetaClass(metaClass));
+        if ( !parent.hasSuper() ) {
+            throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_ILLEGAL_EXTENTION, metaClass, getSuperMetaClass(metaClass));
+        } else {
+            if ( !parent.getSuper().hasTransition(getSuperMetaClass(metaClass)) ) {
+                throw newVerificationException(getDottedPath(), SyntaxErrors.TRANSITION_EXTENED_TRANSITION_CAN_NOT_FOUND_IN_SUPER_STATEMACHINE, metaClass,
+                        getSuperMetaClass(metaClass), parent.getSuper().getPrimaryKey());
+            }
         }
     }
 

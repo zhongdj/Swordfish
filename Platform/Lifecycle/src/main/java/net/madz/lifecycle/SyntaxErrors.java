@@ -82,7 +82,13 @@ public interface SyntaxErrors {
      * @param {0} Transition class
      * @param {1} Transition class' super class or interface
      */
-    public static final String TRANSITION_EXTENDS_NON_TRANSITION = "002-2504";
+    public static final String TRANSITION_ILLEGAL_EXTENTION = "002-2504";
+    /**
+     * @param {0} Transition class
+     * @param {1} Transition class' super class or interface
+     * @param {2} Super state machine class
+     */
+    public static final String TRANSITION_EXTENED_TRANSITION_CAN_NOT_FOUND_IN_SUPER_STATEMACHINE = "002-2505";
     // State's Function
     public static final String FUNCTION_INVALID_TRANSITION_REFERENCE = "002-2610";
     public static final String FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION = "002-2611";
