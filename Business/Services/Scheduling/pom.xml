@@ -120,7 +120,7 @@
 						<configuration>
 							<tasks>
 								<java classname="org.eclipse.persistence.tools.weaving.jpa.StaticWeave"
-									classpathref="maven.runtime.classpath" fork="true">
+									classpathref="maven.compile.classpath" fork="true">
 									<arg
 										line="-loglevel FINE -persistenceinfo src/main/resources target/classes target/classes" />
 								</java>
