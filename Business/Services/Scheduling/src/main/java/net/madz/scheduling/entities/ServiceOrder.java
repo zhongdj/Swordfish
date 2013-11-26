@@ -88,6 +88,13 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     @Temporal(TemporalType.TIMESTAMP)
     private Date plantCanceledOn;
 
+    protected ServiceOrder() {}
+
+    public ServiceOrder(ServiceSummaryPlan parent) {
+        parent.addResourceAllocatedTask(this);
+        this.summaryPlan = parent;
+    }
+
     @Override
     public String getState() {
         return state;
@@ -119,11 +126,9 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     }
 
     @Transition(ServiceOrderLifecycleMeta.Transitions.Start.class)
-    public void configureResources(@Relation(ServiceOrderLifecycleMeta.Relations.SummaryPlan.class) ServiceSummaryPlan serviceSummaryPlan,
-            @Relation(ServiceOrderLifecycleMeta.Relations.PlantResource.class) MixingPlantResource plantResource,
+    public void configureResources(@Relation(ServiceOrderLifecycleMeta.Relations.PlantResource.class) MixingPlantResource plantResource,
             @Relation(ServiceOrderLifecycleMeta.Relations.ConcreteTruckResource.class) ConcreteTruckResource truckResource, double volume) {
         {
-            this.setSummaryPlan(serviceSummaryPlan);
             this.spec = summaryPlan.getSpec();
             this.truckResource = truckResource;
             this.mixingPlantResource = plantResource;
@@ -141,14 +146,6 @@ public class ServiceOrder extends OrderBase implements IServiceOrder, IPlantSche
     @Transition(ServiceOrderLifecycleMeta.Transitions.Cancel.class)
     public void cancel() {
         this.canceledOn = new Date();
-    }
-
-    private void setSummaryPlan(ServiceSummaryPlan summaryPlan) {
-        if ( null != this.summaryPlan && null == summaryPlan ) {
-            this.summaryPlan.removeResourceAllocatedTask(this);
-        }
-        this.summaryPlan = summaryPlan;
-        this.summaryPlan.addResourceAllocatedTask(this);
     }
 
     @Override

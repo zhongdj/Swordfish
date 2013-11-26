@@ -78,6 +78,7 @@ public class OperationBeanTestBase {
         System.out.println(result.getOutput());
         deployer = glassfish.getDeployer();
         appName = deployer.deploy(uri);
+        System.out.println(appName);
     }
 
     protected static URI createScatteredArchive(String appName, String moduleName) throws IOException {

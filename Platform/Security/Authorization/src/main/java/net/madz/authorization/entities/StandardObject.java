@@ -15,6 +15,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import net.madz.authorization.interceptor.UserSession;
 import net.madz.core.entities.AbstractBaseEntity;
 
 /**
@@ -80,5 +81,17 @@ public abstract class StandardObject extends AbstractBaseEntity {
 
     public void setUpdatedOn(Date updatedOn) {
         this.updatedOn = updatedOn;
+    }
+
+    public void init() {
+        this.createdOn = new Date();
+        this.createdBy = UserSession.getUserSession().getUser();
+        this.updatedOn = this.createdOn;
+        this.updatedBy = UserSession.getUserSession().getUser();
+    }
+
+    public void touch() {
+        this.updatedOn = new Date();
+        this.updatedBy = UserSession.getUserSession().getUser();
     }
 }

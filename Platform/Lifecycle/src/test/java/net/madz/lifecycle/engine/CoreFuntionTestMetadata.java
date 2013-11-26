@@ -1,10 +1,7 @@
 package net.madz.lifecycle.engine;
 
 import java.util.Date;
-import java.util.concurrent.Callable;
 
-import net.madz.bcel.intercept.InterceptContext;
-import net.madz.bcel.intercept.InterceptorController;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.LifecycleMeta;

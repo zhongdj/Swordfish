@@ -18,8 +18,7 @@ public interface IServiceOrder {
 
     /** Transition methods **/
     @Transition(ServiceOrderLifecycleMeta.Transitions.Start.class)
-    void configureResources(@Relation(ServiceOrderLifecycleMeta.Relations.SummaryPlan.class) ServiceSummaryPlan summaryPlan,
-            @Relation(ServiceOrderLifecycleMeta.Relations.PlantResource.class) MixingPlantResource plantResource,
+    void configureResources(@Relation(ServiceOrderLifecycleMeta.Relations.PlantResource.class) MixingPlantResource plantResource,
             @Relation(ServiceOrderLifecycleMeta.Relations.ConcreteTruckResource.class) ConcreteTruckResource truckResource, double volume);
 
     @Transition(Finish.class)

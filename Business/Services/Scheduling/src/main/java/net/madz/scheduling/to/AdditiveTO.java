@@ -1,23 +1,23 @@
 package net.madz.scheduling.to;
 
+import java.io.Serializable;
+
 import org.eclipse.persistence.oxm.annotations.XmlPath;
 
 import net.madz.binding.annotation.Binding;
 
-public class AdditiveTO {
+public class AdditiveTO implements Serializable {
 
+    private static final long serialVersionUID = 1232904967875589665L;
     @XmlPath("id/text()")
     @Binding(name = "id")
     private Long additiveId;
-
     @XmlPath("name/text()")
     @Binding(name = "name")
     private String additiveName;
-
     @XmlPath("pinyinAbbrName/text()")
     @Binding(name = "pinyinAbbrName")
     private String additivePinyinAbbrName;
-
     @XmlPath("code/text()")
     @Binding(name = "code")
     private String additiveCode;

@@ -77,9 +77,9 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
     public final static class PropertyAccessor<T> implements StateAccessor<T> {
 
         private final Method getter;
-        private final Setter setter;
+        private final Setter<T> setter;
 
-        public PropertyAccessor(Method getter, Setter setter) {
+        public PropertyAccessor(Method getter, Setter<T> setter) {
             this.getter = getter;
             this.setter = setter;
         }
