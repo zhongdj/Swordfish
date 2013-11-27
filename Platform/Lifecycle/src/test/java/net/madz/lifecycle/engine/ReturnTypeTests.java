@@ -1,9 +1,7 @@
 package net.madz.lifecycle.engine;
 
-import java.util.concurrent.Callable;
-
-import net.madz.bcel.intercept.InterceptContext;
-import net.madz.bcel.intercept.InterceptorController;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
 import net.madz.lifecycle.annotations.LifecycleMeta;
@@ -17,8 +15,6 @@ import net.madz.lifecycle.engine.ReturnTypeTests.ReturnTypeStateMachine.Transiti
 import net.madz.lifecycle.engine.ReturnTypeTests.ReturnTypeStateMachine.Transitions.JustDoIt;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ReturnTypeTests extends EngineTestBase {
 
@@ -97,23 +93,25 @@ public class ReturnTypeTests extends EngineTestBase {
 
         @Transition(FinishThis.class)
         public void doFinish() {}
-
-        public Object doObject() {
-            InterceptorController<ReturnTypes, Object> controller = new InterceptorController<>();
-            InterceptContext<ReturnTypes, Object> context = new InterceptContext<ReturnTypeTests.ReturnTypes, Object>(ReturnTypes.class, this, "doObject",
-                    new Class[0], new Object[0]);
-            return controller.exec(context, new Callable<Object>() {
-
-                @Override
-                public Object call() throws Exception {
-                    return doObject$Impl();
-                }
-            });
-        }
-
-        public Object doObject$Impl() {
-            return new Object();
-        }
+        // public Object doObject() {
+        // InterceptorController<ReturnTypes, Object> controller = new
+        // InterceptorController<>();
+        // InterceptContext<ReturnTypes, Object> context = new
+        // InterceptContext<ReturnTypeTests.ReturnTypes,
+        // Object>(ReturnTypes.class, this, "doObject",
+        // new Class[0], new Object[0]);
+        // return controller.exec(context, new Callable<Object>() {
+        //
+        // @Override
+        // public Object call() throws Exception {
+        // return doObject$Impl();
+        // }
+        // });
+        // }
+        //
+        // public Object doObject$Impl() {
+        // return new Object();
+        // }
     }
 
     @Test
