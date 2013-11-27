@@ -158,9 +158,23 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
         try {
             order.pay();
         } catch (LifecycleException e) {
-            assertLifecycleError(e, LifecycleCommonErrors.RELATION_TARGET_IS_NULL, OrderValidWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class,
-                    "nullable = false", OrderValidWhileNotNullableLifecycleMeta.States.Draft.class );
-            
+            assertLifecycleError(e, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL,
+                    OrderValidWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class, "nullable = false",
+                    OrderValidWhileNotNullableLifecycleMeta.States.Draft.class);
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_inboundwhile_not_nullable_true() {
+        MemberShip memberShip = null;
+        OrderInboundWhileNotNullable order = new OrderInboundWhileNotNullable(memberShip);
+        assertState(OrderInboundWhileNotNullableLifecycleMeta.States.Draft.class, order);
+        try {
+            order.pay();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.INBOUND_WHILE_RELATION_TARGET_IS_NULL,
+                    OrderInboundWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class, "nullable = false",
+                    OrderInboundWhileNotNullableLifecycleMeta.States.Draft.class);
         }
     }
 }

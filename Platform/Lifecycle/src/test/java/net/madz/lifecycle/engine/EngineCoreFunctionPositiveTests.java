@@ -104,4 +104,13 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         order.pay();
         assertState(OrderValidWhileNullableLifecycleMeta.States.Paid.class, order);
     }
+
+    @Test
+    public void test_inboundwhile_nullable_true() {
+        MemberShip memberShip = null;
+        OrderInboundWhileNullable order = new OrderInboundWhileNullable(memberShip);
+        assertState(OrderInboundWhileNullableLifecycleMeta.States.Draft.class, order);
+        order.pay();
+        assertState(OrderInboundWhileNullableLifecycleMeta.States.Paid.class, order);
+    }
 }

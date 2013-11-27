@@ -918,4 +918,82 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             }
         }
     }
+    @StateMachine
+    static interface OrderInboundWhileNullableLifecycleMeta {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { Paid.class })
+            static interface Draft {}
+            @End
+            @InboundWhile(on = { MemberShipLifecycleMeta.States.Active.class }, relation = Relations.MemberShipRelation.class, nullable = true)
+            static interface Paid {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Pay {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(MemberShipLifecycleMeta.class)
+            static interface MemberShipRelation {}
+        }
+    }
+    @StateMachine
+    static interface OrderInboundWhileNotNullableLifecycleMeta {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { Paid.class })
+            static interface Draft {}
+            @End
+            @InboundWhile(on = { MemberShipLifecycleMeta.States.Active.class }, relation = Relations.MemberShipRelation.class, nullable = false)
+            static interface Paid {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Pay {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(MemberShipLifecycleMeta.class)
+            static interface MemberShipRelation {}
+        }
+    }
+    @LifecycleMeta(OrderInboundWhileNullableLifecycleMeta.class)
+    public static class OrderInboundWhileNullable extends ReactiveObject {
+
+        @Relation(OrderInboundWhileNullableLifecycleMeta.Relations.MemberShipRelation.class)
+        private MemberShip memberShip;
+
+        @Transition
+        public void pay() {}
+
+        public OrderInboundWhileNullable(MemberShip memberShip) {
+            this.memberShip = memberShip;
+            this.initialState(OrderInboundWhileNullableLifecycleMeta.States.Draft.class.getSimpleName());
+        }
+    }
+    @LifecycleMeta(OrderInboundWhileNotNullableLifecycleMeta.class)
+    public static class OrderInboundWhileNotNullable extends ReactiveObject {
+
+        @Relation(OrderInboundWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class)
+        private MemberShip memberShip;
+
+        @Transition
+        public void pay() {}
+
+        public OrderInboundWhileNotNullable(MemberShip memberShip) {
+            this.memberShip = memberShip;
+            this.initialState(OrderInboundWhileNotNullableLifecycleMeta.States.Draft.class.getSimpleName());
+        }
+    }
 }
