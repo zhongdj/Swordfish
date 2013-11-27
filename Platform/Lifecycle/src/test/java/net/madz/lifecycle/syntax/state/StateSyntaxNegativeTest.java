@@ -9,15 +9,14 @@ import net.madz.lifecycle.annotations.state.ShortCut;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS2.States.NCS2_B.CStates.NCS2_CC;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.States.NCS3_B.CStates.NCS3_CC;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CStates.NCS4_CC;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CStates.NSC1_CB;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.States.A;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.C;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S2.States.D;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.States.E;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.Transitions.Y;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S5.states.S5_A;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.States.SC1_C;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.TransitionReferencedInTwoCompositeStates.States.S3;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -52,8 +51,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE,
-                    C.class.getAnnotation(Function.class), C.class.getName(),
-                    net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class.getName());
+                    C.class.getAnnotation(Function.class), C.class, net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S1.Transitions.X.class);
             throw e;
         }
     }
@@ -93,23 +91,6 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_composite_state_with_reference_transition_beyond_scope() throws VerificationException {
-        @LifecycleRegistry(NSC1.class)
-        @StateMachineBuilder
-        class Registry extends AbsStateMachineRegistry {
-
-            protected Registry() throws VerificationException {}
-        }
-        try {
-            new Registry();
-        } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE,
-                    NSC1_CB.class.getAnnotation(Function.class), NSC1_CB.class.getName(), NSC1_X.class.getName());
-            throw e;
-        }
-    }
-
-    @Test(expected = VerificationException.class)
     public void test_shortcut_referencing_state_beyond_scope() throws VerificationException {
         @LifecycleRegistry(NCS2.class)
         @StateMachineBuilder
@@ -121,7 +102,7 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.COMPOSITE_STATEMACHINE_SHORTCUT_STATE_INVALID,
-                    NCS2_CC.class.getAnnotation(ShortCut.class), NCS2_CC.class, NSC1_C.class);
+                    NCS2_CC.class.getAnnotation(ShortCut.class), NCS2_CC.class, SC1_C.class);
             throw e;
         }
     }
@@ -223,6 +204,25 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE,
                     NegativeOverridesMissingInitial.States.A.class, CorrectBase.States.A.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_transition_referenced_in_two_composite_states() throws VerificationException {
+        @LifecycleRegistry(TransitionReferencedInTwoCompositeStates.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE,
+                    TransitionReferencedInTwoCompositeStates.States.S2.S2_States.S2_A.class.getAnnotation(Function.class),
+                    TransitionReferencedInTwoCompositeStates.States.S2.S2_States.S2_A.class,
+                    TransitionReferencedInTwoCompositeStates.States.S3.S3_Transitions.S3_X.class);
             throw e;
         }
     }

@@ -24,10 +24,10 @@ import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS3.Transitions.NCS3
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.States.NCS4_B.CTransitions.NCS4_CX;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NCS4.Transitions.NCS4_Y;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_B.CTransitions.NSC1_CX;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.States.NSC1_C;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_X;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.NSC1.Transitions.NSC1_Y;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.States.SC1_B.CTransitions.SC1_CX;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.States.SC1_C;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.Transitions.SC1_X;
+import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.Transitions.SC1_Y;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.States.PCS1_B.CTransitions.PCS1_CX;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.Transitions.PCS1_X;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.PCS1.Transitions.PCS1_Y;
@@ -251,44 +251,44 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
-    static interface NSC1 {
+    static interface StateMachineWithFunctionInCompositeStateReferencingOuterTransition {
 
         @StateSet
         static interface States {
 
             @Initial
-            @Function(transition = NSC1_X.class, value = NSC1_B.class)
-            static interface NSC1_A {}
+            @Function(transition = SC1_X.class, value = SC1_B.class)
+            static interface SC1_A {}
             @CompositeState
-            @Function(transition = NSC1_Y.class, value = NSC1_C.class)
-            static interface NSC1_B {
+            @Function(transition = SC1_Y.class, value = SC1_C.class)
+            static interface SC1_B {
 
                 @StateSet
                 static interface CStates {
 
                     @Initial
-                    @Function(transition = NSC1_CX.class, value = NSC1_CB.class)
-                    static interface NSC1_CA {}
-                    @Function(transition = NSC1_X.class, value = NSC1_CC.class)
-                    static interface NSC1_CB {}
+                    @Function(transition = SC1_CX.class, value = SC1_CB.class)
+                    static interface SC1_CA {}
+                    @Function(transition = SC1_X.class, value = SC1_CC.class)
+                    static interface SC1_CB {}
                     @End
-                    @ShortCut(NSC1_C.class)
-                    static interface NSC1_CC {}
+                    @ShortCut(SC1_C.class)
+                    static interface SC1_CC {}
                 }
                 @TransitionSet
                 static interface CTransitions {
 
-                    static interface NSC1_CX {}
+                    static interface SC1_CX {}
                 }
             }
             @End
-            static interface NSC1_C {}
+            static interface SC1_C {}
         }
         @TransitionSet
         static interface Transitions {
 
-            static interface NSC1_X {}
-            static interface NSC1_Y {}
+            static interface SC1_X {}
+            static interface SC1_Y {}
         }
     }
     @StateMachine
@@ -311,7 +311,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
                     @Function(transition = NCS2_CX.class, value = NCS2_CC.class)
                     static interface NCS2_CA {}
                     @End
-                    @ShortCut(NSC1_C.class)
+                    @ShortCut(SC1_C.class)
                     static interface NCS2_CC {}
                 }
                 @TransitionSet
@@ -516,6 +516,153 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
             // Should define another @Initial state or add @Initial to this
             // @Initial State
             static interface A extends CorrectBase.States.A {}
+        }
+    }
+    @StateMachine
+    static interface SuperStateMachine {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.X.class, value = { States.Super_S2.class })
+            static interface Super_S1 {}
+            @Function(transition = Transitions.Y.class, value = { States.Super_S3.class })
+            @CompositeState
+            static interface Super_S2 {
+
+                @StateSet
+                static interface CompositeStates {
+
+                    @Initial
+                    @Function(transition = CompositeTransitions.Super_S2_X.class, value = { Super_S2_S2.class })
+                    static interface Super_S2_S1 {}
+                    @Function(transition = CompositeTransitions.Super_S2_Y.class, value = { Super_S2_S3.class })
+                    static interface Super_S2_S2 {}
+                    @End
+                    @ShortCut(value = Super_S3.class)
+                    static interface Super_S2_S3 {}
+                }
+                @TransitionSet
+                static interface CompositeTransitions {
+
+                    static interface Super_S2_X {}
+                    static interface Super_S2_Y {}
+                }
+            }
+            @Function(transition = Transitions.Y.class, value = { Super_S4.class })
+            static interface Super_S3 {}
+            @End
+            static interface Super_S4 {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface X {}
+            static interface Y {}
+            static interface Z {}
+        }
+    }
+    @StateMachine
+    static interface FunctionInCompositeStateReferencingTransitionInSuper extends SuperStateMachine {
+
+        @StateSet
+        static interface States extends SuperStateMachine.States {
+
+            @CompositeState
+            static interface Child_S2 extends SuperStateMachine.States.Super_S2 {
+
+                @StateSet
+                static interface Child_S2_States extends SuperStateMachine.States.Super_S2.CompositeStates {
+
+                    @Function(transition = SuperStateMachine.States.Super_S2.CompositeTransitions.Super_S2_X.class, value = { Child_S2_S2.class })
+                    static interface Child_S2_S1 extends SuperStateMachine.States.Super_S2.CompositeStates.Super_S2_S2 {}
+                    @End
+                    @ShortCut(value = SuperStateMachine.States.Super_S3.class)
+                    static interface Child_S2_S2 {}
+                }
+            }
+            @CompositeState
+            static interface Child_S3 extends SuperStateMachine.States.Super_S3 {
+
+                @StateSet
+                static interface ChildStates {
+
+                    @Initial
+                    @Functions({ @Function(transition = SuperStateMachine.Transitions.Z.class, value = { Child_S3_S2.class }),
+                            @Function(transition = ChildTransitions.Child_S3_X.class, value = { Child_S3_S3.class }) })
+                    static interface Child_S3_S1 {}
+                    @End
+                    @ShortCut(value = SuperStateMachine.States.Super_S4.class)
+                    static interface Child_S3_S2 {}
+                    @End
+                    @ShortCut(value = SuperStateMachine.States.Super_S4.class)
+                    static interface Child_S3_S3 {}
+                }
+                @TransitionSet
+                static interface ChildTransitions {
+
+                    static interface Child_S3_X {}
+                }
+            }
+        }
+    }
+    @StateMachine
+    static interface TransitionReferencedInTwoCompositeStates {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.X.class, value = { S2.class })
+            static interface S1 {}
+            @Function(transition = Transitions.Y.class, value = { S3.class })
+            @CompositeState
+            static interface S2 {
+
+                @StateSet
+                static interface S2_States {
+
+                    @Initial
+                    @Function(transition = S3.S3_Transitions.S3_X.class, value = { S2_B.class })
+                    static interface S2_A {}
+                    @End
+                    @ShortCut(value = States.S3.class)
+                    static interface S2_B {}
+                }
+                @TransitionSet
+                static interface S2_Transitions {
+
+                    static interface S2_X {}
+                }
+            }
+            @CompositeState
+            static interface S3 {
+
+                @StateSet
+                static interface S3_States {
+
+                    @Initial
+                    @Function(transition = S2.S2_Transitions.S2_X.class, value = { S3_B.class })
+                    static interface S3_A {}
+                    @End
+                    @ShortCut(value = States.S4.class)
+                    static interface S3_B {}
+                }
+                @TransitionSet
+                static interface S3_Transitions {
+
+                    static interface S3_X {}
+                }
+            }
+            @End
+            static interface S4 {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface X {}
+            static interface Y {}
         }
     }
 }

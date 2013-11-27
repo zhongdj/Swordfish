@@ -52,4 +52,26 @@ public class StateSyntaxPositiveTest extends StateSyntaxMetadata {
         }
         new Registry();
     }
+
+    @Test
+    public void test_composite_state_with_reference_transition_in_owning_statemachine() throws VerificationException {
+        @LifecycleRegistry(StateMachineWithFunctionInCompositeStateReferencingOuterTransition.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        new Registry();
+    }
+
+    @Test
+    public void test_composite_state_with_reference_transition_in_super_statemachine() throws VerificationException {
+        @LifecycleRegistry(FunctionInCompositeStateReferencingTransitionInSuper.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        new Registry();
+    }
 }
