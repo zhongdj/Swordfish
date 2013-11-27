@@ -397,7 +397,7 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     private void configureFunction(StateMetaBuilderImpl parent, Function function) {
-        final TransitionMetadata transition = parent.getParent().getTransition(function.transition());
+        final TransitionMetadata transition = findTransition(parent.getParent(), function.transition());
         Class<?>[] value = function.value();
         final LinkedList<StateMetadata> nextStates = new LinkedList<>();
         for ( Class<?> item : value ) {
@@ -432,31 +432,21 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     private void verifyFunction(Class<?> stateClass, Function function) throws VerificationException {
-        Class<?> transitionClz = function.transition();
+        Class<?> transitionClass = function.transition();
         Class<?>[] stateCandidates = function.value();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        TransitionMetadata transition = parent.getTransition(transitionClz);
+        final TransitionMetadata transition = findTransition(parent, transitionClass);
         if ( null == transition ) {
-            if ( this.parent.isComposite() ) {
-                if ( null != this.parent.getOwningStateMachine().getTransition(transitionClz) ) {
-                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(),
-                            SyntaxErrors.FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE, function, stateClass.getName(), transitionClz.getName()));
-                } else {
-                    failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function,
-                            stateClass.getName(), transitionClz.getName()));
-                }
-            } else {
-                failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function,
-                        stateClass.getName(), transitionClz.getName()));
-            }
+            failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE, function,
+                    stateClass, transitionClass));
         }
         if ( 0 == stateCandidates.length ) {
             failureSet.add(newVerificationFailure(getDottedPath().getAbsoluteName(), SyntaxErrors.FUNCTION_WITH_EMPTY_STATE_CANDIDATES, function,
-                    stateClass.getName(), transitionClz.getName()));
+                    stateClass.getName(), transitionClass.getName()));
         } else if ( 1 < stateCandidates.length ) {
             if ( !transition.isConditional() ) {
                 failureSet.add(newVerificationFailure(transition.getDottedPath().getAbsoluteName(),
-                        SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(), transitionClz.getName()));
+                        SyntaxErrors.FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION, function, stateClass.getName(), transitionClass.getName()));
             }
         }
         for ( int i = 0; i < stateCandidates.length; i++ ) {
@@ -470,6 +460,27 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
         if ( 0 < failureSet.size() ) {
             throw new VerificationException(failureSet);
         }
+    }
+
+    private TransitionMetadata findTransition(StateMachineMetadata stateMachine, Class<?> transitionKey) {
+        TransitionMetadata declaredTransition = stateMachine.getDeclaredTransition(transitionKey);
+        if ( null == declaredTransition ) {
+            if ( stateMachine.isComposite() ) {
+                declaredTransition = stateMachine.getOwningStateMachine().getDeclaredTransition(transitionKey);
+                if ( null == declaredTransition ) {
+                    if ( stateMachine.hasSuper() ) {
+                        declaredTransition = findTransition(stateMachine.getSuper(), transitionKey);
+                    } else if ( stateMachine.getOwningStateMachine().hasSuper() ) {
+                        declaredTransition = findTransition(stateMachine.getOwningStateMachine().getSuper(), transitionKey);
+                    }
+                }
+            } else {
+                if ( stateMachine.hasSuper() ) {
+                    declaredTransition = findTransition(stateMachine.getSuper(), transitionKey);
+                }
+            }
+        }
+        return declaredTransition;
     }
 
     private StateMetadata findStateMetadata(final Class<?> stateCandidateClass, StateMachineMetadata stateMachine) {
