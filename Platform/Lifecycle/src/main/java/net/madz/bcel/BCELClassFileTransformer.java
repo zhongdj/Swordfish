@@ -131,7 +131,12 @@ public class BCELClassFileTransformer implements ClassFileTransformer {
         doGenerate.getJavaClass().getBytes();
         MethodInterceptor.addWrapper(cgen, interceptingMethod, innerClassSeq);
         if ( "true".equals(System.getProperty("net.madz.bcel.save.original")) ) {
-            final String fileName = location + cgen.getClassName().replaceAll("\\.", File.separator) + ".class";
+            final String fileName;
+            if ( '\\' == File.separatorChar ) {
+                fileName = location + cgen.getClassName().replaceAll("\\.", "\\\\") + ".class";
+            } else {
+                fileName = location + cgen.getClassName().replaceAll("\\.", File.separator) + ".class";
+            }
             FileOutputStream fos = new FileOutputStream(fileName);
             cgen.getJavaClass().dump(fos);
             fos.close();

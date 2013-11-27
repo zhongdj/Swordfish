@@ -110,7 +110,13 @@ public class JavaAnonymousInnerClass {
             logger.fine(visitor.toString());
         }
         try {
-            final String path = this.location + thisClassName.replaceAll("\\.", File.separator) + ".class";
+            String classFilePath = null;
+            if ( '\\' == File.separatorChar ) {
+                classFilePath = thisClassName.replaceAll("\\.", "\\\\");
+            } else {
+                classFilePath = thisClassName.replaceAll("\\.", File.separator);
+            }
+            final String path = this.location + classFilePath + ".class";
             cgen.getJavaClass().dump(path);
         } catch (IOException e) {
             e.printStackTrace();
