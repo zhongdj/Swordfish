@@ -76,9 +76,7 @@ public class StandaloneLifecyclePureMetadataTest {
         // Check Keys
         {
             assertNotNull(types.get(ServiceableLifecycleMeta.class));
-            assertNotNull(types.get(ServiceableLifecycleMeta.class.getName()));
             assertNotNull(instances.get(IServiceOrder.class));
-            assertNotNull(instances.get(IServiceOrder.class.getName()));
         }
     }
 
