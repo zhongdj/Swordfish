@@ -4,7 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
+import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleException;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.MemberShip;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.OrderValidWhileNullable;
+import net.madz.lifecycle.engine.CoreFuntionTestMetadata.OrderValidWhileNullableLifecycleMeta;
 
 import org.junit.Test;
 
@@ -143,6 +147,20 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
             tvService.start();
         } catch (LifecycleException e) {
             assertInvalidStateErrorByValidWhile(e, tvProvider, tvService, InternetTVProviderLifecycle.States.ServiceAvailable.class);
+        }
+    }
+
+    @Test(expected = LifecycleException.class)
+    public void test_validwhile_not_nullable_true() {
+        MemberShip memberShip = null;
+        OrderValidWhileNotNullable order = new OrderValidWhileNotNullable(memberShip);
+        assertState(OrderValidWhileNotNullableLifecycleMeta.States.Draft.class, order);
+        try {
+            order.pay();
+        } catch (LifecycleException e) {
+            assertLifecycleError(e, LifecycleCommonErrors.RELATION_TARGET_IS_NULL, OrderValidWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class,
+                    "nullable = false", OrderValidWhileNotNullableLifecycleMeta.States.Draft.class );
+            
         }
     }
 }

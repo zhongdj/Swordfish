@@ -95,4 +95,13 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
         tvService.start();
         assertState(InternetTVServiceLifecycle.States.InService.class, tvService);
     }
+
+    @Test
+    public void test_validwhile_nullable_true() {
+        MemberShip memberShip = null;
+        OrderValidWhileNullable order = new OrderValidWhileNullable(memberShip);
+        assertState(OrderValidWhileNullableLifecycleMeta.States.Draft.class, order);
+        order.pay();
+        assertState(OrderValidWhileNullableLifecycleMeta.States.Paid.class, order);
+    }
 }

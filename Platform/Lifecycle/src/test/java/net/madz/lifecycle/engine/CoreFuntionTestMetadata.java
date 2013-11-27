@@ -772,4 +772,150 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         @Relation(InternetTVServiceLifecycle.Relations.TVProvider.class)
         public InternetTVServiceProvider provider;
     }
+    @StateMachine
+    static interface MemberShipLifecycleMeta {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Activate.class, value = { Active.class })
+            static interface Draft {}
+            @Function(transition = Transitions.Expire.class, value = { Expired.class })
+            static interface Active {}
+            @End
+            static interface Expired {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Activate {}
+            static interface Expire {}
+        }
+    }
+    @StateMachine
+    static interface OrderValidWhileNullableLifecycleMeta {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { Paid.class })
+            @ValidWhile(on = { MemberShipLifecycleMeta.States.Active.class }, relation = Relations.MemberShipRelation.class, nullable = true)
+            static interface Draft {}
+            @End
+            static interface Paid {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Pay {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(MemberShipLifecycleMeta.class)
+            static interface MemberShipRelation {}
+        }
+    }
+    @StateMachine
+    static interface OrderValidWhileNotNullableLifecycleMeta {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { Paid.class })
+            @ValidWhile(on = { MemberShipLifecycleMeta.States.Active.class }, relation = Relations.MemberShipRelation.class, nullable = false)
+            static interface Draft {}
+            @End
+            static interface Paid {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Pay {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(MemberShipLifecycleMeta.class)
+            static interface MemberShipRelation {}
+        }
+    }
+    @LifecycleMeta(MemberShipLifecycleMeta.class)
+    public static class MemberShip extends ReactiveObject {
+
+        private int point;
+        private Date activatedOn;
+        private Date expiredOn;
+
+        public MemberShip() {
+            this.initialState(MemberShipLifecycleMeta.States.Draft.class.getSimpleName());
+        }
+
+        @Transition(MemberShipLifecycleMeta.Transitions.Activate.class)
+        public void active() {
+            this.activatedOn = new Date();
+            point = 0;
+        }
+
+        @Transition
+        public void expire() {
+            this.expiredOn = new Date();
+            point = 0;
+        }
+
+        public void setPoint(int point) {
+            this.point = point;
+        }
+
+        public int getPoint() {
+            return point;
+        }
+
+        public Date getActivatedOn() {
+            return activatedOn;
+        }
+
+        public Date getExpiredOn() {
+            return expiredOn;
+        }
+    }
+    @LifecycleMeta(OrderValidWhileNullableLifecycleMeta.class)
+    public static class OrderValidWhileNullable extends ReactiveObject {
+
+        private double totalAmount = 400d;
+        @Relation(OrderValidWhileNullableLifecycleMeta.Relations.MemberShipRelation.class)
+        private MemberShip memberShip;
+
+        public OrderValidWhileNullable(MemberShip memberShip) {
+            this.memberShip = memberShip;
+            this.initialState(OrderValidWhileNullableLifecycleMeta.States.Draft.class.getSimpleName());
+        }
+
+        @Transition
+        public void pay() {
+            if ( null != memberShip ) memberShip.setPoint((int) totalAmount);
+        }
+    }
+    @LifecycleMeta(OrderValidWhileNotNullableLifecycleMeta.class)
+    public static class OrderValidWhileNotNullable extends ReactiveObject {
+
+        private double totalAmount = 400d;
+        @Relation(OrderValidWhileNotNullableLifecycleMeta.Relations.MemberShipRelation.class)
+        private MemberShip memberShip;
+
+        public OrderValidWhileNotNullable(MemberShip memberShip) {
+            this.memberShip = memberShip;
+            this.initialState(OrderValidWhileNotNullableLifecycleMeta.States.Draft.class.getSimpleName());
+        }
+
+        @Transition
+        public void pay() {
+            if ( null != memberShip ) {
+                memberShip.setPoint((int) totalAmount);
+            }
+        }
+    }
 }
