@@ -12,4 +12,6 @@ public interface RelationConstraintMetadata extends MetaType<RelationConstraintM
     StateMetadata[] getOnStates();
 
     ErrorMessageObject[] getErrorMessageObjects();
+
+    boolean isNullable();
 }

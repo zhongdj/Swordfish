@@ -20,7 +20,9 @@ import java.util.Set;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.bcel.intercept.UnlockableStack;
+import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleContext;
+import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
@@ -1298,6 +1300,15 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         final StateObject<S> stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
+            if ( null == relationInstance ) {
+                for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
+                    if ( !item.isNullable() ) {
+                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.RELATION_TARGET_IS_NULL,
+                                item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
+                    }
+                }
+                continue;
+            }
             stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
         }
     }

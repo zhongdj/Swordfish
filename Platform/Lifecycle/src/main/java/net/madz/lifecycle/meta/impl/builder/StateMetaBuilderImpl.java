@@ -512,14 +512,14 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
             RelationConstraintMetadata relationMetadata = configureRelationConstraint(findRelatedStateMachine(inboundWhile.relation()), "InboundWhiles."
                     + inboundWhile.relation().getSimpleName(), inboundWhile.relation(),
                     getOnStates(findRelatedStateMachine(inboundWhile.relation()), inboundWhile.on()),
-                    configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()));
+                    configureErrorMessageObjects(inboundWhile.otherwise(), inboundWhile.relation()), inboundWhile.nullable());
             this.inboundWhileRelations.add(relationMetadata);
         }
         for ( ValidWhile validWhile : findDeclaredValidWhiles(clazz) ) {
             RelationConstraintMetadata relationMetadata = configureRelationConstraint(findRelatedStateMachine(validWhile.relation()), "ValidWhiles."
                     + validWhile.relation().getSimpleName(), validWhile.relation(),
                     getOnStates(findRelatedStateMachine(validWhile.relation()), validWhile.on()),
-                    configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()));
+                    configureErrorMessageObjects(validWhile.otherwise(), validWhile.relation()), validWhile.nullable());
             this.validWhileRelations.add(relationMetadata);
         }
     }
@@ -533,8 +533,8 @@ public class StateMetaBuilderImpl extends InheritableAnnotationMetaBuilderBase<S
     }
 
     private RelationConstraintMetadata configureRelationConstraint(StateMachineMetadata relatedStateMachine, String name, Class<?> relationClass,
-            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects) throws VerificationException {
-        return new RelationConstraintBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine).build(relationClass, this);
+            LinkedList<StateMetadata> onStates, LinkedList<ErrorMessageObject> errorObjects, boolean nullable) throws VerificationException {
+        return new RelationConstraintBuilderImpl(this, name, onStates, errorObjects, relatedStateMachine, nullable).build(relationClass, this);
     }
 
     private LinkedList<ErrorMessageObject> configureErrorMessageObjects(ErrorMessage[] otherwise, Class<?> clz) {

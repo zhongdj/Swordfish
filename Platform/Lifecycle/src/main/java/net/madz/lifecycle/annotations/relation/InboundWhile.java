@@ -13,5 +13,7 @@ public @interface InboundWhile {
 
     Class<?>[] on();
 
+    boolean nullable() default false;
+
     ErrorMessage[] otherwise() default {};
 }

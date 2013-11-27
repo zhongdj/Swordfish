@@ -19,6 +19,7 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     private StateMachineMetadata relatedStateMachine;
     private final LinkedList<StateMetadata> onStates = new LinkedList<>();
     private final LinkedList<ErrorMessageObject> errorMessageObjects = new LinkedList<>();
+    private boolean nullable;
 
     @Override
     public StateMachineMetadata getRelatedStateMachine() {
@@ -26,11 +27,12 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     }
 
     public RelationConstraintBuilderImpl(StateMetaBuilder parent, String name, List<StateMetadata> onStates, List<ErrorMessageObject> errorMessageObjects,
-            StateMachineMetadata stateMachineMetadata) {
+            StateMachineMetadata stateMachineMetadata, boolean nullable) {
         super(parent, name);
         this.onStates.addAll(onStates);
         this.errorMessageObjects.addAll(errorMessageObjects);
         this.relatedStateMachine = stateMachineMetadata;
+        this.nullable = nullable;
     }
 
     @Override
@@ -54,6 +56,10 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
         return this.errorMessageObjects.toArray(new ErrorMessageObject[0]);
     }
 
+    @Override
+    public boolean isNullable () {
+        return nullable;
+    }
     @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub

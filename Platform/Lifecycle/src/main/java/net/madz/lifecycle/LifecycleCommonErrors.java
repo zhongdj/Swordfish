@@ -32,6 +32,12 @@ public class LifecycleCommonErrors {
      * @param {0} Method object
      */
     public static final String CALLBACK_EXCEPTION_OCCOURRED = "002-9003";
+    /**
+     * @param {0} Relation class
+     * @param {1} @nullable value
+     * @param {2} State class
+     */
+    public static final String RELATION_TARGET_IS_NULL = "002-9004";
 
     private LifecycleCommonErrors() {}
 }

@@ -12,6 +12,8 @@ public @interface ValidWhile {
     Class<?> relation();
 
     Class<?>[] on();
+    
+    boolean nullable() default false;
 
     ErrorMessage[] otherwise() default {};
 }
