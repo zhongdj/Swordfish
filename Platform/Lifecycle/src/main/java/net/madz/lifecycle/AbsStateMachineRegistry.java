@@ -177,23 +177,27 @@ public abstract class AbsStateMachineRegistry implements LifecycleMetaRegistry {
     }
 
     public synchronized void addInstance(Class<?> clazz, StateMachineObject<?> stateMachine) {
-        instanceMap.put(clazz, stateMachine);
-        instanceMap.put(clazz.getName(), stateMachine);
+        if ( instanceMap.containsKey(stateMachine.getPrimaryKey()) ) {
+            final StateMachineObject<?> existedStateMachine = instanceMap.get(stateMachine.getPrimaryKey());
+            if ( !existedStateMachine.getDottedPath().equals(stateMachine.getDottedPath()) ) {
+                throw new IllegalStateException("Same Key corresponds two different StateMachine: " + stateMachine.getPrimaryKey().toString() + ", one is : "
+                        + existedStateMachine.getDottedPath() + " and another is:" + stateMachine.getDottedPath());
+            }
+        } else {
+            instanceMap.put(stateMachine.getPrimaryKey(), stateMachine);
+        }
     }
 
     public synchronized void addTemplate(final StateMachineMetadata metaData) {
-        for ( Object key : metaData.getKeySet() ) {
-            StateMachineMetadata existedStateMachine = getStateMachineMeta(key);
-            if ( isMetaTypeRegistered(key) ) {
-                if ( !existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
-                    new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
-                            + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
-                } else {
-                    continue;
-                }
-            } else {
-                typeMap.put(key, metaData);
+        final Object key = metaData.getPrimaryKey();
+        if ( isMetaTypeRegistered(key) ) {
+            final StateMachineMetadata existedStateMachine = getStateMachineMeta(key);
+            if ( !existedStateMachine.getDottedPath().equals(metaData.getDottedPath()) ) {
+                throw new IllegalStateException("Same Key corresponds two different StateMachine: " + key.toString() + ", one is : "
+                        + existedStateMachine.getDottedPath() + " and another is:" + metaData.getDottedPath());
             }
+        } else {
+            typeMap.put(key, metaData);
         }
     }
 
