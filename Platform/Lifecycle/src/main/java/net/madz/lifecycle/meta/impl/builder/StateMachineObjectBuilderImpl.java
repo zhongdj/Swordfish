@@ -1303,7 +1303,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             if ( null == relationInstance ) {
                 for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
                     if ( !item.isNullable() ) {
-                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.RELATION_TARGET_IS_NULL,
+                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL,
                                 item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
                     }
                 }
@@ -1358,9 +1358,18 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         final String nextState = getNextState(target, transitionKey);
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
-            final Object relationInstance = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
+            final Object relationTarget = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
+            if ( null == relationTarget ) {
+                for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
+                    if ( !item.isNullable() ) {
+                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.INBOUND_WHILE_RELATION_TARGET_IS_NULL,
+                                item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
+                    }
+                }
+                continue;
+            }
             getState(state.getDottedPath()).verifyInboundWhile(transitionKey, target, nextState,
-                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, context);
+                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationTarget, context);
         }
         context.setToState(nextState);
     }

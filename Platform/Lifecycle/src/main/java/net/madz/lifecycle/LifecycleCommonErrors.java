@@ -37,7 +37,13 @@ public class LifecycleCommonErrors {
      * @param {1} @nullable value
      * @param {2} State class
      */
-    public static final String RELATION_TARGET_IS_NULL = "002-9004";
+    public static final String VALID_WHILE_RELATION_TARGET_IS_NULL = "002-9004";
+    /**
+     * @param {0} Relation class
+     * @param {1} @nullable value
+     * @param {2} State class
+     */
+    public static final String INBOUND_WHILE_RELATION_TARGET_IS_NULL = "002-9005";
 
     private LifecycleCommonErrors() {}
 }
