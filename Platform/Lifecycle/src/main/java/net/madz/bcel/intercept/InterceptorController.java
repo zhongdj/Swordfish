@@ -8,11 +8,16 @@ public class InterceptorController<V, R> {
 
     private static Logger logger = Logger.getLogger("Lifecycle Framework");
 
-    public R exec(InterceptContext<V ,R> context, Callable<R> callable) {
+    public R exec(InterceptContext<V, R> context, Callable<R> callable) throws Exception {
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("Intercepting....InterceptorController is doing exec ...");
         }
         Interceptor<V, R> interceptorChain = context.createInterceptorChain();
-        return interceptorChain.intercept(context, callable);
+        try {
+            return interceptorChain.intercept(context, callable);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
     }
 }

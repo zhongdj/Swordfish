@@ -16,7 +16,7 @@ public abstract class Interceptor<V, R> {
         this.next = next;
     }
 
-    public R intercept(InterceptContext<V, R> context, Callable<R> callable) {
+    public R intercept(InterceptContext<V, R> context, Callable<R> callable) throws Exception {
         try {
             preExec(context);
             R result = next.intercept(context, callable);
@@ -35,11 +35,6 @@ public abstract class Interceptor<V, R> {
             logger.fine("intercepting with:" + getClass().getName() + " @handleException");
         }
         logger.log(Level.SEVERE, e.getMessage(), e);
-        if ( e instanceof RuntimeException ) {
-            throw (RuntimeException) e;
-        } else {
-            throw new IllegalStateException(e);
-        }
     }
 
     protected void cleanup(InterceptContext<V, R> context) {

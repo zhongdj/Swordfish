@@ -9,7 +9,7 @@ public class CallableInterceptor<V, R> extends Interceptor<V, R> {
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
     @Override
-    public R intercept(InterceptContext<V, R> context, Callable<R> callable) {
+    public R intercept(InterceptContext<V, R> context, Callable<R> callable) throws Exception {
         try {
             if ( logger.isLoggable(Level.FINE) ) {
                 logger.fine("intercepting with: " + getClass().getName() + " @intercept");
@@ -17,11 +17,7 @@ public class CallableInterceptor<V, R> extends Interceptor<V, R> {
             return callable.call();
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
-            if ( e instanceof RuntimeException ) {
-                throw (RuntimeException) e;
-            } else {
-                throw new IllegalStateException(e);
-            }
+            throw e;
         }
     }
 }
