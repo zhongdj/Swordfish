@@ -25,34 +25,6 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     private static final Logger logger = Logger.getLogger("Lifecycle Framework");
 
-    private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?, ?> context) {
-        try {
-            return AbsStateMachineRegistry.getInstance().loadStateMachineObject(extractLifecycleMetaClass(context));
-        } catch (VerificationException e) {
-            throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
-        }
-    }
-
-    private static Class<? extends Object> extractLifecycleMetaClass(InterceptContext<?, ?> context) {
-        if ( null != context.getTarget().getClass().getAnnotation(ReactiveObject.class) ) {
-            Method method = context.getMethod();
-            Object target = context.getTarget();
-            Class<?> lifecycleMetaClass = findLifecycleMetaClass(target.getClass(), method);
-            return lifecycleMetaClass;
-        } else {
-            return context.getTarget().getClass();
-        }
-    }
-
-    private static Class<?> findLifecycleMetaClass(final Class<?> implClass, final Method method) {
-        final Transition transition = method.getAnnotation(Transition.class);
-        if ( Null.class == transition.value() ) {
-            throw new IllegalStateException("With @ReactiveObject, transition.value has to be explicitly specified.");
-        } else {
-            return scanMethodsOnClasses(implClass.getInterfaces(), method);
-        }
-    }
-
     public static Class<?> scanMethodsOnClasses(Class<?>[] klasses, final Method method) {
         if ( 0 == klasses.length ) throw new IllegalArgumentException();
         final ArrayList<Class<?>> superclasses = new ArrayList<Class<?>>();
@@ -173,14 +145,6 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
         }
     }
 
-    private void unlockRelationObjects(UnlockableStack stack) {
-        Unlockable unlockable = null;
-        while ( !stack.isEmpty() ) {
-            unlockable = stack.popUnlockable();
-            unlockable.unlock();
-        }
-    }
-
     @Override
     protected void cleanup(InterceptContext<V, R> context) {
         super.cleanup(context);
@@ -271,5 +235,41 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     private void validateStateValidWhiles(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
         stateMachine.validateValidWhiles(context);
+    }
+
+    private static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?, ?> context) {
+        try {
+            return AbsStateMachineRegistry.getInstance().loadStateMachineObject(extractLifecycleMetaClass(context));
+        } catch (VerificationException e) {
+            throw new IllegalStateException("Should not encounter syntax verification exception at intercepting runtime", e);
+        }
+    }
+
+    private static Class<? extends Object> extractLifecycleMetaClass(InterceptContext<?, ?> context) {
+        if ( null != context.getTarget().getClass().getAnnotation(ReactiveObject.class) ) {
+            Method method = context.getMethod();
+            Object target = context.getTarget();
+            Class<?> lifecycleMetaClass = findLifecycleMetaClass(target.getClass(), method);
+            return lifecycleMetaClass;
+        } else {
+            return context.getTarget().getClass();
+        }
+    }
+
+    private static Class<?> findLifecycleMetaClass(final Class<?> implClass, final Method method) {
+        final Transition transition = method.getAnnotation(Transition.class);
+        if ( Null.class == transition.value() ) {
+            throw new IllegalStateException("With @ReactiveObject, transition.value has to be explicitly specified.");
+        } else {
+            return scanMethodsOnClasses(implClass.getInterfaces(), method);
+        }
+    }
+
+    private void unlockRelationObjects(UnlockableStack stack) {
+        Unlockable unlockable = null;
+        while ( !stack.isEmpty() ) {
+            unlockable = stack.popUnlockable();
+            unlockable.unlock();
+        }
     }
 }
