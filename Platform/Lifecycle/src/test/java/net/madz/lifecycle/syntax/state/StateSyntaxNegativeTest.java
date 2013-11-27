@@ -16,7 +16,6 @@ import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.States.E;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S3.Transitions.Y;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.S5.states.S5_A;
 import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.StateMachineWithFunctionInCompositeStateReferencingOuterTransition.States.SC1_C;
-import net.madz.lifecycle.syntax.state.StateSyntaxMetadata.TransitionReferencedInTwoCompositeStates.States.S3;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -209,8 +208,8 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_transition_referenced_in_two_composite_states() throws VerificationException {
-        @LifecycleRegistry(TransitionReferencedInTwoCompositeStates.class)
+    public void test_composite_statemachine_transition_referenced_from_another_composite_state_machine() throws VerificationException {
+        @LifecycleRegistry(CompositeStateMachineTransitionReferencedFromAnotherCompositeStateMachine.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
@@ -220,9 +219,29 @@ public class StateSyntaxNegativeTest extends StateSyntaxMetadata {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE,
-                    TransitionReferencedInTwoCompositeStates.States.S2.S2_States.S2_A.class.getAnnotation(Function.class),
-                    TransitionReferencedInTwoCompositeStates.States.S2.S2_States.S2_A.class,
-                    TransitionReferencedInTwoCompositeStates.States.S3.S3_Transitions.S3_X.class);
+                    CompositeStateMachineTransitionReferencedFromAnotherCompositeStateMachine.States.S2.S2_States.S2_A.class.getAnnotation(Function.class),
+                    CompositeStateMachineTransitionReferencedFromAnotherCompositeStateMachine.States.S2.S2_States.S2_A.class,
+                    CompositeStateMachineTransitionReferencedFromAnotherCompositeStateMachine.States.S3.S3_Transitions.S3_X.class);
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_composite_statemachine_transition_referenced_from_super_non_extended_composite_state_machine() throws VerificationException {
+        @LifecycleRegistry(CompositeStateMachineTransitionReferenceFromSuperNonExtendedCompositeStateMachine.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.FUNCTION_INVALID_TRANSITION_REFERENCE,
+                    CompositeStateMachineTransitionReferenceFromSuperNonExtendedCompositeStateMachine.States.Composite_S1.InnerStates.Inner_S2.class
+                            .getAnnotation(Function.class),
+                    CompositeStateMachineTransitionReferenceFromSuperNonExtendedCompositeStateMachine.States.Composite_S1.InnerStates.Inner_S2.class,
+                    SuperStateMachine.States.Super_S2.CompositeTransitions.Super_S2_X.class);
             throw e;
         }
     }

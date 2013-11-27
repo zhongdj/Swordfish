@@ -608,7 +608,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
         }
     }
     @StateMachine
-    static interface TransitionReferencedInTwoCompositeStates {
+    static interface CompositeStateMachineTransitionReferencedFromAnotherCompositeStateMachine {
 
         @StateSet
         static interface States {
@@ -663,6 +663,35 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
 
             static interface X {}
             static interface Y {}
+        }
+    }
+    @StateMachine
+    static interface CompositeStateMachineTransitionReferenceFromSuperNonExtendedCompositeStateMachine extends SuperStateMachine {
+
+        @StateSet
+        static interface States extends SuperStateMachine.States {
+
+            @CompositeState
+            static interface Composite_S1 extends SuperStateMachine.States.Super_S3 {
+
+                @StateSet
+                static interface InnerStates {
+
+                    @Initial
+                    @Function(transition = InnerTransitions.Inner_X.class, value = { Inner_S2.class })
+                    static interface Inner_S1 {}
+                    @Function(transition = SuperStateMachine.States.Super_S2.CompositeTransitions.Super_S2_X.class, value = { Inner_S3.class })
+                    static interface Inner_S2 {}
+                    @End
+                    @ShortCut(value = SuperStateMachine.States.Super_S4.class)
+                    static interface Inner_S3 {}
+                }
+                @TransitionSet
+                static interface InnerTransitions {
+
+                    static interface Inner_X {}
+                }
+            }
         }
     }
 }
