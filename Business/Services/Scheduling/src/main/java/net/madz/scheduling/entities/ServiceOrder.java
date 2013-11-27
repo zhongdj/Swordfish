@@ -18,6 +18,7 @@ import net.madz.scheduling.biz.IServiceOrder;
 import net.madz.scheduling.biz.IVehicleScheduleOrder;
 import net.madz.scheduling.meta.PlantScheduleOrderLifecycleMeta;
 import net.madz.scheduling.meta.ServiceOrderLifecycleMeta;
+import net.madz.scheduling.meta.VehicleScheduleOrderLifecycleMeta;
 
 @Entity
 @Table(name = "service_order")
@@ -57,36 +58,47 @@ public class ServiceOrder extends ServiceOrderBase implements IServiceOrder, IPl
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Start.class)
     public void doLoad() {
         this.vehicleLoadOn = new Date();
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoTransport.class)
     public void doTransport() {
         this.vehicleTransportOn = new Date();
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoConstruct.class)
     public void doConstruct() {
         this.vehicleConstructOn = new Date();
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Finish.class)
     public void doComplete() {
         this.vehicleCompletedOn = new Date();
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.Transitions.Cancel.class)
     public void doAbortOnVehicleScheduleOrder() {
         this.vehicleAbortedOn = new Date();
     }
 
     @Override
+    @Transition(VehicleScheduleOrderLifecycleMeta.States.Ongoing.CTransitions.DoFinish.class)
+    public void doFinishVehicalOrder() {}
+
+    @Override
+    @Transition(PlantScheduleOrderLifecycleMeta.Transitions.Start.class)
     public void doStartPlantOrder() {
         this.plantStartedOn = new Date();
     }
 
     @Override
+    @Transition(PlantScheduleOrderLifecycleMeta.Transitions.Finish.class)
     public void doFinishPlantOrder() {
         this.plantFinishOn = new Date();
     }
@@ -98,17 +110,16 @@ public class ServiceOrder extends ServiceOrderBase implements IServiceOrder, IPl
     }
 
     @Override
+    @Relation
     public IServiceOrder getServiceOrder() {
         return this;
     }
 
     @Override
+    @Relation
     public ConcreteTruckResource getConcreteTruckResource() {
         return this.truckResource;
     }
-
-    @Override
-    public void doFinishVehicalOrder() {}
 
     @Override
     public String getConcretePlantName() {
