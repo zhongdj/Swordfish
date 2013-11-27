@@ -90,9 +90,13 @@ public interface SyntaxErrors {
      */
     public static final String TRANSITION_EXTENED_TRANSITION_CAN_NOT_FOUND_IN_SUPER_STATEMACHINE = "002-2505";
     // State's Function
+    /**
+     * @param {0} @Function definition
+     * @param {1} State class
+     * @param {2} Transition class
+     */
     public static final String FUNCTION_INVALID_TRANSITION_REFERENCE = "002-2610";
     public static final String FUNCTION_CONDITIONAL_TRANSITION_WITHOUT_CONDITION = "002-2611";
-    public static final String FUNCTION_TRANSITION_REFERENCE_BEYOND_COMPOSITE_STATE_SCOPE = "002-2612";
     public static final String FUNCTION_TRANSITION_MUST_BE_NOT_ON_END_STATE = "002-2613";
     public static final String FUNCTION_WITH_EMPTY_STATE_CANDIDATES = "002-2614";
     public static final String STATE_NON_FINAL_WITHOUT_FUNCTIONS = "002-2615";
