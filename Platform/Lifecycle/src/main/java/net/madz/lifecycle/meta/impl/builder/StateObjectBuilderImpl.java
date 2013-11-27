@@ -1,5 +1,6 @@
 package net.madz.lifecycle.meta.impl.builder;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ import net.madz.lifecycle.LifecycleCommonErrors;
 import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.LifecycleLockStrategry;
+import net.madz.lifecycle.annotations.LifecycleMeta;
+import net.madz.lifecycle.annotations.ReactiveObject;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateObjectBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
@@ -45,7 +48,7 @@ public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>,
     @Override
     public void verifyValidWhile(Object target, RelationConstraintMetadata[] relationMetadataArray, final Object relatedTarget, UnlockableStack stack) {
         try {
-            final StateMachineObject<?> relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            final StateMachineObject<?> relatedStateMachineObject = findRelatedStateMachineWithRelatedTarget(relationMetadataArray, relatedTarget);
             lockRelatedObject(relatedTarget, stack, relatedStateMachineObject);
             final String relatedStateName = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean found = false;
@@ -74,6 +77,19 @@ public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>,
         }
     }
 
+    private StateMachineObject<?> findRelatedStateMachineWithRelatedTarget(RelationConstraintMetadata[] relationMetadataArray, final Object relatedTarget)
+            throws VerificationException {
+        Class<?> relatedKey = null;
+        if ( null != relatedTarget.getClass().getAnnotation(ReactiveObject.class) ) {
+            final RelationConstraintMetadata relationConstraintMetadata = relationMetadataArray[0];
+            relatedKey = findRelationKey(relatedTarget, relationConstraintMetadata);
+        } else {
+            relatedKey = relatedTarget.getClass();
+        }
+        final StateMachineObject<?> relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedKey);
+        return relatedStateMachineObject;
+    }
+
     private void lockRelatedObject(final Object relatedTarget, UnlockableStack stack, final StateMachineObject<?> relatedStateMachineObject) {
         if ( !relatedStateMachineObject.isLockEnabled() ) {
             return;
@@ -93,7 +109,7 @@ public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>,
     public void verifyInboundWhile(Object transitionKey, Object target, String nextState, RelationConstraintMetadata[] relationMetadataArray,
             Object relatedTarget, UnlockableStack stack) {
         try {
-            final StateMachineObject<?> relatedStateMachineObject = this.getRegistry().loadStateMachineObject(relatedTarget.getClass());
+            final StateMachineObject<?> relatedStateMachineObject = findRelatedStateMachineWithRelatedTarget(relationMetadataArray, relatedTarget);
             lockRelatedObject(relatedTarget, stack, relatedStateMachineObject);
             final String relatedEvaluateState = relatedStateMachineObject.evaluateState(relatedTarget);
             boolean find = false;
@@ -120,6 +136,37 @@ public class StateObjectBuilderImpl<S> extends ObjectBuilderBase<StateObject<S>,
         } catch (VerificationException e) {
             throw new IllegalStateException("Cannot happen, it should be defect of syntax verification.");
         }
+    }
+
+    private Class<?> findRelationKey(Object relatedTarget, final RelationConstraintMetadata relationConstraintMetadata) {
+        Class<?> relatedKey;
+        final Class<?> stateMachineClass = (Class<?>) relationConstraintMetadata.getRelatedStateMachine().getPrimaryKey();
+        final Class<?>[] interfaces = relatedTarget.getClass().getInterfaces();
+        relatedKey = findRelationClass(stateMachineClass, interfaces);
+        if ( null == relatedKey ) {
+            throw new IllegalArgumentException("Cannot find " + stateMachineClass + " from " + Arrays.toString(interfaces));
+        }
+        return relatedKey;
+    }
+
+    private Class<?> findRelationClass(final Class<?> stateMachineClass, final Class<?>[] interfaces) {
+        for ( final Class<?> interfaze : interfaces ) {
+            for ( Annotation annotation : interfaze.getDeclaredAnnotations() ) {
+                if ( LifecycleMeta.class == annotation.annotationType() ) {
+                    LifecycleMeta meta = (LifecycleMeta) annotation;
+                    if ( stateMachineClass == meta.value() ) {
+                        return interfaze;
+                    }
+                }
+            }
+            if ( interfaze.getInterfaces().length > 0 ) {
+                Class<?> result = findRelationClass(stateMachineClass, interfaze.getInterfaces());
+                if ( null != result ) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
