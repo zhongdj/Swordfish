@@ -73,10 +73,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         StateMachineObjectBuilder<S> {
 
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
-    private final KeyedList<TransitionObject> transitionObjectList = new KeyedList<>(TransitionObject.class);
-    private final KeyedList<ConditionObject> conditionObjectList = new KeyedList<>(ConditionObject.class);
-    private final HashMap<Object, StateObject<S>> stateMap = new HashMap<>();
-    private final ArrayList<StateObject<S>> stateList = new ArrayList<>();
+    private final KeyedList<TransitionObject> transitionObjectList = new KeyedList<>();
+    private final KeyedList<ConditionObject> conditionObjectList = new KeyedList<>();
+    @SuppressWarnings("rawtypes")
+    private final KeyedList<StateObject> stateObjectList = new KeyedList<>();
     private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
     private final ArrayList<RelationObject> relationObjectList = new ArrayList<>();
     private final ArrayList<CallbackObject> specificPreStateChangeCallbackObjects = new ArrayList<>();
@@ -196,11 +196,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             StateObjectBuilderImpl<S> stateObject = new StateObjectBuilderImpl<S>(this, stateMetadata);
             stateObject.setRegistry(getRegistry());
             stateObject.build(klass, this);
-            Iterator<Object> iterator = stateObject.getKeySet().iterator();
-            while ( iterator.hasNext() ) {
-                this.stateMap.put(iterator.next(), stateObject.getMetaData());
-            }
-            this.stateList.add(stateObject);
+            this.stateObjectList.add(stateObject.getMetaData());
         }
     }
 
@@ -788,7 +784,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public TransitionObject[] getTransitionSet() {
-        return transitionObjectList.toArray();
+        return transitionObjectList.toArray(TransitionObject.class);
     }
 
     @Override
@@ -804,12 +800,13 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @SuppressWarnings("unchecked")
     @Override
     public StateObject<S>[] getStateSet() {
-        return this.stateList.toArray(new StateObject[0]);
+        return (StateObject<S>[]) this.stateObjectList.toArray(StateObject.class);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public StateObject<S> getState(Object stateKey) {
-        return stateMap.get(stateKey);
+        return (StateObject<S>) stateObjectList.get(stateKey);
     }
 
     @Override

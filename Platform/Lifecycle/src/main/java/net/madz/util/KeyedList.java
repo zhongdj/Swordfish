@@ -11,14 +11,6 @@ public class KeyedList<T extends MultiKeyed> {
 
     private final ArrayList<T> elements = new ArrayList<>();
     private final HashMap<Object, T> elementMap = new HashMap<>();
-    private final Class<T> tClass;
-
-    public KeyedList(Class<T> tClass) {
-        if ( null == tClass ) {
-            throw new IllegalArgumentException("tClass cannot be Null");
-        }
-        this.tClass = tClass;
-    }
 
     public void add(T element) {
         this.elements.add(element);
@@ -33,7 +25,7 @@ public class KeyedList<T extends MultiKeyed> {
     }
 
     @SuppressWarnings("unchecked")
-    public T[] toArray() {
+    public T[] toArray(Class<T> tClass) {
         return this.elements.toArray((T[]) Array.newInstance(tClass, this.elements.size()));
     }
 

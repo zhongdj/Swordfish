@@ -3,11 +3,12 @@ package net.madz.lifecycle.meta.instance;
 import net.madz.bcel.intercept.UnlockableStack;
 import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.meta.MetaObject;
+import net.madz.lifecycle.meta.MultiKeyed;
 import net.madz.lifecycle.meta.impl.builder.CallbackObject;
 import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 
-public interface StateObject<S> extends MetaObject<StateObject<S>, StateMetadata> {
+public interface StateObject<S> extends MetaObject<StateObject<S>, StateMetadata> , MultiKeyed {
 
     void verifyValidWhile(Object target, RelationConstraintMetadata[] relation, Object relationInstance, UnlockableStack stack);
 
