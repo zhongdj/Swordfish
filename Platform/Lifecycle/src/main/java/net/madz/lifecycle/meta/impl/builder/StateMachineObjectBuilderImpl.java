@@ -59,6 +59,8 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.meta.KeySet;
+import net.madz.util.MethodScanCallback;
+import net.madz.util.MethodScannerImpl;
 import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
@@ -124,10 +126,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         if ( Object.class == klass || null == klass ) {
             return;
         }
-        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this);
-        final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class<?>[] { klass }, verificationFailureSet, scanner);
-        if ( 0 < verificationFailureSet.size() ) throw new VerificationException(verificationFailureSet);
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this, failureSet);
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        if ( 0 < failureSet.size() ) throw new VerificationException(failureSet);
     }
 
     private void configureRelationObjectsFromField(Class<?> klass) throws VerificationException {
@@ -262,18 +264,24 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyCallbackMethods(Class<?> klass) throws VerificationException {
-        final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner();
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class[] { klass }, failureSet, scanner);
+        final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner(failureSet);
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
     }
 
-    private final class CallbackMethodVerificationScanner implements MethodScanner {
+    private final class CallbackMethodVerificationScanner implements MethodScanCallback {
+
+        private VerificationFailureSet failureSet;
+
+        public CallbackMethodVerificationScanner(final VerificationFailureSet failureSet) {
+            this.failureSet = failureSet;
+        }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             final PreStateChange preStateChange = method.getAnnotation(PreStateChange.class);
             if ( null != preStateChange ) {
                 verifyPreStateChange(method, failureSet, preStateChange);
@@ -354,14 +362,14 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyConditionBeCovered(Class<?> klass, final ConditionMetadata conditionMetadata) throws VerificationException {
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
-        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
         if ( !scanner.isCovered() ) {
             throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getMetaType().getDottedPath(),
                     conditionMetadata.getDottedPath());
         }
     }
 
-    private final class ScannerForVerifyConditionCoverage implements MethodScanner {
+    private final class ScannerForVerifyConditionCoverage implements MethodScanCallback {
 
         private final ConditionMetadata conditionMetadata;
         private boolean covered = false;
@@ -371,7 +379,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             final Condition condition = method.getAnnotation(Condition.class);
             if ( null != condition ) {
                 if ( conditionMetadata.getKeySet().contains(condition.value()) ) {
@@ -389,25 +397,27 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class[] { klass }, failureSet, new ConditionProviderMethodScanner(klass, getMetaType()));
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, new ConditionProviderMethodScanner(klass, getMetaType(), failureSet));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
     }
 
-    private final class ConditionProviderMethodScanner implements MethodScanner {
+    private final class ConditionProviderMethodScanner implements MethodScanCallback {
 
+        private final VerificationFailureSet failureSet;
         private HashSet<Class<?>> conditions = new HashSet<>();
         private StateMachineMetadata template;
         private Class<?> klass;
 
-        public ConditionProviderMethodScanner(Class<?> klass, StateMachineMetadata template) {
+        public ConditionProviderMethodScanner(Class<?> klass, StateMachineMetadata template, VerificationFailureSet failureSet) {
             this.template = template;
             this.klass = klass;
+            this.failureSet = failureSet;
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             final Condition condition = method.getAnnotation(Condition.class);
             if ( null != condition ) {
                 if ( template.hasCondition(condition.value()) ) {
@@ -480,7 +490,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private void verifyRelationBeCovered(Class<?> klass, final RelationConstraintMetadata relation, final TransitionMetadata transition)
             throws VerificationException {
         final TransitionMethodScanner scanner = new TransitionMethodScanner(transition);
-        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
         final Method[] transitionMethods = scanner.getTransitionMethods();
         NEXT_TRANSITION_METHOD: for ( final Method method : transitionMethods ) {
             if ( hasRelationOnMethodParameters(relation, method) ) {
@@ -491,7 +501,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 continue NEXT_TRANSITION_METHOD;
             }
             final RelationGetterScanner relationGetterScanner = new RelationGetterScanner(relation);
-            scanMethodsOnClasses(new Class[] { klass }, null, relationGetterScanner);
+            MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, relationGetterScanner);
             if ( relationGetterScanner.isCovered() ) {
                 continue NEXT_TRANSITION_METHOD;
             }
@@ -543,7 +553,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         return relation.getKeySet().contains(key);
     }
 
-    private final class TransitionMethodScanner implements MethodScanner {
+    private final class TransitionMethodScanner implements MethodScanCallback {
 
         private final TransitionMetadata transition;
 
@@ -554,7 +564,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         private ArrayList<Method> transitionMethodList = new ArrayList<Method>();
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             final Transition transitionAnno = method.getAnnotation(Transition.class);
             if ( null != transitionAnno ) {
                 if ( Null.class != transitionAnno.value() ) {
@@ -592,18 +602,24 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         if ( Object.class == klass || null == klass ) {
             return;
         }
-        RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner();
-        final VerificationFailureSet verificationFailureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class<?>[] { klass }, verificationFailureSet, scanner);
-        if ( verificationFailureSet.size() > 0 ) {
-            throw new VerificationException(verificationFailureSet);
+        final VerificationFailureSet failureSet = new VerificationFailureSet();
+        RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner(failureSet);
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        if ( failureSet.size() > 0 ) {
+            throw new VerificationException(failureSet);
         }
     }
 
-    private final class RelationIndicatorPropertyMethodScanner implements MethodScanner {
+    private final class RelationIndicatorPropertyMethodScanner implements MethodScanCallback {
+
+        private final VerificationFailureSet failureSet;
+
+        public RelationIndicatorPropertyMethodScanner(VerificationFailureSet failureSet) {
+            this.failureSet = failureSet;
+        }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             Relation relation = method.getAnnotation(Relation.class);
             if ( null == relation ) {
                 return false;
@@ -616,16 +632,19 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return false;
         }
     }
-    private final class RelationGetterConfigureScanner implements MethodScanner {
+    private final class RelationGetterConfigureScanner implements MethodScanCallback {
 
         final private StateMachineObject<S> stateMachineObject;
+        private final VerificationFailureSet failureSet;
 
-        public RelationGetterConfigureScanner(StateMachineObject<S> stateMachineObject) {
+        public RelationGetterConfigureScanner(StateMachineObject<S> stateMachineObject, VerificationFailureSet failureSet) {
+            super();
             this.stateMachineObject = stateMachineObject;
+            this.failureSet = failureSet;
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             Relation relation = method.getAnnotation(Relation.class);
             if ( null != relation ) {
                 RelationObject relationObject = null;
@@ -652,7 +671,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return false;
         }
     }
-    private final class RelationGetterScanner implements MethodScanner {
+    private final class RelationGetterScanner implements MethodScanCallback {
 
         private RelationConstraintMetadata relationMetadata;
 
@@ -663,7 +682,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         public boolean covered = false;
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             if ( method.getName().startsWith("get") ) {
                 Relation relation = method.getAnnotation(Relation.class);
                 if ( null != relation ) {
@@ -773,9 +792,9 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private Method findCustomizedStateIndicatorGetter(Class<?> klass) throws VerificationException {
-        final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(klass);
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, scanner);
+        final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(klass, failureSet);
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
         if ( failureSet.size() > 0 )
             throw new VerificationException(failureSet);
         else {
@@ -845,7 +864,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Method findMethod(Class<?> klass, String setterName, Class<?> returnType) {
         final MethodSignatureScanner scanner = new MethodSignatureScanner(setterName, new Class<?>[] { returnType });
-        scanMethodsOnClasses(new Class<?>[] { klass }, null, scanner);
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
         return scanner.getMethod();
     }
 
@@ -859,7 +878,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Method findDefaultStateGetterMethod(Class<?> klass) {
         final StateIndicatorDefaultMethodScanner scanner = new StateIndicatorDefaultMethodScanner();
-        scanMethodsOnClasses(new Class[] { klass }, null, scanner);
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
         return scanner.getDefaultMethod();
     }
 
@@ -889,9 +908,9 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata, VerificationFailureSet failureSet) {
-        CoverageVerifier coverage = new CoverageVerifier(transitionMetadata);
-        scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, coverage);
+    private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata, final VerificationFailureSet failureSet) {
+        CoverageVerifier coverage = new CoverageVerifier(transitionMetadata, failureSet);
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
                     transitionMetadata.getDottedPath().getName(), getMetaType().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
@@ -899,10 +918,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyTransitionMethodsValidity(final Class<?> klass, final VerificationFailureSet failureSet) {
-        scanMethodsOnClasses(new Class<?>[] { klass }, failureSet, new MethodScanner() {
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
 
             @Override
-            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            public boolean onMethodFound(Method method) {
                 verifyTransitionMethod(method, failureSet);
                 return false;
             }
@@ -910,10 +929,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureConditions(final Class<?> klass) {
-        scanMethodsOnClasses(new Class<?>[] { klass }, null, new MethodScanner() {
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
 
             @Override
-            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            public boolean onMethodFound(Method method) {
                 final Condition conditionMeta = method.getAnnotation(Condition.class);
                 if ( null == conditionMeta ) {
                     return false;
@@ -940,10 +959,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureTransitionObjects(final Class<?> klass) {
-        scanMethodsOnClasses(new Class<?>[] { klass }, null, new MethodScanner() {
+        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
 
             @Override
-            public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+            public boolean onMethodFound(Method method) {
                 final Transition transitionAnno = method.getAnnotation(Transition.class);
                 if ( null == transitionAnno ) {
                     return false;
@@ -964,12 +983,12 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         });
     }
 
-    private final class StateIndicatorDefaultMethodScanner implements MethodScanner {
+    private final class StateIndicatorDefaultMethodScanner implements MethodScanCallback {
 
         private Method defaultStateGetterMethod = null;
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             if ( "getState".equals(method.getName()) ) {
                 if ( String.class.equals(method.getReturnType()) && null == defaultStateGetterMethod ) {
                     defaultStateGetterMethod = method;
@@ -986,18 +1005,20 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return defaultStateGetterMethod;
         }
     }
-    private final class StateIndicatorGetterMethodScanner implements MethodScanner {
+    private final class StateIndicatorGetterMethodScanner implements MethodScanCallback {
 
         private Method stateGetterMethod = null;
         private boolean overridingFound = false;
         private final Class<?> klass;
+        private final VerificationFailureSet failureSet;
 
-        public StateIndicatorGetterMethodScanner(Class<?> klass) {
+        public StateIndicatorGetterMethodScanner(Class<?> klass, final VerificationFailureSet failureSet) {
             this.klass = klass;
+            this.failureSet = failureSet;
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             if ( null == stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
                 stateGetterMethod = method;
                 overridingFound = null != method.getAnnotation(LifecycleOverride.class);
@@ -1015,7 +1036,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return stateGetterMethod;
         }
     }
-    private final class MethodSignatureScanner implements MethodScanner {
+    private final class MethodSignatureScanner implements MethodScanCallback {
 
         private Method targetMethod = null;
         private String targetMethodName = null;
@@ -1027,7 +1048,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             if ( null == targetMethod && targetMethodName.equals(method.getName()) && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
                 targetMethod = method;
                 return true;
@@ -1039,13 +1060,15 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return targetMethod;
         }
     }
-    private final class CoverageVerifier implements MethodScanner {
+    private final class CoverageVerifier implements MethodScanCallback {
 
         private final TransitionMetadata transitionMetadata;
         HashSet<Class<?>> declaringClass = new HashSet<>();
+        private final VerificationFailureSet failureSet;
 
-        private CoverageVerifier(TransitionMetadata transitionMetadata) {
+        private CoverageVerifier(final TransitionMetadata transitionMetadata, final VerificationFailureSet failureSet) {
             this.transitionMetadata = transitionMetadata;
+            this.failureSet = failureSet;
         }
 
         public boolean notCovered() {
@@ -1053,7 +1076,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
 
         @Override
-        public boolean onMethodFound(Method method, VerificationFailureSet failureSet) {
+        public boolean onMethodFound(Method method) {
             if ( !match(transitionMetadata, method) ) {
                 return false;
             }
