@@ -63,7 +63,7 @@ import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.KeySet;
 import net.madz.util.MethodScanCallback;
-import net.madz.util.MethodScannerImpl;
+import net.madz.util.MethodScanner;
 import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
@@ -131,7 +131,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this, this, failureSet);
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( 0 < failureSet.size() ) throw new VerificationException(failureSet);
     }
 
@@ -269,7 +269,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private void verifyCallbackMethods(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner(this, failureSet);
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -288,7 +288,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyConditionBeCovered(Class<?> klass, final ConditionMetadata conditionMetadata) throws VerificationException {
         final ScannerForVerifyConditionCoverage scanner = new ScannerForVerifyConditionCoverage(conditionMetadata);
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( !scanner.isCovered() ) {
             throw newVerificationException(getDottedPath(), SyntaxErrors.LM_CONDITION_NOT_COVERED, klass, getMetaType().getDottedPath(),
                     conditionMetadata.getDottedPath());
@@ -297,7 +297,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, new ConditionProviderMethodScanner(this, klass, getMetaType(), failureSet));
+        MethodScanner.scanMethodsOnClasses(klass, new ConditionProviderMethodScanner(this, klass, getMetaType(), failureSet));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -354,7 +354,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private void verifyRelationBeCovered(Class<?> klass, final RelationConstraintMetadata relation, final TransitionMetadata transition)
             throws VerificationException {
         final TransitionMethodScanner scanner = new TransitionMethodScanner(transition);
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         final Method[] transitionMethods = scanner.getTransitionMethods();
         NEXT_TRANSITION_METHOD: for ( final Method method : transitionMethods ) {
             if ( hasRelationOnMethodParameters(relation, method) ) {
@@ -365,7 +365,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 continue NEXT_TRANSITION_METHOD;
             }
             final RelationGetterScanner relationGetterScanner = new RelationGetterScanner(this, relation);
-            MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, relationGetterScanner);
+            MethodScanner.scanMethodsOnClasses(klass, relationGetterScanner);
             if ( relationGetterScanner.isCovered() ) {
                 continue NEXT_TRANSITION_METHOD;
             }
@@ -436,7 +436,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner(this, failureSet);
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
         }
@@ -529,7 +529,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private Method findCustomizedStateIndicatorGetter(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
         final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(this, klass, failureSet);
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( failureSet.size() > 0 )
             throw new VerificationException(failureSet);
         else {
@@ -599,7 +599,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Method findMethod(Class<?> klass, String setterName, Class<?> returnType) {
         final MethodSignatureScanner scanner = new MethodSignatureScanner(setterName, new Class<?>[] { returnType });
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         return scanner.getMethod();
     }
 
@@ -613,7 +613,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Method findDefaultStateGetterMethod(Class<?> klass) {
         final StateIndicatorDefaultMethodScanner scanner = new StateIndicatorDefaultMethodScanner();
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
+        MethodScanner.scanMethodsOnClasses(klass, scanner);
         return scanner.getDefaultMethod();
     }
 
@@ -645,7 +645,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata, final VerificationFailureSet failureSet) {
         CoverageVerifier coverage = new CoverageVerifier(this, transitionMetadata, failureSet);
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, coverage);
+        MethodScanner.scanMethodsOnClasses(klass, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
                     transitionMetadata.getDottedPath().getName(), getMetaType().getDottedPath().getAbsoluteName(), klass.getSimpleName()));
@@ -653,7 +653,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyTransitionMethodsValidity(final Class<?> klass, final VerificationFailureSet failureSet) {
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
+        MethodScanner.scanMethodsOnClasses(klass, new MethodScanCallback() {
 
             @Override
             public boolean onMethodFound(Method method) {
@@ -664,7 +664,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureConditions(final Class<?> klass) {
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
+        MethodScanner.scanMethodsOnClasses(klass, new MethodScanCallback() {
 
             @Override
             public boolean onMethodFound(Method method) {
@@ -694,7 +694,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureTransitionObjects(final Class<?> klass) {
-        MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, new MethodScanCallback() {
+        MethodScanner.scanMethodsOnClasses(klass, new MethodScanCallback() {
 
             @Override
             public boolean onMethodFound(Method method) {
