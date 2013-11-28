@@ -40,9 +40,7 @@ public final class CallbackMethodConfigureScanner {
     }
 
     public void scanMethod() throws VerificationException {
-        if ( klass.isInterface() ) {
-            return;
-        }
+        if ( klass.isInterface() ) return;
         for ( Class<?> clazz = klass; clazz != null && clazz != Object.class; clazz = clazz.getSuperclass() ) {
             for ( Method method : clazz.getDeclaredMethods() ) {
                 onMethodFound(method);
@@ -51,12 +49,8 @@ public final class CallbackMethodConfigureScanner {
     }
 
     public boolean onMethodFound(Method method) throws VerificationException {
-        if ( !isCallbackMethod(method) ) {
-            return false;
-        }
-        if ( lifecycleOverridenCallbackDefinitionSet.contains(method.getName()) ) {
-            return false;
-        }
+        if ( !isCallbackMethod(method) ) return false;
+        if ( lifecycleOverridenCallbackDefinitionSet.contains(method.getName()) ) return false;
         configureCallbacks(method, method.getAnnotation(Callbacks.class));
         configurePreStateChange(method, method.getAnnotation(PreStateChange.class));
         configurePostStateChange(method, method.getAnnotation(PostStateChange.class));
@@ -67,9 +61,7 @@ public final class CallbackMethodConfigureScanner {
     }
 
     private void configureCallbacks(final Method method, final Callbacks callbacks) throws VerificationException {
-        if ( null == callbacks ) {
-            return;
-        }
+        if ( null == callbacks ) return;
         final PreStateChange[] preStateChange = callbacks.preStateChange();
         for ( final PreStateChange item : preStateChange ) {
             configurePreStateChange(method, item);
@@ -81,9 +73,7 @@ public final class CallbackMethodConfigureScanner {
     }
 
     private void configurePreStateChange(final Method method, final PreStateChange preStateChange) throws VerificationException {
-        if ( null == preStateChange ) {
-            return;
-        }
+        if ( null == preStateChange ) return;
         final Class<?> from = preStateChange.from();
         final Class<?> to = preStateChange.to();
         final String observableName = preStateChange.observableName();
@@ -148,9 +138,7 @@ public final class CallbackMethodConfigureScanner {
     }
 
     private void configurePostStateChange(Method method, PostStateChange postStateChange) throws VerificationException {
-        if ( null == postStateChange ) {
-            return;
-        }
+        if ( null == postStateChange ) return;
         final Class<?> from = postStateChange.from();
         final Class<?> to = postStateChange.to();
         final String observableName = postStateChange.observableName();
@@ -249,13 +237,9 @@ public final class CallbackMethodConfigureScanner {
             return evaluateRelationKeyFromRelationField(mappedBy, observerField);
         }
         Method observerMethod = evaluateObserverMethod(klass, mappedBy);
-        if ( null == observerMethod ) {
-            return null;
-        }
+        if ( null == observerMethod ) return null;
         final Relation relation = observerMethod.getAnnotation(Relation.class);
-        if ( null == relation ) {
-            return null;
-        }
+        if ( null == relation ) return null;
         if ( Null.class != relation.value() ) {
             return relation.value().getName();
         } else {
@@ -409,18 +393,16 @@ public final class CallbackMethodConfigureScanner {
             }
             return observableField.getType();
         }
+        return evaluateObservableClassFromProperties(klass, observableName);
+    }
+
+    private Class<?> evaluateObservableClassFromProperties(Class<?> klass, String observableName) {
         final Method observableMethod = findObservableMethod(klass, observableName);
-        if ( null == observableMethod ) {
-            return null;
-        }
-        Class<?> relatedClass = observableMethod.getReturnType();
-        if ( relatedClass.isArray() ) {
-            return relatedClass.getComponentType();
-        } else if ( Iterable.class.isAssignableFrom(relatedClass) ) {
-            return null;
-        } else {
-            return relatedClass;
-        }
+        if ( null == observableMethod ) return null;
+        final Class<?> relatedClass = observableMethod.getReturnType();
+        if ( Iterable.class.isAssignableFrom(relatedClass) ) return null;
+        if ( relatedClass.isArray() ) return relatedClass.getComponentType();
+        return relatedClass;
     }
 
     private Method findObservableMethod(Class<?> klass, String observableName) {
