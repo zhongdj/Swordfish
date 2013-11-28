@@ -36,7 +36,7 @@ public abstract class ObjectBuilderBase<SELF extends MetaObject<SELF, TYPE>, PAR
 
     @Override
     public AnnotationMetaBuilder<SELF, PARENT> build(Class<?> klass, PARENT parent) throws VerificationException {
-        setPrimaryKey(klass);
+        setPrimaryKey(getMetaType().getPrimaryKey());
         addKeys(getMetaType().getKeySet());
         return this;
     }

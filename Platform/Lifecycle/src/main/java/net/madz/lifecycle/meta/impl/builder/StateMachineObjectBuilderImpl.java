@@ -811,8 +811,9 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public StateMachineObjectBuilder<S> build(Class<?> klass, StateMachineObject<S> parent) throws VerificationException {
-        super.build(klass, parent);
+        setPrimaryKey(klass);
         addKey(klass);
+        addKeys(getMetaType().getKeySet());
         verifySyntax(klass);
         configureStateIndicatorAccessor(klass);
         configureConditions(klass);
