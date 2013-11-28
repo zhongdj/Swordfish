@@ -88,10 +88,6 @@ public class InterceptContext<V, R> implements UnlockableStack {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
     public long getEndTime() {
         return endTime;
     }
