@@ -74,8 +74,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
     private final KeyedList<TransitionObject> transitionObjectList = new KeyedList<>(TransitionObject.class);
-    private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
-    private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
+    private final KeyedList<ConditionObject> conditionObjectList = new KeyedList<>(ConditionObject.class);
     private final HashMap<Object, StateObject<S>> stateMap = new HashMap<>();
     private final ArrayList<StateObject<S>> stateList = new ArrayList<>();
     private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
@@ -686,11 +685,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     protected void configureCondition(Class<?> klass, Method method, ConditionMetadata conditionMetadata) throws VerificationException {
         ConditionObjectBuilder builder = new ConditionObjectBuilderImpl(this, method, conditionMetadata);
         builder.build(klass, this);
-        final Iterator<Object> iterator = builder.getKeySet().iterator();
-        while ( iterator.hasNext() ) {
-            this.conditionObjectMap.put(iterator.next(), builder.getMetaData());
-        }
-        this.conditionObjectList.add(builder);
+        conditionObjectList.add(builder.getMetaData());
     }
 
     private void configureTransitionObjects(final Class<?> klass) {
@@ -911,7 +906,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private ConditionObject getConditionObject(Class<?> conditionClass) {
-        return this.conditionObjectMap.get(conditionClass);
+        return this.conditionObjectList.get(conditionClass);
     }
 
     @Override
