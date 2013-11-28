@@ -24,10 +24,12 @@ public final class RelationGetterConfigureScanner implements MethodScanCallback 
     private final StateMachineObjectBuilderImpl<?> stateMachineObjectBuilderImpl;
     final private StateMachineObject<?> stateMachineObject;
     private final VerificationFailureSet failureSet;
+    private final Class<?> klass;
 
-    public RelationGetterConfigureScanner(StateMachineObjectBuilderImpl<?> stateMachineObjectBuilderImpl, StateMachineObject<?> stateMachineObject,
-            VerificationFailureSet failureSet) {
+    public RelationGetterConfigureScanner(Class<?> klass, StateMachineObjectBuilderImpl<?> stateMachineObjectBuilderImpl,
+            StateMachineObject<?> stateMachineObject, VerificationFailureSet failureSet) {
         super();
+        this.klass = klass;
         this.stateMachineObjectBuilderImpl = stateMachineObjectBuilderImpl;
         this.stateMachineObject = stateMachineObject;
         this.failureSet = failureSet;
@@ -52,7 +54,7 @@ public final class RelationGetterConfigureScanner implements MethodScanCallback 
                 } else {
                     relationMetadata = relatedStateMachine.getRelationMetadata(relation.value());
                 }
-                relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
+                relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata).build(klass, stateMachineObject).getMetaData();
                 this.stateMachineObjectBuilderImpl.addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
             } catch (VerificationException e) {
                 failureSet.add(e);
