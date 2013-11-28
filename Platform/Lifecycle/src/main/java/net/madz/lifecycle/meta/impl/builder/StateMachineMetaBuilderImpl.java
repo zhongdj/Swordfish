@@ -871,17 +871,24 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     private RelationMetadata findRelation(StateMachineMetadata stateMachineMetadata, Object relationKey) {
-        if ( null == stateMachineMetadata ) {
-            throw new IllegalStateException("Cannot find relation with Key: " + relationKey);
-        }
         RelationMetadata relationMetadata = stateMachineMetadata.getDeclaredRelationMetadata(relationKey);
         if ( null != relationMetadata ) {
             return relationMetadata;
+        }
+        if ( stateMachineMetadata.isComposite()) {
+            relationMetadata = stateMachineMetadata.getOwningStateMachine().getRelationMetadata(relationKey);
+            if (null != relationMetadata) {
+                return relationMetadata;
+            }
         }
         for ( StateMachineMetadata builder : stateMachineMetadata.getCompositeStateMachines() ) {
             relationMetadata = builder.getDeclaredRelationMetadata(relationKey);
             if ( null != relationMetadata ) return relationMetadata;
         }
-        return findRelation(getSuper(), relationKey);
+        if (stateMachineMetadata.hasSuper()) {
+            return findRelation(stateMachineMetadata.getSuper(), relationKey);
+        } else {
+            throw new IllegalStateException("Cannot find relation with Key: " + relationKey);
+        }
     }
 }
