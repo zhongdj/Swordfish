@@ -10,7 +10,7 @@ import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
-import net.madz.lifecycle.meta.impl.builder.RelationalCallbackObject;
+import net.madz.lifecycle.meta.impl.builder.CallbackObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 
 public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>, StateMachineMetadata> {
@@ -231,13 +231,13 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     RelationObject getRelationObject(Object primaryKey);
 
-    void addSpecificPreStateChangeCallbackObject(RelationalCallbackObject item);
+    void addSpecificPreStateChangeCallbackObject(CallbackObject item);
 
-    void addCommonPreStateChangeCallbackObject(RelationalCallbackObject item);
+    void addCommonPreStateChangeCallbackObject(CallbackObject item);
 
-    void addSpecificPostStateChangeCallbackObject(RelationalCallbackObject item);
+    void addSpecificPostStateChangeCallbackObject(CallbackObject item);
 
-    void addCommonPostStateChangeCallbackObject(RelationalCallbackObject item);
+    void addCommonPostStateChangeCallbackObject(CallbackObject item);
 
     RelationObject getParentRelationObject();
 }

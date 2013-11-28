@@ -9,7 +9,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,24 +26,29 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.LifecycleLock;
-import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
-import net.madz.lifecycle.annotations.callback.AnyState;
-import net.madz.lifecycle.annotations.callback.CallbackConsts;
-import net.madz.lifecycle.annotations.callback.Callbacks;
-import net.madz.lifecycle.annotations.callback.PostStateChange;
-import net.madz.lifecycle.annotations.callback.PreStateChange;
 import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
-import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.meta.builder.ConditionObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
+import net.madz.lifecycle.meta.impl.builder.helper.CallbackMethodConfigureScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.CallbackMethodVerificationScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.ConditionProviderMethodScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.CoverageVerifier;
+import net.madz.lifecycle.meta.impl.builder.helper.MethodSignatureScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.RelationGetterConfigureScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.RelationGetterScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.RelationIndicatorPropertyMethodScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.ScannerForVerifyConditionCoverage;
+import net.madz.lifecycle.meta.impl.builder.helper.StateIndicatorDefaultMethodScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.StateIndicatorGetterMethodScanner;
+import net.madz.lifecycle.meta.impl.builder.helper.TransitionMethodScanner;
 import net.madz.lifecycle.meta.instance.ConditionObject;
 import net.madz.lifecycle.meta.instance.FunctionMetadata;
 import net.madz.lifecycle.meta.instance.RelationObject;
@@ -57,7 +61,6 @@ import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 import net.madz.meta.KeySet;
 import net.madz.util.MethodScanCallback;
 import net.madz.util.MethodScannerImpl;
@@ -127,7 +130,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return;
         }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this, failureSet);
+        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(this, this, failureSet);
         MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
         if ( 0 < failureSet.size() ) throw new VerificationException(failureSet);
     }
@@ -175,7 +178,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private void addRelation(Class<?> klass, final RelationObject relationObject, final Object primaryKey) {
+    public void addRelation(Class<?> klass, final RelationObject relationObject, final Object primaryKey) {
         this.relationObjectsMap.put(primaryKey, relationObject);
         this.relationObjectList.add(relationObject);
         // [TODO] [Tracy] Need to test parent
@@ -265,87 +268,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyCallbackMethods(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner(failureSet);
+        final CallbackMethodVerificationScanner scanner = new CallbackMethodVerificationScanner(this, failureSet);
         MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, scanner);
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
-        }
-    }
-
-    private final class CallbackMethodVerificationScanner implements MethodScanCallback {
-
-        private VerificationFailureSet failureSet;
-
-        public CallbackMethodVerificationScanner(final VerificationFailureSet failureSet) {
-            this.failureSet = failureSet;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            final PreStateChange preStateChange = method.getAnnotation(PreStateChange.class);
-            if ( null != preStateChange ) {
-                verifyPreStateChange(method, failureSet, preStateChange);
-            }
-            final PostStateChange postStateChange = method.getAnnotation(PostStateChange.class);
-            if ( null != postStateChange ) {
-                verifyPostStateChange(method, failureSet, postStateChange);
-            }
-            final Callbacks callbacks = method.getAnnotation(Callbacks.class);
-            if ( null != callbacks ) {
-                for ( PreStateChange item : callbacks.preStateChange() ) {
-                    verifyPreStateChange(method, failureSet, item);
-                }
-                for ( PostStateChange item : callbacks.postStateChange() ) {
-                    verifyPostStateChange(method, failureSet, item);
-                }
-            }
-            return false;
-        }
-
-        private void verifyPostStateChange(Method method, VerificationFailureSet failureSet, final PostStateChange postStateChange) {
-            Class<?> fromStateClass = postStateChange.from();
-            Class<?> toStateClass = postStateChange.to();
-            String relation = postStateChange.observableName();
-            if ( CallbackConsts.NULL_STR.equals(relation) ) {
-                verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID);
-                verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.POST_STATE_CHANGE_TO_STATE_IS_INVALID);
-            } else {
-                // Relational Syntax verification is done in build stage.
-            }
-        }
-
-        private void verifyPreStateChange(Method method, VerificationFailureSet failureSet, final PreStateChange preStateChange) {
-            Class<?> fromStateClass = preStateChange.from();
-            Class<?> toStateClass = preStateChange.to();
-            String relation = preStateChange.observableName();
-            if ( CallbackConsts.NULL_STR.equals(relation) ) {
-                verifyStateWithoutRelation(method, failureSet, fromStateClass, SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID);
-                verifyStateWithoutRelation(method, failureSet, toStateClass, SyntaxErrors.PRE_STATE_CHANGE_TO_STATE_IS_INVALID);
-                if ( AnyState.class != toStateClass && null != getMetaType().getState(toStateClass) ) {
-                    verifyPreToStatePostEvaluate(method, failureSet, toStateClass, getMetaType());
-                }
-            } else {
-                // Relational Syntax verification is done in build stage.
-            }
-        }
-
-        private void verifyPreToStatePostEvaluate(Method method, VerificationFailureSet failureSet, Class<?> toStateClass,
-                StateMachineMetadata stateMachineMetadata) {
-            for ( final TransitionMetadata transition : stateMachineMetadata.getState(toStateClass).getPossibleReachingTransitions() ) {
-                if ( transition.isConditional() && transition.postValidate() ) {
-                    failureSet.add(newVerificationFailure(getDottedPath(), SyntaxErrors.PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID, toStateClass,
-                            method, transition.getDottedPath()));
-                }
-            }
-        }
-
-        private void verifyStateWithoutRelation(final Method method, final VerificationFailureSet failureSet, final Class<?> stateClass, final String errorCode) {
-            if ( AnyState.class != stateClass ) {
-                if ( null == getMetaType().getState(stateClass) ) {
-                    failureSet.add(newVerificationException(method.getDeclaringClass().getName() + "." + stateClass + "." + errorCode, errorCode, stateClass,
-                            method, getMetaType().getPrimaryKey()));
-                }
-            }
         }
     }
 
@@ -369,73 +295,11 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private final class ScannerForVerifyConditionCoverage implements MethodScanCallback {
-
-        private final ConditionMetadata conditionMetadata;
-        private boolean covered = false;
-
-        public ScannerForVerifyConditionCoverage(ConditionMetadata conditionMetadata) {
-            this.conditionMetadata = conditionMetadata;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            final Condition condition = method.getAnnotation(Condition.class);
-            if ( null != condition ) {
-                if ( conditionMetadata.getKeySet().contains(condition.value()) ) {
-                    covered = true;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public boolean isCovered() {
-            return covered;
-        }
-    }
-
     private void verifyConditionReferenceValid(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, new ConditionProviderMethodScanner(klass, getMetaType(), failureSet));
+        MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, new ConditionProviderMethodScanner(this, klass, getMetaType(), failureSet));
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
-        }
-    }
-
-    private final class ConditionProviderMethodScanner implements MethodScanCallback {
-
-        private final VerificationFailureSet failureSet;
-        private HashSet<Class<?>> conditions = new HashSet<>();
-        private StateMachineMetadata template;
-        private Class<?> klass;
-
-        public ConditionProviderMethodScanner(Class<?> klass, StateMachineMetadata template, VerificationFailureSet failureSet) {
-            this.template = template;
-            this.klass = klass;
-            this.failureSet = failureSet;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            final Condition condition = method.getAnnotation(Condition.class);
-            if ( null != condition ) {
-                if ( template.hasCondition(condition.value()) ) {
-                    if ( conditions.contains(condition.value()) ) {
-                        failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_MULTIPLE_METHODS_REFERENCE_SAME_CONDITION, klass,
-                                condition.value()));
-                    } else {
-                        if ( !condition.value().isAssignableFrom(method.getReturnType()) ) {
-                            failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_OBJECT_DOES_NOT_IMPLEMENT_CONDITION_INTERFACE,
-                                    method, condition.value()));
-                        }
-                        conditions.add(condition.value());
-                    }
-                } else {
-                    failureSet.add(newVerificationException(klass.getName(), SyntaxErrors.LM_CONDITION_REFERENCE_INVALID, method, condition.value()));
-                }
-            }
-            return false;
         }
     }
 
@@ -500,7 +364,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             if ( !klass.isInterface() && scanFieldsRelation(klass, relation) ) {
                 continue NEXT_TRANSITION_METHOD;
             }
-            final RelationGetterScanner relationGetterScanner = new RelationGetterScanner(relation);
+            final RelationGetterScanner relationGetterScanner = new RelationGetterScanner(this, relation);
             MethodScannerImpl.scanMethodsOnClasses(new Class[] { klass }, relationGetterScanner);
             if ( relationGetterScanner.isCovered() ) {
                 continue NEXT_TRANSITION_METHOD;
@@ -549,40 +413,8 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         return false;
     }
 
-    private boolean isKeyOfRelationMetadata(final RelationConstraintMetadata relation, Object key) {
+    public boolean isKeyOfRelationMetadata(final RelationConstraintMetadata relation, Object key) {
         return relation.getKeySet().contains(key);
-    }
-
-    private final class TransitionMethodScanner implements MethodScanCallback {
-
-        private final TransitionMetadata transition;
-
-        public TransitionMethodScanner(final TransitionMetadata transition) {
-            this.transition = transition;
-        }
-
-        private ArrayList<Method> transitionMethodList = new ArrayList<Method>();
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            final Transition transitionAnno = method.getAnnotation(Transition.class);
-            if ( null != transitionAnno ) {
-                if ( Null.class != transitionAnno.value() ) {
-                    if ( transitionAnno.value().getSimpleName().equals(transition.getDottedPath().getName()) ) {
-                        transitionMethodList.add(method);
-                    }
-                } else {
-                    if ( StringUtil.toUppercaseFirstCharacter(method.getName()).equals(transition.getDottedPath().getName()) ) {
-                        transitionMethodList.add(method);
-                    }
-                }
-            }
-            return false;
-        }
-
-        public Method[] getTransitionMethods() {
-            return transitionMethodList.toArray(new Method[0]);
-        }
     }
 
     private void verifyRelationInstancesDefinedCorrectly(Class<?> klass) throws VerificationException {
@@ -603,107 +435,10 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return;
         }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner(failureSet);
+        RelationIndicatorPropertyMethodScanner scanner = new RelationIndicatorPropertyMethodScanner(this, failureSet);
         MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
         if ( failureSet.size() > 0 ) {
             throw new VerificationException(failureSet);
-        }
-    }
-
-    private final class RelationIndicatorPropertyMethodScanner implements MethodScanCallback {
-
-        private final VerificationFailureSet failureSet;
-
-        public RelationIndicatorPropertyMethodScanner(VerificationFailureSet failureSet) {
-            this.failureSet = failureSet;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            Relation relation = method.getAnnotation(Relation.class);
-            if ( null == relation ) {
-                return false;
-            } else {
-                if ( Null.class == relation.value() ) {} else if ( !getMetaType().hasRelation(relation.value()) ) {
-                    failureSet.add(newVerificationFailure(method.getDeclaringClass().getName(), SyntaxErrors.LM_REFERENCE_INVALID_RELATION_INSTANCE, method
-                            .getDeclaringClass().getName(), relation.value().getName(), getMetaType().getDottedPath().getAbsoluteName()));
-                }
-            }
-            return false;
-        }
-    }
-    private final class RelationGetterConfigureScanner implements MethodScanCallback {
-
-        final private StateMachineObject<S> stateMachineObject;
-        private final VerificationFailureSet failureSet;
-
-        public RelationGetterConfigureScanner(StateMachineObject<S> stateMachineObject, VerificationFailureSet failureSet) {
-            super();
-            this.stateMachineObject = stateMachineObject;
-            this.failureSet = failureSet;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            Relation relation = method.getAnnotation(Relation.class);
-            if ( null != relation ) {
-                RelationObject relationObject = null;
-                StateMachineMetadata relatedStateMachine = null;
-                try {
-                    relatedStateMachine = getMetaType().getRegistry().loadStateMachineMetadata(
-                            method.getDeclaringClass().getAnnotation(LifecycleMeta.class).value(), null);
-                    final RelationMetadata relationMetadata;
-                    if ( Null.class == relation.value() ) {
-                        if ( method.getName().startsWith("get") ) {
-                            relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName().substring(3)));
-                        } else {
-                            relationMetadata = relatedStateMachine.getRelationMetadata(StringUtil.toUppercaseFirstCharacter(method.getName()));
-                        }
-                    } else {
-                        relationMetadata = relatedStateMachine.getRelationMetadata(relation.value());
-                    }
-                    relationObject = new RelationObjectBuilderImpl(stateMachineObject, method, relationMetadata);
-                    addRelation(method.getDeclaringClass(), relationObject, relationMetadata.getPrimaryKey());
-                } catch (VerificationException e) {
-                    failureSet.add(e);
-                }
-            }
-            return false;
-        }
-    }
-    private final class RelationGetterScanner implements MethodScanCallback {
-
-        private RelationConstraintMetadata relationMetadata;
-
-        public RelationGetterScanner(RelationConstraintMetadata relation) {
-            this.relationMetadata = relation;
-        }
-
-        public boolean covered = false;
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            if ( method.getName().startsWith("get") ) {
-                Relation relation = method.getAnnotation(Relation.class);
-                if ( null != relation ) {
-                    if ( Null.class == relation.value() ) {
-                        if ( isKeyOfRelationMetadata(relationMetadata, method.getName().substring(3)) ) {
-                            covered = true;
-                            return true;
-                        }
-                    } else {
-                        if ( isKeyOfRelationMetadata(relationMetadata, relation.value()) ) {
-                            covered = true;
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        public boolean isCovered() {
-            return covered;
         }
     }
 
@@ -793,7 +528,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Method findCustomizedStateIndicatorGetter(Class<?> klass) throws VerificationException {
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(klass, failureSet);
+        final StateIndicatorGetterMethodScanner scanner = new StateIndicatorGetterMethodScanner(this, klass, failureSet);
         MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, scanner);
         if ( failureSet.size() > 0 )
             throw new VerificationException(failureSet);
@@ -909,7 +644,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyTransitionBeCovered(Class<?> klass, final TransitionMetadata transitionMetadata, final VerificationFailureSet failureSet) {
-        CoverageVerifier coverage = new CoverageVerifier(transitionMetadata, failureSet);
+        CoverageVerifier coverage = new CoverageVerifier(this, transitionMetadata, failureSet);
         MethodScannerImpl.scanMethodsOnClasses(new Class<?>[] { klass }, coverage);
         if ( coverage.notCovered() ) {
             failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath().getAbsoluteName(), SyntaxErrors.LM_TRANSITION_NOT_CONCRETED_IN_LM,
@@ -981,131 +716,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 return false;
             }
         });
-    }
-
-    private final class StateIndicatorDefaultMethodScanner implements MethodScanCallback {
-
-        private Method defaultStateGetterMethod = null;
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            if ( "getState".equals(method.getName()) ) {
-                if ( String.class.equals(method.getReturnType()) && null == defaultStateGetterMethod ) {
-                    defaultStateGetterMethod = method;
-                    return true;
-                } else if ( null != method.getAnnotation(Converter.class) && null == defaultStateGetterMethod ) {
-                    defaultStateGetterMethod = method;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public Method getDefaultMethod() {
-            return defaultStateGetterMethod;
-        }
-    }
-    private final class StateIndicatorGetterMethodScanner implements MethodScanCallback {
-
-        private Method stateGetterMethod = null;
-        private boolean overridingFound = false;
-        private final Class<?> klass;
-        private final VerificationFailureSet failureSet;
-
-        public StateIndicatorGetterMethodScanner(Class<?> klass, final VerificationFailureSet failureSet) {
-            this.klass = klass;
-            this.failureSet = failureSet;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            if ( null == stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
-                stateGetterMethod = method;
-                overridingFound = null != method.getAnnotation(LifecycleOverride.class);
-                return false;
-            } else if ( null != stateGetterMethod && null != method.getAnnotation(StateIndicator.class) ) {
-                if ( !overridingFound ) {
-                    failureSet.add(newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR, klass));
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public Method getStateGetterMethod() {
-            return stateGetterMethod;
-        }
-    }
-    private final class MethodSignatureScanner implements MethodScanCallback {
-
-        private Method targetMethod = null;
-        private String targetMethodName = null;
-        private Class<?>[] parameterTypes = null;
-
-        public MethodSignatureScanner(String setterName, Class<?>[] classes) {
-            this.targetMethodName = setterName;
-            this.parameterTypes = classes;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            if ( null == targetMethod && targetMethodName.equals(method.getName()) && Arrays.equals(method.getParameterTypes(), parameterTypes) ) {
-                targetMethod = method;
-                return true;
-            }
-            return false;
-        }
-
-        public Method getMethod() {
-            return targetMethod;
-        }
-    }
-    private final class CoverageVerifier implements MethodScanCallback {
-
-        private final TransitionMetadata transitionMetadata;
-        HashSet<Class<?>> declaringClass = new HashSet<>();
-        private final VerificationFailureSet failureSet;
-
-        private CoverageVerifier(final TransitionMetadata transitionMetadata, final VerificationFailureSet failureSet) {
-            this.transitionMetadata = transitionMetadata;
-            this.failureSet = failureSet;
-        }
-
-        public boolean notCovered() {
-            return declaringClass.size() == 0;
-        }
-
-        @Override
-        public boolean onMethodFound(Method method) {
-            if ( !match(transitionMetadata, method) ) {
-                return false;
-            }
-            if ( !declaringClass.contains(method.getDeclaringClass()) ) {
-                declaringClass.add(method.getDeclaringClass());
-                return false;
-            }
-            final TransitionTypeEnum type = transitionMetadata.getType();
-            if ( isUniqueTransition(type) ) {
-                failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(), SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
-                        transitionMetadata.getDottedPath().getName(), "@" + type.name(), getMetaType().getDottedPath(), getDottedPath().getAbsoluteName()));
-            }
-            return false;
-        }
-
-        private boolean isUniqueTransition(final TransitionTypeEnum type) {
-            return type == TransitionTypeEnum.Corrupt || type == TransitionTypeEnum.Recover || type == TransitionTypeEnum.Redo;
-        }
-
-        private boolean match(TransitionMetadata transitionMetadata, Method transitionMethod) {
-            Transition transition = transitionMethod.getAnnotation(Transition.class);
-            if ( null == transition ) return false;
-            final String transitionName = transitionMetadata.getDottedPath().getName();
-            if ( Null.class == transition.value() ) {
-                return transitionName.equals(StringUtil.toUppercaseFirstCharacter(transitionMethod.getName()));
-            } else {
-                return transitionName.equals(transition.value().getSimpleName());
-            }
-        }
     }
 
     private void verifyTransitionMethod(Method method, VerificationFailureSet failureSet) {
@@ -1226,7 +836,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureCallbacks(Class<?> klass) throws VerificationException {
-        final CallbackMethodConfigureScanner<S> scanner = new CallbackMethodConfigureScanner<S>(this, klass);
+        final CallbackMethodConfigureScanner scanner = new CallbackMethodConfigureScanner(this, klass);
         scanner.scanMethod();
     }
 
@@ -1572,22 +1182,38 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void addSpecificPreStateChangeCallbackObject(RelationalCallbackObject item) {
+    public void addSpecificPreStateChangeCallbackObject(CallbackObject item) {
         this.specificPreStateChangeCallbackObjects.add(item);
     }
 
     @Override
-    public void addCommonPreStateChangeCallbackObject(RelationalCallbackObject item) {
+    public void addCommonPreStateChangeCallbackObject(CallbackObject item) {
         this.commonPreStateChangeCallbackObjects.add(item);
     }
 
     @Override
-    public void addSpecificPostStateChangeCallbackObject(RelationalCallbackObject item) {
+    public void addSpecificPostStateChangeCallbackObject(CallbackObject item) {
         this.specificPostStateChangeCallbackObjects.add(item);
     }
 
     @Override
-    public void addCommonPostStateChangeCallbackObject(RelationalCallbackObject item) {
+    public void addCommonPostStateChangeCallbackObject(CallbackObject item) {
         this.commonPostStateChangeCallbackObjects.add(item);
+    }
+
+    public ArrayList<CallbackObject> getSpecificPreStateChangeCallbackObjects() {
+        return specificPreStateChangeCallbackObjects;
+    }
+
+    public ArrayList<CallbackObject> getSpecificPostStateChangeCallbackObjects() {
+        return specificPostStateChangeCallbackObjects;
+    }
+
+    public ArrayList<CallbackObject> getCommonPreStateChangeCallbackObjects() {
+        return commonPreStateChangeCallbackObjects;
+    }
+
+    public ArrayList<CallbackObject> getCommonPostStateChangeCallbackObjects() {
+        return commonPostStateChangeCallbackObjects;
     }
 }

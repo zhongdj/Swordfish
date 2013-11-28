@@ -28,19 +28,19 @@ public abstract class AnnotationMetaBuilderBase<SELF extends MetaData, PARENT ex
         this.registry = registry;
     }
 
-    protected VerificationException newVerificationException(String dottedPathName, String errorCode, Object... args) {
+    public VerificationException newVerificationException(String dottedPathName, String errorCode, Object... args) {
         return new VerificationException(newVerificationFailure(dottedPathName, errorCode, args));
     }
 
-    protected VerificationException newVerificationException(DottedPath dottedPath, String errorCode, Object... args) {
+    public VerificationException newVerificationException(DottedPath dottedPath, String errorCode, Object... args) {
         return new VerificationException(newVerificationFailure(dottedPath.getAbsoluteName(), errorCode, args));
     }
 
-    protected VerificationFailure newVerificationFailure(DottedPath dottedPath, String errorCode, Object... args) {
+    public VerificationFailure newVerificationFailure(DottedPath dottedPath, String errorCode, Object... args) {
         return newVerificationFailure(dottedPath.getAbsoluteName(), errorCode, args);
     }
 
-    protected VerificationFailure newVerificationFailure(String dottedPathName, String errorCode, Object... args) {
+    public VerificationFailure newVerificationFailure(String dottedPathName, String errorCode, Object... args) {
         return new VerificationFailure(this, dottedPathName, errorCode, BundleUtils.getBundledMessage(getClass(), SyntaxErrors.SYNTAX_ERROR_BUNDLE, errorCode,
                 args));
     }

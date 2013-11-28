@@ -75,7 +75,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
 
     protected void verifySuper(Class<?> metaClass) throws VerificationException {}
 
-    protected boolean hasOverrides(AnnotatedElement metaClass) {
+    public boolean hasOverrides(AnnotatedElement metaClass) {
         return null != metaClass.getAnnotation(LifecycleOverride.class);
     }
 

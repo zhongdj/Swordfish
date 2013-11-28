@@ -1,4 +1,4 @@
-package net.madz.lifecycle.meta.impl.builder;
+package net.madz.lifecycle.meta.impl.builder.helper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -20,19 +20,22 @@ import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.meta.FieldEvaluator;
 import net.madz.lifecycle.meta.MetaObject.ReadAccessor;
 import net.madz.lifecycle.meta.PropertyEvaluator;
+import net.madz.lifecycle.meta.impl.builder.CallbackObject;
+import net.madz.lifecycle.meta.impl.builder.RelationalCallbackObject;
+import net.madz.lifecycle.meta.impl.builder.StateMachineObjectBuilderImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 
-final class CallbackMethodConfigureScanner<S> {
+public final class CallbackMethodConfigureScanner {
 
-    private final StateMachineObjectBuilderImpl<S> stateMachineObjectBuilderImpl;
+    private final StateMachineObjectBuilderImpl<?> stateMachineObjectBuilderImpl;
     private final Class<?> klass;
     private final HashSet<String> lifecycleOverridenCallbackDefinitionSet = new HashSet<>();
 
-    public CallbackMethodConfigureScanner(StateMachineObjectBuilderImpl<S> stateMachineObjectBuilderImpl, Class<?> klass) {
+    public CallbackMethodConfigureScanner(StateMachineObjectBuilderImpl<?> stateMachineObjectBuilderImpl, Class<?> klass) {
         this.stateMachineObjectBuilderImpl = stateMachineObjectBuilderImpl;
         this.klass = klass;
     }
@@ -91,8 +94,9 @@ final class CallbackMethodConfigureScanner<S> {
         final String mappedBy = preStateChange.mappedBy();
         final Class<?> observableClass = preStateChange.observableClass();
         if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
-            configurePreStateChangeNonRelationalCallbackObjects(method, from, to, this.stateMachineObjectBuilderImpl.specificPreStateChangeCallbackObjects,
-                    this.stateMachineObjectBuilderImpl.commonPreStateChangeCallbackObjects);
+            configurePreStateChangeNonRelationalCallbackObjects(method, from, to,
+                    this.stateMachineObjectBuilderImpl.getSpecificPreStateChangeCallbackObjects(),
+                    this.stateMachineObjectBuilderImpl.getCommonPreStateChangeCallbackObjects());
         } else {
             Class<?> actualObservableClass = null;
             if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
@@ -139,8 +143,7 @@ final class CallbackMethodConfigureScanner<S> {
         final String mappedBy = postStateChange.mappedBy();
         final Class<?> observableClass = postStateChange.observableClass();
         if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
-            configurePostStateChangeNonRelationalCallbackObjects(method, from, to, this.stateMachineObjectBuilderImpl.specificPostStateChangeCallbackObjects,
-                    this.stateMachineObjectBuilderImpl.commonPostStateChangeCallbackObjects);
+            configurePostStateChangeNonRelationalCallbackObjects(method, from, to);
         } else {
             Class<?> actualObservableClass = null;
             if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
@@ -390,7 +393,7 @@ final class CallbackMethodConfigureScanner<S> {
         CallbackObject item = null;
         if ( AnyState.class != from && AnyState.class != to ) {
             item = new CallbackObject(from.getSimpleName(), to.getSimpleName(), method);
-            specificCallbackObjects.add(item);
+            this.stateMachineObjectBuilderImpl.addSpecificPreStateChangeCallbackObject(item);
         } else if ( AnyState.class == from && AnyState.class != to ) {
             item = new CallbackObject(AnyState.class.getSimpleName(), to.getSimpleName(), method);
             this.stateMachineObjectBuilderImpl.getState(to).addPreToCallbackObject(to, item);
@@ -399,16 +402,15 @@ final class CallbackMethodConfigureScanner<S> {
             this.stateMachineObjectBuilderImpl.getState(from).addPreFromCallbackObject(from, item);
         } else {
             item = new CallbackObject(AnyState.class.getSimpleName(), AnyState.class.getSimpleName(), method);
-            commonCallbackObjects.add(item);
+            this.stateMachineObjectBuilderImpl.addCommonPreStateChangeCallbackObject(item);
         }
     }
 
-    private void configurePostStateChangeNonRelationalCallbackObjects(Method method, Class<?> from, Class<?> to,
-            final ArrayList<CallbackObject> specificCallbackObjects, final ArrayList<CallbackObject> commonCallbackObjects) {
+    private void configurePostStateChangeNonRelationalCallbackObjects(Method method, Class<?> from, Class<?> to) {
         CallbackObject item = null;
         if ( AnyState.class != from && AnyState.class != to ) {
             item = new CallbackObject(from.getSimpleName(), to.getSimpleName(), method);
-            specificCallbackObjects.add(item);
+            this.stateMachineObjectBuilderImpl.addSpecificPostStateChangeCallbackObject(item);
         } else if ( AnyState.class == from && AnyState.class != to ) {
             item = new CallbackObject(AnyState.class.getSimpleName(), to.getSimpleName(), method);
             this.stateMachineObjectBuilderImpl.getState(to).addPostToCallbackObject(to, item);
@@ -417,7 +419,7 @@ final class CallbackMethodConfigureScanner<S> {
             this.stateMachineObjectBuilderImpl.getState(from).addPostFromCallbackObject(from, item);
         } else {
             item = new CallbackObject(AnyState.class.getSimpleName(), AnyState.class.getSimpleName(), method);
-            commonCallbackObjects.add(item);
+            this.stateMachineObjectBuilderImpl.addCommonPostStateChangeCallbackObject(item);
         }
     }
 
