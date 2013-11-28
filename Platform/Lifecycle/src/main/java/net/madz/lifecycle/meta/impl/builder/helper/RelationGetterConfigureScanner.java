@@ -43,7 +43,7 @@ public final class RelationGetterConfigureScanner implements MethodScanCallback 
             StateMachineMetadata relatedStateMachine = null;
             try {
                 relatedStateMachine = this.stateMachineObjectBuilderImpl.getMetaType().getRegistry()
-                        .loadStateMachineMetadata(method.getDeclaringClass().getAnnotation(LifecycleMeta.class).value(), null);
+                        .loadStateMachineMetadata(method.getDeclaringClass().getAnnotation(LifecycleMeta.class).value());
                 final RelationMetadata relationMetadata;
                 if ( Null.class == relation.value() ) {
                     if ( method.getName().startsWith("get") ) {
