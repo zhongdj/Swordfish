@@ -1082,8 +1082,8 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public void performPreStateChangeCallback(LifecycleContext<?, S> callbackContext) {
-        final String fromState = evaluateFromState(callbackContext);
-        final String toState = evaluateToState(callbackContext);
+        final String fromState = evaluateTypedState(callbackContext.getFromState());
+        final String toState = evaluateTypedState(callbackContext.getToState());
         if ( null != toState ) {
             invokeSpecificPreStateChangeCallbacks(callbackContext);
         }
@@ -1098,13 +1098,11 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public void performPostStateChangeCallback(LifecycleContext<?, S> callbackContext) {
-        final String fromState = evaluateFromState(callbackContext);
-        final String toState = evaluateToState(callbackContext);
+        final String fromState = evaluateTypedState(callbackContext.getFromState());
+        final String toState = evaluateTypedState(callbackContext.getToState());
         invokeSpecificPostStateChangeCallbacks(callbackContext);
-        final StateObject<S> fromStateObject = getState(fromState);
-        fromStateObject.invokeFromPostStateChangeCallbacks(callbackContext);
-        final StateObject<S> toStateObject = getState(toState);
-        toStateObject.invokeToPostStateChangeCallbacks(callbackContext);
+        getState(fromState).invokeFromPostStateChangeCallbacks(callbackContext);
+        getState(toState).invokeToPostStateChangeCallbacks(callbackContext);
         invokeCommonPostStateChangeCallbacks(callbackContext);
     }
 
@@ -1136,27 +1134,17 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private String evaluateToState(LifecycleContext<?, S> callbackContext) {
-        if ( null == callbackContext.getToState() ) {
+    private String evaluateTypedState(S state) {
+        if ( null == state ) {
             return null;
         }
-        final String toState;
+        final String stateValue;
         if ( null != this.stateConverter ) {
-            toState = stateConverter.toState(callbackContext.getToState());
+            stateValue = stateConverter.toState(state);
         } else {
-            toState = String.valueOf(callbackContext.getToState());
+            stateValue = String.valueOf(state);
         }
-        return toState;
-    }
-
-    private String evaluateFromState(LifecycleContext<?, S> callbackContext) {
-        final String fromState;
-        if ( null != this.stateConverter ) {
-            fromState = stateConverter.toState(callbackContext.getFromState());
-        } else {
-            fromState = String.valueOf(callbackContext.getFromState());
-        }
-        return fromState;
+        return stateValue;
     }
 
     @Override
