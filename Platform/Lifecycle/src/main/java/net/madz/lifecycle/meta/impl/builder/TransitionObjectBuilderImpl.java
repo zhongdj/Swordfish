@@ -7,8 +7,6 @@ import net.madz.lifecycle.meta.builder.TransitionObjectBuilder;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.instance.TransitionObject;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
-import net.madz.meta.MetaData;
-import net.madz.meta.MetaDataFilter;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
@@ -37,10 +35,5 @@ public class TransitionObjectBuilderImpl extends ObjectBuilderBase<TransitionObj
     @Override
     public void verifyMetaData(VerificationFailureSet verificationSet) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public TransitionObjectBuilder filter(MetaData parent, MetaDataFilter filter, boolean lazyFilter) {
-        return this;
     }
 }

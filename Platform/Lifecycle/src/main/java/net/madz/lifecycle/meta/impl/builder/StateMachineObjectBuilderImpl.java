@@ -62,6 +62,7 @@ import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.lifecycle.meta.template.TransitionMetadata;
 import net.madz.meta.KeySet;
+import net.madz.util.KeyedList;
 import net.madz.util.MethodScanCallback;
 import net.madz.util.MethodScanner;
 import net.madz.util.StringUtil;
@@ -71,9 +72,8 @@ import net.madz.verification.VerificationFailureSet;
 public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMachineObject<S>, StateMachineObject<S>, StateMachineMetadata> implements
         StateMachineObjectBuilder<S> {
 
-    private final HashMap<Object, TransitionObject> transitionObjectMap = new HashMap<>();
-    private final ArrayList<TransitionObject> transitionObjectList = new ArrayList<>();
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
+    private final KeyedList<TransitionObject> transitionObjectList = new KeyedList<>(TransitionObject.class);
     private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
     private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
     private final HashMap<Object, StateObject<S>> stateMap = new HashMap<>();
@@ -737,17 +737,14 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private void configureTransitionObject(final Class<?> klass, final Method method, final TransitionMetadata transitionMetadata) throws VerificationException {
         final TransitionObjectBuilderImpl transitionObjectBuilder = new TransitionObjectBuilderImpl(this, method, transitionMetadata);
         transitionObjectBuilder.build(klass, this);
-        transitionObjectList.add(transitionObjectBuilder.getMetaData());
-        final Iterator<Object> iterator = transitionObjectBuilder.getKeySet().iterator();
-        while ( iterator.hasNext() ) {
-            this.transitionObjectMap.put(iterator.next(), transitionObjectBuilder.getMetaData());
-        }
+        final TransitionObject transitionObject = transitionObjectBuilder.getMetaData();
+        transitionObjectList.add(transitionObject);
         if ( null == transitionMetadataMap.get(transitionMetadata) ) {
             final LinkedList<TransitionObject> transitionObjects = new LinkedList<>();
-            transitionObjects.add(transitionObjectBuilder.getMetaData());
+            transitionObjects.add(transitionObject);
             transitionMetadataMap.put(transitionMetadata, transitionObjects);
         } else {
-            transitionMetadataMap.get(transitionMetadata).add(transitionObjectBuilder.getMetaData());
+            transitionMetadataMap.get(transitionMetadata).add(transitionObject);
         }
     }
 
@@ -796,17 +793,17 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public TransitionObject[] getTransitionSet() {
-        return transitionObjectList.toArray(new TransitionObject[0]);
+        return transitionObjectList.toArray();
     }
 
     @Override
     public boolean hasTransition(Object transitionKey) {
-        return this.transitionObjectMap.containsKey(transitionKey);
+        return this.transitionObjectList.containsKey(transitionKey);
     }
 
     @Override
     public TransitionObject getTransition(Object transitionKey) {
-        return this.transitionObjectMap.get(transitionKey);
+        return this.transitionObjectList.get(transitionKey);
     }
 
     @SuppressWarnings("unchecked")
