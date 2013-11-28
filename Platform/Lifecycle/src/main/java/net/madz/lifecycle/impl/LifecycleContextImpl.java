@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.LifecycleContext;
-import net.madz.lifecycle.StateConverter;
 
 public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
 
@@ -17,23 +16,14 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
     private final Method transitionMethod;
     private final Object[] arguments;
 
-    @SuppressWarnings("unchecked")
-    public LifecycleContextImpl(InterceptContext<T, ?> context, StateConverter<S> converter) {
+    public LifecycleContextImpl(InterceptContext<T, ?> context, S fromState, S toState) {
         this.target = context.getTarget();
         this.fromStateName = context.getFromState();
-        if ( null != converter ) {
-            this.fromState = converter.fromState(context.getFromState());
-        } else {
-            this.fromState = (S) context.getFromState();
-        }
+        this.fromState = fromState;
         if ( null == context.getToState() ) {
             this.toState = null;
         } else {
-            if ( null != converter ) {
-                this.toState = converter.fromState(context.getToState());
-            } else {
-                this.toState = (S) context.getToState();
-            }
+            this.toState = toState;
         }
         this.toStateName = context.getToState();
         this.transitionMethod = context.getMethod();

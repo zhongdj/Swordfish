@@ -34,6 +34,7 @@ import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.relation.Parent;
 import net.madz.lifecycle.annotations.relation.Relation;
 import net.madz.lifecycle.annotations.state.Converter;
+import net.madz.lifecycle.impl.LifecycleContextImpl;
 import net.madz.lifecycle.meta.builder.ConditionObjectBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineMetaBuilder;
 import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
@@ -90,11 +91,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
         this.setMetaType(template);
-    }
-
-    @Override
-    public StateConverter<S> getStateConverter() {
-        return this.stateConverter;
     }
 
     @Override
@@ -1081,9 +1077,15 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void performPreStateChangeCallback(LifecycleContext<?, S> callbackContext) {
-        final String fromState = evaluateTypedState(callbackContext.getFromState());
-        final String toState = evaluateTypedState(callbackContext.getToState());
+    public void performPreStateChangeCallback(InterceptContext<?, ?> context) {
+        final S fromStateType = this.getStateType(context.getFromState());
+        S toStateType = null;
+        if ( null != context.getToState() ) {
+            toStateType = this.getStateType(context.getToState());
+        }
+        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl(context, fromStateType, toStateType);
+        final String fromState = callbackContext.getFromStateName();
+        final String toState = callbackContext.getToStateName();
         if ( null != toState ) {
             invokeSpecificPreStateChangeCallbacks(callbackContext);
         }
@@ -1097,9 +1099,15 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void performPostStateChangeCallback(LifecycleContext<?, S> callbackContext) {
-        final String fromState = evaluateTypedState(callbackContext.getFromState());
-        final String toState = evaluateTypedState(callbackContext.getToState());
+    public void performPostStateChangeCallback(InterceptContext<?, ?> context) {
+        final S fromStateType = this.getStateType(context.getFromState());
+        S toStateType = null;
+        if ( null != context.getToState() ) {
+            toStateType = this.getStateType(context.getToState());
+        }
+        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl(context, fromStateType, toStateType);
+        final String fromState = callbackContext.getFromStateName();
+        final String toState = callbackContext.getToStateName();
         invokeSpecificPostStateChangeCallbacks(callbackContext);
         getState(fromState).invokeFromPostStateChangeCallbacks(callbackContext);
         getState(toState).invokeToPostStateChangeCallbacks(callbackContext);
@@ -1134,19 +1142,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private String evaluateTypedState(S state) {
-        if ( null == state ) {
-            return null;
-        }
-        final String stateValue;
-        if ( null != this.stateConverter ) {
-            stateValue = stateConverter.toState(state);
-        } else {
-            stateValue = String.valueOf(state);
-        }
-        return stateValue;
-    }
-
     @Override
     public RelationObject getRelationObject(Object primaryKey) {
         return this.relationObjectList.get(primaryKey);
@@ -1175,5 +1170,18 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @Override
     public void addCommonPostStateChangeCallbackObject(CallbackObject item) {
         this.commonPostStateChangeCallbackObjects.add(item);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public S getStateType(String stateName) {
+        if ( null == stateName || 0 >= stateName.trim().length() ) {
+            return null;
+        }
+        if ( null != this.stateConverter ) {
+            return this.stateConverter.fromState(stateName);
+        } else {
+            return (S) String.valueOf(stateName);
+        }
     }
 }

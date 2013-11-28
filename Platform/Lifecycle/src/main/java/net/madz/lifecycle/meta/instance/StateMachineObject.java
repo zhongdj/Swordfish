@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.bcel.intercept.UnlockableStack;
-import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
@@ -221,11 +220,9 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     void validateValidWhiles(Object target, UnlockableStack stack);
 
-    void performPreStateChangeCallback(LifecycleContext<?, S> callbackContext);
+    void performPreStateChangeCallback(InterceptContext<?, ?> context);
 
-    void performPostStateChangeCallback(LifecycleContext<?, S> callbackContext);
-
-    StateConverter<S> getStateConverter();
+    void performPostStateChangeCallback(InterceptContext<?,?> context);
 
     boolean isLockEnabled();
 
@@ -240,4 +237,7 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
     void addCommonPostStateChangeCallbackObject(CallbackObject item);
 
     RelationObject getParentRelationObject();
+
+    S getStateType(String stateName);
+
 }

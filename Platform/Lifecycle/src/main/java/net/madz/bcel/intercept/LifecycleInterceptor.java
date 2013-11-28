@@ -180,7 +180,7 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void performCallbacksAfterStateChange(StateMachineObject stateMachine, InterceptContext<V, R> context) {
-        stateMachine.performPostStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
+        stateMachine.performPostStateChangeCallback(context);
     }
 
     private void setNextState(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
@@ -218,7 +218,7 @@ public class LifecycleInterceptor<V, R> extends Interceptor<V, R> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void performCallbacksBeforeStateChange(StateMachineObject stateMachine, InterceptContext<V, R> context) {
-        stateMachine.performPreStateChangeCallback(new LifecycleContextImpl(context, stateMachine.getStateConverter()));
+        stateMachine.performPreStateChangeCallback(context);
     }
 
     private void validateTransition(StateMachineObject<?> stateMachine, InterceptContext<V, R> context) {
