@@ -11,32 +11,41 @@ import net.madz.util.StringUtil;
 
 public final class TransitionMethodScanner implements MethodScanCallback {
 
+    private final ArrayList<Method> transitionMethodList = new ArrayList<Method>();
     private final TransitionMetadata transition;
 
     public TransitionMethodScanner(final TransitionMetadata transition) {
         this.transition = transition;
     }
 
-    private ArrayList<Method> transitionMethodList = new ArrayList<Method>();
-
     @Override
     public boolean onMethodFound(Method method) {
         final Transition transitionAnno = method.getAnnotation(Transition.class);
-        if ( null != transitionAnno ) {
-            if ( Null.class != transitionAnno.value() ) {
-                if ( transitionAnno.value().getSimpleName().equals(transition.getDottedPath().getName()) ) {
-                    transitionMethodList.add(method);
-                }
-            } else {
-                if ( StringUtil.toUppercaseFirstCharacter(method.getName()).equals(transition.getDottedPath().getName()) ) {
-                    transitionMethodList.add(method);
-                }
-            }
+        if ( null == transitionAnno ) {
+            return false;
+        }
+        final Class<?> transitionKey = transitionAnno.value();
+        if ( matchedTransitionPrimaryKey(transitionKey, transition.getPrimaryKey()) ) {
+            transitionMethodList.add(method);
+        } else if ( matchedTransitionName(transitionKey, method.getName(), transition.getDottedPath().getName()) ) {
+            transitionMethodList.add(method);
         }
         return false;
     }
 
+    private boolean matchedTransitionName(final Class<?> transitionKey, String methodName, final String transitionName) {
+        return isDefaultStyle(transitionKey) && StringUtil.toUppercaseFirstCharacter(methodName).equals(transitionName);
+    }
+
+    private boolean matchedTransitionPrimaryKey(final Class<?> transitionKey, Object primaryKey) {
+        return !isDefaultStyle(transitionKey) && transitionKey.equals(primaryKey);
+    }
+
     public Method[] getTransitionMethods() {
         return transitionMethodList.toArray(new Method[0]);
+    }
+
+    private boolean isDefaultStyle(final Class<?> transitionKey) {
+        return Null.class == transitionKey;
     }
 }
