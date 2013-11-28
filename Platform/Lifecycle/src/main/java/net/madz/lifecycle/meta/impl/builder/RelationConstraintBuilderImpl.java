@@ -8,6 +8,7 @@ import net.madz.lifecycle.meta.builder.RelationConstraintBuilder;
 import net.madz.lifecycle.meta.builder.StateMetaBuilder;
 import net.madz.lifecycle.meta.instance.ErrorMessageObject;
 import net.madz.lifecycle.meta.template.RelationConstraintMetadata;
+import net.madz.lifecycle.meta.template.RelationMetadata;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
 import net.madz.lifecycle.meta.template.StateMetadata;
 import net.madz.verification.VerificationException;
@@ -20,6 +21,7 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     private final LinkedList<StateMetadata> onStates = new LinkedList<>();
     private final LinkedList<ErrorMessageObject> errorMessageObjects = new LinkedList<>();
     private boolean nullable;
+    private RelationMetadata relationMetadata;
 
     @Override
     public StateMachineMetadata getRelatedStateMachine() {
@@ -43,6 +45,7 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     @Override
     public RelationConstraintBuilder build(Class<?> klass, StateMetadata parent) throws VerificationException {
         super.build(klass, parent);
+        this.relationMetadata = parent.getStateMachine().getRelationMetadata(klass);
         return this;
     }
 
@@ -57,9 +60,10 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     }
 
     @Override
-    public boolean isNullable () {
+    public boolean isNullable() {
         return nullable;
     }
+
     @Override
     public void dump(Dumper dumper) {
         // TODO Auto-generated method stub
@@ -76,5 +80,10 @@ public class RelationConstraintBuilderImpl extends InheritableAnnotationMetaBuil
     @Override
     protected boolean extendsSuperKeySet() {
         return true;
+    }
+
+    @Override
+    public RelationMetadata getRelationMetadata() {
+        return relationMetadata;
     }
 }

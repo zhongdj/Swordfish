@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 
 import net.madz.lifecycle.meta.FieldEvaluator;
 import net.madz.lifecycle.meta.PropertyEvaluator;
-import net.madz.lifecycle.meta.builder.AnnotationMetaBuilder;
 import net.madz.lifecycle.meta.builder.RelationObjectBuilder;
 import net.madz.lifecycle.meta.instance.RelationObject;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
@@ -36,7 +35,7 @@ public class RelationObjectBuilderImpl extends ObjectBuilderBase<RelationObject,
     }
 
     @Override
-    public AnnotationMetaBuilder<RelationObject, StateMachineObject<?>> build(Class<?> klass, StateMachineObject<?> parent) throws VerificationException {
+    public RelationObjectBuilder build(Class<?> klass, StateMachineObject<?> parent) throws VerificationException {
         super.build(klass, parent);
         return this;
     }

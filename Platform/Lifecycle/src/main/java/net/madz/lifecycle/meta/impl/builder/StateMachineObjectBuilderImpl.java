@@ -77,8 +77,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private final KeyedList<ConditionObject> conditionObjectList = new KeyedList<>();
     @SuppressWarnings("rawtypes")
     private final KeyedList<StateObject> stateObjectList = new KeyedList<>();
-    private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
-    private final ArrayList<RelationObject> relationObjectList = new ArrayList<>();
+    private final KeyedList<RelationObject> relationObjectList = new KeyedList<>();
     private final ArrayList<CallbackObject> specificPreStateChangeCallbackObjects = new ArrayList<>();
     private final ArrayList<CallbackObject> specificPostStateChangeCallbackObjects = new ArrayList<>();
     private final ArrayList<CallbackObject> commonPreStateChangeCallbackObjects = new ArrayList<>();
@@ -178,7 +177,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     public void addRelation(Class<?> klass, final RelationObject relationObject, final Object primaryKey) {
-        this.relationObjectsMap.put(primaryKey, relationObject);
         this.relationObjectList.add(relationObject);
         // [TODO] [Tracy] Need to test parent
         if ( isParentRelation(klass) ) {
@@ -965,8 +963,8 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private ReadAccessor<?> getEvaluator(Object relationKey) {
-        if ( relationObjectsMap.containsKey(relationKey) ) {
-            return (ReadAccessor<?>) relationObjectsMap.get(relationKey).getEvaluator();
+        if ( relationObjectList.containsKey(relationKey) ) {
+            return (ReadAccessor<?>) relationObjectList.get(relationKey).getEvaluator();
         }
         throw new IllegalStateException("The evaluate is not found, which should not happen. Check the verifyRelationsAllBeCoveraged method with key:"
                 + relationKey);
@@ -1001,7 +999,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
         Object relationObject = getRelationInMethodParameters(relationsInMethodParameters, relationMetadataEntry.getValue().get(0).getKeySet());
         if ( null == relationObject ) {
-            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getPrimaryKey());
+            ReadAccessor<?> evaluator = getEvaluator(relationMetadataEntry.getValue().get(0).getRelationMetadata().getPrimaryKey());
             relationObject = evaluator.read(contextTarget);
         }
         return relationObject;
@@ -1041,7 +1039,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public RelationObject[] evaluateRelatives(Object target) {
-        return relationObjectList.toArray(new RelationObject[0]);
+        return relationObjectList.toArray(RelationObject.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -1065,7 +1063,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public StateMachineObject<?> getRelatedStateMachine(Object target, Object relativeKey) {
-        final ReadAccessor<?> relationEvaluator = (ReadAccessor<?>) relationObjectsMap.get(relativeKey).getEvaluator();
+        final ReadAccessor<?> relationEvaluator = (ReadAccessor<?>) relationObjectList.get(relativeKey).getEvaluator();
         if ( null == relationEvaluator ) {
             throw new IllegalArgumentException("Cannot find relation with Key: " + relativeKey);
         } else {
@@ -1163,7 +1161,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     @Override
     public RelationObject getRelationObject(Object primaryKey) {
-        return this.relationObjectsMap.get(primaryKey);
+        return this.relationObjectList.get(primaryKey);
     }
 
     @Override
