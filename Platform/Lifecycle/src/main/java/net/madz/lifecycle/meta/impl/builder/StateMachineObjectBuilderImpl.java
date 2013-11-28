@@ -76,18 +76,18 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
     private final HashMap<Object, ConditionObject> conditionObjectMap = new HashMap<>();
     private final ArrayList<ConditionObject> conditionObjectList = new ArrayList<>();
-    private StateAccessor<String> stateAccessor;
     private final HashMap<Object, StateObject<S>> stateMap = new HashMap<>();
     private final ArrayList<StateObject<S>> stateList = new ArrayList<>();
     private final HashMap<Object, RelationObject> relationObjectsMap = new HashMap<>();
     private final ArrayList<RelationObject> relationObjectList = new ArrayList<>();
+    private final ArrayList<CallbackObject> specificPreStateChangeCallbackObjects = new ArrayList<>();
+    private final ArrayList<CallbackObject> specificPostStateChangeCallbackObjects = new ArrayList<>();
+    private final ArrayList<CallbackObject> commonPreStateChangeCallbackObjects = new ArrayList<>();
+    private final ArrayList<CallbackObject> commonPostStateChangeCallbackObjects = new ArrayList<>();
+    private StateAccessor<String> stateAccessor;
     private RelationObject parentRelationObject;
     private LifecycleLockStrategry lifecycleLockStrategry;
     private StateConverter<S> stateConverter;
-    final ArrayList<CallbackObject> specificPreStateChangeCallbackObjects = new ArrayList<>();
-    final ArrayList<CallbackObject> specificPostStateChangeCallbackObjects = new ArrayList<>();
-    final ArrayList<CallbackObject> commonPreStateChangeCallbackObjects = new ArrayList<>();
-    final ArrayList<CallbackObject> commonPostStateChangeCallbackObjects = new ArrayList<>();
 
     public StateMachineObjectBuilderImpl(StateMachineMetaBuilder template, String name) {
         super(null, name);
@@ -1199,21 +1199,5 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @Override
     public void addCommonPostStateChangeCallbackObject(CallbackObject item) {
         this.commonPostStateChangeCallbackObjects.add(item);
-    }
-
-    public ArrayList<CallbackObject> getSpecificPreStateChangeCallbackObjects() {
-        return specificPreStateChangeCallbackObjects;
-    }
-
-    public ArrayList<CallbackObject> getSpecificPostStateChangeCallbackObjects() {
-        return specificPostStateChangeCallbackObjects;
-    }
-
-    public ArrayList<CallbackObject> getCommonPreStateChangeCallbackObjects() {
-        return commonPreStateChangeCallbackObjects;
-    }
-
-    public ArrayList<CallbackObject> getCommonPostStateChangeCallbackObjects() {
-        return commonPostStateChangeCallbackObjects;
     }
 }

@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.madz.lifecycle.SyntaxErrors;
@@ -94,9 +93,7 @@ public final class CallbackMethodConfigureScanner {
         final String mappedBy = preStateChange.mappedBy();
         final Class<?> observableClass = preStateChange.observableClass();
         if ( CallbackConsts.NULL_STR.equals(observableName) && Null.class == observableClass ) {
-            configurePreStateChangeNonRelationalCallbackObjects(method, from, to,
-                    this.stateMachineObjectBuilderImpl.getSpecificPreStateChangeCallbackObjects(),
-                    this.stateMachineObjectBuilderImpl.getCommonPreStateChangeCallbackObjects());
+            configurePreStateChangeNonRelationalCallbackObjects(method, from, to);
         } else {
             Class<?> actualObservableClass = null;
             if ( !CallbackConsts.NULL_STR.equals(observableName) && Null.class != observableClass ) {
@@ -388,8 +385,7 @@ public final class CallbackMethodConfigureScanner {
         return null;
     }
 
-    private void configurePreStateChangeNonRelationalCallbackObjects(final Method method, final Class<?> from, final Class<?> to,
-            final ArrayList<CallbackObject> specificCallbackObjects, final ArrayList<CallbackObject> commonCallbackObjects) {
+    private void configurePreStateChangeNonRelationalCallbackObjects(final Method method, final Class<?> from, final Class<?> to) {
         CallbackObject item = null;
         if ( AnyState.class != from && AnyState.class != to ) {
             item = new CallbackObject(from.getSimpleName(), to.getSimpleName(), method);
