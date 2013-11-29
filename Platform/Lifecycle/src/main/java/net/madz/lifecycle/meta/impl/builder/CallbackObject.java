@@ -20,7 +20,7 @@ public class CallbackObject {
         this.callbackMethod = callbackMethod;
     }
 
-    public boolean matches(LifecycleContext<?, ?> callbackContext) {
+    public boolean matches(final LifecycleContext<?, ?> callbackContext) {
         String fromState = callbackContext.getFromStateName();
         String toStateName = callbackContext.getToStateName();
         if ( this.fromStateName.equals(fromState) && this.toStateName.equals(toStateName) ) {
@@ -29,7 +29,7 @@ public class CallbackObject {
         return false;
     }
 
-    public void doCallback(LifecycleContext<?, ?> callbackContext) {
+    public void doCallback(final LifecycleContext<?, ?> callbackContext) {
         try {
             Object evaluateTarget = evaluateTarget(callbackContext.getTarget());
             callbackMethod.invoke(evaluateTarget, callbackContext);
