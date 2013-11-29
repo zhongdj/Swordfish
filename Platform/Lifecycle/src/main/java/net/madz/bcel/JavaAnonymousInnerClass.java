@@ -219,63 +219,61 @@ public class JavaAnonymousInnerClass {
     }
 
     private Instruction createValueOf(final InstructionFactory ifact, final Type returnType) {
-        final Instruction valueOfInstruction;
-        if ( returnType.getType() == Constants.T_VOID ) {
-            valueOfInstruction = InstructionConstants.ACONST_NULL;
-        } else if ( returnType.getType() == Type.INT.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Integer.class.getName(), "valueOf", new ObjectType(Integer.class.getName()), new Type[] { Type.INT },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.LONG.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Long.class.getName(), "valueOf", new ObjectType(Long.class.getName()), new Type[] { Type.LONG },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.FLOAT.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Float.class.getName(), "valueOf", new ObjectType(Float.class.getName()), new Type[] { Type.FLOAT },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.DOUBLE.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Double.class.getName(), "valueOf", new ObjectType(Double.class.getName()), new Type[] { Type.DOUBLE },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.BYTE.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Byte.class.getName(), "valueOf", new ObjectType(Byte.class.getName()), new Type[] { Type.BYTE },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.SHORT.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Short.class.getName(), "valueOf", new ObjectType(Short.class.getName()), new Type[] { Type.SHORT },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.CHAR.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Character.class.getName(), "valueOf", new ObjectType(Character.class.getName()), new Type[] { Type.CHAR },
-                    Constants.INVOKESTATIC);
-        } else if ( returnType.getType() == Type.BOOLEAN.getType() ) {
-            valueOfInstruction = ifact.createInvoke(Boolean.class.getName(), "valueOf", new ObjectType(Boolean.class.getName()), new Type[] { Type.BOOLEAN },
-                    Constants.INVOKESTATIC);
-        } else {
-            valueOfInstruction = null;
+        switch (returnType.getType()) {
+            case Constants.T_VOID:
+                return InstructionConstants.ACONST_NULL;
+            case Constants.T_INT:
+                return ifact.createInvoke(Integer.class.getName(), "valueOf", new ObjectType(Integer.class.getName()), new Type[] { Type.INT },
+                        Constants.INVOKESTATIC);
+            case Constants.T_LONG:
+                return ifact.createInvoke(Long.class.getName(), "valueOf", new ObjectType(Long.class.getName()), new Type[] { Type.LONG },
+                        Constants.INVOKESTATIC);
+            case Constants.T_FLOAT:
+                return ifact.createInvoke(Float.class.getName(), "valueOf", new ObjectType(Float.class.getName()), new Type[] { Type.FLOAT },
+                        Constants.INVOKESTATIC);
+            case Constants.T_DOUBLE:
+                return ifact.createInvoke(Double.class.getName(), "valueOf", new ObjectType(Double.class.getName()), new Type[] { Type.DOUBLE },
+                        Constants.INVOKESTATIC);
+            case Constants.T_BYTE:
+                return ifact.createInvoke(Byte.class.getName(), "valueOf", new ObjectType(Byte.class.getName()), new Type[] { Type.BYTE },
+                        Constants.INVOKESTATIC);
+            case Constants.T_SHORT:
+                return ifact.createInvoke(Short.class.getName(), "valueOf", new ObjectType(Short.class.getName()), new Type[] { Type.SHORT },
+                        Constants.INVOKESTATIC);
+            case Constants.T_CHAR:
+                return ifact.createInvoke(Character.class.getName(), "valueOf", new ObjectType(Character.class.getName()), new Type[] { Type.CHAR },
+                        Constants.INVOKESTATIC);
+            case Constants.T_BOOLEAN:
+                return ifact.createInvoke(Boolean.class.getName(), "valueOf", new ObjectType(Boolean.class.getName()), new Type[] { Type.BOOLEAN },
+                        Constants.INVOKESTATIC);
+            default:
+                return null;
         }
-        return valueOfInstruction;
     }
 
     private Type convertWrappedReturnType(final Type returnType) {
-        final Type wrappedReturnType;
-        if ( returnType.getType() == Constants.T_VOID ) {
-            wrappedReturnType = new ObjectType("java.lang.Void");
-        } else if ( returnType.getType() == Type.INT.getType() ) {
-            wrappedReturnType = new ObjectType(Integer.class.getName());
-        } else if ( returnType.getType() == Type.LONG.getType() ) {
-            wrappedReturnType = new ObjectType(Long.class.getName());
-        } else if ( returnType.getType() == Type.FLOAT.getType() ) {
-            wrappedReturnType = new ObjectType(Float.class.getName());
-        } else if ( returnType.getType() == Type.DOUBLE.getType() ) {
-            wrappedReturnType = new ObjectType(Double.class.getName());
-        } else if ( returnType.getType() == Type.BYTE.getType() ) {
-            wrappedReturnType = new ObjectType(Byte.class.getName());
-        } else if ( returnType.getType() == Type.SHORT.getType() ) {
-            wrappedReturnType = new ObjectType(Short.class.getName());
-        } else if ( returnType.getType() == Type.CHAR.getType() ) {
-            wrappedReturnType = new ObjectType(Character.class.getName());
-        } else if ( returnType.getType() == Type.BOOLEAN.getType() ) {
-            wrappedReturnType = new ObjectType(Boolean.class.getName());
-        } else {
-            wrappedReturnType = returnType;
+        switch (returnType.getType()) {
+            case Constants.T_VOID:
+                return new ObjectType("java.lang.Void");
+            case Constants.T_INT:
+                return new ObjectType(Integer.class.getName());
+            case Constants.T_LONG:
+                return new ObjectType(Long.class.getName());
+            case Constants.T_FLOAT:
+                return new ObjectType(Float.class.getName());
+            case Constants.T_DOUBLE:
+                return new ObjectType(Double.class.getName());
+            case Constants.T_BYTE:
+                return new ObjectType(Byte.class.getName());
+            case Constants.T_SHORT:
+                return new ObjectType(Short.class.getName());
+            case Constants.T_CHAR:
+                return new ObjectType(Character.class.getName());
+            case Constants.T_BOOLEAN:
+                return new ObjectType(Boolean.class.getName());
+            default:
+                return returnType;
         }
-        return wrappedReturnType;
     }
 
     private void doGenerateConstructor(ClassGen cgen) throws Throwable {
@@ -326,16 +324,6 @@ public class JavaAnonymousInnerClass {
         method.setMaxLocals();
         method.setMaxStack();
         method.stripAttributes(true);
-        // final LocalVariableTable localVariableTable =
-        // method.getLocalVariableTable(cgen.getConstantPool());
-        // final LocalVariable[] local_variable_table = new LocalVariable[1];
-        // final int thisIndex = cgen.getConstantPool().addUtf8("this");
-        // final int signature_index = cgen.getConstantPool().lookupUtf8(new
-        // ObjectType(thisClassName).getSignature());
-        // local_variable_table[0] = new LocalVariable(0,
-        // method.getInstructionList().getLength(), thisIndex,
-        // signature_index, 0, cgen.getConstantPool().getConstantPool());
-        // localVariableTable.setLocalVariableTable(local_variable_table);
         cgen.addMethod(method.getMethod());
         cgen.setMinor(0);
         cgen.setMajor(50);
@@ -438,31 +426,42 @@ public class JavaAnonymousInnerClass {
 
     private List<LocalVariable> lookupEnclosingMethodArgumentVariables() throws ClassNotFoundException {
         final JavaClass outerClass = lookupOuterClass();
-        for ( Method method : outerClass.getMethods() ) {
-            if ( !enclosingMethodName.equals(method.getName()) ) {
+        for ( final Method method : outerClass.getMethods() ) {
+            if ( isNotEnclosingMethod(method) ) {
                 continue;
             }
-            if ( !argumentsMatch(method.getArgumentTypes()) ) {
-                continue;
-            }
-            final List<LocalVariable> result = new ArrayList<LocalVariable>();
             final LocalVariableTable localVariableTable = method.getLocalVariableTable();
             if ( null != localVariableTable ) {
-                for ( org.apache.bcel.classfile.LocalVariable localVariable : localVariableTable.getLocalVariableTable() ) {
-                    if ( localVariable.getStartPC() == 0 ) {
-                        result.add(new LocalVariable(localVariable.getName(), localVariable.getSignature()));
-                    }
-                }
+                return populateNamedArgumentsFromLocalVariableTable(localVariableTable);
             } else {
-                int i = 1;
-                result.add(new LocalVariable("this", new ObjectType(outerClassName).getSignature()));
-                for ( Type argumentType : method.getArgumentTypes() ) {
-                    result.add(new LocalVariable("" + i++, argumentType.getSignature()));
-                }
+                return populateNonamedMethodArguments(method);
             }
-            return result;
         }
         return new ArrayList<LocalVariable>();
+    }
+
+    private boolean isNotEnclosingMethod(final Method method) {
+        return !enclosingMethodName.equals(method.getName()) || !argumentsMatch(method.getArgumentTypes());
+    }
+
+    private List<LocalVariable> populateNonamedMethodArguments(Method method) {
+        int i = 1;
+        final List<LocalVariable> result = new ArrayList<LocalVariable>();
+        result.add(new LocalVariable("this", new ObjectType(outerClassName).getSignature()));
+        for ( Type argumentType : method.getArgumentTypes() ) {
+            result.add(new LocalVariable("" + i++, argumentType.getSignature()));
+        }
+        return result;
+    }
+
+    private List<LocalVariable> populateNamedArgumentsFromLocalVariableTable(final LocalVariableTable localVariableTable) {
+        final List<LocalVariable> result = new ArrayList<LocalVariable>();
+        for ( org.apache.bcel.classfile.LocalVariable localVariable : localVariableTable.getLocalVariableTable() ) {
+            if ( localVariable.getStartPC() == 0 ) {
+                result.add(new LocalVariable(localVariable.getName(), localVariable.getSignature()));
+            }
+        }
+        return result;
     }
 
     private Type lookupEnclosingMethodReturnType() throws ClassNotFoundException {
@@ -516,7 +515,6 @@ public class JavaAnonymousInnerClass {
         private final String signature;
 
         public LocalVariable(String name, String signature) {
-            super();
             this.name = name;
             this.signature = signature;
         }
