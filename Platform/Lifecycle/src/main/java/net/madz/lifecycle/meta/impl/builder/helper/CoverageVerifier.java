@@ -40,15 +40,11 @@ public final class CoverageVerifier implements MethodScanCallback {
             return false;
         }
         final TransitionTypeEnum type = transitionMetadata.getType();
-        if ( isUniqueTransition(type) ) {
+        if ( type.isUniqueTransition() ) {
             failureSet.add(this.stateMachineObjectBuilderImpl.newVerificationFailure(transitionMetadata.getDottedPath(), SyntaxErrors.LM_REDO_CORRUPT_RECOVER_TRANSITION_HAS_ONLY_ONE_METHOD,
                     transitionMetadata.getDottedPath().getName(), "@" + type.name(), this.stateMachineObjectBuilderImpl.getMetaType().getDottedPath(), this.stateMachineObjectBuilderImpl.getDottedPath().getAbsoluteName()));
         }
         return false;
-    }
-
-    private boolean isUniqueTransition(final TransitionTypeEnum type) {
-        return type == TransitionTypeEnum.Corrupt || type == TransitionTypeEnum.Recover || type == TransitionTypeEnum.Redo;
     }
 
     private boolean match(TransitionMetadata transitionMetadata, Method transitionMethod) {

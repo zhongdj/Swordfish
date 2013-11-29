@@ -2,6 +2,7 @@ package net.madz.lifecycle.meta.template;
 
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.meta.MetaType;
+import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
 
 public interface TransitionMetadata extends MetaType<TransitionMetadata> {
 
@@ -13,7 +14,11 @@ public interface TransitionMetadata extends MetaType<TransitionMetadata> {
         Redo,
         Fail,
         Common,
-        Other
+        Other;
+
+        public boolean isUniqueTransition() {
+            return this == TransitionTypeEnum.Corrupt || this == TransitionTypeEnum.Recover || this == TransitionTypeEnum.Redo;
+        }
     }
 
     TransitionTypeEnum getType();
