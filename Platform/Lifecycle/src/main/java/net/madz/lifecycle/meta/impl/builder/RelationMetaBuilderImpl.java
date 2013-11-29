@@ -46,7 +46,7 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
     private void configureParent(Class<?> klass) {
         if ( !hasSuper(klass) ) {
             this.parentRelation = null != klass.getAnnotation(Parent.class);
-        } else if ( hasOverrides(klass) ) {
+        } else if ( hasLifecycleOverrideAnnotation(klass) ) {
             this.parentRelation = hasDeclaredAnnotation(klass, Parent.class);
         } else {
             if ( hasDeclaredAnnotation(klass, Parent.class) ) {
@@ -67,7 +67,7 @@ public class RelationMetaBuilderImpl extends InheritableAnnotationMetaBuilderBas
             if ( null == clazz.getAnnotation(RelateTo.class) ) {
                 throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
             }
-        } else if ( hasOverrides(clazz) ) {
+        } else if ( hasLifecycleOverrideAnnotation(clazz) ) {
             if ( !hasDeclaredAnnotation(clazz, RelateTo.class) ) {
                 throw newVerificationException(clazz.getName(), SyntaxErrors.RELATION_NO_RELATED_TO_DEFINED, clazz);
             }

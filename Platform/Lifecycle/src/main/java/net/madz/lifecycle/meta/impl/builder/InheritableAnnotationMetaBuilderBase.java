@@ -56,7 +56,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
         }
         verifySuper(metaClass);
         setSuper(findSuper(getSuperMetaClass(metaClass)));
-        if ( hasOverrides(metaClass) ) {
+        if ( hasLifecycleOverrideAnnotation(metaClass) ) {
             this.setOverriding(true);
         } else {
             this.setOverriding(false);
@@ -75,7 +75,7 @@ public abstract class InheritableAnnotationMetaBuilderBase<SELF extends MetaData
 
     protected void verifySuper(Class<?> metaClass) throws VerificationException {}
 
-    public boolean hasOverrides(AnnotatedElement metaClass) {
+    public boolean hasLifecycleOverrideAnnotation(AnnotatedElement metaClass) {
         return null != metaClass.getAnnotation(LifecycleOverride.class);
     }
 

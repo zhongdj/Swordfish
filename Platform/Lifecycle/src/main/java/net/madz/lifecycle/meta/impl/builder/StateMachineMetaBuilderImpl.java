@@ -534,7 +534,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
         for ( Class<?> stateClass : stateClasses ) {
             if ( hasSuper(stateClass) ) {
                 final Class<?> superStateClass = getSuperMetaClass(stateClass);
-                if ( hasInitial(superStateClass) && hasOverrides(stateClass) ) {
+                if ( hasInitial(superStateClass) && hasLifecycleOverrideAnnotation(stateClass) ) {
                     throw newVerificationException(getDottedPath() + ".StateSet",
                             SyntaxErrors.STATESET_WITHOUT_INITAL_STATE_AFTER_OVERRIDING_SUPER_INITIAL_STATE, stateClass, superStateClass);
                 }
