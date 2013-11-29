@@ -13,7 +13,6 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.ReactiveObject;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.impl.LifecycleContextImpl;
 import net.madz.lifecycle.impl.LifecycleEventImpl;
 import net.madz.lifecycle.meta.instance.StateMachineObject;
 import net.madz.lifecycle.meta.template.StateMetadata;

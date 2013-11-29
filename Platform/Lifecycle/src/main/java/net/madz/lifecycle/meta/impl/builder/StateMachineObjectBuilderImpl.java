@@ -1083,7 +1083,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         if ( null != context.getToState() ) {
             toStateType = this.getStateType(context.getToState());
         }
-        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl(context, fromStateType, toStateType);
+        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl<>(context, fromStateType, toStateType);
         final String fromState = callbackContext.getFromStateName();
         final String toState = callbackContext.getToStateName();
         if ( null != toState ) {
@@ -1105,7 +1105,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         if ( null != context.getToState() ) {
             toStateType = this.getStateType(context.getToState());
         }
-        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl(context, fromStateType, toStateType);
+        final LifecycleContext<?, S> callbackContext = new LifecycleContextImpl<>(context, fromStateType, toStateType);
         final String fromState = callbackContext.getFromStateName();
         final String toState = callbackContext.getToStateName();
         invokeSpecificPostStateChangeCallbacks(callbackContext);
