@@ -31,12 +31,9 @@ public class ConditionMetaBuilderImpl extends InheritableAnnotationMetaBuilderBa
 
     @Override
     public boolean hasSuper(Class<?> metaClass) {
-        if ( !super.hasSuper(metaClass) ) {
-            return false;
-        }
+        if ( !super.hasSuper(metaClass) ) return false;
         try {
-            ConditionMetadata superCondition = findSuper(metaClass);
-            if ( null == superCondition ) {
+            if ( null == findSuper(metaClass) ) {
                 return false;
             } else {
                 return true;

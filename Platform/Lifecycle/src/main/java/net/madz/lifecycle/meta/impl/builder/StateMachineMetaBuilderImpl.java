@@ -446,9 +446,8 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     private void configureConditionSet(Class<?> clazz) throws VerificationException {
         ConditionMetaBuilder conditionMetaBuilder = null;
         for ( Class<?> klass : findComponentClasses(clazz, ConditionSet.class) ) {
-            conditionMetaBuilder = new ConditionMetaBuilderImpl(this, klass.getSimpleName());
-            final ConditionMetaBuilder conditionMetadata = conditionMetaBuilder.build(klass, this);
-            addConditionMetadata(clazz, conditionMetadata);
+            conditionMetaBuilder = new ConditionMetaBuilderImpl(this, klass.getSimpleName()).build(klass, this);
+            addConditionMetadata(clazz, conditionMetaBuilder);
         }
     }
 
