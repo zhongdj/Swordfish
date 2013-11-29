@@ -177,13 +177,13 @@ public class InterceptContext<V, R> implements UnlockableStack {
         }
     }
 
-    public void logStep6_1SetupNextStateFinsihed() {
+    public void logStep6_2SetupNextStateFinsihed() {
         if ( logger.isLoggable(Level.FINE) ) {
-            logger.fine("\tStep 6. ReactiveObject is tranisited to state: [" + this.getToState() + "]");
+            logger.fine("\tStep 6. ReactiveObject is transited to state: [" + this.getToState() + "]");
         }
     }
 
-    public void logStep6_2SetupNextStateStart() {
+    public void logStep6_1SetupNextStateStart() {
         if ( logger.isLoggable(Level.FINE) ) {
             logger.fine("\tStep 6. Set next state to reactiveObject.");
         }
@@ -237,10 +237,10 @@ public class InterceptContext<V, R> implements UnlockableStack {
     }
 
     public void setupNextState(final StateMachineObject<?> stateMachine) {
-        this.logStep6_2SetupNextStateStart();
+        this.logStep6_1SetupNextStateStart();
         final String stateName = stateMachine.transitToNextState(this.getTarget(), this.getTransitionKey());
         this.setToState(stateName);
-        this.logStep6_1SetupNextStateFinsihed();
+        this.logStep6_2SetupNextStateFinsihed();
     }
 
     public void validateTransition(StateMachineObject<?> stateMachine) {
