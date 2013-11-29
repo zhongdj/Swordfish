@@ -839,13 +839,13 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     @Override
-    public void setTargetState(Object target, String state) {
+    public void setNextState(Object target, String state) {
         this.stateAccessor.write(target, state);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public String getNextState(Object target, Object transitionKey) {
+    public String evaluateNextState(Object target, Object transitionKey) {
         final String stateName = evaluateState(target);
         final StateObject<S> state = getState(stateName);
         final FunctionMetadata functionMetadata = state.getMetaType().getFunctionMetadata(transitionKey);
@@ -972,7 +972,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         final Object target = context.getTarget();
         final Object transitionKey = context.getTransitionKey();
         final StateMetadata state = getMetaType().getState(evaluateState(target));
-        final String nextState = getNextState(target, transitionKey);
+        final String nextState = evaluateNextState(target, transitionKey);
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
             final Object relationTarget = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
@@ -1182,6 +1182,22 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             return this.stateConverter.fromState(stateName);
         } else {
             return (S) String.valueOf(stateName);
+        }
+    }
+
+    @Override
+    public String transitToNextState(Object target, Object transitionKey) {
+        final String stateName = evaluateNextState(target, transitionKey);
+        setNextState(target, stateName);
+        return stateName;
+    }
+
+    public TransitionMetadata validateTransition(final Object target, final String fromState, final Object transitionKey) {
+        final StateMetadata stateMetadata = this.getMetaType().getState(fromState);
+        if ( !stateMetadata.isTransitionValid(transitionKey) ) {
+            throw new LifecycleException(getClass(), "lifecycle_common", LifecycleCommonErrors.ILLEGAL_TRANSITION_ON_STATE, transitionKey, fromState, target);
+        } else {
+            return stateMetadata.getTransition(transitionKey);
         }
     }
 }

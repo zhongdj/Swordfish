@@ -11,6 +11,7 @@ import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.meta.MetaObject;
 import net.madz.lifecycle.meta.impl.builder.CallbackObject;
 import net.madz.lifecycle.meta.template.StateMachineMetadata;
+import net.madz.lifecycle.meta.template.TransitionMetadata;
 
 public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>, StateMachineMetadata> {
 
@@ -198,9 +199,9 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     String evaluateState(Object target);
 
-    void setTargetState(Object target, String state);
+    void setNextState(Object target, String state);
 
-    String getNextState(Object target, Object transtionKey);
+    String evaluateNextState(Object target, Object transtionKey);
 
     void validateValidWhiles(final InterceptContext<?, ?> context);
 
@@ -222,7 +223,7 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     void performPreStateChangeCallback(InterceptContext<?, ?> context);
 
-    void performPostStateChangeCallback(InterceptContext<?,?> context);
+    void performPostStateChangeCallback(InterceptContext<?, ?> context);
 
     boolean isLockEnabled();
 
@@ -240,4 +241,6 @@ public interface StateMachineObject<S> extends MetaObject<StateMachineObject<S>,
 
     S getStateType(String stateName);
 
+    TransitionMetadata validateTransition(final Object target, final String fromState, final Object transitionKey);
+    String transitToNextState(final Object target, final Object transitionKey);
 }
