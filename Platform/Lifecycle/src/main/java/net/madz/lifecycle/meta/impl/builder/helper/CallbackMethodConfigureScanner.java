@@ -85,7 +85,7 @@ public final class CallbackMethodConfigureScanner {
                 verifyPreToState(method, to, callBackEventSourceContainer.getMetaType());
             }
             if ( AnyState.class != from ) {
-                verifyPreFromState(method, from, callBackEventSourceContainer.getMetaType());
+                verifyFromState(method, from, callBackEventSourceContainer.getMetaType(), SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID);
             }
             validateMappedby(method, mappedBy, actualObservableClass, SyntaxErrors.PRE_STATE_CHANGE_MAPPEDBY_INVALID);
             final ReadAccessor<?> accessor = evaluateAccessor(mappedBy, actualObservableClass);
@@ -136,7 +136,7 @@ public final class CallbackMethodConfigureScanner {
             final StateMachineObject<?> callBackEventSourceContainer = this.stateMachineObjectBuilderImpl.getRegistry().loadStateMachineObject(
                     actualObservableClass);
             if ( AnyState.class != from ) {
-                verifyPostFromState(method, from, callBackEventSourceContainer.getMetaType());
+                verifyFromState(method, from, callBackEventSourceContainer.getMetaType(), SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID);
             }
             if ( AnyState.class != to ) {
                 verifyPostToState(method, to, callBackEventSourceContainer.getMetaType());
@@ -206,13 +206,6 @@ public final class CallbackMethodConfigureScanner {
         }
     }
 
-    private void verifyPostFromState(Method method, Class<?> from, StateMachineMetadata metaType) throws VerificationException {
-        if ( null == metaType.getState(from) ) {
-            throw this.stateMachineObjectBuilderImpl.newVerificationException(metaType.getDottedPath(), SyntaxErrors.POST_STATE_CHANGE_FROM_STATE_IS_INVALID,
-                    from, method, metaType.getPrimaryKey());
-        }
-    }
-
     private String convertRelationKey(final Class<?> klass, final String mappedBy) {
         final Field observerField = evaluateObserverField(klass, mappedBy);
         if ( isRightRelationField(observerField) ) {
@@ -276,19 +269,19 @@ public final class CallbackMethodConfigureScanner {
         verifyPreToStatePostEvaluate(method, to, stateMachineMetadata);
     }
 
-    private void verifyPreFromState(Method method, Class<?> from, StateMachineMetadata metaType) throws VerificationException {
-        if ( null == metaType.getState(from) ) {
-            throw this.stateMachineObjectBuilderImpl.newVerificationException(metaType.getDottedPath(), SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID,
-                    from, method, metaType.getPrimaryKey());
-        }
-    }
-
     private void verifyPreToStatePostEvaluate(Method method, Class<?> toStateClass, StateMachineMetadata stateMachineMetadata) throws VerificationException {
         for ( final TransitionMetadata transition : stateMachineMetadata.getState(toStateClass).getPossibleReachingTransitions() ) {
             if ( transition.isConditional() && transition.postValidate() ) {
                 throw this.stateMachineObjectBuilderImpl.newVerificationException(stateMachineMetadata.getDottedPath(),
                         SyntaxErrors.PRE_STATE_CHANGE_TO_POST_EVALUATE_STATE_IS_INVALID, toStateClass, method, transition.getDottedPath());
             }
+        }
+    }
+
+    private void verifyFromState(Method method, Class<?> stateClass, StateMachineMetadata metaType, String errorCode) throws VerificationException {
+        if ( null == metaType.getState(stateClass) ) {
+            throw this.stateMachineObjectBuilderImpl
+                    .newVerificationException(metaType.getDottedPath(), errorCode, stateClass, method, metaType.getPrimaryKey());
         }
     }
 
