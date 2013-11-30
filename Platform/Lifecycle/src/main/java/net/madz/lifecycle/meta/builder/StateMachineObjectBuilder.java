@@ -1,6 +1,7 @@
 package net.madz.lifecycle.meta.builder;
 
 import net.madz.lifecycle.meta.object.StateMachineObject;
+import net.madz.lifecycle.meta.object.StateObject;
 import net.madz.lifecycle.meta.type.LifecycleMetaRegistry;
 import net.madz.verification.VerificationException;
 

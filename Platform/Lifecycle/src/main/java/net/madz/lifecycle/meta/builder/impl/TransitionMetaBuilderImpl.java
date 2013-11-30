@@ -1,5 +1,6 @@
 package net.madz.lifecycle.meta.builder.impl;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -15,6 +16,7 @@ import net.madz.lifecycle.annotations.action.Timeout;
 import net.madz.lifecycle.meta.builder.TransitionMetaBuilder;
 import net.madz.lifecycle.meta.type.StateMachineMetadata;
 import net.madz.lifecycle.meta.type.TransitionMetadata;
+import net.madz.util.StringUtil;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailureSet;
 
@@ -157,5 +159,16 @@ public class TransitionMetaBuilderImpl extends InheritableAnnotationMetaBuilderB
     @Override
     protected boolean extendsSuperKeySet() {
         return true;
+    }
+
+    @Override
+    public void verifyTransitionMethod(Method method, VerificationFailureSet failureSet) {
+        if ( method.getParameterTypes().length <= 0 ) {
+            return;
+        }
+        if ( TransitionTypeEnum.Corrupt == getType() || TransitionTypeEnum.Recover == getType() || TransitionTypeEnum.Redo == getType() ) {
+            failureSet.add(newVerificationFailure(getDottedPath(), SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER, method,
+                    StringUtil.toUppercaseFirstCharacter(method.getName()), getType()));
+        }
     }
 }

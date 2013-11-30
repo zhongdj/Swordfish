@@ -1,7 +1,10 @@
 package net.madz.lifecycle.meta.type;
 
+import java.lang.reflect.Method;
+
 import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.meta.MetaType;
+import net.madz.verification.VerificationFailureSet;
 
 public interface TransitionMetadata extends MetaType<TransitionMetadata> {
 
@@ -31,4 +34,6 @@ public interface TransitionMetadata extends MetaType<TransitionMetadata> {
     Class<? extends ConditionalTransition<?>> getJudgerClass();
 
     boolean postValidate();
+
+    void verifyTransitionMethod(Method method, VerificationFailureSet failureSet);
 }

@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 
 import net.madz.bcel.intercept.LifecycleInterceptContext;
 import net.madz.bcel.intercept.UnlockableStack;
@@ -68,15 +67,15 @@ import net.madz.lifecycle.meta.type.TransitionMetadata;
 import net.madz.meta.KeySet;
 import net.madz.util.ConverterAccessor;
 import net.madz.util.EagerSetterImpl;
-import net.madz.util.Readable;
-import net.madz.util.StateFieldAccessor;
 import net.madz.util.KeyedList;
 import net.madz.util.LazySetterImpl;
 import net.madz.util.MethodScanCallback;
 import net.madz.util.MethodScanner;
-import net.madz.util.StatePropertyAccessor;
+import net.madz.util.Readable;
 import net.madz.util.Setter;
 import net.madz.util.StateAccessible;
+import net.madz.util.StateFieldAccessor;
+import net.madz.util.StatePropertyAccessor;
 import net.madz.util.StringUtil;
 import net.madz.utils.Null;
 import net.madz.verification.VerificationException;
@@ -85,7 +84,6 @@ import net.madz.verification.VerificationFailureSet;
 public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMachineObject<S>, StateMachineObject<S>, StateMachineMetadata> implements
         StateMachineObjectBuilder<S> {
 
-    private static final Level FINE = Level.FINE;
     private final HashMap<TransitionMetadata, LinkedList<TransitionObject>> transitionMetadataMap = new HashMap<>();
     private final KeyedList<TransitionObject> transitionObjectList = new KeyedList<>();
     private final KeyedList<ConditionObject> conditionObjectList = new KeyedList<>();
@@ -191,6 +189,14 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         if ( isParentRelation(klass) ) {
             this.parentRelationObject = relationObject;
         }
+    }
+
+    public RelationObject getParentRelationObject() {
+        return parentRelationObject;
+    }
+
+    public void setParentRelationObject(RelationObject parentRelationObject) {
+        this.parentRelationObject = parentRelationObject;
     }
 
     private boolean isParentRelation(Class<?> klass) {
@@ -507,24 +513,17 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyStateIndicator(Class<?> klass) throws VerificationException {
-        if ( !klass.isInterface() ) {
-            Field specifiedStateField = findFieldWith(klass, StateIndicator.class);
-            if ( null != specifiedStateField ) {
-                verifyStateIndicatorElement(klass, specifiedStateField, specifiedStateField.getType());
-                return;
-            }
+        final Field specifiedStateField = findFieldWith(klass, StateIndicator.class);
+        if ( null != specifiedStateField ) {
+            return;
         }
         final Method specifiedGetter = findCustomizedStateIndicatorGetter(klass);
         if ( null != specifiedGetter ) {
-            verifyStateIndicatorElement(klass, specifiedGetter, specifiedGetter.getReturnType());
-        } else {
-            // verify default
-            final Method defaultGetter = findDefaultStateGetterMethod(klass);
-            if ( null == defaultGetter ) {
-                throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
-            } else {
-                verifyStateIndicatorElement(klass, defaultGetter, defaultGetter.getReturnType());
-            }
+            return;
+        }
+        final Method defaultGetter = findDefaultStateGetterMethod(klass);
+        if ( null == defaultGetter ) {
+            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CANNOT_FIND_DEFAULT_AND_SPECIFIED_STATE_INDICATOR, klass);
         }
     }
 
@@ -536,6 +535,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             throw new VerificationException(failureSet);
         else {
             final Method specifiedGetter = scanner.getStateGetterMethod();
+            if ( null != specifiedGetter ) verifyStateIndicatorElement(klass, specifiedGetter, specifiedGetter.getReturnType());
             return specifiedGetter;
         }
     }
@@ -560,19 +560,21 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         final Converter converterMeta = getter.getAnnotation(Converter.class);
         if ( null == converterMeta ) {
             throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_NOT_FOUND, getterDeclaringClass, stateType);
-        } else {
-            Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
-            for ( Type type : genericInterfaces ) {
-                if ( type instanceof ParameterizedType ) {
-                    ParameterizedType pType = (ParameterizedType) type;
-                    if ( pType.getRawType() instanceof Class && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
-                        if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
-                            throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
-                                    converterMeta.value(), pType.getActualTypeArguments()[0]);
-                        }
+        }
+        verifyStateIndicatorConverterDeclaredCorrectTypeParameter(stateType, getterDeclaringClass, converterMeta);
+    }
+
+    private void verifyStateIndicatorConverterDeclaredCorrectTypeParameter(Class<?> stateType, final Class<?> getterDeclaringClass,
+            final Converter converterMeta) throws VerificationException {
+        Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
+        for ( Type type : genericInterfaces ) {
+            if ( type instanceof ParameterizedType ) {
+                ParameterizedType pType = (ParameterizedType) type;
+                if ( pType.getRawType() instanceof Class && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
+                    if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
+                        throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
+                                converterMeta.value(), pType.getActualTypeArguments()[0]);
                     }
-                } else {
-                    continue;
                 }
             }
         }
@@ -613,16 +615,20 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private Method findDefaultStateGetterMethod(Class<?> klass) {
+    private Method findDefaultStateGetterMethod(Class<?> klass) throws VerificationException {
         final StateIndicatorDefaultMethodScanner scanner = new StateIndicatorDefaultMethodScanner();
         MethodScanner.scanMethodsOnClasses(klass, scanner);
-        return scanner.getDefaultMethod();
+        final Method defaultGetter = scanner.getDefaultMethod();
+        if ( null != defaultGetter ) verifyStateIndicatorElement(klass, defaultGetter, defaultGetter.getReturnType());
+        return defaultGetter;
     }
 
-    private Field findFieldWith(Class<?> klass, Class<? extends Annotation> aClass) {
+    private Field findFieldWith(Class<?> klass, Class<? extends Annotation> aClass) throws VerificationException {
+        if ( klass.isInterface() ) return null;
         for ( Class<?> index = klass; index != Object.class; index = index.getSuperclass() ) {
             for ( Field field : index.getDeclaredFields() ) {
                 if ( null != field.getAnnotation(aClass) ) {
+                    verifyStateIndicatorElement(klass, field, field.getType());
                     return field;
                 }
             }
@@ -728,7 +734,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             transitionMetadata = verifyTransitionMethodWithTransitionClassKey(method, failureSet, transition, transitionMetadata);
         }
         if ( null != transitionMetadata ) {
-            verifySpecialTransitionMethodHasZeroArgument(method, failureSet, transitionMetadata);
+            transitionMetadata.verifyTransitionMethod(method, failureSet);
         }
     }
 
@@ -765,24 +771,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             transitionMetadata = getMetaType().getTransition(StringUtil.toUppercaseFirstCharacter(method.getName()));
         }
         return transitionMetadata;
-    }
-
-    private void verifySpecialTransitionMethodHasZeroArgument(Method method, VerificationFailureSet failureSet, TransitionMetadata transitionMetadata) {
-        switch (transitionMetadata.getType()) {
-            case Corrupt:
-                // fall through
-            case Recover:
-                // fall through
-            case Redo:
-                if ( method.getParameterTypes().length > 0 ) {
-                    failureSet.add(newVerificationFailure(transitionMetadata.getDottedPath(),
-                            SyntaxErrors.TRANSITION_TYPE_CORRUPT_RECOVER_REDO_REQUIRES_ZERO_PARAMETER, method,
-                            StringUtil.toUppercaseFirstCharacter(method.getName()), transitionMetadata.getType()));
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     private String getMethodDottedPath(Method method) {
@@ -829,33 +817,46 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         this.stateAccessor.write(target, state);
     }
 
-    @SuppressWarnings("unchecked")
     private String evaluateNextState(Object target, Object transitionKey) {
-        final String stateName = evaluateState(target);
-        final StateObject<S> state = getState(stateName);
+        final StateObject<S> state = getState(evaluateState(target));
         final FunctionMetadata functionMetadata = state.getMetaType().getFunctionMetadata(transitionKey);
+        requireFunctionNotNull(transitionKey, state, functionMetadata);
+        if ( isConditional(functionMetadata) ) {
+            return evaluateNextStateWithConditionalTransition(target, functionMetadata);
+        } else {
+            StateMetadata nextState = findStateFromBottomToTop(functionMetadata);
+            nextState = handleCompositeStateMachineLinkage(nextState);
+            return nextState.getSimpleName();
+        }
+    }
+
+    private void requireFunctionNotNull(Object transitionKey, final StateObject<S> state, final FunctionMetadata functionMetadata) {
         if ( null == functionMetadata ) {
             throw new IllegalArgumentException("Invalid Key or Key not registered: " + transitionKey + " while searching function metadata from state: "
                     + state);
         }
-        if ( 1 < functionMetadata.getNextStates().size() ) {
-            final TransitionMetadata transitionMetadata = functionMetadata.getTransition();
-            Class<? extends ConditionalTransition<?>> judgerClass = transitionMetadata.getJudgerClass();
-            try {
-                ConditionalTransition<Object> conditionalTransition = (ConditionalTransition<Object>) judgerClass.newInstance();
-                final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target, transitionMetadata));
-                final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass).getMetaType());
-                return nextState.getSimpleName();
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new IllegalStateException("Cannot create judger instance of Class: " + judgerClass + ". Please provide no-arg constructor.");
-            }
-        } else if ( 1 == functionMetadata.getNextStates().size() ) {
-            StateMetadata nextState = findStateFromBottomToTop(functionMetadata);
-            nextState = handleCompositeStateMachineLinkage(nextState);
+    }
+
+    private String evaluateNextStateWithConditionalTransition(Object target, final FunctionMetadata functionMetadata) {
+        try {
+            final ConditionalTransition<Object> conditionalTransition = createConditionalTransition(functionMetadata);
+            final Class<?> nextStateClass = conditionalTransition.doConditionJudge(evaluateJudgeable(target, functionMetadata.getTransition()));
+            final StateMetadata nextState = handleCompositeStateMachineLinkage(getState(nextStateClass).getMetaType());
             return nextState.getSimpleName();
-        } else {
-            throw new IllegalArgumentException("No next states found with fuction: " + functionMetadata);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new IllegalStateException("Cannot create judger instance of Class: " + functionMetadata.getTransition().getJudgerClass()
+                    + ". Please provide no-arg constructor.");
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ConditionalTransition<Object> createConditionalTransition(final FunctionMetadata functionMetadata) throws InstantiationException,
+            IllegalAccessException {
+        return (ConditionalTransition<Object>) functionMetadata.getTransition().getJudgerClass().newInstance();
+    }
+
+    private boolean isConditional(final FunctionMetadata functionMetadata) {
+        return 1 < functionMetadata.getNextStates().size();
     }
 
     private StateMetadata findStateFromBottomToTop(final FunctionMetadata functionMetadata) {
@@ -866,8 +867,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private Object evaluateJudgeable(Object target, final TransitionMetadata transitionMetadata) throws IllegalAccessException, InvocationTargetException {
         final ConditionObject conditionObject = getConditionObject(transitionMetadata.getConditionClass());
-        Object getJudgeable = conditionObject.conditionGetter().invoke(target);
-        return getJudgeable;
+        return conditionObject.conditionGetter().invoke(target);
     }
 
     private StateMetadata handleCompositeStateMachineLinkage(StateMetadata nextState) {
@@ -889,21 +889,24 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     @Override
     public void validateValidWhiles(final Object target, final UnlockableStack stack) {
         final StateMetadata state = getMetaType().getState(evaluateState(target));
-        final RelationConstraintMetadata[] validWhiles = state.getValidWhiles();
-        final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(validWhiles);
+        final HashMap<String, List<RelationConstraintMetadata>> mergedRelations = mergeRelations(state.getValidWhiles());
         final StateObject<S> stateObject = getState(state.getDottedPath());
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergedRelations.entrySet() ) {
             final Object relationInstance = getRelationInstance(target, new HashMap<Class<?>, Object>(), relationMetadataEntry);
-            if ( null == relationInstance ) {
-                for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
-                    if ( !item.isNullable() ) {
-                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL,
-                                item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
-                    }
-                }
-                continue;
+            if ( null != relationInstance ) {
+                stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
+            } else {
+                validateRequiredRelationExist(state, relationMetadataEntry);
             }
-            stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
+        }
+    }
+
+    private void validateRequiredRelationExist(final StateMetadata state, final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
+        for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
+            if ( !item.isNullable() ) {
+                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL,
+                        item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
+            }
         }
     }
 
@@ -1045,14 +1048,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
-        for ( CallbackObject callbackObject : this.specificPreStateChangeCallbackObjects ) {
-            if ( callbackObject.matches(callbackContext) ) {
-                callbackObject.doCallback(callbackContext);
-            }
-        }
-    }
-
     private void invokeCommonPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         for ( CallbackObject callbackObject : this.commonPostStateChangeCallbackObjects ) {
             callbackObject.doCallback(callbackContext);
@@ -1061,6 +1056,14 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void invokeSpecificPostStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
         for ( CallbackObject callbackObject : this.specificPostStateChangeCallbackObjects ) {
+            if ( callbackObject.matches(callbackContext) ) {
+                callbackObject.doCallback(callbackContext);
+            }
+        }
+    }
+
+    private void invokeSpecificPreStateChangeCallbacks(LifecycleContext<?, S> callbackContext) {
+        for ( CallbackObject callbackObject : this.specificPreStateChangeCallbackObjects ) {
             if ( callbackObject.matches(callbackContext) ) {
                 callbackObject.doCallback(callbackContext);
             }
@@ -1158,7 +1161,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void performCallbacksBeforeStateChange(LifecycleInterceptContext context) {
         context.logStep4PreStateChangeCallback();
         performPreStateChangeCallback(context);
