@@ -3,7 +3,7 @@ package net.madz.lifecycle.impl;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import net.madz.bcel.intercept.InterceptContext;
+import net.madz.bcel.intercept.LifecycleInterceptContext;
 import net.madz.lifecycle.LifecycleContext;
 
 public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
@@ -16,8 +16,9 @@ public class LifecycleContextImpl<T, S> implements LifecycleContext<T, S> {
     private final Method transitionMethod;
     private final Object[] arguments;
 
-    public LifecycleContextImpl(InterceptContext<T, ?> context, S fromState, S toState) {
-        this.target = context.getTarget();
+    @SuppressWarnings("unchecked")
+    public LifecycleContextImpl(LifecycleInterceptContext context, S fromState, S toState) {
+        this.target = (T) context.getTarget();
         this.fromStateName = context.getFromState();
         this.fromState = fromState;
         if ( null == context.getToState() ) {

@@ -16,13 +16,15 @@ public abstract class Interceptor<V, R> {
         this.next = next;
     }
 
-    public R intercept(InterceptContext<V, R> context, Callable<R> callable) throws Exception {
+    public R aroundInvoke(InterceptContext<V, R> context, Callable<R> callable) throws Exception {
         try {
             preExec(context);
-            R result = next.intercept(context, callable);
+            R result = next.aroundInvoke(context, callable);
             postExec(context);
+            context.markSuccess();
             return result;
         } catch (Throwable e) {
+            context.markFail(e);
             handleException(context, e);
             throw e;
         } finally {

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.logging.LogManager;
 
 import net.madz.lifecycle.engine.EngineTestSuite;
-import net.madz.lifecycle.meta.StandaloneLifecyclePureMetadataTest;
 import net.madz.lifecycle.semantics.SemanticsTestSuite;
 import net.madz.lifecycle.syntax.SyntaxTestSuite;
 
@@ -16,7 +15,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ SyntaxTestSuite.class, SemanticsTestSuite.class, EngineTestSuite.class, StandaloneLifecyclePureMetadataTest.class })
+@SuiteClasses({ SyntaxTestSuite.class, SemanticsTestSuite.class, EngineTestSuite.class })
 public class AllTestSuites {
 
     @BeforeClass

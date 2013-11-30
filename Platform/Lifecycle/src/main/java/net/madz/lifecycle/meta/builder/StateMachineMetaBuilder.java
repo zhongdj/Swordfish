@@ -1,8 +1,8 @@
 package net.madz.lifecycle.meta.builder;
 
-import net.madz.lifecycle.meta.template.LifecycleMetaRegistry;
-import net.madz.lifecycle.meta.template.StateMachineMetadata;
-import net.madz.lifecycle.meta.template.StateMetadata;
+import net.madz.lifecycle.meta.type.LifecycleMetaRegistry;
+import net.madz.lifecycle.meta.type.StateMachineMetadata;
+import net.madz.lifecycle.meta.type.StateMetadata;
 
 public interface StateMachineMetaBuilder extends AnnotationMetaBuilder<StateMachineMetadata, StateMachineMetadata>, StateMachineMetadata {
 

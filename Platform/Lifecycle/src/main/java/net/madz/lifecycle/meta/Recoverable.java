@@ -1,6 +1,6 @@
 package net.madz.lifecycle.meta;
 
-import net.madz.lifecycle.meta.template.TransitionMetadata;
+import net.madz.lifecycle.meta.type.TransitionMetadata;
 
 public interface Recoverable {
 

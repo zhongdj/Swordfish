@@ -13,7 +13,7 @@ import net.madz.lifecycle.LifecycleEventHandler;
 import net.madz.lifecycle.LifecycleException;
 import net.madz.lifecycle.engine.LifecycleLockTestMetadata.CustomerObject;
 import net.madz.lifecycle.engine.LifecycleLockTestMetadata.CustomerStateMachine;
-import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.lifecycle.meta.type.TransitionMetadata.TransitionTypeEnum;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;

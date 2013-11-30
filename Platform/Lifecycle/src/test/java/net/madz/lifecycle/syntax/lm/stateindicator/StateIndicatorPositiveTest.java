@@ -3,7 +3,7 @@ package net.madz.lifecycle.syntax.lm.stateindicator;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
+import net.madz.lifecycle.meta.builder.impl.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;

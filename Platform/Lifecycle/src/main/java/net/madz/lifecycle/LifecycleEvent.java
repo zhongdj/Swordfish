@@ -1,6 +1,6 @@
 package net.madz.lifecycle;
 
-import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.lifecycle.meta.type.TransitionMetadata.TransitionTypeEnum;
 
 public interface LifecycleEvent {
 

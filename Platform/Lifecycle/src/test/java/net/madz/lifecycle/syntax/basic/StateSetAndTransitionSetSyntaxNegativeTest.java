@@ -6,7 +6,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.meta.impl.builder.StateMachineMetaBuilderImpl;
+import net.madz.lifecycle.meta.builder.impl.StateMachineMetaBuilderImpl;
 import net.madz.verification.VerificationException;
 import net.madz.verification.VerificationFailure;
 import net.madz.verification.VerificationFailureSet;

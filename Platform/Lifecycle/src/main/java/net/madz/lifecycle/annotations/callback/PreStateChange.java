@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.madz.lifecycle.annotations.Null;
+import net.madz.utils.Null;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

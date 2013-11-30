@@ -8,7 +8,7 @@ import net.madz.common.DottedPath;
 import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
-import net.madz.lifecycle.meta.template.StateMetadata;
+import net.madz.lifecycle.meta.type.StateMetadata;
 import net.madz.verification.VerificationException;
 
 import org.junit.Assert;

@@ -7,7 +7,7 @@ import net.madz.lifecycle.AbsStateMachineRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.LifecycleRegistry;
 import net.madz.lifecycle.AbsStateMachineRegistry.StateMachineBuilder;
 import net.madz.lifecycle.SyntaxErrors;
-import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.lifecycle.meta.type.TransitionMetadata.TransitionTypeEnum;
 import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Activate;
 import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Inactivate;
 import net.madz.lifecycle.syntax.lm.transition.TransitionTestMetadata.SpecialTranstionStateMachine.Transitions.Restart;

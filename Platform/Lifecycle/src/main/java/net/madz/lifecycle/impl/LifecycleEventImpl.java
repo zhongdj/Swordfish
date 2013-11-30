@@ -1,8 +1,8 @@
 package net.madz.lifecycle.impl;
 
-import net.madz.bcel.intercept.InterceptContext;
+import net.madz.bcel.intercept.LifecycleInterceptContext;
 import net.madz.lifecycle.LifecycleEvent;
-import net.madz.lifecycle.meta.template.TransitionMetadata.TransitionTypeEnum;
+import net.madz.lifecycle.meta.type.TransitionMetadata.TransitionTypeEnum;
 
 public class LifecycleEventImpl implements LifecycleEvent {
 
@@ -14,7 +14,7 @@ public class LifecycleEventImpl implements LifecycleEvent {
     private final long startTime;
     private final long endTime;
 
-    public LifecycleEventImpl(InterceptContext<?, ?> context) {
+    public LifecycleEventImpl(LifecycleInterceptContext context) {
         this.reactiveObject = context.getTarget();
         this.fromState = context.getFromState();
         this.toState = context.getToState();

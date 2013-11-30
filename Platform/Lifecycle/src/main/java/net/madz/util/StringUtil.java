@@ -15,13 +15,9 @@ public class StringUtil {
     public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final CharsetEncoder UTF8_ENCODER = UTF8.newEncoder(); // used
 
-    // only
-    // for
-    // escapeXml
-    // -
-    // no
-    // actual
-    // encoding
+    /**
+     * only for escapeXml - no actual encoding
+     */
     public static String escapeXml(String string) {
         return escapeXml(string, UTF8);
     }

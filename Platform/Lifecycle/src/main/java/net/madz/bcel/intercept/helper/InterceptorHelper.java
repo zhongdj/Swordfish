@@ -5,11 +5,11 @@ import java.util.ArrayList;
 
 import net.madz.bcel.intercept.InterceptContext;
 import net.madz.lifecycle.AbsStateMachineRegistry;
-import net.madz.lifecycle.annotations.Null;
 import net.madz.lifecycle.annotations.ReactiveObject;
 import net.madz.lifecycle.annotations.Transition;
-import net.madz.lifecycle.meta.instance.StateMachineObject;
+import net.madz.lifecycle.meta.object.StateMachineObject;
 import net.madz.util.StringUtil;
+import net.madz.utils.Null;
 import net.madz.verification.VerificationException;
 
 public class InterceptorHelper {
