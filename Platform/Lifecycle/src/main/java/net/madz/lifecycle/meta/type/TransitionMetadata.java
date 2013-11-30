@@ -13,7 +13,11 @@ public interface TransitionMetadata extends MetaType<TransitionMetadata> {
         Redo,
         Fail,
         Common,
-        Other
+        Other;
+
+        public boolean isUniqueTransition() {
+            return this == TransitionTypeEnum.Corrupt || this == TransitionTypeEnum.Recover || this == TransitionTypeEnum.Redo;
+        }
     }
 
     TransitionTypeEnum getType();
