@@ -1,6 +1,6 @@
 package net.madz.lifecycle.annotations.callback;
 
-public class CallbackConsts {
+public final class CallbackConsts {
 
     public static final String NULL_STR = "$null$";
 

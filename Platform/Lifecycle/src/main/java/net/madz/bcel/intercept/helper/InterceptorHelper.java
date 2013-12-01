@@ -12,7 +12,7 @@ import net.madz.util.StringUtil;
 import net.madz.utils.Null;
 import net.madz.verification.VerificationException;
 
-public class InterceptorHelper {
+public final class InterceptorHelper {
 
     public static synchronized StateMachineObject<?> lookupStateMachine(InterceptContext<?, ?> context) {
         try {

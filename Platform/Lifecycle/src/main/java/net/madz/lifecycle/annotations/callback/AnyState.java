@@ -1,3 +1,6 @@
 package net.madz.lifecycle.annotations.callback;
 
-public class AnyState {}
+public final class AnyState {
+
+    private AnyState() {}
+}
