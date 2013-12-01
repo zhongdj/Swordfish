@@ -95,6 +95,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private final ArrayList<CallbackObject> commonPreStateChangeCallbackObjects = new ArrayList<>();
     private final ArrayList<CallbackObject> commonPostStateChangeCallbackObjects = new ArrayList<>();
     private StateAccessible<String> stateAccessor;
+    @SuppressWarnings("unused")
     private RelationObject parentRelationObject;
     private LifecycleLockStrategry lifecycleLockStrategry;
     private StateConverter<S> stateConverter;
@@ -529,10 +530,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         return method.getDeclaringClass().getName() + "." + method.getName();
     }
 
-    public RelationObject getParentRelationObject() {
-        return parentRelationObject;
-    }
-
     private Object getRelationInMethodParameters(HashMap<Class<?>, Object> relationsInMethodParameters, KeySet keySet) {
         Iterator<Object> iterator = keySet.iterator();
         while ( iterator.hasNext() ) {
@@ -802,17 +799,9 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         return false;
     }
 
-    public void setParentRelationObject(RelationObject parentRelationObject) {
-        this.parentRelationObject = parentRelationObject;
-    }
-
-    public void setStateAccessor(StateAccessible<String> accessor) {
-        this.stateAccessor = accessor;
-    }
-
     private String transitToNextState(Object target, Object transitionKey) {
         final String stateName = evaluateNextState(target, transitionKey);
-        updateNewState(target, stateName);
+        this.stateAccessor.write(target, stateName);
         return stateName;
     }
 
@@ -823,10 +812,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
                 lockStrategry.unlockWrite(context.getTarget());
             }
         }
-    }
-
-    private void updateNewState(Object target, String state) {
-        this.stateAccessor.write(target, state);
     }
 
     private void validateInboundConstraintAfterMethodInvocation(LifecycleInterceptContext context, final StateMachineObject<?> stateMachine) {
@@ -846,32 +831,27 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     private void validateInboundWhiles(LifecycleInterceptContext context) {
         final HashMap<Class<?>, Object> relationsInMethodParameters = evaluatorRelationsInMethodParameters(context);
         final Object target = context.getTarget();
-        final Object transitionKey = context.getTransitionKey();
         final StateMetadata state = getMetaType().getState(evaluateState(target));
-        final String nextState = evaluateNextState(target, transitionKey);
+        final String nextState = evaluateNextState(target, context.getTransitionKey());
         final StateMetadata nextStateMetadata = getMetaType().getState(nextState);
         for ( final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry : mergeRelations(nextStateMetadata.getInboundWhiles()).entrySet() ) {
             final Object relationTarget = getRelationInstance(target, relationsInMethodParameters, relationMetadataEntry);
-            if ( null == relationTarget ) {
-                for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
-                    if ( !item.isNullable() ) {
-                        throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.INBOUND_WHILE_RELATION_TARGET_IS_NULL,
-                                item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
-                    }
-                }
-                continue;
+            if ( null != relationTarget ) {
+                getState(state.getDottedPath()).verifyInboundWhileAndLockRelatedObjects(context.getTransitionKey(), target, nextState,
+                        relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationTarget, context);
+            } else {
+                validateRequiredRelationExist(state, relationMetadataEntry, LifecycleCommonErrors.INBOUND_WHILE_RELATION_TARGET_IS_NULL);
             }
-            getState(state.getDottedPath()).verifyInboundWhileAndLockRelatedObjects(transitionKey, target, nextState,
-                    relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationTarget, context);
         }
         context.setNextState(nextState);
     }
 
-    private void validateRequiredRelationExist(final StateMetadata state, final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry) {
+    private void validateRequiredRelationExist(final StateMetadata state, final Entry<String, List<RelationConstraintMetadata>> relationMetadataEntry,
+            String errorCode) {
         for ( final RelationConstraintMetadata item : relationMetadataEntry.getValue() ) {
             if ( !item.isNullable() ) {
-                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL,
-                        item.getPrimaryKey(), "nullable = " + item.isNullable(), state.getPrimaryKey());
+                throw new LifecycleException(getClass(), LifecycleCommonErrors.BUNDLE, errorCode, item.getPrimaryKey(), "nullable = " + item.isNullable(),
+                        state.getPrimaryKey());
             }
         }
     }
@@ -907,7 +887,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             if ( null != relationInstance ) {
                 stateObject.verifyValidWhile(target, relationMetadataEntry.getValue().toArray(new RelationConstraintMetadata[0]), relationInstance, stack);
             } else {
-                validateRequiredRelationExist(state, relationMetadataEntry);
+                validateRequiredRelationExist(state, relationMetadataEntry, LifecycleCommonErrors.VALID_WHILE_RELATION_TARGET_IS_NULL);
             }
         }
     }
