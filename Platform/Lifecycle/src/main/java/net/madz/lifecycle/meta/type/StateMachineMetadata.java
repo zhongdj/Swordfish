@@ -14,8 +14,6 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
 
     StateMachineMetadata getParent();
 
-    boolean hasRelations();
-
     boolean hasRelation(Object relationKey);
 
     /**
@@ -102,8 +100,7 @@ public interface StateMachineMetadata extends Recoverable, MetaType<StateMachine
 
     StateMetadata getOwningState();
 
-    StateMetadata[] getShortcutStateSet();
-
+    // StateMetadata[] getShortcutStateSet();
     StateMachineMetadata[] getCompositeStateMachines();
 
     /* //////////////////////////////////////////////////// */

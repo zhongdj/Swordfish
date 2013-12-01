@@ -104,11 +104,6 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     @Override
-    public boolean hasRelations() {
-        return relationList.size() > 0;
-    }
-
-    @Override
     public StateMetadata[] getDeclaredStateSet() {
         return stateList.toArray(new StateMetadata[stateList.size()]);
     }
@@ -218,11 +213,6 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
         this.owningState = stateMetaBuilder;
     }
 
-    @Override
-    public StateMetadata[] getShortcutStateSet() {
-        return shortcutStateList.toArray(new StateMetadata[shortcutStateList.size()]);
-    }
-
     /* //////////////////////////////////////////////////// */
     /* ////////////// Methods For Builder ///////////////// */
     /* //////////////////////////////////////////////////// */
@@ -328,7 +318,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
             } else if ( hasParent(relationClass) ) {
                 hasParentRelation = true;
                 if ( hasSuper() ) {
-                    if ( getSuper().hasParent() && null == relationClass.getAnnotation(LifecycleOverride.class) ) {
+                    if ( getSuper().hasParent() && !hasLifecycleOverrideAnnotation(relationClass) ) {
                         throw newVerificationException(getDottedPath(), SyntaxErrors.RELATION_NEED_OVERRIDES_TO_OVERRIDE_SUPER_STATEMACHINE_PARENT_RELATION,
                                 clazz, getSuperMetaClass(clazz));
                     }
@@ -377,7 +367,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
     }
 
     private void verifyStateClassBasic(Class<?> klass) throws VerificationException {
-        if ( null != klass.getAnnotation(LifecycleOverride.class) ) {
+        if ( hasLifecycleOverrideAnnotation(klass) ) {
             if ( klass.isInterface() ) {
                 if ( 0 >= klass.getInterfaces().length ) {
                     throw newVerificationException(getDottedPath() + ".StateSet." + klass.getSimpleName(), SyntaxErrors.STATE_OVERRIDES_WITHOUT_SUPER_CLASS,
@@ -874,9 +864,9 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
         if ( null != relationMetadata ) {
             return relationMetadata;
         }
-        if ( stateMachineMetadata.isComposite()) {
+        if ( stateMachineMetadata.isComposite() ) {
             relationMetadata = stateMachineMetadata.getOwningStateMachine().getRelationMetadata(relationKey);
-            if (null != relationMetadata) {
+            if ( null != relationMetadata ) {
                 return relationMetadata;
             }
         }
@@ -884,7 +874,7 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
             relationMetadata = builder.getDeclaredRelationMetadata(relationKey);
             if ( null != relationMetadata ) return relationMetadata;
         }
-        if (stateMachineMetadata.hasSuper()) {
+        if ( stateMachineMetadata.hasSuper() ) {
             return findRelation(stateMachineMetadata.getSuper(), relationKey);
         } else {
             throw new IllegalStateException("Cannot find relation with Key: " + relationKey);
