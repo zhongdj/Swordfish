@@ -14,7 +14,7 @@ import net.madz.verification.VerificationException;
 
 public class RelationObjectConfigure {
 
-    final ArrayList<RelationMetadata> extendedRelationMetadata;
+    private final ArrayList<RelationMetadata> extendedRelationMetadata;
     private final Class<?> klass;
     private final StateMachineObject<?> parent;
 
@@ -45,7 +45,7 @@ public class RelationObjectConfigure {
         }
     }
 
-    public void markExtendedRelationMetadata(final ArrayList<RelationMetadata> extendedRelationMetadata, final RelationMetadata relationMetadata) {
+    private void markExtendedRelationMetadata(final ArrayList<RelationMetadata> extendedRelationMetadata, final RelationMetadata relationMetadata) {
         if ( extendedRelationMetadata == null || relationMetadata == null ) {
             return;
         }
