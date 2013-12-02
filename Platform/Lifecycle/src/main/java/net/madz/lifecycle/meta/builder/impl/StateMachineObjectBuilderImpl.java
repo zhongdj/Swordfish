@@ -28,6 +28,7 @@ import net.madz.lifecycle.LifecycleLockStrategry;
 import net.madz.lifecycle.StateConverter;
 import net.madz.lifecycle.SyntaxErrors;
 import net.madz.lifecycle.annotations.LifecycleLock;
+import net.madz.lifecycle.annotations.LifecycleMeta;
 import net.madz.lifecycle.annotations.StateIndicator;
 import net.madz.lifecycle.annotations.Transition;
 import net.madz.lifecycle.annotations.action.Condition;
@@ -43,6 +44,7 @@ import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.impl.helpers.CallbackMethodConfigureScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.CallbackMethodVerificationScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.ConditionProviderMethodScanner;
+import net.madz.lifecycle.meta.builder.impl.helpers.RelationObjectConfigure;
 import net.madz.lifecycle.meta.builder.impl.helpers.CoverageVerifier;
 import net.madz.lifecycle.meta.builder.impl.helpers.MethodSignatureScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.RelationGetterConfigureScanner;
@@ -231,40 +233,41 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void configureRelationObject(Class<?> klass) throws VerificationException {
-        configureRelationObjectsFromField(klass);
-        configureRelationObjectsOnProperties(klass);
+        final ArrayList<RelationMetadata> extendedRelationMetadata = new ArrayList<>();
+        configureRelationObjectsFromField(klass, extendedRelationMetadata);
+        configureRelationObjectsOnProperties(klass, extendedRelationMetadata);
     }
 
-    private void configureRelationObjectsFromField(Class<?> klass) throws VerificationException {
+    private void configureRelationObjectsFromField(final Class<?> klass, final ArrayList<RelationMetadata> extendedRelationMetadata)
+            throws VerificationException {
         if ( null == klass || klass.isInterface() || Object.class == klass ) {
             return;
         }
-        final ArrayList<RelationMetadata> extendedRelationMetadata = new ArrayList<>();
         for ( Class<?> clazz = klass; clazz != Object.class; clazz = clazz.getSuperclass() ) {
             for ( Field field : clazz.getDeclaredFields() ) {
                 if ( null == field.getAnnotation(Relation.class) ) {
                     continue;
                 }
                 final Object relationKey = getRelationKey(field);
-                final RelationMetadata relationMetadata = getMetaType().getRelationMetadata(relationKey);
-                if ( extendedRelationMetadata.contains(relationMetadata) ) {
+                final StateMachineMetadata relatedStateMachine = getMetaType().getRegistry().loadStateMachineMetadata(
+                        clazz.getAnnotation(LifecycleMeta.class).value());
+                final RelationObjectConfigure configure = new RelationObjectConfigure(klass, extendedRelationMetadata, this);
+                final RelationObject relationObject = configure.configure(relatedStateMachine, relationKey, field);
+                if ( null == relationObject ) {
                     continue;
+                } else {
+                    addRelation(klass, relationObject, relationObject.getMetaType().getPrimaryKey());
                 }
-                if ( relationMetadata.hasSuper() ) {
-                    markExtendedRelationMetadata(extendedRelationMetadata, relationMetadata);
-                }
-                final RelationObject relationObject = new RelationObjectBuilderImpl(this, field, relationMetadata).build(klass, this).getMetaData();
-                addRelation(klass, relationObject, relationMetadata.getPrimaryKey());
             }
         }
     }
 
-    private void configureRelationObjectsOnProperties(Class<?> klass) throws VerificationException {
+    private void configureRelationObjectsOnProperties(Class<?> klass, ArrayList<RelationMetadata> extendedRelationMetadata) throws VerificationException {
         if ( Object.class == klass || null == klass ) {
             return;
         }
         final VerificationFailureSet failureSet = new VerificationFailureSet();
-        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(klass, this, this, failureSet);
+        RelationGetterConfigureScanner scanner = new RelationGetterConfigureScanner(klass, this, this, failureSet, extendedRelationMetadata);
         MethodScanner.scanMethodsOnClasses(klass, scanner);
         if ( 0 < failureSet.size() ) throw new VerificationException(failureSet);
     }
@@ -700,16 +703,6 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             }
         }
         return false;
-    }
-
-    private void markExtendedRelationMetadata(final ArrayList<RelationMetadata> extendedRelationMetadata, final RelationMetadata relationMetadata) {
-        if ( extendedRelationMetadata == null || relationMetadata == null ) {
-            return;
-        }
-        extendedRelationMetadata.add(relationMetadata);
-        if ( relationMetadata.hasSuper() ) {
-            markExtendedRelationMetadata(extendedRelationMetadata, relationMetadata.getSuper());
-        }
     }
 
     private HashMap<String, List<RelationConstraintMetadata>> mergeRelations(RelationConstraintMetadata[] relations) {
