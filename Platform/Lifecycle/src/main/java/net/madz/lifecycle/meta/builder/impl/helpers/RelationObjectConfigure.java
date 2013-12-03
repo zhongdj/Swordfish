@@ -46,9 +46,6 @@ public class RelationObjectConfigure {
     }
 
     private void markExtendedRelationMetadata(final ArrayList<RelationMetadata> extendedRelationMetadata, final RelationMetadata relationMetadata) {
-        if ( extendedRelationMetadata == null || relationMetadata == null ) {
-            return;
-        }
         extendedRelationMetadata.add(relationMetadata);
         if ( relationMetadata.hasSuper() ) {
             markExtendedRelationMetadata(extendedRelationMetadata, relationMetadata.getSuper());
