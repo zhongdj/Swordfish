@@ -682,17 +682,17 @@ public class StateMachineMetaBuilderImpl extends InheritableAnnotationMetaBuilde
         return findTransition(this, transitionKey);
     }
 
-    private TransitionMetadata findTransition(StateMachineMetadata stateMachineMetaBuilder, Object transitionKey) {
-        if ( null == stateMachineMetaBuilder ) return null;
-        TransitionMetadata transitionMetadata = stateMachineMetaBuilder.getDeclaredTransition(transitionKey);
+    private TransitionMetadata findTransition(StateMachineMetadata stateMachineMetadata, Object transitionKey) {
+        if ( null == stateMachineMetadata ) return null;
+        TransitionMetadata transitionMetadata = stateMachineMetadata.getDeclaredTransition(transitionKey);
         if ( null != transitionMetadata ) {
             return transitionMetadata;
         }
-        for ( StateMachineMetadata builder : stateMachineMetaBuilder.getCompositeStateMachines() ) {
+        for ( StateMachineMetadata builder : stateMachineMetadata.getCompositeStateMachines() ) {
             transitionMetadata = builder.getDeclaredTransition(transitionKey);
             if ( null != transitionMetadata ) return transitionMetadata;
         }
-        return findTransition(getSuper(), transitionKey);
+        return findTransition(stateMachineMetadata.getSuper(), transitionKey);
     }
 
     @Override
