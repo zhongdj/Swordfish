@@ -14,7 +14,9 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.relation.ValidWhile;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
+import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.engine.EngineTestBase.ReactiveObject;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R1_S.Transitions.R1_S_X;
 import net.madz.lifecycle.syntax.lm.relation.LMSyntaxRelationMetadata.R2_S.Transitions.R2_S_X;
@@ -538,5 +540,191 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         PLM_5 plm_5 = new PLM_5();
         PLM_R1_S x = new TestLifecycleInterceptor();
         plm_5.tM1(x);
+    }
+
+    @StateMachine
+    static interface LevelOneOrderLifecycle {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Pay.class, value = { States.Paid.class })
+            @ValidWhile(on = { LevelOneCustomerLifecycle.States.Activated.class }, relation = Relations.CustomerRelation.class)
+            static interface Draft {}
+            @Function(transition = Transitions.Deliver.class, value = { States.Delivered.class })
+            static interface Paid {}
+            @End
+            static interface Delivered {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Pay {}
+            static interface Deliver {}
+        }
+        @RelationSet
+        static interface Relations {
+
+            @RelateTo(LevelOneCustomerLifecycle.class)
+            static interface CustomerRelation {}
+        }
+    }
+    @StateMachine
+    static interface LevelTwoOrderLifecycle extends LevelOneOrderLifecycle {
+
+        @StateSet
+        static interface States extends LevelOneOrderLifecycle.States {
+
+            @LifecycleOverride
+            @ValidWhile(on = { LevelTwoCustomerLifecycle.States.CreditRated.class }, relation = Relations.CustomerRelation.class)
+            @Function(transition = LevelOneOrderLifecycle.Transitions.Pay.class, value = { LevelOneOrderLifecycle.States.Paid.class })
+            @Initial
+            static interface Draft extends LevelOneOrderLifecycle.States.Draft {}
+        }
+        @RelationSet
+        static interface Relations extends LevelOneOrderLifecycle.Relations {
+
+            @RelateTo(LevelTwoCustomerLifecycle.class)
+            static interface CustomerRelation extends LevelOneOrderLifecycle.Relations.CustomerRelation {}
+        }
+    }
+    @StateMachine
+    static interface LevelThreeOrderLifecycle extends LevelTwoOrderLifecycle {
+
+        @StateSet
+        static interface States extends LevelTwoOrderLifecycle.States {
+
+            @LifecycleOverride
+            @ValidWhile(on = { LevelThreeCustomerLifecycle.States.Prepaid.class }, relation = Relations.CustomerRelation.class)
+            @Function(transition = LevelTwoOrderLifecycle.Transitions.Pay.class, value = { LevelTwoOrderLifecycle.States.Paid.class })
+            @Initial
+            static interface Draft extends LevelOneOrderLifecycle.States.Draft {}
+        }
+        @RelationSet
+        static interface Relations extends LevelTwoOrderLifecycle.Relations {
+
+            @RelateTo(LevelThreeCustomerLifecycle.class)
+            static interface CustomerRelation extends LevelTwoOrderLifecycle.Relations.CustomerRelation {}
+        }
+    }
+    @StateMachine
+    static interface LevelOneCustomerLifecycle {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = Transitions.Activate.class, value = { States.Activated.class })
+            static interface Draft {}
+            @End
+            static interface Activated {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface Activate {}
+        }
+    }
+    @StateMachine
+    static interface LevelTwoCustomerLifecycle extends LevelOneCustomerLifecycle {
+
+        @StateSet
+        static interface States extends LevelOneCustomerLifecycle.States {
+
+            @LifecycleOverride
+            @Function(transition = Transitions.CreditRate.class, value = { States.CreditRated.class })
+            static interface Activated extends LevelOneCustomerLifecycle.States.Activated {}
+            @End
+            static interface CreditRated {}
+        }
+        @TransitionSet
+        static interface Transitions extends LevelOneCustomerLifecycle.Transitions {
+
+            static interface CreditRate {}
+        }
+    }
+    @StateMachine
+    static interface LevelThreeCustomerLifecycle extends LevelTwoCustomerLifecycle {
+
+        @StateSet
+        static interface States extends LevelTwoCustomerLifecycle.States {
+
+            @LifecycleOverride
+            @Function(transition = Transitions.Prepay.class, value = { States.Prepaid.class })
+            static interface CreditRated extends LevelTwoCustomerLifecycle.States.CreditRated {}
+            @End
+            static interface Prepaid {}
+        }
+        @TransitionSet
+        static interface Transitions extends LevelTwoCustomerLifecycle.Transitions {
+
+            static interface Prepay {}
+        }
+    }
+    @LifecycleMeta(LevelOneCustomerLifecycle.class)
+    public static class LevelOneCustomer extends ReactiveObject {
+
+        public LevelOneCustomer() {
+            initialState(LevelOneCustomerLifecycle.States.Draft.class.getSimpleName());
+        }
+
+        @Transition
+        public void activate() {}
+    }
+    @LifecycleMeta(LevelTwoCustomerLifecycle.class)
+    public static class LevelTwoCustomer extends LevelOneCustomer {
+
+        @Transition
+        public void creditRate() {}
+    }
+    @LifecycleMeta(LevelThreeCustomerLifecycle.class)
+    public static class LevelThreeCustomer extends LevelTwoCustomer {
+
+        @Transition
+        public void prepay() {}
+    }
+    @LifecycleMeta(LevelOneOrderLifecycle.class)
+    public static class LevelOneOrder extends ReactiveObject {
+
+        public LevelOneOrder(LevelOneCustomer levelOneCustomer) {
+            this.levelOneCustomer = levelOneCustomer;
+            initialState(LevelOneOrderLifecycle.States.Draft.class.getSimpleName());
+        }
+
+        @Relation(LevelOneOrderLifecycle.Relations.CustomerRelation.class)
+        private LevelOneCustomer levelOneCustomer;
+
+        @Transition
+        public void pay() {}
+
+        @Transition
+        public void deliver() {}
+    }
+    @LifecycleMeta(LevelTwoOrderLifecycle.class)
+    public static class LevelTwoOrder extends LevelOneOrder {
+
+        public LevelTwoOrder(LevelTwoCustomer customer) {
+            super(customer);
+            this.levelTwoCustomer = customer;
+        }
+
+        @Relation(LevelTwoOrderLifecycle.Relations.CustomerRelation.class)
+        private LevelTwoCustomer levelTwoCustomer;
+    }
+    @LifecycleMeta(LevelThreeOrderLifecycle.class)
+    public static class LevelThreeOrder extends LevelTwoOrder {
+
+        public LevelThreeOrder(LevelThreeCustomer customer) {
+            super(customer);
+            this.customer = customer;
+        }
+
+        private LevelThreeCustomer customer;
+
+        @Relation(LevelThreeOrderLifecycle.Relations.CustomerRelation.class)
+        public LevelThreeCustomer getLevelThreeCustomer() {
+            return customer;
+        }
     }
 }

@@ -57,4 +57,26 @@ public class LMSyntaxRelationPositiveTest extends LMSyntaxRelationMetadata {
             fail("No exception expected!");
         }
     }
+
+    @Test
+    public final void test_extended_relation_metadata() {
+        @LifecycleRegistry(LevelThreeOrder.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+            LevelThreeCustomer levelThreeCustomer = new LevelThreeCustomer();
+            levelThreeCustomer.activate();
+            levelThreeCustomer.creditRate();
+            levelThreeCustomer.prepay();
+            LevelThreeOrder levelThreeOrder = new LevelThreeOrder(levelThreeCustomer);
+            levelThreeOrder.pay();
+        } catch (VerificationException e) {
+            e.printStackTrace();
+            fail("No exception expected!");
+        }
+    }
 }
