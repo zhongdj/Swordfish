@@ -1060,8 +1060,7 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
     }
 
     private void verifyRelationsAllBeCoveraged(Class<?> klass) throws VerificationException {
-        StateMetadata[] allStates = getMetaType().getAllStates();
-        for ( StateMetadata state : allStates ) {
+        for ( StateMetadata state : getMetaType().getAllStates() ) {
             for ( RelationConstraintMetadata relation : state.getValidWhiles() ) {
                 for ( TransitionMetadata transition : state.getPossibleLeavingTransitions() ) {
                     verifyRelationBeCovered(klass, relation, transition);
@@ -1100,18 +1099,73 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyStateIndicatorConverterDeclaredCorrectTypeParameter(Class<?> stateType, final Class<?> getterDeclaringClass,
             final Converter converterMeta) throws VerificationException {
-        Type[] genericInterfaces = converterMeta.value().getGenericInterfaces();
-        for ( Type type : genericInterfaces ) {
+        for ( Type type : converterMeta.value().getGenericInterfaces() ) {
             if ( type instanceof ParameterizedType ) {
-                ParameterizedType pType = (ParameterizedType) type;
-                if ( pType.getRawType() instanceof Class && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType()) ) {
-                    if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
-                        throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
-                                converterMeta.value(), pType.getActualTypeArguments()[0]);
-                    }
+                final ParameterizedType pType = (ParameterizedType) type;
+                if ( implementsStateConverter(pType) && !matchedWithStateType(stateType, pType) ) {
+                    throw newVerificationException(getDottedPath(), SyntaxErrors.STATE_INDICATOR_CONVERTER_INVALID, getterDeclaringClass, stateType,
+                            converterMeta.value(), pType.getActualTypeArguments()[0]);
                 }
             }
         }
+    }
+
+    private boolean matchedWithStateType(Class<?> stateType, final ParameterizedType pType) {
+        boolean matched = true;
+        if ( !stateType.isPrimitive() ) {
+            if ( !stateType.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else {
+            if ( !matchPrimitiveType(stateType, pType) ) {
+                matched = false;
+            }
+        }
+        return matched;
+    }
+
+    private boolean implementsStateConverter(final ParameterizedType pType) {
+        return pType.getRawType() instanceof Class && StateConverter.class.isAssignableFrom((Class<?>) pType.getRawType());
+    }
+
+    private boolean matchPrimitiveType(Class<?> stateType, ParameterizedType pType) {
+        boolean matched = true;
+        if ( Byte.TYPE.equals(stateType) ) {
+            if ( !Byte.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Short.TYPE.equals(stateType) ) {
+            if ( !Short.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Integer.TYPE.equals(stateType) ) {
+            if ( !Integer.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Long.TYPE.equals(stateType) ) {
+            if ( !Long.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Boolean.TYPE.equals(stateType) ) {
+            if ( !Boolean.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Character.TYPE.equals(stateType) ) {
+            if ( !Character.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Float.TYPE.equals(stateType) ) {
+            if ( !Float.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else if ( Double.TYPE.equals(stateType) ) {
+            if ( !Double.class.equals(pType.getActualTypeArguments()[0]) ) {
+                matched = false;
+            }
+        } else {
+            matched = false;
+        }
+        return matched;
     }
 
     private void verifyStateIndicatorElement(Class<?> klass, AnnotatedElement getter, Class<?> stateType) throws VerificationException {
