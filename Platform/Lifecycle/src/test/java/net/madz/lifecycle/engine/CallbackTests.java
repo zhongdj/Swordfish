@@ -71,12 +71,9 @@ public class CallbackTests extends CallbackTestMetadata {
     @Test
     public void test_non_relational_callback_post_state_change() {
         final InvoiceNonRelationalCallback invoice = new InvoiceNonRelationalCallback(new BigDecimal(10000.0D));
-        final InvoiceItemNonRelationalCallback itemOne = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(
-                4000.0D));
-        final InvoiceItemNonRelationalCallback itemTwo = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(
-                4000.0D));
-        final InvoiceItemNonRelationalCallback itemThree = new InvoiceItemNonRelationalCallback(invoice,
-                new BigDecimal(2000.0D));
+        final InvoiceItemNonRelationalCallback itemOne = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(4000.0D));
+        final InvoiceItemNonRelationalCallback itemTwo = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(4000.0D));
+        final InvoiceItemNonRelationalCallback itemThree = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(2000.0D));
         invoice.post();
         assertState(InvoiceStateMachineMeta.States.Posted.class, invoice);
         assertState(InvoiceItemStateMachineMeta.States.Unpaid.class, itemOne);
@@ -112,7 +109,7 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_order_object_callback_definition () {
+    public void test_order_object_callback_definition() {
         final OrderObject<?> order = new OrderObject<>();
         assertEquals(0, order.getCount());
         order.pay();
@@ -120,6 +117,7 @@ public class CallbackTests extends CallbackTestMetadata {
         order.deliver();
         assertEquals(2, order.getCount());
     }
+
     @Test
     public void test_extends_callback_definition() {
         final BigProductOrderObjectWithExtendsCallbackDefinition bigOrder = new BigProductOrderObjectWithExtendsCallbackDefinition();
@@ -142,5 +140,25 @@ public class CallbackTests extends CallbackTestMetadata {
         assertEquals(1, bigOrder.getCount());
         bigOrder.install();
         assertEquals(2, bigOrder.getCount());
+    }
+
+    @Test
+    public void test_specified_post_from_to_callback_definition() {
+        final OrderWithSpecifiedFromToCallback bigOrder = new OrderWithSpecifiedFromToCallback();
+        assertEquals(0, bigOrder.getCount());
+        bigOrder.cancel();
+        assertEquals(2, bigOrder.getCount());
+    }
+
+    @Test
+    public void test_specified_pre_from_to_callback_definition() {
+        final OrderWithSpecifiedPreFromToCallback bigOrder = new OrderWithSpecifiedPreFromToCallback();
+        assertEquals(0, bigOrder.getCount());
+        bigOrder.pay();
+        assertEquals(1, bigOrder.getCount());
+        bigOrder.deliver();
+        assertEquals(2, bigOrder.getCount());
+        bigOrder.install();
+        assertEquals(3, bigOrder.getCount());
     }
 }

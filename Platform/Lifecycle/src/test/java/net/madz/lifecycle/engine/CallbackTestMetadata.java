@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
+
 import net.madz.lifecycle.LifecycleContext;
 import net.madz.lifecycle.annotations.Function;
 import net.madz.lifecycle.annotations.Functions;
@@ -541,6 +543,45 @@ public class CallbackTestMetadata extends EngineTestBase {
         public void interceptPostStateChangeWhenOrderFinished(LifecycleContext<BigProductOrderObjectWithOverridesCallbackDefinition, String> context) {
             count++;
             System.out.println("Big Product Order is finished.");
+        }
+    }
+    @LifecycleMeta(BigProductOrderStateMachine.class)
+    public static class OrderWithSpecifiedFromToCallback extends OrderObject<OrderWithSpecifiedFromToCallback> {
+
+        @Transition
+        public void install() {}
+
+        @Transition
+        public void cancel() {}
+
+        @PostStateChange(from = BigProductOrderStateMachine.States.New.class, to = BigProductOrderStateMachine.States.Cancelled.class)
+        public void intercept(LifecycleContext<OrderWithSpecifiedFromToCallback, String> context) {
+            count++;
+            System.out.println("OrderWithSpecifiedFromToCallback is finished.");
+        }
+    }
+    @LifecycleMeta(BigProductOrderStateMachine.class)
+    public static class OrderWithSpecifiedPreFromToCallback extends OrderObject<OrderWithSpecifiedPreFromToCallback> {
+
+        @Transition
+        public void install() {}
+
+        @Transition
+        public void cancel() {}
+
+        @PreStateChange(from = BigProductOrderStateMachine.States.Delivered.class, to = BigProductOrderStateMachine.States.Installed.class)
+        public void intercept(LifecycleContext<OrderWithSpecifiedPreFromToCallback, String> context) {
+            Assert.assertEquals(BigProductOrderStateMachine.States.Installed.class.getSimpleName(), context.getToStateName());
+            Assert.assertEquals(BigProductOrderStateMachine.States.Installed.class.getSimpleName(), context.getToState());
+            Assert.assertEquals(BigProductOrderStateMachine.States.Delivered.class.getSimpleName(), context.getFromStateName());
+            Assert.assertEquals(BigProductOrderStateMachine.States.Delivered.class.getSimpleName(), context.getFromState());
+            Assert.assertEquals(this, context.getTarget());
+            try {
+                Assert.assertEquals(OrderWithSpecifiedPreFromToCallback.class.getMethod("install"), context.getTransitionMethod());
+            } catch (NoSuchMethodException | SecurityException ignored) {}
+            Assert.assertEquals(0, context.getArguments().length);
+            count++;
+            System.out.println("OrderWithSpecifiedPreFromToCallback is finished.");
         }
     }
 }
