@@ -27,7 +27,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     public void test_standalone_object_with_definite_relation() {
         Customer customer = new Customer();
         customer.activate();
-        InternetServiceOrder order = new InternetServiceOrder(new Date(), null, customer, "1 year");
+        final InternetServiceOrder order = new InternetServiceOrder(new Date(), null, customer, "1 year");
         order.start();
         assertEquals(InternetServiceLifecycleMeta.States.InService.class.getSimpleName(), order.getState());
     }

@@ -43,7 +43,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_superclass_without_StateMachine() throws VerificationException {
+    public void test_incorrect_registering_super_interface_without_StateMachine() throws VerificationException {
         @LifecycleRegistry(IncorrectStateMachineInheritanceChildSyntax.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
@@ -61,6 +61,31 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
             VerificationFailure failure = iterator.next();
             final String expectedErrorMessage = getMessage(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE,
                     IncorrectStateMachineInheritanceSuperSyntax.class);
+            final String actualErrorMessage = failure.getErrorMessage(null);
+            assertEquals(expectedErrorMessage, actualErrorMessage);
+            assertEquals(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());
+            throw ex;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public void test_incorrect_registering_superclass_without_StateMachine() throws VerificationException {
+        @LifecycleRegistry(IllegalExtendsNonStateMachineClass.class)
+        @StateMachineBuilder
+        class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
+
+            protected IncorrectStateMachineInheritanceRegistry() throws VerificationException {
+                super();
+            }
+        }
+        try {
+            new IncorrectStateMachineInheritanceRegistry();
+        } catch (VerificationException ex) {
+            VerificationFailureSet failureSet = ex.getVerificationFailureSet();
+            Iterator<VerificationFailure> iterator = failureSet.iterator();
+            assertEquals(1, failureSet.size());
+            VerificationFailure failure = iterator.next();
+            final String expectedErrorMessage = getMessage(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, NonStateMachineClass.class);
             final String actualErrorMessage = failure.getErrorMessage(null);
             assertEquals(expectedErrorMessage, actualErrorMessage);
             assertEquals(SyntaxErrors.STATEMACHINE_SUPER_MUST_BE_STATEMACHINE, failure.getErrorCode());

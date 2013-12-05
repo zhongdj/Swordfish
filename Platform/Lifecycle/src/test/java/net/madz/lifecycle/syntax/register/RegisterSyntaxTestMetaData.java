@@ -101,4 +101,23 @@ public class RegisterSyntaxTestMetaData extends BaseMetaDataTest {
     protected static interface WrongStateMachineSyntaxWithoutAnnotation {}
     @LifecycleMeta(WrongStateMachineSyntaxWithoutAnnotation.class)
     protected static class WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation {}
+    public static class NonStateMachineClass {}
+    @StateMachine
+    public static class IllegalExtendsNonStateMachineClass extends NonStateMachineClass {
+
+        @StateSet
+        static interface States {
+
+            @Initial
+            @Function(transition = TransitionThree.class, value = StateF.class)
+            static interface StateE {}
+            @End
+            static interface StateF {}
+        }
+        @TransitionSet
+        static interface Transitions {
+
+            static interface TransitionThree {}
+        }
+    }
 }
