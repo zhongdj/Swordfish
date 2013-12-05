@@ -660,6 +660,79 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
             return shutdown;
         }
     }
+    @LifecycleMeta(PowerLifecycleMetadata.class)
+    public static class NonGetterConditionPowerObject extends ReactiveObject implements PowerLeftCondition {
+
+        private int powerLeft = 2;
+        private boolean shutdown = false;
+
+        @Transition
+        public void shutDown() {
+            shutdown = true;
+        }
+
+        @Transition
+        public void reducePower() {
+            powerLeft--;
+        }
+
+        public NonGetterConditionPowerObject() {
+            initialState(PowerLifecycleMetadata.States.PowerOn.class.getSimpleName());
+        }
+
+        @Condition(PowerLifecycleMetadata.Conditions.PowerLeftCondition.class)
+        public PowerLeftCondition powerLeftCondition() {
+            return this;
+        }
+
+        @Override
+        public boolean powerLeft() {
+            return powerLeft > 0;
+        }
+
+        @Override
+        public boolean isShutDown() {
+            return shutdown;
+        }
+    }
+    @LifecycleMeta(KeyBoardLifecycleMetadataPostValidateCondition.class)
+    public static class NonGetterConditionKeyBoardObjectPostValidateCondition extends ReactiveObject implements TimesLeft {
+
+        private int times = 2;
+        private NonGetterConditionPowerObject powerObject;
+
+        public NonGetterConditionKeyBoardObjectPostValidateCondition(NonGetterConditionPowerObject powerObject) {
+            super();
+            this.powerObject = powerObject;
+            initialState(KeyBoardLifecycleMetadataPostValidateCondition.States.ReadingInput.class.getSimpleName());
+        }
+
+        @Condition(KeyBoardLifecycleMetadataPostValidateCondition.Conditions.TimesLeft.class)
+        public TimesLeft getTimeLeft() {
+            return this;
+        }
+
+        @Relation(PowerRelation.class)
+        public NonGetterConditionPowerObject powerRelation() {
+            return this.powerObject;
+        }
+
+        @Transition
+        public void pressAnyKey() {
+            times = times - 1;
+            powerObject.reducePower();
+        }
+
+        @Override
+        public boolean timesLeft() {
+            return times > 0;
+        }
+
+        @Override
+        public boolean isPowerOff() {
+            return !powerObject.powerLeft();
+        }
+    }
     @LifecycleMeta(KeyBoardLifecycleMetadataPreValidateCondition.class)
     public static class KeyBoardObjectPreValidateCondition extends ReactiveObject implements TimesLeft {
 
