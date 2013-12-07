@@ -119,7 +119,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_LM_relation_defined_multi_times_in_stateMachine() throws VerificationException {
+    public final void test_relation_defined_multi_times_in_class_level() throws VerificationException {
         @LifecycleRegistry(NLM_7.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -131,6 +131,23 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, NLM_7.class.getName(),
                     S4.Relations.R3.class.getName());
+            throw e;
+        }
+    }
+
+    @Test(expected = VerificationException.class)
+    public final void test_relation_defined_multi_times_in_method_level() throws VerificationException {
+        @LifecycleRegistry(Negative_Same_Relation_Concreted_Multiple_Times_In_Method_tM1.class)
+        @StateMachineBuilder
+        class Registry extends AbsStateMachineRegistry {
+
+            protected Registry() throws VerificationException {}
+        }
+        try {
+            new Registry();
+        } catch (VerificationException e) {
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, Negative_Same_Relation_Concreted_Multiple_Times_In_Method_tM1.class.getName(),
+                    S4.Relations.R1.class.getName());
             throw e;
         }
     }

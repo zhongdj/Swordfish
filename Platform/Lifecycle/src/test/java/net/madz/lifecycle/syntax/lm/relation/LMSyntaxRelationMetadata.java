@@ -534,6 +534,34 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
             this.state = state;
         }
     }
+    @LifecycleMeta(S4.class)
+    static class Negative_Same_Relation_Concreted_Multiple_Times_In_Method_tM1 {
+
+        String state;
+
+        @Transition(S4.Transitions.X.class)
+        void tM1(@Relation(R1.class) PLM_R1_S x, @Relation(R1.class) PLM_R1_S x2) {}
+
+        @Transition(S4.Transitions.Y.class)
+        void tM2() {}
+
+        @Transition(S4.Transitions.Z.class)
+        void tM3() {}
+
+        @Relation(S4.Relations.R2.class)
+        PLM_R2_S r2 = null;
+        @Relation(S4.Relations.R3.class)
+        PLM_R2_S r3 = null;
+        
+        public String getState() {
+            return null;
+        }
+
+        @SuppressWarnings("unused")
+        private void setState(String state) {
+            this.state = state;
+        }
+    }
 
     public static void main(String[] args) throws Throwable {
         System.out.println("Testing Main");
