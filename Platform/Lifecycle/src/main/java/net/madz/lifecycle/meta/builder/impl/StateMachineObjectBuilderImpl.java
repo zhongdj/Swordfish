@@ -44,12 +44,12 @@ import net.madz.lifecycle.meta.builder.StateMachineObjectBuilder;
 import net.madz.lifecycle.meta.builder.impl.helpers.CallbackMethodConfigureScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.CallbackMethodVerificationScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.ConditionProviderMethodScanner;
-import net.madz.lifecycle.meta.builder.impl.helpers.RelationObjectConfigure;
 import net.madz.lifecycle.meta.builder.impl.helpers.CoverageVerifier;
 import net.madz.lifecycle.meta.builder.impl.helpers.MethodSignatureScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.RelationGetterConfigureScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.RelationGetterScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.RelationIndicatorPropertyMethodScanner;
+import net.madz.lifecycle.meta.builder.impl.helpers.RelationObjectConfigure;
 import net.madz.lifecycle.meta.builder.impl.helpers.ScannerForVerifyConditionCoverage;
 import net.madz.lifecycle.meta.builder.impl.helpers.StateIndicatorDefaultMethodScanner;
 import net.madz.lifecycle.meta.builder.impl.helpers.StateIndicatorGetterMethodScanner;
@@ -1023,10 +1023,11 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
 
     private void verifyRelationInstancesDefinedCorrectly(Class<?> klass) throws VerificationException {
         verifyRelationInstanceNotBeyondStateMachine(klass);
-        verifyRelationInstancesUnique(klass);
+        verifyRelationInstancesInClassLevelUnique(klass);
+        verifyRelationInstancesInMethodLevelUnique(klass);
     }
 
-    private void verifyRelationInstancesUnique(Class<?> klass) throws VerificationException {
+    private void verifyRelationInstancesInClassLevelUnique(Class<?> klass) throws VerificationException {
         final Set<Class<?>> relations = new HashSet<>();
         for ( Field field : klass.getDeclaredFields() ) {
             final Relation relation = field.getAnnotation(Relation.class);
@@ -1035,14 +1036,20 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
         for ( final Method method : klass.getDeclaredMethods() ) {
             if ( Relation.Utils.isRelationMethod(method) ) {
                 checkRelationInstanceWhetherExists(klass, relations, method.getAnnotation(Relation.class));
-            } else if ( method.getTypeParameters().length > 0 ) {
-                final Set<Class<?>> methodRelations = new HashSet<>();
-                for ( final Annotation[] annotations : method.getParameterAnnotations() ) {
-                    for ( final Annotation annotation : annotations ) {
-                        if ( annotation instanceof Relation ) {
-                            final Relation r = (Relation) annotation;
-                            checkRelationInstanceWhetherExists(klass, methodRelations, r);
-                        }
+            }
+        }
+    }
+
+    private void verifyRelationInstancesInMethodLevelUnique(final Class<?> klass) throws VerificationException {
+        for ( final Method method : klass.getDeclaredMethods() ) {
+            if ( method.getParameterTypes().length <= 0 ) {
+                continue;
+            }
+            final Set<Class<?>> methodRelations = new HashSet<>();
+            for ( final Annotation[] annotations : method.getParameterAnnotations() ) {
+                for ( final Annotation annotation : annotations ) {
+                    if ( annotation instanceof Relation ) {
+                        checkRelationInstanceWhetherExists(klass, methodRelations, (Relation) annotation);
                     }
                 }
             }
