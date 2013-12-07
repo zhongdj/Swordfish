@@ -120,7 +120,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
 
     @Test(expected = VerificationException.class)
     public final void test_relation_defined_multi_times_in_class_level() throws VerificationException {
-        @LifecycleRegistry(NLM_7.class)
+        @LifecycleRegistry(Negative_Same_Relation_Concreted_Duplicate_On_Fields_r2_r3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
@@ -129,7 +129,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, NLM_7.class.getName(),
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.LM_RELATION_INSTANCE_MUST_BE_UNIQUE, Negative_Same_Relation_Concreted_Duplicate_On_Fields_r2_r3.class.getName(),
                     S4.Relations.R3.class.getName());
             throw e;
         }

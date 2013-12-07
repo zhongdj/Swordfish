@@ -502,7 +502,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(S4.class)
-    static class NLM_7 {
+    static class Negative_Same_Relation_Concreted_Duplicate_On_Fields_r2_r3 {
 
         String state;
 
