@@ -1033,20 +1033,15 @@ public class StateMachineObjectBuilderImpl<S> extends ObjectBuilderBase<StateMac
             checkRelationInstanceWhetherExists(klass, relations, relation);
         }
         for ( final Method method : klass.getDeclaredMethods() ) {
-            if ( method.getName().startsWith("get") && method.getTypeParameters().length <= 0 ) {
-                if ( method.getAnnotation(Relation.class) != null ) {
-                    checkRelationInstanceWhetherExists(klass, relations, method.getAnnotation(Relation.class));
-                }
-            } else {
-                if ( method.getAnnotation(Relation.class) != null ) {
-                    final Set<Class<?>> methodRelations = new HashSet<>();
-                    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-                    for ( final Annotation[] annotations : parameterAnnotations ) {
-                        for ( final Annotation annotation : annotations ) {
-                            if ( annotation instanceof Relation ) {
-                                final Relation r = (Relation) annotation;
-                                checkRelationInstanceWhetherExists(klass, methodRelations, r);
-                            }
+            if ( Relation.Utils.isRelationMethod(method) ) {
+                checkRelationInstanceWhetherExists(klass, relations, method.getAnnotation(Relation.class));
+            } else if ( method.getTypeParameters().length > 0 ) {
+                final Set<Class<?>> methodRelations = new HashSet<>();
+                for ( final Annotation[] annotations : method.getParameterAnnotations() ) {
+                    for ( final Annotation annotation : annotations ) {
+                        if ( annotation instanceof Relation ) {
+                            final Relation r = (Relation) annotation;
+                            checkRelationInstanceWhetherExists(klass, methodRelations, r);
                         }
                     }
                 }

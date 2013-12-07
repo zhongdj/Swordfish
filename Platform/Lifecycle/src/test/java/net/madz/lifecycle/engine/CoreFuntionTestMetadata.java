@@ -708,12 +708,12 @@ public class CoreFuntionTestMetadata extends EngineTestBase {
         }
 
         @Condition(KeyBoardLifecycleMetadataPostValidateCondition.Conditions.TimesLeft.class)
-        public TimesLeft getTimeLeft() {
+        public TimesLeft timeLeft() {
             return this;
         }
 
         @Relation(PowerRelation.class)
-        public NonGetterConditionPowerObject powerRelation() {
+        public NonGetterConditionPowerObject getPowerRelation() {
             return this.powerObject;
         }
 

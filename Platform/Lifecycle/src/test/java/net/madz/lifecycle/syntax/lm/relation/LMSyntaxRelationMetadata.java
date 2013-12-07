@@ -521,7 +521,7 @@ public class LMSyntaxRelationMetadata extends BaseMetaDataTest {
         PLM_R2_S r3 = null;
 
         @Relation(S4.Relations.R3.class)
-        PLM_R3_S getR3S() {
+        public PLM_R3_S getR3S() {
             return null;
         }
 
