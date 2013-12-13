@@ -176,7 +176,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_prestatechange_relation_invalid extends S1BaseLM {
+    static class NLM_prestatechange_observable_object_not_found extends S1BaseLM {
 
         @PreStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleContext<NLM_prestatechange_to_state_invalid_non_relational, String> context) {
@@ -209,7 +209,7 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
     }
     
     @LifecycleMeta(S1.class)
-    static class NLM_poststatechange_relation_invalid extends S1BaseLM {
+    static class NLM_poststatechange_observable_name_invalid extends S1BaseLM {
 
         @PostStateChange(to = S1.States.S1_State_A.class, observableName = "s1", mappedBy = "s1")
         public void interceptStateChange(LifecycleContext<NLM_prestatechange_to_state_invalid_non_relational, String> context) {
