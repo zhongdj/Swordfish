@@ -10,7 +10,7 @@ import org.junit.Test;
 public class TransitionPositiveTests extends TransitionTestMetadata {
 
     @Test
-    public void test_special_transition_type() throws VerificationException {
+    public void special_transition_types_redo_recover_corrupt() throws VerificationException {
         @LifecycleRegistry(PositiveProcess.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

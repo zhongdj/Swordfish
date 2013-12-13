@@ -19,7 +19,7 @@ import org.junit.Test;
 public class TransitionNegativeTests extends TransitionTestMetadata {
 
     @Test(expected = VerificationException.class)
-    public void test_special_transition_type() throws VerificationException, Throwable {
+    public void should_throw_exception_if_transition_method_of_special_transition_type_has_parameter() throws VerificationException, Throwable {
         @LifecycleRegistry(NegativeProcess.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
