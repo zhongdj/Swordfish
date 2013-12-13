@@ -14,11 +14,11 @@ import net.madz.lifecycle.annotations.action.ConditionalTransition;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.syntax.BaseMetaDataTest;
-import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Conditions.CompareWithZero;
-import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.States.I;
-import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.States.J;
-import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Transitions.Z;
-import net.madz.lifecycle.syntax.basic.ConditionSetTest.S4.Utils.ConcreteCondition;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.InvalidStateMachineWithMultiConditionSet.Conditions.CompareWithZero;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.InvalidStateMachineWithMultiConditionSet.States.I;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.InvalidStateMachineWithMultiConditionSet.States.J;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.InvalidStateMachineWithMultiConditionSet.Transitions.Z;
+import net.madz.lifecycle.syntax.basic.ConditionSetTest.InvalidStateMachineWithMultiConditionSet.Utils.ConcreteCondition;
 import net.madz.verification.VerificationException;
 
 import org.junit.Test;
@@ -26,8 +26,8 @@ import org.junit.Test;
 public class ConditionSetTest extends BaseMetaDataTest {
 
     @Test(expected = VerificationException.class)
-    public void test_multiple_condition_set() throws VerificationException {
-        @LifecycleRegistry(S4.class)
+    public void should_throw_exception_002_3400_if_exists_multiple_condition_set() throws VerificationException {
+        @LifecycleRegistry(InvalidStateMachineWithMultiConditionSet.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
@@ -36,13 +36,13 @@ public class ConditionSetTest extends BaseMetaDataTest {
         try {
             new Registry();
         } catch (VerificationException e) {
-            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.CONDITIONSET_MULTIPLE, S4.class);
+            assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.CONDITIONSET_MULTIPLE, InvalidStateMachineWithMultiConditionSet.class);
             throw e;
         }
     }
 
     @StateMachine
-    static interface S4 {
+    static interface InvalidStateMachineWithMultiConditionSet {
 
         @StateSet
         static interface States {

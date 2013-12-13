@@ -13,7 +13,7 @@ import org.junit.Test;
 public class TransitionSyntaxNegativeTest extends TransitionSyntaxMetadata {
 
     @Test(expected = VerificationException.class)
-    public final void test_transition_conditional_condition_not_match_judger() throws VerificationException {
+    public final void should_throw_exception_002_2503_if_conditional_condition_class_does_not_match_judger_class_type_parameter() throws VerificationException {
         @LifecycleRegistry(S1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -33,7 +33,7 @@ public class TransitionSyntaxNegativeTest extends TransitionSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_illegal_extension_on_transition() throws VerificationException {
+    public final void should_throw_exception_002_2504_if_transition_extends_interface_but_parent_state_machine_has_no_super() throws VerificationException {
         @LifecycleRegistry(NegativeOrder.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -52,7 +52,7 @@ public class TransitionSyntaxNegativeTest extends TransitionSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_extended_transition_can_not_be_found_in_super_statemachine() throws VerificationException {
+    public final void should_throw_exception_002_2505_if_extended_transition_can_not_be_found_in_super_statemachine() throws VerificationException {
         @LifecycleRegistry(NegativeBigProductOrder.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

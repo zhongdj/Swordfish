@@ -64,7 +64,7 @@ public class CompositeStateMachineNegativeTests extends BaseMetaDataTest {
 
     @Test(expected = VerificationException.class)
     @Ignore
-    public void test_composite_extends_owning_stateMachine() throws VerificationException {
+    public void should_throw_exception_002_2804_if_composite_state_extends_owning_stateMachine() throws VerificationException {
         @LifecycleRegistry(CompositeExtendsOwningStateMachine.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

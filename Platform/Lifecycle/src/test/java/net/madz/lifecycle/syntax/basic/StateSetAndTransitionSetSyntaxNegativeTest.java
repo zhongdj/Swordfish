@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMetadata {
 
     @Test(expected = VerificationException.class)
-    public void test_StateMachine_without_InnerClasses() throws VerificationException {
+    public void should_throw_exception_002_2107_if_stateMachine_defines_no_innerClasses() throws VerificationException {
         @LifecycleRegistry(Negative_No_InnerClasses.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
@@ -39,7 +39,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     }
 
     @Test(expected = VerificationException.class)
-    public void test_StateMachine_without_StateSet_and_TransitionSet() throws VerificationException {
+    public void should_throw_exception_002_2103_and_002_2105_if_stateMachine_defines_no_stateSet_and_transitionSet() throws VerificationException {
         @LifecycleRegistry(Negative_No_StateSet_and_TransitionSet.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
@@ -70,7 +70,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     }
 
     @Test(expected = VerificationException.class)
-    public void test_StateMachine_with_Multi_StateSet_And_Multi_TransitionSet() throws VerificationException {
+    public void should_throw_exception_002_2104_and_002_2106_if_stateMachine_defines_multi_stateSet_and_multi_transitionSet() throws VerificationException {
         @LifecycleRegistry({ Negative_Multi_StateSet_Multi_TransitionSet.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
@@ -91,7 +91,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     }
 
     @Test(expected = VerificationException.class)
-    public void test_StateSet_no_states() throws VerificationException {
+    public void should_throw_exception_002_2403_and_002_2501_if_stateSet_defines_no_states_and_transitionSet_has_no_transitions() throws VerificationException {
         @LifecycleRegistry({ Negative_No_State_No_Transition.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
@@ -109,7 +109,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     }
 
     @Test(expected = VerificationException.class)
-    public void test_StateSet_Without_InitialState_And_EndState() throws VerificationException {
+    public void should_throw_exception_002_2400_and_002_2402_if_stateSet_defines_no_initialState_and_endState() throws VerificationException {
         @LifecycleRegistry(Negative_StateSet_Without_InitalState_And_EndState.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
@@ -131,7 +131,7 @@ public class StateSetAndTransitionSetSyntaxNegativeTest extends StateSetSyntaxMe
     }
 
     @Test(expected = VerificationException.class)
-    public void test_StateSet_With_Multi_InitialState() throws VerificationException {
+    public void should_throw_exception_002_2401_if_stateSet_has_multi_initialState() throws VerificationException {
         @LifecycleRegistry(Negative_StateSet_With_Multi_InitalState.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class Registry extends AbsStateMachineRegistry {
