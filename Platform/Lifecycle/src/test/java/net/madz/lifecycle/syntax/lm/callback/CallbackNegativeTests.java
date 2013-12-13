@@ -349,7 +349,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3710_if_postStateChange_observableClass_is_non_lifecycle_class_relational() throws NoSuchMethodException, SecurityException,
+    public void should_throw_002_3710_if_postStateChange_observableClass_is_non_lifecycle_class() throws NoSuchMethodException, SecurityException,
             VerificationException {
         @LifecycleRegistry(NLM_With_PostStateChange_ObservableClass_Invalid_Relational.class)
         @StateMachineBuilder
@@ -368,7 +368,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3703_if_postStateChange_from_State_invalid_when_specified_observableClass_Relational() throws NoSuchMethodException,
+    public void should_throw_002_3703_if_postStateChange_from_State_invalid_when_specified_observableClass() throws NoSuchMethodException,
             SecurityException, VerificationException {
         @LifecycleRegistry(NLM_With_PostStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class)
         @StateMachineBuilder
@@ -407,7 +407,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
 
     // ///////////////////////////////
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3712_if_preStateChange_observableName_mistmatch_observableClass_relational() throws NoSuchMethodException, SecurityException,
+    public void should_throw_002_3712_if_preStateChange_observableName_mistmatch_observableClass() throws NoSuchMethodException, SecurityException,
             VerificationException {
         @LifecycleRegistry(NLM_With_PreStateChange_ObservableName_Mistmatch_ObservableClass_Relational.class)
         @StateMachineBuilder
@@ -427,7 +427,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3711_if_preStateChange_observableClass_is_not_lifecycle_class_relational() throws NoSuchMethodException, SecurityException,
+    public void should_throw_002_3711_if_preStateChange_observableClass_is_not_lifecycle_class() throws NoSuchMethodException, SecurityException,
             VerificationException {
         @LifecycleRegistry(NLM_With_PreStateChange_ObservableClass_Invalid_Relational.class)
         @StateMachineBuilder
@@ -446,7 +446,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3701_if_preStateChange_from_state_invalid_specified_observableClass_relational() throws NoSuchMethodException,
+    public void should_throw_002_3701_if_preStateChange_from_state_invalid_specified_observableClass() throws NoSuchMethodException,
             SecurityException, VerificationException {
         @LifecycleRegistry(NLM_With_PreStateChange_From_State_Invalid_Specified_ObservableClass_Relational.class)
         @StateMachineBuilder
@@ -465,7 +465,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3702_if_preStateChange_to_state_invalid_when_specified_observableClass_relational() throws NoSuchMethodException,
+    public void should_throw_002_3702_if_preStateChange_to_state_invalid_when_specified_observableClass() throws NoSuchMethodException,
             SecurityException, VerificationException {
         @LifecycleRegistry(NLM_With_PreStateChange_To_State_Invalid_Specified_ObservableClass_Relational.class)
         @StateMachineBuilder
