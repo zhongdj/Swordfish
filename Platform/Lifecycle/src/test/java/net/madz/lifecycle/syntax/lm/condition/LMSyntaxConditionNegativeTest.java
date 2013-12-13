@@ -12,7 +12,7 @@ import org.junit.Test;
 public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
 
     @Test(expected = VerificationException.class)
-    public final void test_condition_reference_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
+    public final void should_throw_002_3231_if_condition_reference_invalid() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -29,7 +29,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_multiple_methods_reference_same_condition() throws VerificationException {
+    public final void should_throw_002_3232_if_multiple_methods_reference_same_condition() throws VerificationException {
         @LifecycleRegistry(NLM_2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -46,7 +46,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_condition_not_covered() throws VerificationException {
+    public final void should_throw_002_3230_if_condition_not_covered() throws VerificationException {
         @LifecycleRegistry(NLM_3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -63,7 +63,7 @@ public class LMSyntaxConditionNegativeTest extends LMSyntaxConditionMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_condition_object_does_not_implement_condition_class() throws NoSuchMethodException, SecurityException, VerificationException {
+    public final void should_throw_002_3233_if_condition_object_does_not_implement_condition_class() throws NoSuchMethodException, SecurityException, VerificationException {
         @LifecycleRegistry(ConditionObjectDoesNotImplementConditionClass.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

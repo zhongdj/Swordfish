@@ -10,7 +10,7 @@ import org.junit.Test;
 public class LMSyntaxConditionPositiveTests extends LMSyntaxConditionMetadata {
 
     @Test
-    public final void test_standalone_state_machine_case() throws VerificationException {
+    public final void should_concrete_condition_in_standalone_state_machine() throws VerificationException {
         @LifecycleRegistry(PLM_1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -21,7 +21,7 @@ public class LMSyntaxConditionPositiveTests extends LMSyntaxConditionMetadata {
     }
 
     @Test
-    public final void test_composite_state_machine_case() throws VerificationException {
+    public final void should_concrete_condition_in_composite_state_machine() throws VerificationException {
         @LifecycleRegistry(PLM_2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -32,7 +32,7 @@ public class LMSyntaxConditionPositiveTests extends LMSyntaxConditionMetadata {
     }
 
     @Test
-    public final void test_super_state_machine_case() throws VerificationException {
+    public final void should_concrete_condition_in_super_state_machine() throws VerificationException {
         @LifecycleRegistry(PLM_3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
