@@ -17,7 +17,7 @@ import org.junit.Test;
 public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
 
     @Test(expected = VerificationException.class)
-    public void test_relation_to_refers_to_invalid_statemachine() throws VerificationException {
+    public void should_throw_002_2931_if_relateTo_refers_to_invalid_statemachine() throws VerificationException {
         @LifecycleRegistry(NStandalone3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -34,7 +34,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_multiple_relationset() throws VerificationException {
+    public void should_throw_002_3500_if_defines_multiple_relationset() throws VerificationException {
         @LifecycleRegistry(NStandalone4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -50,7 +50,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_relation_otherwise_refers_to_invalid_state() throws VerificationException {
+    public void should_throw_002_2913_and_002_2914_if_relation_otherwise_refers_to_invalid_state() throws VerificationException {
         @LifecycleRegistry(NStandalone5.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -70,7 +70,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_relation_not_defined_in_relation_set() throws VerificationException {
+    public void should_throw_002_2911_if_relation_not_defined_in_relation_set() throws VerificationException {
         @LifecycleRegistry(NStandalone.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -87,7 +87,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_relation_on_not_matching_relation() throws VerificationException {
+    public void should_throw_002_2912_if_relation_on_state_not_defined_in_relation() throws VerificationException {
         @LifecycleRegistry(NStandalone2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -104,7 +104,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_inheritance_relation_not_defined_in_relation_set() throws VerificationException {
+    public void should_throw_002_2911_if_inheritance_relation_not_defined_in_relation_set() throws VerificationException {
         @LifecycleRegistry(NChild.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -121,7 +121,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_inheritance_relation_on_not_matching_relation() throws VerificationException {
+    public void should_throw_002_2912_if_inheritance_relation_on_state_not_defined_in_relation() throws VerificationException {
         @LifecycleRegistry(NChild2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -138,7 +138,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_inheritance_validWhile_relation_not_defined_in_relation_set() throws VerificationException {
+    public void should_throw_002_2921_if_inheritance_validWhile_relation_not_defined_in_relation_set() throws VerificationException {
         @LifecycleRegistry(NChild3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -155,7 +155,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_inheritance_validWhile_relation_on_not_matching_relation() throws VerificationException {
+    public void should_throw_002_2922_if_inheritance_validWhile_relation_on_not_matching_relation() throws VerificationException {
         @LifecycleRegistry(NChild4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -172,7 +172,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_multiple_parent_relation_standalone() throws VerificationException {
+    public void should_throw_002_3501_if_multiple_parent_relation_defined_in_standalone() throws VerificationException {
         @LifecycleRegistry(NStandaloneParent.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -188,7 +188,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_forget_to_override_super_state_machine_parent_relation() throws VerificationException {
+    public void should_throw_002_3502_if_forget_to_override_super_state_machine_parent_relation() throws VerificationException {
         @LifecycleRegistry(NParentRelationChild.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -205,7 +205,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_illegal_to_override_owning_state_machine_parent_relation_with_overrides() throws VerificationException {
+    public void should_throw_002_3503_if_overrides_owning_state_machine_parent_relation_with_overrides() throws VerificationException {
         @LifecycleRegistry(NOwningStateMachine.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -224,7 +224,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_illegal_to_override_owning_state_machine_parent_relation_without_overrides() throws VerificationException {
+    public void should_throw_002_3503_if_overrides_owning_state_machine_parent_relation_without_overrides() throws VerificationException {
         @LifecycleRegistry(N2OwningStateMachine.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -243,7 +243,7 @@ public class RelationSyntaxNegativeTest extends RelationSyntaxMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_relation_without_relate_to() throws VerificationException {
+    public void should_throw_002_3504_if_relation_without_relate_to() throws VerificationException {
         @LifecycleRegistry(NoRelateTo.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
