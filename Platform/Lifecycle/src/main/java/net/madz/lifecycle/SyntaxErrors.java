@@ -220,6 +220,9 @@ public interface SyntaxErrors {
      */
     public static final String STATE_INDICATOR_MULTIPLE_STATE_INDICATOR_ERROR = "002-3306";
     // @ConditionSet
+    /**
+     * @param {0} stateMachine class
+     */
     public static final String CONDITIONSET_MULTIPLE = "002-3400";
     // @RelationSet
     public static final String RELATIONSET_MULTIPLE = "002-3500";
