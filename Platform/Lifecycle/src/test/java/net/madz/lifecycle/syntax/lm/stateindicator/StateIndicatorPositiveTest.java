@@ -11,7 +11,7 @@ import org.junit.Test;
 public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
 
     @Test
-    public void test_default_state_indicator_interface_impl() throws VerificationException {
+    public void default_state_indicator_interface_impl() throws VerificationException {
         @LifecycleRegistry({ StateIndicatorMetadata.PDefaultStateIndicatorInterface.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
@@ -24,7 +24,7 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
     }
 
     @Test
-    public void test_default_state_indicator_class_impl() throws VerificationException {
+    public void default_state_indicator_class_impl() throws VerificationException {
         @LifecycleRegistry({ StateIndicatorMetadata.PDefaultPrivateStateSetterClass.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
@@ -37,7 +37,7 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
     }
 
     @Test
-    public void test_field_access_state_indicator_class_impl() throws VerificationException {
+    public void field_access_state_indicator_class_impl() throws VerificationException {
         @LifecycleRegistry({ StateIndicatorMetadata.PrivateStateFieldClass.class, StateIndicatorMetadata.PrivateStateFieldConverterClass.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
@@ -53,7 +53,7 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
     }
 
     @Test
-    public void test_property_access_state_indicator_class_impl() throws VerificationException {
+    public void property_access_state_indicator_class_impl() throws VerificationException {
         @LifecycleRegistry({ StateIndicatorMetadata.PrivateStateSetterClass.class, StateIndicatorMetadata.PStateIndicatorInterface.class,
                 PStateIndicatorConverterInterface.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
@@ -67,7 +67,7 @@ public class StateIndicatorPositiveTest extends StateIndicatorMetadata {
     }
 
     @Test
-    public void test_state_indicator_overrides() throws VerificationException {
+    public void state_indicator_overrides() throws VerificationException {
         @LifecycleRegistry({ PositiveMultipleStateIndicatorChild.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
