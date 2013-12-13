@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_without_StateMachine_or_LifecycleMeta() throws VerificationException {
+    public void should_throw_002_1000_if_registering_without_StateMachine_or_LifecycleMeta() throws VerificationException {
         @LifecycleRegistry(WithoutMetadataAnnotationErrorSyntax.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineRegistry extends AbsStateMachineRegistry {
@@ -43,7 +43,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_super_interface_without_StateMachine() throws VerificationException {
+    public void should_throw_002_2100_if_registering_super_interface_without_StateMachine() throws VerificationException {
         @LifecycleRegistry(IncorrectStateMachineInheritanceChildSyntax.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
@@ -69,7 +69,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_superclass_without_StateMachine() throws VerificationException {
+    public void should_throw_002_2100_if_registering_superclass_without_StateMachine() throws VerificationException {
         @LifecycleRegistry(IllegalExtendsNonStateMachineClass.class)
         @StateMachineBuilder
         class IncorrectStateMachineInheritanceRegistry extends AbsStateMachineRegistry {
@@ -94,7 +94,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_with_multi_super_interfaces() throws VerificationException {
+    public void should_throw_002_2101_if_registering_with_multi_super_interfaces() throws VerificationException {
         @LifecycleRegistry(IncorrectStateMachineInheritanceChildWithMultiSuperInterfacesSyntax.class)
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class IncorrectStateMachineInheritanceWithMultiSuperInterfacesRegistry extends AbsStateMachineRegistry {
@@ -120,7 +120,7 @@ public class RegisterSyntaxNegativeTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test(expected = VerificationException.class)
-    public void test_incorrect_registering_lifecycleMeta_value_without_stateMachine_annotation() throws VerificationException {
+    public void should_throw_002_2102_if_registering_lifecycleMeta_value_without_stateMachine_annotation() throws VerificationException {
         @LifecycleRegistry(value = { WrongLifecycleMetaSyntaxWithStateMachineWithoutAnnotation.class })
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

@@ -11,7 +11,7 @@ import org.junit.Test;
 public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
 
     @Test
-    public void test_correct_metadata_without_syntax_error() throws VerificationException {
+    public void correct_metadata_without_syntax_error() throws VerificationException {
         @LifecycleRegistry({ CorrectStateMachineSyntax.class, CorrectLifecycleMetaSyntax.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectRegistry extends AbsStateMachineRegistry {
@@ -24,7 +24,7 @@ public class RegisterSyntaxPositiveTest extends RegisterSyntaxTestMetaData {
     }
 
     @Test
-    public void test_correct_inheritance_statemachine() throws VerificationException {
+    public void correct_inheritance_statemachine() throws VerificationException {
         @LifecycleRegistry({ CorrectStateMachineInheritanceChildSyntax.class })
         @StateMachineBuilder(StateMachineMetaBuilderImpl.class)
         class CorrectInheritanceRegistry extends AbsStateMachineRegistry {
