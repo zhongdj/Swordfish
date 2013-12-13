@@ -144,10 +144,10 @@ public abstract class CallbackTestBase extends BaseMetaDataTest {
         }
     }
     @LifecycleMeta(S1.class)
-    static class NLM_prestatechange_from_state_invalid_non_relational extends S1BaseLM {
+    static class NLM_prestatechange_from_state_not_found_in_stateMachine_non_relational extends S1BaseLM {
 
         @PreStateChange(from = S2.States.S2_State_A.class)
-        public void interceptStateChange(LifecycleContext<NLM_prestatechange_from_state_invalid_non_relational, String> context) {
+        public void interceptStateChange(LifecycleContext<NLM_prestatechange_from_state_not_found_in_stateMachine_non_relational, String> context) {
             System.out.println("The from state is invalid.");
         }
     }

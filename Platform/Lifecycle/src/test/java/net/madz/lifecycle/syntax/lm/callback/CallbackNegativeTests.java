@@ -62,9 +62,9 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3701_if_prestatechange_from_state_is_invalid_non_relational() throws VerificationException, NoSuchMethodException,
+    public void should_throw_002_3701_if_prestatechange_from_state_not_found_in_stateMachine_non_relational() throws VerificationException, NoSuchMethodException,
             SecurityException {
-        @LifecycleRegistry(NLM_prestatechange_from_state_invalid_non_relational.class)
+        @LifecycleRegistry(NLM_prestatechange_from_state_not_found_in_stateMachine_non_relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
 
@@ -74,13 +74,13 @@ public class CallbackNegativeTests extends CallbackTestBase {
             new Registry();
         } catch (VerificationException e) {
             assertFailure(e.getVerificationFailureSet().iterator().next(), SyntaxErrors.PRE_STATE_CHANGE_FROM_STATE_IS_INVALID, S2.States.S2_State_A.class,
-                    NLM_prestatechange_from_state_invalid_non_relational.class.getMethod("interceptStateChange", LifecycleContext.class), S1.class);
+                    NLM_prestatechange_from_state_not_found_in_stateMachine_non_relational.class.getMethod("interceptStateChange", LifecycleContext.class), S1.class);
             throw e;
         }
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3701_if_prestatechange_from_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void should_throw_002_3701_if_prestatechange_from_state_not_found_in_observable_stateMachine_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_With_PreStateChange_From_State_Invalid_Relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -97,7 +97,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3702_if_prestatechange_to_state_invalid_non_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void should_throw_002_3702_if_prestatechange_to_state_not_found_in_stateMachine_non_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_prestatechange_to_state_invalid_non_relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -114,7 +114,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3702_if_prestatechange_to_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void should_throw_002_3702_if_prestatechange_to_state_not_found_in_observable_stateMachine_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_With_PreStateChange_To_State_Invalid_Relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -131,7 +131,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3703_if_poststatechange_from_state_invalid_non_relational() throws VerificationException, NoSuchMethodException,
+    public void should_throw_002_3703_if_poststatechange_from_state_not_found_in_stateMachine_non_relational() throws VerificationException, NoSuchMethodException,
             SecurityException {
         @LifecycleRegistry(NLM_poststatechange_from_state_invalid_non_relational.class)
         @StateMachineBuilder
@@ -149,7 +149,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3703_if_poststatechange_from_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void should_throw_002_3703_if_poststatechange_from_state_not_found_in_observable_stateMachine_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_With_PostStateChange_From_State_Invalid_Relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -166,7 +166,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3704_if_poststatechange_to_state_invalid_non_relational() throws VerificationException, NoSuchMethodException,
+    public void should_throw_002_3704_if_poststatechange_to_state_not_found_in_stateMachine_non_relational() throws VerificationException, NoSuchMethodException,
             SecurityException {
         @LifecycleRegistry(NLM_poststatechange_to_state_invalid_non_relational.class)
         @StateMachineBuilder
@@ -184,7 +184,7 @@ public class CallbackNegativeTests extends CallbackTestBase {
     }
 
     @Test(expected = VerificationException.class)
-    public void should_throw_002_3704_if_poststatechange_to_state_invalid_relational() throws VerificationException, NoSuchMethodException, SecurityException {
+    public void should_throw_002_3704_if_poststatechange_to_state_not_found_in_observable_stateMachine_relational() throws VerificationException, NoSuchMethodException, SecurityException {
         @LifecycleRegistry(NLM_With_PostStateChange_To_State_Invalid_Relational.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
