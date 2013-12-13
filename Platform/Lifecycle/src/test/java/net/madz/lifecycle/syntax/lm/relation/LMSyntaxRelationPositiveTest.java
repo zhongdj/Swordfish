@@ -11,7 +11,7 @@ import org.junit.Test;
 public class LMSyntaxRelationPositiveTest extends LMSyntaxRelationMetadata {
 
     @Test
-    public final void test_relations_coverage_in_simple_stateMachine() {
+    public final void should_relations_in_simple_stateMachine_be_covered() {
         @LifecycleRegistry(PLM_5.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -27,7 +27,7 @@ public class LMSyntaxRelationPositiveTest extends LMSyntaxRelationMetadata {
     }
 
     @Test
-    public final void test_relations_coverage_in_stateMachine_with_composite_stateMachines() {
+    public final void should_relations_in_composite_stateMachine_be_covered() {
         @LifecycleRegistry(PLM_6.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -43,7 +43,7 @@ public class LMSyntaxRelationPositiveTest extends LMSyntaxRelationMetadata {
     }
 
     @Test
-    public final void test_relations_coverage_in_stateMachine_with_superSateMachine() {
+    public final void should_relations_in_superSateMachine_be_covered() {
         @LifecycleRegistry(PLM_7.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -59,7 +59,7 @@ public class LMSyntaxRelationPositiveTest extends LMSyntaxRelationMetadata {
     }
 
     @Test
-    public final void test_extended_relation_metadata() {
+    public final void relation_can_extend_relation() {
         @LifecycleRegistry(LevelThreeOrder.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {

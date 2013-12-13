@@ -17,7 +17,7 @@ import org.junit.Test;
 public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
 
     @Test(expected = VerificationException.class)
-    public final void test_inboundwhile_relation_not_coveraged() throws VerificationException {
+    public final void should_throw_002_3223_if_inboundwhile_relation_not_coveraged() throws VerificationException {
         @LifecycleRegistry(NLM_1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -34,7 +34,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_validwhile_relation_not_coveraged() throws VerificationException {
+    public final void should_throw_002_3223_if_validwhile_relation_not_coveraged() throws VerificationException {
         @LifecycleRegistry(NLM_2.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -51,7 +51,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_relation_in_composite_stateMachine_not_coveraged() throws VerificationException {
+    public final void should_throw_002_3223_if_relation_in_composite_stateMachine_not_coveraged() throws VerificationException {
         @LifecycleRegistry(NLM_3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -68,7 +68,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_relation_in_super_stateMachine_not_coveraged() throws VerificationException {
+    public final void should_throw_002_3223_if_relation_in_super_stateMachine_not_coveraged() throws VerificationException {
         @LifecycleRegistry(NLM_4.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -85,7 +85,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_LM_reference_an_invalid_relation_on_field() throws VerificationException {
+    public final void should_throw_002_3221_if_LM_reference_an_invalid_relation_on_field() throws VerificationException {
         @LifecycleRegistry(NLM_5.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -102,7 +102,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_LM_reference_an_invalid_relation_on_property() throws VerificationException {
+    public final void should_throw_002_3221_if_test_LM_reference_an_invalid_relation_on_property() throws VerificationException {
         @LifecycleRegistry(NLM_6.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -119,7 +119,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_relation_defined_multi_times_in_class_level() throws VerificationException {
+    public final void should_throw_002_3222_if_relation_defined_multi_times_in_class_level() throws VerificationException {
         @LifecycleRegistry(Negative_Same_Relation_Concreted_Duplicate_On_Fields_r2_r3.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
@@ -136,7 +136,7 @@ public class LMSyntaxRelationNegativeTest extends LMSyntaxRelationMetadata {
     }
 
     @Test(expected = VerificationException.class)
-    public final void test_relation_defined_multi_times_in_method_level() throws VerificationException {
+    public final void should_throw_002_3222_if_relation_defined_multi_times_in_method_level() throws VerificationException {
         @LifecycleRegistry(Negative_Same_Relation_Concreted_Multiple_Times_In_Method_tM1.class)
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
