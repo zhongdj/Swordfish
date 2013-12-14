@@ -211,7 +211,7 @@ public class MultipleStateMachineTests extends MultipleStateMachineTestMetadata 
     }
 
     @Test
-    public void test_one_business_implementation_with_multiple_state_machines() {
+    public void should_support_one_business_implementation_with_multiple_state_machines() {
         final PurchaseOrderImpl order = new PurchaseOrderImpl();
         // tricks
         final PCPurchaseOrder purchaseOrder = order;
