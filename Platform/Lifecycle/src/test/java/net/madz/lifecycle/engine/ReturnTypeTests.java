@@ -115,7 +115,7 @@ public class ReturnTypeTests extends EngineTestBase {
     }
 
     @Test
-    public void test_return_type_with_bcel_bytecode_transform() {
+    public void should_support_8_wrapper_classes_and_Object_as_return_type_with_bcel_bytecode_transform() {
         final ReturnTypes type = new ReturnTypes();
         assertFalse(type.returnBoolean());
         assertEquals((byte) 1, type.returnByte());
