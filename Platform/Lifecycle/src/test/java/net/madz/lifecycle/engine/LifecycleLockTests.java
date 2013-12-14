@@ -20,12 +20,12 @@ import org.junit.Test;
 public class LifecycleLockTests extends LifecycleLockTestMetadata {
 
     @Test
-    public void test_synchronized_lock() throws Throwable {
+    public void should_support_synchronized_lock() throws Throwable {
         doConcurrent(SynchronizedLockingReactiveObject.class);
     }
 
     @Test
-    public void test_simple_lock() throws Throwable {
+    public void should_support_simple_lock() throws Throwable {
         doConcurrent(SimpleLockingReactiveObject.class);
     }
 
@@ -91,7 +91,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
     }
 
     @Test
-    public void test_relational_locking() {
+    public void should_support_relational_locking() {
         final CustomerObject customer = new CustomerObject();
         final ContractObject contract = new ContractObject(customer);
         final OrderObject order = new OrderObject(contract);
@@ -110,7 +110,7 @@ public class LifecycleLockTests extends LifecycleLockTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_relational_locking_concurrent_cancel_parent_first() throws Throwable {
+    public void should_throw_state_invalid_exception_if_relational_locking_concurrent_cancel_parent_first() throws Throwable {
         final CustomerObject customer = new CustomerObject();
         customer.confirm();
         final ContractObject contract = new ContractObject(customer);
