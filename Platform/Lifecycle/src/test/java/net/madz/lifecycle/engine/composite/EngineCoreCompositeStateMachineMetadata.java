@@ -1,4 +1,4 @@
-package net.madz.lifecycle.engine;
+package net.madz.lifecycle.engine.composite;
 
 import net.madz.lifecycle.annotations.CompositeState;
 import net.madz.lifecycle.annotations.Function;
@@ -16,6 +16,7 @@ import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.LifecycleOverride;
 import net.madz.lifecycle.annotations.state.ShortCut;
+import net.madz.lifecycle.engine.EngineTestBase;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;
@@ -149,7 +150,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
     // Relational Case 1.
     // ///////////////////////////////////////////////////////////////////////////////
     @StateMachine
-    static interface RelationalOrderLifecycleSharingValidWhile {
+    static interface RelationalOrderLifecycleReferencingOuterRelation {
 
         @StateSet
         static interface States {
@@ -166,17 +167,23 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                 static interface SubStates {
 
                     @Initial
-                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.DoProduce.class, value = Producing.class)
-                    @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = RelationalOrderLifecycleSharingValidWhile.Relations.Contract.class)
+                    @Function(transition = RelationalOrderLifecycleReferencingOuterRelation.States.Started.SubTransitions.DoProduce.class,
+                            value = Producing.class)
+                    @ValidWhile(on = { ContractLifecycle.States.Active.class },
+                            relation = RelationalOrderLifecycleReferencingOuterRelation.Relations.Contract.class)
                     static interface OrderCreated {}
-                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.DoDeliver.class, value = Delivering.class)
-                    @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = RelationalOrderLifecycleSharingValidWhile.Relations.Contract.class)
+                    @Function(transition = RelationalOrderLifecycleReferencingOuterRelation.States.Started.SubTransitions.DoDeliver.class,
+                            value = Delivering.class)
+                    @ValidWhile(on = { ContractLifecycle.States.Active.class },
+                            relation = RelationalOrderLifecycleReferencingOuterRelation.Relations.Contract.class)
                     static interface Producing {}
-                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.ConfirmComplete.class, value = Done.class)
-                    @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = RelationalOrderLifecycleSharingValidWhile.Relations.Contract.class)
+                    @Function(transition = RelationalOrderLifecycleReferencingOuterRelation.States.Started.SubTransitions.ConfirmComplete.class,
+                            value = Done.class)
+                    @ValidWhile(on = { ContractLifecycle.States.Active.class },
+                            relation = RelationalOrderLifecycleReferencingOuterRelation.Relations.Contract.class)
                     static interface Delivering {}
                     @End
-                    @ShortCut(RelationalOrderLifecycleSharingValidWhile.States.Finished.class)
+                    @ShortCut(RelationalOrderLifecycleReferencingOuterRelation.States.Finished.class)
                     // Ignoring : @ValidWhile(on = {
                     // ContractLifecycle.States.Active.class }, relation =
                     // Relations.Contract.class)
@@ -242,7 +249,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
     // Relational Case 2.
     // ///////////////////////////////////////////////////////////////////////////////
     @StateMachine
-    static interface RelationalOrderLifecycleReferencingOuterValidWhile {
+    static interface RelationalOrderLifecycleSharingValidWhile {
 
         @StateSet
         static interface States {
@@ -260,17 +267,14 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                 static interface SubStates {
 
                     @Initial
-                    @Function(transition = RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubTransitions.DoProduce.class,
-                            value = Producing.class)
+                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.DoProduce.class, value = Producing.class)
                     static interface OrderCreated {}
-                    @Function(transition = RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubTransitions.DoDeliver.class,
-                            value = Delivering.class)
+                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.DoDeliver.class, value = Delivering.class)
                     static interface Producing {}
-                    @Function(transition = RelationalOrderLifecycleReferencingOuterValidWhile.States.Started.SubTransitions.ConfirmComplete.class,
-                            value = Done.class)
+                    @Function(transition = RelationalOrderLifecycleSharingValidWhile.States.Started.SubTransitions.ConfirmComplete.class, value = Done.class)
                     static interface Delivering {}
                     @End
-                    @ShortCut(RelationalOrderLifecycleReferencingOuterValidWhile.States.Finished.class)
+                    @ShortCut(RelationalOrderLifecycleSharingValidWhile.States.Finished.class)
                     static interface Done {}
                 }
                 @TransitionSet
@@ -299,17 +303,17 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
             static interface Contract {}
         }
     }
-    @LifecycleMeta(RelationalOrderLifecycleReferencingOuterValidWhile.class)
-    public static class ProductOrderOuterValidWhile extends ProductBase {
+    @LifecycleMeta(RelationalOrderLifecycleReferencingOuterRelation.class)
+    public static class ProductOrderOuterRelation extends ProductBase {
 
         private final Contract contract;
 
-        public ProductOrderOuterValidWhile(Contract contract) {
-            initialState(RelationalOrderLifecycleReferencingOuterValidWhile.States.Created.class.getSimpleName());
+        public ProductOrderOuterRelation(Contract contract) {
+            initialState(RelationalOrderLifecycleReferencingOuterRelation.States.Created.class.getSimpleName());
             this.contract = contract;
         }
 
-        @Relation(RelationalOrderLifecycleReferencingOuterValidWhile.Relations.Contract.class)
+        @Relation(RelationalOrderLifecycleReferencingOuterRelation.Relations.Contract.class)
         public Contract getContract() {
             return this.contract;
         }

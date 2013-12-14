@@ -11,7 +11,7 @@ import org.junit.Test;
 public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
 
     @Test
-    public void test_standalone_object_without_relation_lifecycle() throws VerificationException {
+    public void should_support_standalone_object_without_relation_lifecycle() throws VerificationException {
         Customer customer = new Customer();
         customer.activate();
         assertEquals(CustomerLifecycleMeta.States.Active.class.getSimpleName(), customer.getState());
@@ -24,7 +24,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_standalone_object_with_definite_relation() {
+    public void should_support_standalone_object_with_definite_relation() {
         Customer customer = new Customer();
         customer.activate();
         final InternetServiceOrder order = new InternetServiceOrder(new Date(), null, customer, "1 year");
@@ -33,7 +33,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inherited_valid_while_relation_validation() {
+    public void should_support_inherited_valid_while_relation_validation() {
         final InternetTVServiceProvider provider = new InternetTVServiceProvider();
         assertEquals(InternetTVProviderLifecycle.States.ServiceAvailable.class.getSimpleName(), provider.getState());
         Customer customer = new Customer();
@@ -46,7 +46,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_overrides_inherited_valid_while_relation_validation_positive_with_super_valid_while() {
+    public void should_support_overrides_inherited_valid_while_relation_validation_positive_with_super_valid_while() {
         final VOIPProvider provider = new VOIPProvider();
         final Customer customer = new Customer();
         assertEquals(CustomerLifecycleMeta.States.Draft.class.getSimpleName(), customer.getState());
@@ -58,7 +58,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inbound_while_with_non_conditional_transition() {
+    public void should_support_inbound_while_with_non_conditional_transition() {
         final Customer customer = new Customer();
         customer.activate();
         InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null, customer, "3 years");
@@ -67,7 +67,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inbound_while_with_conditional_transition_prevalidate_inbound_while() {
+    public void should_support_inbound_while_with_conditional_transition_prevalidate_inbound_while() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPreValidateCondition keyboard = new KeyBoardObjectPreValidateCondition(power);
         keyboard.pressAnyKey();
@@ -79,7 +79,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inbound_while_with_conditional_transition_postvalidate_inbound_while() {
+    public void should_support_inbound_while_with_conditional_transition_postvalidate_inbound_while() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
@@ -87,7 +87,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inbound_while_with_non_getter_conditional_transition_postvalidate_inbound_while() {
+    public void should_support_inbound_while_with_non_getter_conditional_transition_postvalidate_inbound_while() {
         final NonGetterConditionPowerObject power = new NonGetterConditionPowerObject();
         final NonGetterConditionKeyBoardObjectPostValidateCondition keyboard = new NonGetterConditionKeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
@@ -95,7 +95,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_relations_concreted_on_fields_in_hierarachy_classes() {
+    public void should_support_relations_concreted_on_fields_in_hierarachy_classes() {
         final Customer customer = new Customer();
         customer.activate();
         final InternetTVServiceProvider tvProvider = new InternetTVServiceProvider();
@@ -105,7 +105,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_validwhile_nullable_true() {
+    public void should_support_validwhile_nullable_true() {
         MemberShip memberShip = null;
         OrderValidWhileNullable order = new OrderValidWhileNullable(memberShip);
         assertState(OrderValidWhileNullableLifecycleMeta.States.Draft.class, order);
@@ -114,7 +114,7 @@ public class EngineCoreFunctionPositiveTests extends CoreFuntionTestMetadata {
     }
 
     @Test
-    public void test_inboundwhile_nullable_true() {
+    public void should_support_inboundwhile_nullable_true() {
         MemberShip memberShip = null;
         OrderInboundWhileNullable order = new OrderInboundWhileNullable(memberShip);
         assertState(OrderInboundWhileNullableLifecycleMeta.States.Draft.class, order);

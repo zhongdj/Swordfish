@@ -12,7 +12,7 @@ import org.junit.Test;
 public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
 
     @Test(expected = LifecycleException.class)
-    public void test_standalone_object_with_definite_relation_negative() throws LifecycleException {
+    public void should_throw_002_9001_if_valid_while_relation_object_not_in_expected_states() throws LifecycleException {
         Customer customer = new Customer();
         customer.activate();
         customer.cancel();
@@ -26,7 +26,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inherited_valid_while_relation_validation_negative_with_super_valid_while() throws LifecycleException {
+    public void should_throw_002_9001_if_inherited_valid_while_relation_object_not_in_expected_states() throws LifecycleException {
         final InternetTVServiceProvider provider = new InternetTVServiceProvider();
         assertEquals(InternetTVProviderLifecycle.States.ServiceAvailable.class.getSimpleName(), provider.getState());
         final Customer customer = new Customer();
@@ -44,7 +44,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inherited_valid_while_relation_validation_negative_with_self_valid_while() throws LifecycleException {
+    public void should_throw_002_9001_if_self_valid_while_relation_object_not_in_expected_states() throws LifecycleException {
         final InternetTVServiceProvider provider = new InternetTVServiceProvider();
         assertEquals(InternetTVProviderLifecycle.States.ServiceAvailable.class.getSimpleName(), provider.getState());
         provider.shutdown();
@@ -62,7 +62,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_overrides_inherited_valid_while_relation_validation_negative_with_self_valid_while() throws LifecycleException {
+    public void should_throw_002_9001_if_overrides_inherited_valid_while_relation_and_validation_negative_with_self_valid_while() throws LifecycleException {
         final VOIPProvider provider = new VOIPProvider();
         final Customer customer = new Customer();
         assertEquals(CustomerLifecycleMeta.States.Draft.class.getSimpleName(), customer.getState());
@@ -79,7 +79,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inbound_while_with_non_conditional_transition() {
+    public void should_throw_002_9002_if_violates_inbound_while_with_non_conditional_transition() {
         final Customer customer = new Customer();
         customer.activate();
         InternetServiceOrderWithInboundWhile service = new InternetServiceOrderWithInboundWhile(new Date(), null, customer, "3 years");
@@ -94,7 +94,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inbound_while_with_conditional_transition_prevalidate_inbound_while_negative() {
+    public void should_throw_002_9002_if_violates_inbound_while_with_conditional_transition_prevalidate() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPreValidateCondition keyboard = new KeyBoardObjectPreValidateCondition(power);
         power.shutDown();
@@ -108,7 +108,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inbound_while_with_conditional_transition_postvalidate_inbound_while_negative() {
+    public void should_throw_002_9002_if_violates_inbound_while_with_conditional_transition_postvalidate() {
         final PowerObject power = new PowerObject();
         final KeyBoardObjectPostValidateCondition keyboard = new KeyBoardObjectPostValidateCondition(power);
         keyboard.pressAnyKey();
@@ -122,7 +122,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_relations_concreted_on_fields_in_hierarachy_classes_negative1() {
+    public void should_throw_002_9001_if_violates_relations_concreted_on_fields_in_hierarachy_classes_negative1() {
         final Customer customer = new Customer();
         final InternetTVServiceProvider tvProvider = new InternetTVServiceProvider();
         final InternetTVServiceWithRelationOnFields tvService = new InternetTVServiceWithRelationOnFields(customer, tvProvider);
@@ -134,7 +134,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_relations_concreted_on_fields_in_hierarachy_classes_negative2() {
+    public void should_throw_002_9001_if_violates_relations_concreted_on_fields_in_hierarachy_classes_negative2() {
         final Customer customer = new Customer();
         customer.activate();
         final InternetTVServiceProvider tvProvider = new InternetTVServiceProvider();
@@ -148,7 +148,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_validwhile_not_nullable_true() {
+    public void should_throw_002_9004_if_relation_object_null_but_validwhile_not_nullable_true() {
         MemberShip memberShip = null;
         OrderValidWhileNotNullable order = new OrderValidWhileNotNullable(memberShip);
         assertState(OrderValidWhileNotNullableLifecycleMeta.States.Draft.class, order);
@@ -162,7 +162,7 @@ public class EngineCoreFunctionNegativeTests extends CoreFuntionTestMetadata {
     }
 
     @Test(expected = LifecycleException.class)
-    public void test_inboundwhile_not_nullable_true() {
+    public void should_throw_002_9005_if_relation_object_null_but_inboundwhile_not_nullable_true() {
         MemberShip memberShip = null;
         OrderInboundWhileNotNullable order = new OrderInboundWhileNotNullable(memberShip);
         assertState(OrderInboundWhileNotNullableLifecycleMeta.States.Draft.class, order);
