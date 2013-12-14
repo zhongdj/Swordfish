@@ -31,7 +31,7 @@ public class LifecycleEventTests extends EngineTestBase {
     }
 
     @Test
-    public void test_lifecycle_event() throws VerificationException {
+    public void should_fire_lifecycle_event_if_transition_method_invoked_after_lifecycleEventHandler_registered() throws VerificationException {
         @LifecycleRegistry({ CustomerObject.class, TestLifecycleEventHandler.class })
         @StateMachineBuilder
         class Registry extends AbsStateMachineRegistry {
