@@ -7,7 +7,7 @@ import org.junit.Test;
 public class StateSetterTests extends StateSetterTestMetadata {
 
     @Test
-    public void test_eager_and_lazy_state_setter() {
+    public void should_support_eager_and_lazy_state_setter() {
         final LazySetterBusinessImpl lazy = new LazySetterBusinessImpl();
         assertEquals(StateSetterTestMetadata.SetterTestStateMachine.States.New.class.getSimpleName(), lazy.getState());
         lazy.doIt();
@@ -19,7 +19,7 @@ public class StateSetterTests extends StateSetterTestMetadata {
     }
 
     @Test
-    public void test_boolean_type_state_indicator() {
+    public void should_support_boolean_type_state_indicator() {
         final BooleanTypeObject o = new BooleanTypeObject();
         assertEquals(false, o.isClosed());
         o.close();
