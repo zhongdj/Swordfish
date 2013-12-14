@@ -1,4 +1,4 @@
-package net.madz.lifecycle.engine;
+package net.madz.lifecycle.engine.callback;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,11 +28,13 @@ import net.madz.lifecycle.annotations.relation.RelationSet;
 import net.madz.lifecycle.annotations.state.End;
 import net.madz.lifecycle.annotations.state.Initial;
 import net.madz.lifecycle.annotations.state.LifecycleOverride;
-import net.madz.lifecycle.engine.CallbackTestMetadata.InvoiceStateMachineMeta.Conditions;
-import net.madz.lifecycle.engine.CallbackTestMetadata.InvoiceStateMachineMeta.Conditions.Payable;
-import net.madz.lifecycle.engine.CallbackTestMetadata.InvoiceStateMachineMeta.States.PaidOff;
-import net.madz.lifecycle.engine.CallbackTestMetadata.InvoiceStateMachineMeta.States.PartialPaid;
-import net.madz.lifecycle.engine.CallbackTestMetadata.InvoiceStateMachineMeta.Utilities.PayableJudger;
+import net.madz.lifecycle.engine.EngineTestBase;
+import net.madz.lifecycle.engine.EngineTestBase.ReactiveObject;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta.Conditions;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta.Conditions.Payable;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta.States.PaidOff;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta.States.PartialPaid;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta.Utilities.PayableJudger;
 import net.madz.verification.VerificationException;
 
 import org.junit.BeforeClass;

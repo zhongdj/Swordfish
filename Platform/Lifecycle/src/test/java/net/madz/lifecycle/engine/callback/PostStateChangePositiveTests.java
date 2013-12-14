@@ -1,45 +1,23 @@
-package net.madz.lifecycle.engine;
+package net.madz.lifecycle.engine.callback;
 
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.Invoice;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceItem;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceItemNonRelationalCallback;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceItemStateMachineMeta;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceNonRelationalCallback;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.InvoiceStateMachineMeta;
+import net.madz.lifecycle.engine.callback.CallbackTestMetadata.OrderWithSpecifiedFromToCallback;
+
 import org.junit.Test;
 
-public class CallbackTests extends CallbackTestMetadata {
+public class PostStateChangePositiveTests extends CallbackTestMetadata {
 
     @Test
-    public void test_standalone_pre_state_change_callback_from_any_to_any() {
-        final PreCallbackFromAnyToAny o = new PreCallbackFromAnyToAny();
-        assertEquals(0, o.getCallbackInvokeCounter());
-        o.start();
-        assertEquals(1, o.getCallbackInvokeCounter());
-        o.finish();
-        assertEquals(2, o.getCallbackInvokeCounter());
-    }
-
-    @Test
-    public void test_standalone_pre_state_change_callback_from_started_to_any() {
-        final PreCallbackFromStartToAny o = new PreCallbackFromStartToAny();
-        assertEquals(0, o.getCallbackInvokeCounter());
-        o.start();
-        assertEquals(0, o.getCallbackInvokeCounter());
-        o.finish();
-        assertEquals(1, o.getCallbackInvokeCounter());
-    }
-
-    @Test
-    public void test_standalone_pre_state_change_callback_from_any_to_start() {
-        final PreCallbackFromAnyToStart o = new PreCallbackFromAnyToStart();
-        assertEquals(0, o.getCallbackInvokeCounter());
-        o.start();
-        assertEquals(1, o.getCallbackInvokeCounter());
-        o.finish();
-        assertEquals(1, o.getCallbackInvokeCounter());
-    }
-
-    @Test
-    public void test_standalone_post_state_change_callback_from_any_to_any() {
+    public void should_increase_counter_if_any_transition_method_invoked() {
         final PostCallbackFromAnyToAny o = new PostCallbackFromAnyToAny();
         assertEquals(0, o.getCallbackInvokeCounter());
         o.start();
@@ -49,7 +27,7 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_standalone_post_state_change_callback_from_started_to_any() {
+    public void should_increase_counter_only_if_transition_method_invoked_when_state_is_started() {
         final PostCallbackFromStartToAny o = new PostCallbackFromStartToAny();
         assertEquals(0, o.getCallbackInvokeCounter());
         o.start();
@@ -59,7 +37,7 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_standalone_post_state_change_callback_from_any_to_start() {
+    public void should_increase_counter_only_if_transition_method_invoked_when_next_state_is_started() {
         final PostCallbackFromAnyToStart o = new PostCallbackFromAnyToStart();
         assertEquals(0, o.getCallbackInvokeCounter());
         o.start();
@@ -69,7 +47,7 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_non_relational_callback_post_state_change() {
+    public void non_relational_callback() {
         final InvoiceNonRelationalCallback invoice = new InvoiceNonRelationalCallback(new BigDecimal(10000.0D));
         final InvoiceItemNonRelationalCallback itemOne = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(4000.0D));
         final InvoiceItemNonRelationalCallback itemTwo = new InvoiceItemNonRelationalCallback(invoice, new BigDecimal(4000.0D));
@@ -89,7 +67,7 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_relational_callback_post_state_change() {
+    public void relational_callback() {
         final Invoice invoice = new Invoice(new BigDecimal(10000.0D));
         final InvoiceItem itemOne = new InvoiceItem(invoice, new BigDecimal(4000.0D));
         final InvoiceItem itemTwo = new InvoiceItem(invoice, new BigDecimal(4000.0D));
@@ -109,56 +87,10 @@ public class CallbackTests extends CallbackTestMetadata {
     }
 
     @Test
-    public void test_order_object_callback_definition() {
-        final OrderObject<?> order = new OrderObject<>();
-        assertEquals(0, order.getCount());
-        order.pay();
-        assertEquals(1, order.getCount());
-        order.deliver();
-        assertEquals(2, order.getCount());
-    }
-
-    @Test
-    public void test_extends_callback_definition() {
-        final BigProductOrderObjectWithExtendsCallbackDefinition bigOrder = new BigProductOrderObjectWithExtendsCallbackDefinition();
-        assertEquals(0, bigOrder.getCount());
-        bigOrder.pay();
-        assertEquals(1, bigOrder.getCount());
-        bigOrder.deliver();
-        assertEquals(2, bigOrder.getCount());
-        bigOrder.install();
-        assertEquals(3, bigOrder.getCount());
-    }
-
-    @Test
-    public void test_overrides_callback_definition() {
-        final BigProductOrderObjectWithOverridesCallbackDefinition bigOrder = new BigProductOrderObjectWithOverridesCallbackDefinition();
-        assertEquals(0, bigOrder.getCount());
-        bigOrder.pay();
-        assertEquals(1, bigOrder.getCount());
-        bigOrder.deliver();
-        assertEquals(1, bigOrder.getCount());
-        bigOrder.install();
-        assertEquals(2, bigOrder.getCount());
-    }
-
-    @Test
-    public void test_specified_post_from_to_callback_definition() {
+    public void should_increase_counter_if_transition_method_invoked_when_specified_from_and_to_states_matched() {
         final OrderWithSpecifiedFromToCallback bigOrder = new OrderWithSpecifiedFromToCallback();
         assertEquals(0, bigOrder.getCount());
         bigOrder.cancel();
         assertEquals(2, bigOrder.getCount());
-    }
-
-    @Test
-    public void test_specified_pre_from_to_callback_definition() {
-        final OrderWithSpecifiedPreFromToCallback bigOrder = new OrderWithSpecifiedPreFromToCallback();
-        assertEquals(0, bigOrder.getCount());
-        bigOrder.pay();
-        assertEquals(1, bigOrder.getCount());
-        bigOrder.deliver();
-        assertEquals(2, bigOrder.getCount());
-        bigOrder.install();
-        assertEquals(3, bigOrder.getCount());
     }
 }
