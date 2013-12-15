@@ -1,11 +1,5 @@
 package net.madz.lifecycle.engine.composite;
 
-import static org.junit.Assert.*;
-import net.madz.lifecycle.engine.composite.EngineCoreCompositeStateMachineMetadata.Contract;
-import net.madz.lifecycle.engine.composite.EngineCoreCompositeStateMachineMetadata.ContractLifecycle;
-import net.madz.lifecycle.engine.composite.EngineCoreCompositeStateMachineMetadata.NoOverrideComposite;
-import net.madz.lifecycle.engine.composite.EngineCoreCompositeStateMachineMetadata.SM1_No_Overrides;
-
 import org.junit.Test;
 
 
@@ -17,7 +11,7 @@ public class NonOverridedInheritanceCompositeStateMachinePositiveTests extends E
     // Composite State Machine Visibility Scope.png
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
     @Test
-    public void should_support_no_overrides_relational_composite_state_machine_with_Active_contract() {
+    public void should_be_ok_if_satisfy_validwhile_constraint_on_owning_state_super_state_with_Active_contract() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         contract.activate(); // Draft from Owning State, Active From Owning
@@ -34,7 +28,7 @@ public class NonOverridedInheritanceCompositeStateMachinePositiveTests extends E
     }
 
     @Test
-    public void should_support_no_overrides_relational_composite_state_machine_with_Active_contract_and_owning_super_T6() {
+    public void should_be_ok_if_satisfy_validwhile_constraint_on_owning_state_super_state_with_Active_contract_and_invoke_owning_super_T6() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         contract.activate(); // Draft from Owning State, Active From Owning
@@ -51,7 +45,7 @@ public class NonOverridedInheritanceCompositeStateMachinePositiveTests extends E
     }
 
     @Test
-    public void should_support_no_overrides_relational_composite_state_machine_with_Active_contract_and_owning_T2() {
+    public void should_be_ok_if_satisfy_validwhile_constraint_on_owning_state_super_state_with_Active_contract_and_invoke_owning_T2() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         contract.activate(); // Draft from Owning State, Active From Owning
@@ -68,7 +62,7 @@ public class NonOverridedInheritanceCompositeStateMachinePositiveTests extends E
     }
 
     @Test
-    public void should_support_no_overrides_relational_composite_state_machine_with_Draft_contract() {
+    public void should_be_ok_if_satisfy_validwhile_constraint_on_owning_state_with_Draft_contract() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         // Draft from Owning State, Active From Owning
@@ -84,7 +78,7 @@ public class NonOverridedInheritanceCompositeStateMachinePositiveTests extends E
     }
 
     @Test
-    public void should_support_no_overrides_relational_composite_state_machine_with_expire_contract() {
+    public void should_be_ok_if_satisfy_validwhile_constraint_on_super_state_with_Expired_contract() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         contract.activate(); // Draft from Owning State, Active From Owning

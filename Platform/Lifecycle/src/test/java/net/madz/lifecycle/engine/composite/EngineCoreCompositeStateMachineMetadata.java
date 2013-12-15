@@ -352,6 +352,7 @@ public class EngineCoreCompositeStateMachineMetadata extends EngineTestBase {
                     @Initial
                     @Function(transition = RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubTransitions.DoProduce.class,
                             value = Producing.class)
+                    @ValidWhile(on = { ContractLifecycle.States.Active.class }, relation = Relations.Contract.class)
                     static interface OrderCreated {}
                     @Function(transition = RelationalOrderLifecycleReferencingInnerValidWhile.States.Started.SubTransitions.DoDeliver.class,
                             value = Delivering.class)

@@ -40,7 +40,7 @@ public class StandaloneCompositeStateMachineNegativeTests extends EngineCoreComp
     }
 
     @Test(expected = LifecycleException.class)
-    public void should_throw_002_9001_if_violates_sharing_valid_while() {
+    public void should_throw_002_9001_if_violates_sharing_validwhile_constraint() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         final ProductOrderSharingValidWhile order = new ProductOrderSharingValidWhile(contract);
@@ -64,7 +64,7 @@ public class StandaloneCompositeStateMachineNegativeTests extends EngineCoreComp
     }
 
     @Test(expected = LifecycleException.class)
-    public void should_throw_002_9001_if_violates_valid_while_referencing_outer_relation() {
+    public void should_throw_002_9001_if_violates_validwhile_constraint_referencing_outer_relation() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
         final ProductOrderOuterRelation order = new ProductOrderOuterRelation(contract);
@@ -90,15 +90,14 @@ public class StandaloneCompositeStateMachineNegativeTests extends EngineCoreComp
     }
 
     @Test(expected = LifecycleException.class)
-    public void should_throw_002_9001_if_violates_valid_while_relational_standalone_composite_invalid_state_from_inner_valid_while() {
+    public void should_throw_002_9001_if_violates_validwhile_constraint_reference_inner_relation() {
         final Contract contract = new Contract();
         assertState(ContractLifecycle.States.Draft.class, contract);
-        final ProductOrderSharingValidWhile order = new ProductOrderSharingValidWhile(contract);
+        final ProductOrderInnerValidWhile order = new ProductOrderInnerValidWhile(contract);
         try {
             order.start();
-            fail("Should throw LifecycleException");
         } catch (LifecycleException e) {
-            assertInvalidStateErrorByValidWhile(e, contract, order, ContractLifecycle.States.Active.class);
+            fail("Should not throw LifecycleException");
         }
         contract.activate();
         assertState(ContractLifecycle.States.Active.class, contract);
