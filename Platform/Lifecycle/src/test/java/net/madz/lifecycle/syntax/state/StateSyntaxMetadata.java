@@ -643,7 +643,7 @@ public class StateSyntaxMetadata extends BaseMetaDataTest {
                 static interface S3_States {
 
                     @Initial
-                    @Function(transition = S2.S2_Transitions.S2_X.class, value = { S3_B.class })
+                    @Function(transition = S3.S3_Transitions.S3_X.class, value = { S3_B.class })
                     static interface S3_A {}
                     @End
                     @ShortCut(value = States.S4.class)
