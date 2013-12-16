@@ -2,12 +2,12 @@ package net.madz.lifecycle.engine.callback;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.testng.annotations.BeforeTest;
 
 public class CallbackExtendedAndOverrideTests extends CallbackTestMetadata {
 
-    @BeforeTest
+    @Before
     public void base() {
         final OrderObject<?> order = new OrderObject<>();
         assertEquals(0, order.getCount());
